@@ -67,7 +67,7 @@ INCLUDE_DIR = include/
 VPATH = $(SRC_DIR):\
 		$(INCLUDE_DIR) 
 
-EXEC = tests/%.cpp   
+EXEC = tests/%.cpp  
 
 OBJ_DIR = build/obj/
 LIB_DIR = build/lib/

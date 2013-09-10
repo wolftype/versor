@@ -15,18 +15,6 @@
 
 namespace vsr{
 	
-	// template<> void Render(const vsr::Cir& cir, const Mat4f& mvm, Pipe& pipe )	{
-	//         
-	// 	static MBO circle ( Mesh::Disc(.5) );
-	// 	static float mv[16];
-	// 	static Mat4f mat;
-	// 	static Mat4f tmp;
-	// 	
-	// 	mat = mvm * tmp.copy( vsr::Xf::mat(cir) );
-	// 	mat.fill(mv);
-	// 	pipe.program -> uniform("modelView", mv );    
-	// 	pipe.line( circle );                    
-	// }   
 	
 	template<class A>
 	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
@@ -37,9 +25,6 @@ namespace vsr{
 		glPopMatrix();
 	} 
 	
-	// void Render( const A& a){
-	// 	Advanced(a);
-	// } 
            
 	// FEATURE ExTRAcTION (ROTATION AND POSITION)
 
@@ -142,6 +127,13 @@ namespace vsr{
 	            gfx::Glyph::Point(pp[0]);
 	            gfx::Glyph::Point(pp[1]);
 	        }
+	}  
+	
+	void Immediate (const Dll& s){
+	    Drv d = Fl::dir( s.undual() );
+	    Dls v = Fl::loc( s , PAO, true);
+	    gfx::GL::translate (v.begin());
+	    gfx::Glyph::DashedLine(d * 10, d * -10);	
 	}
 }
 
