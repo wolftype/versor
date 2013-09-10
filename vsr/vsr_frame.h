@@ -2,7 +2,7 @@
 #define FRAME_H_INCLUDED
 
  
-#include "operations.h"
+#include "vsr_op.h"
  
 namespace vsr {
 struct Frame{

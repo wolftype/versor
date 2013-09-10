@@ -14,10 +14,12 @@
 #include "GLV/glv_binding.h"  
 
 #include "gfx/gfx_gl.h"  
-#include "gfx/gfx_scene.h"  
+#include "gfx/gfx_scene.h" 
+#include "gfx/gfx_pipe.h" 
 
 #include "vsr_frame.h"
-#include "vsr_interface.h"
+#include "vsr_interface.h"  
+
 
 using namespace vsr;
 using namespace glv;    
@@ -109,16 +111,27 @@ struct GLVApp : public View3D{
 	
 		scene.fit( interface.vd().w, interface.vd().h );
  
-		scene.cam.set( frame );
-		scene.push();
-	    
-		Rot t = Gen::aa( modelView );
-		gfx :: GL :: rotate( t.begin() );
+		scene.cam.set( frame ); 
+		
+		renderB();
+ } 
 
+	 void renderA(){
+	
+		 	scene.push();
+	    
+			Rot t = Gen::aa( modelView );
+			gfx :: GL :: rotate( t.begin() );
+
+			onDraw();
+     
+			scene.pop();
+	}  
+	
+	void renderB(){
+		scene.updateMatrices();
 		onDraw();
-        
-		scene.pop();
- }  
+	}
 
  virtual bool onEvent(Event::t e, GLV& glv){
 
