@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H_INCLUDED
 #define INSTRUCTIONS_H_INCLUDED
 
-#include "basis.h"
+#include "vsr_basis.h"
 
 namespace vsr{
 

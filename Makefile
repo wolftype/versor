@@ -7,21 +7,24 @@ NAME = main
 
 PIROOT = $(HOME)/code/pi/root/
 
-#COMPILER VERSION
+CLANG = 0
+
+#COMPILER VERSION  
+
 ifeq ($(GCC),1) 
 ifeq ($(RPI),1)
    CXX = arm-linux-gnueabihf-g++ -std=c++0x
 else
-   CXX = g++ -std=c++0x  
+   CXX = g++ -std=c++0x 
 endif
-else
-ifeq ($(CLANG_LOCAL),1)
-CXX = usr/local/bin/clang++ -std=c++11 
-else
-CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11  
+else  
+ifeq ($(CLANG),0) 
+	CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11  
+else 
+	CXX = $(CLANG)/clang++ -std=c++11   
+endif 
+	CXX += -arch x86_64
 endif
-CXX += -arch x86_64
-endif  
 CXX += -O3 -fpeel-loops  -ftemplate-depth-1200 
 AR 	= ar crs 
 
@@ -30,7 +33,7 @@ LDFLAGS =
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
 IPATH += -I/usr/include/ 
-LDFLAGS += -Lbuild/lib/ -L../externals/GLV/build/lib/ 
+LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ 
 LDFLAGS += -lm  
 else
 IPATH += -I$(PIROOT)usr/include
@@ -52,7 +55,7 @@ LDFLAGS += -lvcos
 endif
 
 ifeq ($(GFX),1) 
-IPATH += -I../externals/GLV/ -I../externals/gfx/ 
+IPATH += -Iext/glv/ -Iext/gfx/ 
 LDFLAGS += -lglv -framework OpenGL -framework GLUT 
 endif
                            

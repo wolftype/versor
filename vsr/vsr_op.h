@@ -5,8 +5,8 @@
 
 #include <math.h> 
 #include <vector>  
-#include "products_all.h"  
-#include "constants.h" 
+#include "vsr_products.h"  
+#include "vsr_constants.h" 
 #include "vsr_math.h"
 
 namespace vsr{

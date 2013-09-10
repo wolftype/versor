@@ -17,7 +17,7 @@
 #include "gfx/gfx_xfmatrix.h"  
 #include "gfx/gfx_scene.h"
 
-#include "operations.h"
+#include "vsr_op.h"
 #include <map>  
 
 

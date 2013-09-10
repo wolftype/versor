@@ -9,7 +9,7 @@
 #define VSR_DRAW_H_INCLUDED  
 
 #include "gfx/gfx_glyphs.h" 
-#include "constants.h"
+#include "vsr_constants.h"
     
 //#include "gfx/gfx_pipe.h"
 

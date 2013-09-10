@@ -7,7 +7,7 @@ AVOID PICKING ANY SPECIFIC METRIC . . .
 
 */
 
-#include "products_all.h"
+#include "vsr_products.h"
 
 namespace vsr {
 

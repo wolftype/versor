@@ -2,7 +2,7 @@
 #define MV_H_INCLUDED  
 
 #include <math.h>   
-#include "basis.h"       
+#include "vsr_basis.h"       
 
 namespace vsr{
 

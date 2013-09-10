@@ -9,7 +9,7 @@
 #ifndef Versor_vsr_xf_h
 #define Versor_vsr_xf_h
 
-#include "operations.h"      
+#include "vsr_op.h"      
 #include "gfx/gfx_matrix.h"
 
 using namespace gfx;

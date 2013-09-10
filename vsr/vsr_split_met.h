@@ -14,8 +14,8 @@ minkowskian metric (i.e. diagonalized non-degenerate)
 #ifndef SPLIT_H_INCLUDED
 #define SPLIT_H_INCLUDED  
 
-#include "lists.h" 
-#include "instructions.h" 
+#include "vsr_lists.h" 
+#include "vsr_instructions.h" 
 
 namespace vsr{
 

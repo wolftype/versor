@@ -16,7 +16,7 @@
 #include "gfx/gfx_gl.h"  
 #include "gfx/gfx_scene.h"  
 
-#include "frame.h"
+#include "vsr_frame.h"
 #include "vsr_interface.h"
 
 using namespace vsr;
