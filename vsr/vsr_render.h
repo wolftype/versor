@@ -3,7 +3,8 @@
 #include "gfx/gfx_pipe.h"
 #include "vsr_products.h"
 #include "vsr_xf.h"
-#include "vsr_frame.h"
+#include "vsr_frame.h"  
+#include "vsr_field.h"
 
 namespace vsr{   
 	
@@ -232,9 +233,24 @@ namespace vsr{
 		 
 	}
 	
-	// void Render(const Field<Vec>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
-	// 	
-	// }
+	void Render(Field<Vec>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
+		
+	} 
+	
+	void Render(Field<Pnt>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
+		static float mv[16]; 
+		static MBO points ( Mesh::Points( f.dataPtr(), f.num() ), GL::DYNAMIC );
+		
+		mvm.fill(mv);
+	    pipe.program -> uniform("modelView", mv); 
+		
+ 		for (int i = 0; i < f.num(); ++i){
+ 			points.mesh[i].Pos = Vec3f( f[i] );
+ 		}
+	 	points.update();
+	 	pipe.line(points); 
+		
+	} 
 	// 
 	// void Render( Field<Pnt>& f, const Mat4f& mvm, Pipe& pipe ){
 	// 

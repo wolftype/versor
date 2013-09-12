@@ -29,7 +29,10 @@ namespace vsr {
 		
 		Rot rot() const { return mRot; }
 		Rot& rot() { return mRot; } 
-		Frame& rot( const Rot& r) { mRot = r; return *this; }
+		Frame& rot( const Rot& r) { mRot = r; return *this; }  
+		
+		//transpose to quaternionic representation
+		Rot quat() const { return Rot( mRot[0], -mRot[3], mRot[2], mRot[1] ); }
 
 		Pnt pos() const { return mPos; } 
 		Vec vec() const { return mPos; } 

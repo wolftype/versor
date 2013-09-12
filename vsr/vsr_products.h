@@ -586,6 +586,19 @@ struct CGAMV : public A {
 	}                             
 	
    static CGAMV x, y, z, xy, xz, yz;   
+              
+template<typename T>
+CGAMV trs( const T& );
+template<typename T>
+CGAMV rot( const T& );
+template<typename T>
+CGAMV mot( const T& ); 
+template<typename T>
+CGAMV dil( const T& );
+template<typename P, typename T>
+CGAMV dil( const P&, const T& ); 
+template<typename T>
+CGAMV bst( const T& ); 
 };  
 
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().template set<1>(1);

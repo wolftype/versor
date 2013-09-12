@@ -77,7 +77,22 @@ namespace Gen{
         VT sc = -sin(c);
         if (c != 0) sc /= c;
         return Rot( cos(c), b[0]*sc, b[1]*sc, b[2]*sc );	
-	}                        
+	} 
+	
+	/*! Generate a Rotor (i.e. quaternion) from a Vector 
+        @param Vector axis generator (the axis of rotation, AKA dual of the bivector of rotation) 
+    */
+	Rot rot( const Vec& v){
+		Biv b = Op::dle( v );
+    	VT  c = sqrt(- ( b.wt() ) );
+        VT sc = -sin(c);
+        if (c != 0) sc /= c;
+        return Rot( cos(c), b[0]*sc, b[1]*sc, b[2]*sc );	
+	} 
+	
+	Rot rot( VT angle, const Vec& v){
+		return rot( v * angle );
+	}                      
 	
     /*! Get Bivector Generator from a Rotor 
         @param Rotor r
@@ -549,6 +564,35 @@ namespace Fl {
     	return dual ? ( Ori(1) <= Fl::dir( f.undual() ) ).wt() : ( Ori(1) <= Fl::dir(f) ).wt();
 	 }
 }   // Fl ::
+
+
+
+
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t){
+	return this -> sp ( Gen::trs(t) );  
+}
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t){
+		return this -> sp ( Gen::rot(t) );  
+}
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t){
+	 	return this -> sp ( Gen::mot(t) );  
+}
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t){
+	  	return this -> sp ( Gen::dil(t) );  
+}
+template<TT DIM, typename A> template<typename P, typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t){
+	  	return this -> sp ( Gen::dil(a, t) );  
+} 
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t){
+	  	return this -> sp ( Gen::bst(t) );  
+}
+
 
 #define PT(x,y,z) vsr::Ro::null(vsr::Vec(x,y,z))
 #define DLS(r) vsr::Ro::dls(0,0,0,r)
