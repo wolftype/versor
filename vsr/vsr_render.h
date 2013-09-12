@@ -13,16 +13,16 @@ namespace vsr{
 		// Render( f.x(), mvm, pipe, r,g,b,a);
 		// Render( f.y(), mvm, pipe, r,g,b,a);
 		// Render( f.z(), mvm, pipe, r,g,b,a);  
-		//static MBO fm() 
+		static MBO fm ( Mesh::Frame() ); 
 		static float mv[16];
 		static Mat4f mat;
 		static Mat4f tmp;
 		
-		mat = mvm * tmp.copy( vsr::Xf::mat(frame.rot(), frame.vec()) );
+		mat = mvm * tmp.copy( vsr::Xf::mat( frame.rot(), frame.vec(), frame.scale() ) );
 		mat.fill(mv);
 		pipe.program -> uniform("modelView", mv ); 
 		
-	   //pipe.line
+		pipe.line( fm );
 		
 	 }  
 	
@@ -52,6 +52,7 @@ namespace vsr{
 		static Mat4f tmp;
         
 		line.mesh[1].Pos = Vec3f(vec[0],vec[1], vec[2]);
+		line.mesh.color(r,g,b,a);
 		line.update(); 
 		mvm.fill(mv);
 		pipe.program -> uniform("modelView", mv );
@@ -59,7 +60,9 @@ namespace vsr{
    	
 		mat = mvm * tmp.copy( vsr::Xf::mat(vec) );
 		mat.fill( mv );
-		pipe.program -> uniform("modelView", mv );    
+		pipe.program -> uniform("modelView", mv ); 
+		cone.mesh.color(r,g,b,a);
+		cone.update();   
 		pipe.line( cone );
 
 	}
@@ -85,7 +88,9 @@ namespace vsr{
 			mat = mvm * tmp;//tmp;
 
 			mat.fill(mv);
-			pipe.program -> uniform("modelView", mv );    
+			pipe.program -> uniform("modelView", mv ); 
+			sphere.mesh.color(r,g,b,a);
+			sphere.update();   
 			pipe.line( sphere );
 
 	        // (real) ? Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t);	
@@ -95,7 +100,9 @@ namespace vsr{
 
 			//Vertex v(pnt[0], pnt[1], pnt[2]);
             mvm.fill(mv);
-			pipe.program -> uniform("modelView", mv );
+			pipe.program -> uniform("modelView", mv ); 
+			point.mesh.color(r,g,b,a);
+			point.update();
 			pipe.line( point );
 
 	    }
@@ -107,7 +114,7 @@ namespace vsr{
 		static float mv[16];
 		static Mat4f mat;
 		static Mat4f tmp;
-		static MBO sphere ( Mesh::Sphere() );
+		static MBO sphere ( Mesh::Sphere(), GL::DYNAMIC );
 
 		
 		double size = Ro::size( par, false );
@@ -121,7 +128,9 @@ namespace vsr{
         Pnt p2 = Ro::cen( pp[1] );
 
         if ( fabs(ta) >  FPERROR ) {				
-
+            
+			sphere.mesh.color(r,g,b,a);
+			sphere.update();
             double t = sqrt ( fabs ( ta ) );
             bool real = size > 0 ? 1 : 0;	
             
@@ -151,11 +160,19 @@ namespace vsr{
         static float mv[16]; 
 		static Mat4f mat;
 		static Mat4f tmp;
-		static MBO line( Mesh::Line( Vec(0,0,-10), Vec(0,0,10) ) );
-		 
+		static MBO line( Mesh::Line( Vec(0,0,-50), Vec(0,0,50) ), GL::DYNAMIC );
+		
+		// Vec d = (Fl::dir( dll.undual() ) * 10).copy<Vec>();
+		// 	    Vec v = Fl::loc( dll , PAO, true);
+		// Vec aa = v + d;
+		// Vec bb = v - d;
 		mat = mvm * tmp.copy( vsr::Xf::mat(dll) );
 		mat.fill(mv);
 		pipe.program -> uniform("modelView", mv ); 
+		// line.mesh[0].Pos = Vec3f( aa[0], aa[1], aa[2]); 
+		//  line.mesh[1].Pos = Vec3f( bb[0], bb[1], bb[2]);  
+		line.mesh.color(r,g,b,a);
+		line.update();  
 		pipe.line(line);
 	}  
  
@@ -163,11 +180,13 @@ namespace vsr{
         static float mv[16]; 
 		static Mat4f mat;
 		static Mat4f tmp;
-		static MBO line( Mesh::Line( Vec(0,0,-10), Vec(0,0,10) ) );
+		static MBO line( Mesh::Line( Vec(0,0,-10), Vec(0,0,10) ), GL::DYNAMIC );
 		 
 		mat = mvm * tmp.copy( vsr::Xf::mat(lin) );
 		mat.fill(mv);
 		pipe.program -> uniform("modelView", mv ); 
+		line.mesh.color(r,g,b,a);
+		line.update();
 		pipe.line(line);
 	}   
 	
@@ -182,7 +201,9 @@ namespace vsr{
 				
 		mat = mvm * tmp.copy( vsr::Xf::mat( dlp ) );
 		mat.fill(mv);
-		pipe.program -> uniform("modelView", mv ); 
+		pipe.program -> uniform("modelView", mv );
+		plane.mesh.color(r,g,b,a);
+		plane.update(); 
 		pipe.line( plane );
 	}   
 	
@@ -218,5 +239,5 @@ namespace vsr{
 	// } 
 	
 	#define DRAW(x) Render(x, mvm, pipe); 
-    #define DRAW3(x,r,g,b) Render(x, mvm, pipe, r, g, b); 
+    #define DRAWCOLOR(x,r,g,b) Render(x, mvm, pipe, r, g, b); 
 }

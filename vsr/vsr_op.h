@@ -205,7 +205,7 @@ namespace Gen{
 
 	        b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );			//negative necessary . dll? . . 
 	        tq = (b * q);  //Make motor and extract Grade 2 part
-
+            
 	        if (den2 == 0 ) {
 	            //cperp = b * -1.0;
 	            cpara = q;// * -1.0;
@@ -214,12 +214,11 @@ namespace Gen{
 	            cpara = ( b * tq ) / ( ( den2 )  * -1.0 );			//parallel      (in plane of rotation)
 	        }
 
-	        Drv c = cperp + cpara;
+	        Drv c = cperp + cpara; 
+
 	        rq += b;
-	        rq += c;
-
-	//        copy(c.begin(), c.begin() + 3, &(rq.w()[3]));
-
+	        rq += c;          
+	
 	        return rq;
 	    }
 

@@ -556,7 +556,7 @@ struct CGAMV : public A {
 	template<typename B>
 	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
 	template<typename B>
-	CGAMV re( const B& b) const { return (-!b * (*this) * b).template cast<A>(); }
+	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }
 	
 	CGAMV operator + (const CGAMV& a) {
 		CGAMV tmp;
@@ -733,8 +733,8 @@ typedef NDrv<5> Drv;	 //Direction Vector
 typedef NTnv<5> Tnv;	 //Tangent Vector   
 typedef NDrb<5> Drb;	 //Direction Bivector
 typedef NTnb<5> Tnb;	 //Tangent Bivector  
-typedef NDrb<5> Drt;	 //Direction Trivector
-typedef NTnb<5> Tnb;	 //Tangent Trivector  
+typedef NDrt<5> Drt;	 //Direction Trivector
+typedef NTnt<5> Tnt;	 //Tangent Trivector  
                     	
 typedef NDll<5> Dll;	 //Dual Line        
 typedef NLin<5> Lin;	 //Dual Line    
