@@ -103,9 +103,9 @@ namespace vsr {
         }    
 
 		inline Mat4f mat(const Biv& b){
-			Rot r = Gen::aa( Gen::ratio( Vec::z, Op::dle( b ).unit() ) );
+			Rot r = Gen::ratio( Vec::z, Op::dle( b ).unit() );
 
-		    double ta = b.norm(); 
+		    double ta = b.norm();  
 		   // bool sn = Op::sn( s , Biv::xy * (-1));
 		
 			return mat( r, Vec(0,0,0), ta );
