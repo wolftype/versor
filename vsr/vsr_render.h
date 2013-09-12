@@ -44,8 +44,9 @@ namespace vsr{
 	
 	void Render(const Vec& vec, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){ 
 		
-		static MBO cone ( Mesh::Cone(.1,.3) );
+		static MBO cone ( Mesh::Cone(.3) );
 		static MBO line ( Mesh::Line( vsr::Vec(0,0,0),  vec), GL::DYNAMIC );
+		static MBO dir ( Mesh::Dir(), GL::DYNAMIC );
 
 		static float mv[16];
 		static Mat4f mat;
@@ -56,14 +57,21 @@ namespace vsr{
 		line.update(); 
 		mvm.fill(mv);
 		pipe.program -> uniform("modelView", mv );
-	   	pipe.line( line );
-   	
+		pipe.line( line );
+		   	
 		mat = mvm * tmp.copy( vsr::Xf::mat(vec) );
 		mat.fill( mv );
 		pipe.program -> uniform("modelView", mv ); 
 		cone.mesh.color(r,g,b,a);
 		cone.update();   
-		pipe.line( cone );
+		pipe.line( cone );   
+		// Rot r = Gen::ratio( Vec::z, vec )
+		// mat = mvm * tmp.copy( vsr::Xf::mat(r, ) );
+		// mat.fill( mv );
+		// pipe.program -> uniform("modelView", mv );
+		// dir.mesh.color(r,g,b,a);
+		// dir.update();
+		// pipe.line( dir );  
 
 	}
 
@@ -206,6 +214,23 @@ namespace vsr{
 		plane.update(); 
 		pipe.line( plane );
 	}   
+	
+	void Render( const Biv& biv, const Mat4f& mvm, Pipe& pipe, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
+		
+	   	static float mv[16]; 
+		static Mat4f mat;
+		static Mat4f tmp;
+		
+		static MBO cir( Mesh::Circle(), GL::DYNAMIC );
+		
+		mat = mvm * tmp.copy( vsr::Xf::mat( biv ) );
+		mat.fill(mv);
+		pipe.program -> uniform("modelView", mv );
+		cir.mesh.color(r,g,b,a);
+		cir.update(); 
+		pipe.line( cir );
+		 
+	}
 	
 	// void Render(const Field<Vec>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
 	// 	

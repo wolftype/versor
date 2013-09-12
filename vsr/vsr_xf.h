@@ -32,6 +32,21 @@ namespace vsr {
                           0   ,   0 ,   0 ,    1 );
         }
         
+		// /*!
+		//          4x4 Transformation Matrix From Rotor and scale
+		//         */
+		//         inline Mat4f mat( const Rot& r, double s) {
+		//           
+		//             Vec xi = Vec::x.sp(r);
+		//             Vec yi = Vec::y.sp(r);
+		//             Vec zi = Vec::z.sp(r);
+		//             
+		//             return Mat4f(xi[0], xi[1], xi[2], 0, 
+		//                           yi[0], yi[1], yi[2], 0,
+		//                           zi[0], zi[1], zi[2], 0,
+		//                           0   ,   0 ,   0 ,    1 );
+		//         }  
+
         /*!
          4x4 Transformation Matrix From Rotor, Translation Vector, and Scale
         */
@@ -85,7 +100,16 @@ namespace vsr {
         inline Mat4f mat(const Vec& v){
             Rot r = Gen::ratio( Vec::z, v.unit() );	
 			return mat( r, v );
-        }
+        }    
+
+		inline Mat4f mat(const Biv& b){
+			Rot r = Gen::aa( Gen::ratio( Vec::z, Op::dle( b ).unit() ) );
+
+		    double ta = b.norm(); 
+		   // bool sn = Op::sn( s , Biv::xy * (-1));
+		
+			return mat( r, Vec(0,0,0), ta );
+		}
             
         /*
         4x4 Transformation matrix from Circle
