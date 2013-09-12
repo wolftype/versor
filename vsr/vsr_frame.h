@@ -18,6 +18,7 @@ namespace vsr {
         Frame(const Mot& m ) : mPos( PAO.sp(m) ), mRot(m), mScale(1) {} 
 
 		Frame& pos( Pnt p ) { mPos = p; return *this; } 
+		Frame& pos( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
 		Frame& set( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; }
 		Frame& set( Pnt p, Rot r ) { mPos = p; mRot = r; return *this; } 
 		Frame& scale( VT s ) { mScale = s; return *this; }
