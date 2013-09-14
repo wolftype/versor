@@ -592,14 +592,33 @@ CGAMV trs( const T& );
 template<typename T>
 CGAMV rot( const T& );
 template<typename T>
+CGAMV rot( VT a, const T& );
+template<typename T>
 CGAMV mot( const T& ); 
 template<typename T>
 CGAMV dil( const T& );
 template<typename P, typename T>
 CGAMV dil( const P&, const T& ); 
 template<typename T>
-CGAMV bst( const T& ); 
-};  
+CGAMV bst( const T& );   
+
+template<typename T>  
+CGAMV translate( const T& );
+template<typename T>
+CGAMV rotate( const T& );
+template<typename T>
+CGAMV rotate( VT a, const T& );
+template<typename T>
+CGAMV motor( const T& ); 
+template<typename T>
+CGAMV twist( const T& ); //same as motor
+template<typename T>
+CGAMV dilate( const T& );
+template<typename P, typename T>
+CGAMV dilate( const P&, const T& ); 
+template<typename T>
+CGAMV boost( const T& ); 
+};
 
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().template set<1>(1);
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::y =  A().template set<2>(1);  

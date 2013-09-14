@@ -110,6 +110,7 @@ namespace vsr{
 			//Vertex v(pnt[0], pnt[1], pnt[2]);
             mvm.fill(mv);
 			pipe.program -> uniform("modelView", mv ); 
+			point.mesh[0].Pos = Vec3f(pnt[0],pnt[1],pnt[2]);
 			point.mesh.color(r,g,b,a);
 			point.update();
 			pipe.line( point );
@@ -186,17 +187,18 @@ namespace vsr{
 	}  
  
 	void Render(const Lin& lin, const Mat4f& mvm, Pipe& pipe, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0  ){
-        static float mv[16]; 
-		static Mat4f mat;
-		static Mat4f tmp;
-		static MBO line( Mesh::Line( Vec(0,0,-10), Vec(0,0,10) ), GL::DYNAMIC );
-		 
-		mat = mvm * tmp.copy( vsr::Xf::mat(lin) );
-		mat.fill(mv);
-		pipe.program -> uniform("modelView", mv ); 
-		line.mesh.color(r,g,b,a);
-		line.update();
-		pipe.line(line);
+		//         static float mv[16]; 
+		// static Mat4f mat;
+		// static Mat4f tmp;
+		// static MBO line( Mesh::Line( Vec(0,0,-10), Vec(0,0,10) ), GL::DYNAMIC );
+		//  
+		// mat = mvm * tmp.copy( vsr::Xf::mat(lin) );
+		// mat.fill(mv);
+		// pipe.program -> uniform("modelView", mv ); 
+		// line.mesh.color(r,g,b,a);
+		// line.update();
+		// pipe.line(line); 
+		Render( lin.dual(), mvm, pipe, r,g,b,a);
 	}   
 	
 	

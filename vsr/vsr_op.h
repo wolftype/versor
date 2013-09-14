@@ -92,7 +92,11 @@ namespace Gen{
 	
 	Rot rot( VT angle, const Vec& v){
 		return rot( v * angle );
-	}                      
+	}  
+	
+	Rot rot( VT angle, const Biv& v){
+		return rot( v * angle );
+	}                    
 	
     /*! Get Bivector Generator from a Rotor 
         @param Rotor r
@@ -524,6 +528,48 @@ namespace Ro {
     template<class A>
     Dls sur( const A& s) {
         return Dls( s / ( s ^ Inf(1) ));
+    } 
+
+    /*!
+     Direct (imaginary?) Circle From Dual Sphere and Euclidean Bivector
+     */    
+     Cir cir(const Dls& dls, const Biv& flat){
+        return dls ^ ( ( dls <= ( flat.inv() * Inf(1) ) )  * -1.0 );  
+     }
+     /*!
+      Real Dual Sphere from two points
+     */
+    /*!
+     Direct (imaginary?) Point Pair From Dual Sphere and Euclidean Vector
+     */    
+      Par par(const Dls& dls, const Vec& flat){
+        return dls ^ ( ( dls <= ( flat.inv() * Inf(1) ) )  * -1.0 ); // cout << "y" << endl; 
+     }
+    /*!
+     Direct Point From Dual Sphere and Euclidean Carrier Flat
+     */    
+      Pnt pnt(const Dls& dls, const Vec& flat){
+        return Ro::split( par(dls, flat), true ); // cout << "y" << endl; 
+     }
+    
+    /*! Direct (imaginary?) Circle from Point and Euclidean Carrier Flat 
+        @param Center pnt 
+        @param Carrier Bivector 
+        @param Radius r
+    */
+     Cir cir(const Pnt& pnt, const Biv& flat, double r){
+        //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
+        return cir( Ro::dls_pnt(pnt,r),flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
+    }
+
+    /*! Direct Point Pair from Point and Euclidean Carrier Flat 
+        @param Center pnt 
+        @param Carrier Vector 
+        @param Radius r
+    */
+    Par par(const Pnt& pnt, const Vec& flat, double r){
+        //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
+        return par( Ro::dls_pnt(pnt,r), flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
     }
 	
 } // Ro::     
@@ -565,34 +611,97 @@ namespace Fl {
 	 }
 }   // Fl ::
 
+Pnt Point(VT x, VT y, VT z){
+	return Ro::null(x,y,z);
+}
+Par Pair( const Pnt& a, const Pnt& b){
+	return a ^ b;
+}
+Cir Circle(const Pnt& a, const Pnt& b, const Pnt& c){
+	return a ^ b ^ c; 
+}
+Cir Circle(const Biv& B){
+	return Ro::cir( Ro::dls(0,0,0,1), B);//a ^ b ^ c; 
+} 
+Cir Circle(const Vec& v){
+	return Ro::cir( Ro::dls(0,0,0,1), Op::dle(v) );//a ^ b ^ c; 
+}
+Sph Sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
+	return a ^ b ^ c ^ d;
+}
+Dlp Plane( VT a, VT b, VT c, VT d = 0.0){
+	return Dlp(a,b,c,d);
+}
 
+Lin Line( const Pnt& a, const Pnt& b){
+	return a ^ b ^ Inf(1);
+}   
 
+Cir Intersect( Dls& s, Dlp& d){
+	return (s ^ d).dual();
+}
 
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t){
 	return this -> sp ( Gen::trs(t) );  
+} 
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t){
+	return this -> trs(t);  
 }
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t){
 		return this -> sp ( Gen::rot(t) );  
 }
 template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t){
+		return this -> rot(t);  
+} 
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::rot( VT a, const T& t){
+		return this -> sp ( Gen::rot(a,t) );  
+}
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VT a, const T& t){
+		return this -> rot(a, t);  
+} 
+
+template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t){
 	 	return this -> sp ( Gen::mot(t) );  
+} 
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t){
+	 	return this -> mot(t);  
+}
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t){
+	 	return this -> mot(t);  
 }
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t){
 	  	return this -> sp ( Gen::dil(t) );  
+} 
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t){
+	  	return this -> dilate(t);  
 }
 template<TT DIM, typename A> template<typename P, typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t){
 	  	return this -> sp ( Gen::dil(a, t) );  
-} 
+}
+template<TT DIM, typename A> template<typename P, typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t){
+	  	return this -> sp ( Gen::dil(a, t) );  
+}
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t){
 	  	return this -> sp ( Gen::bst(t) );  
 }
-
+template<TT DIM, typename A> template<typename T>
+CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t){
+	  	return this -> bst(t);  
+}
 
 #define PT(x,y,z) vsr::Ro::null(vsr::Vec(x,y,z))
 #define DLS(r) vsr::Ro::dls(0,0,0,r)
