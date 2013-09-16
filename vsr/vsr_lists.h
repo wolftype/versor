@@ -107,7 +107,7 @@ struct FindAll< N, XList<> >{
 };
 
 
-//input an instructionlist and a type, get out a List of Executables 
+//input an instructionlist and a return type, get out a List of Executables 
 template< class I, class R >    
 struct Index{
 

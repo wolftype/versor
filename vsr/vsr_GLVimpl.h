@@ -20,9 +20,12 @@
 #include "vsr_frame.h"
 #include "vsr_interface.h"  
 
+//#include <iostream>
 
+using namespace std;
 using namespace vsr;
-using namespace glv;    
+using namespace glv;
+using namespace gfx::GLSL;    
 
 struct GLVImpl : public Interface::Impl {    
 	
@@ -87,40 +90,87 @@ struct GLVApp : public View3D{
 
   GLVInterface interface;
               
-  gfx::Scene scene; 
+  gfx::Scene scene;
+  Pipe pipe; 
 
-  Frame frame; 		// Camera
-  Rot modelView;    // ModelView
-  
-  
+	Mat4f mvm;
+
+  Frame cam; 		// Camera
+  Frame model;    // ModelView
+    
   GLVApp() : View3D(), 
-    frame(0,0,5),
-	modelView(1,0,0,0) {
+    cam(0,0,5)
+ {
 	
 	stretch(1,1);
-	colors().back.set(.1,.3,.3);
+	colors().back.set(.1,.3,.3); 
 	
-  }   
+	scene.camera.bUseFrust = false; 
+	initView();
+  }  
 
+  ~GLVApp(){}
+
+	void initGL(){
+	    string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
+	   // string Vert = SimpleVertex;//SimpleVertex;//AVertex + VaryingN + MVertN; 
+		string Frag = MFragN;//TFragMix; //mFrag   //SimpleFragment;//
+         
+                               
+		printf("%s\n", "initGL");
+		
+		//cout << Vert << Frag << endl; 
+
+		pipe.program = new ShaderProgram(Vert,Frag,0);
+		pipe.bind();
+		pipe.bindAll();
+		pipe.unbind();
+		
+		//pipe.bindAll(); 
+	} 
+	
+		void initView(){
+            
+
+			cout << width() << " " << height() << endl; 
+			float tw =  width();
+			float th = height();     
+
+		    float aspect = 1.0 * tw / th;   
+          
+			scene.fit(tw,th);
+
+			int numscreens = 4;
+
+			Pose p(-tw/2.0,-th/2.0, 0); //bottom left of screen
+
+			scene.camera.view = gfx::View( scene.camera.pos(), p, aspect, th ); 
+			
+		   // cout << scene.xf.projMatrixf() << endl;  
+    }
 
   virtual void onDraw();
+  virtual void update(){}
 
   virtual void onDraw3D(GLV& glv){   
 	    
 	   interface().getViewData(&glv);
+	   
 	
-		scene.fit( interface.vd().w, interface.vd().h );
+	   //cout << interface.vd().w << " " << interface.vd().h << endl; 
+		scene.resize( interface.vd().w, interface.vd().h );
  
-		scene.cam.set( frame ); 
+		//scene.camera.set( cam ); 
+		//scene.model.set( model ); 
 		
-		renderB();
+		renderD();
  } 
 
 	 void renderA(){
 	
 		 	scene.push();
 	    
-			Rot t = Gen::aa( modelView );
+			Rot t = Gen::aa( model.rot() );
 			gfx :: GL :: rotate( t.begin() );
 
 			onDraw();
@@ -128,9 +178,37 @@ struct GLVApp : public View3D{
 			scene.pop();
 	}  
 	
-	void renderB(){
-		scene.updateMatrices();
-		onDraw();
+	void renderB(){                 	  
+			 // glViewport(0,0,surface.width,surface.height); 
+			 // 	         glClearColor(background[0],background[1],background[2],background[3]);
+			 // 	         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     
+             
+             scene.onFrame();    //update matrices
+		   // scene.camera.print(); 
+             update();
+
+		   	 mvm = scene.xf.modelViewMatrixf(); 
+
+	         pipe.bind( scene.xf );
+
+	         	onDraw();
+			 
+		     pipe.unbind();
+			 //swapBuffers();
+
+	} 
+	//simple render (point)
+	void renderC(){
+		 scene.onFrame(); 
+		update();
+		pipe.bind();
+		onDraw();   
+		pipe.unbind();
+	}
+   
+ 	//render to texture
+	void renderD(){
+		
 	}
 
  virtual bool onEvent(Event::t e, GLV& glv){
@@ -171,8 +249,6 @@ struct GLVApp : public View3D{
 		case glv::Key::Up : {
 			cout << "up" << endl;
 		}
-	 
-
 	}
 	  
 	return true;    

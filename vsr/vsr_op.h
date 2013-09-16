@@ -632,13 +632,24 @@ Sph Sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
 Dlp Plane( VT a, VT b, VT c, VT d = 0.0){
 	return Dlp(a,b,c,d);
 }
-
 Lin Line( const Pnt& a, const Pnt& b){
 	return a ^ b ^ Inf(1);
-}   
-
-Cir Intersect( Dls& s, Dlp& d){
+} 
+// template<class T>  
+// Lin Line( const T& v ){
+// 	return Pnt(0,0,0,1,0) ^ Drv(v[0],v[1],v[2]) ^ Inf(1);
+// } 
+Cir Meet( Dls& s, Dlp& d){
 	return (s ^ d).dual();
+} 
+Cir Meet( Dls& s, Pln& d){
+	return (s ^ d.dual()).dual();
+}
+Cir Meet( Sph& s, Dlp& d){
+	return (s.dual() ^ d).dual();
+}
+Cir Meet( Sph& s, Pln& d){
+	return (s.dual() ^ d.dual()).dual();
 }
 
 template<TT DIM, typename A> template<typename T>

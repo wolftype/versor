@@ -60,7 +60,7 @@ namespace vsr {
             }
 
             int num() const { return mNum; }
-            int num( int n ) {
+            void num( int n ) {
                 resize(n);
             }
 

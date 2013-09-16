@@ -557,6 +557,11 @@ struct CGAMV : public A {
 	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
 	template<typename B>
 	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }
+	                                                                                     
+	// template<typename B>
+	// CGAMV sp2( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
+	// template<typename B>
+	// CGAMV re2( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
 	
 	CGAMV operator + (const CGAMV& a) {
 		CGAMV tmp;

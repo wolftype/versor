@@ -251,12 +251,16 @@ typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type
 // 	return a - b.template cast< MV<XS...> >();
 // }  
 
-template<class B>
-typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type operator + ( VT a, const B& b) {
-	typedef typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type Ret;
+// template<B>
+// typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type operator + ( VT a, const B& b) {
+// 	typedef typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type Ret;
+// 	return Ret(a) + b.template cast<Ret>();
+// } 
+template<TT ... XS>
+typename ICat< typename NotType< MV<0>, MV<XS...> >::Type, MV<0> >::Type operator + ( VT a, const  MV<XS...>& b) {
+	typedef typename ICat< typename NotType< MV<0>,  MV<XS...> >::Type, MV<0> >::Type Ret;
 	return Ret(a) + b.template cast<Ret>();
 }
-
 
          
 
