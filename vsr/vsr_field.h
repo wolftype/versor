@@ -439,7 +439,8 @@ namespace vsr{
 
     };
     
-    template<> void Field<Vec>::boundaryConditions(bool ref){
+    template<> void Field<Vec>::boundaryConditions(bool ref){  
+	
         for (int i = 0; i < mFace.size(); ++i){
             int ix = mFace[i];
             static Nbr n;
@@ -452,8 +453,7 @@ namespace vsr{
             if (type & TOP) mData[ix][1] = ref ? -mData[n.yb][1] : mData[n.yb][1]; 
             if (type & BOTTOM) mData[ix][1] = ref ? -mData[n.yt][1] : mData[n.yt][1]; 
             if (type & BACK) mData[ix][2] = ref ? -mData[n.zf][2] : mData[n.zf][2]; 
-            if (type & FRONT) mData[ix][2] = ref ? -mData[n.zb][2] : mData[n.zb][2]; 
-            
+            if (type & FRONT) mData[ix][2] = ref ? -mData[n.zb][2] : mData[n.zb][2];            
         }    
     }
     

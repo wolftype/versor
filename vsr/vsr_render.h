@@ -29,7 +29,7 @@ namespace vsr{
 	
    	void Render(const Cir& cir, const Mat4f& mvm, Pipe& pipe, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 )	{
         
-		static MBO circle ( Mesh::Circle(1.0), GL::DYNAMIC );
+		static MBO circle ( Mesh::Disc(1.0), GL::DYNAMIC );
 		static float mv[16];
 		static Mat4f mat;
 		static Mat4f tmp;
@@ -235,9 +235,9 @@ namespace vsr{
 		 
 	}
 	
-	void Render(Field<Vec>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
-		
-	} 
+	// void Render(Field<Vec>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
+	// 	
+	// }   
 	
 	void Render(Field<Pnt>& f, const Mat4f& mvm, Pipe& pipe,float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0 ){
 		static float mv[16]; 
@@ -267,19 +267,21 @@ namespace vsr{
 	// 
 	// }  
 
-	// void Render( Field<Vec>& f, const Mat4f& mvm, Pipe& pipe ){
-	// 
-	// 	static MBO points ( Mesh::Points2( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
-	// 
-	// 	// points.mesh
-	// 	for (int i = 0; i < f.num(); ++i){  
-	// 		Vec3f v( f.grid(i) );
-	// 		points.mesh[i*2+1].Pos = v + Vec3f( f[i] ); 
-	// 	}
-	// 	points.update();
-	// 	pipe.line(points);
-	// 
-	// } 
+	void Render( Field<Vec>& f, const Mat4f& mvm, Pipe& pipe, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0  ){
+	
+		static MBO points ( Mesh::Points2( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
+	
+		// points.mesh
+		for (int i = 0; i < f.num(); ++i){  
+			Vec3f v( f.grid(i) );
+			int idx = i*2+1;
+			points.mesh[idx].Pos = v + Vec3f( f[i] ); 
+			points.mesh[idx].Col = Vec4f(r,g,b,a);
+		}
+		points.update();
+		pipe.line(points);
+	
+	} 
 	
 	#define DRAW(x) Render(x, mvm, pipe); 
     #define DRAWCOLOR(x,r,g,b) Render(x, mvm, pipe, r, g, b); 

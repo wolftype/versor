@@ -76,6 +76,11 @@ struct MV<X, XS...>{
 	
 	template<TT IDX> MV& set(VT v);
 	
+	MV& reset(VT v = 0.0){
+		std::fill( &(val[0]), &(val[0]) + Num, v); 
+		return *this;
+	}
+	
 	MV conjugation() const;
 	MV involution() const; 
 	 

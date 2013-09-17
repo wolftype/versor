@@ -10,7 +10,7 @@ namespace vsr{
 using namespace std;
 	
 
-typedef double VT; 
+typedef float VT; 
 typedef short TT;
 
 template<int N>
