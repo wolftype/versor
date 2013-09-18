@@ -449,10 +449,12 @@ struct CGA{
 	typedef typename RMetric<DIM-1,1>::Type M;   
 	
 	typedef MV<0> Sca; 
-	template<TT N> using e = MV< 1<<(N-1) >;   
+	template<TT N> using e = MV< (1<<(N-1)) >;   
+   // template<TT M, TT N> using ee = MV< (1<<(M-1)) (1<<(N-1)) >; 
 	typedef MV< pss(DIM) > Pss;  
 		
 	typedef typename Blade1<DIM-2>::VEC 	Vec;
+	typedef typename Blade1<2>::VEC 	Vec2D;  
 	typedef typename EOProd<Vec,Vec>::Type 	Biv;
 	typedef typename EOProd<Biv,Vec>::Type 	Tri; 	
 	typedef typename EProd<Vec,Vec>::Type 	Rot;
@@ -714,6 +716,7 @@ template<TT N> using NEe   = EGAMV<typename EGA<N>::template e<N> >;
 template<TT N, TT E> using Ne  =  CGAMV<N,typename CGA<N>::template e<E> >; 
 template<TT N> using NSca = CGAMV<N, typename CGA<N>::Sca>;   
 template<TT N> using NVec = CGAMV<N, typename CGA<N>::Vec>; 
+template<TT N> using NVec2D = CGAMV<N, typename CGA<N>::Vec2D>;  
 template<TT N> using NBiv = CGAMV<N, typename CGA<N>::Biv>; 
 template<TT N> using NTri = CGAMV<N, typename CGA<N>::Tri>; 
 template<TT N> using NRot = CGAMV<N, typename CGA<N>::Rot>;
@@ -750,6 +753,7 @@ typedef Ne<5,3> e3;
 
 typedef NSca<5> Sca; 
 typedef NVec<5> Vec; 
+typedef NVec2D<5> Vec2D; 
 typedef NBiv<5> Biv; 
 typedef NTri<5> Tri; 
 typedef NRot<5> Rot;

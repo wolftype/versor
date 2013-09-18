@@ -178,10 +178,16 @@ namespace vsr{
             int idx = vxlAt(p).a;
             return mData[idx];
         }
+
+        //2d Euler (bounded)
+        T euler2d( const Vec2D& v){
+            Vec2D t = range(v);   //bind to range of field         
+            return surf(t[0], t[1]);
+        }
         
         //2d Euler (bounded)
         T euler2d( const Vec& v){
-            Vec t = range(v);            
+            Vec t = range(v);   //bind to range of field         
             return surf(t[0], t[1]);
         }
         

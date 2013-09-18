@@ -713,6 +713,13 @@ template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t){
 	  	return this -> bst(t);  
 }
+ 
+#define E1 e1(1)
+#define E2 e2(1)
+#define E3 e3(1)
+// #define E12 e12(1);
+// #define E13 e13(1);
+// #define E23 e23(1);  
 
 #define PT(x,y,z) vsr::Ro::null(vsr::Vec(x,y,z))
 #define DLS(r) vsr::Ro::dls(0,0,0,r)

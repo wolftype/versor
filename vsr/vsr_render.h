@@ -281,7 +281,39 @@ namespace vsr{
 		points.update();
 		pipe.line(points);
 	
-	} 
+	}  
+	
+	void Render( Field<Vec2D>& f, const Mat4f& mvm, Pipe& pipe, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0  ){
+	
+		static MBO points ( Mesh::Points2D( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
+	
+		// points.mesh
+		for (int i = 0; i < f.num(); ++i){  
+			Vec3f v( f.grid(i) );
+			int idx = i*2+1;
+			points.mesh[idx].Pos = v + Vec3f( f[i][0], f[i][1], 0 ); 
+			points.mesh[idx].Col = Vec4f(r,g,b,a);
+		}
+		points.update();
+		pipe.line(points);
+	
+	}  
+	
+	void Render( Field<Vec2D>& f, const Mat4f& mvm, Pipe& pipe, Field< Sca >& r, Field< Sca >& g, Field< Sca >& b ){
+	
+		static MBO points ( Mesh::Points2D( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
+	
+		// points.mesh
+		for (int i = 0; i < f.num(); ++i){  
+			Vec3f v( f.grid(i) );
+			int idx = i*2+1;
+			points.mesh[idx].Pos = v + Vec3f( f[i][0], f[i][1], 0 ); 
+			points.mesh[idx].Col = Vec4f( r[i][0], g[i][0], b[i][0], 1.0 );
+		}
+		points.update();
+		pipe.line(points);
+	
+	}
 	
 	#define DRAW(x) Render(x, mvm, pipe); 
     #define DRAWCOLOR(x,r,g,b) Render(x, mvm, pipe, r, g, b); 

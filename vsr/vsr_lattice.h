@@ -278,6 +278,26 @@ namespace vsr {
     }	
 
     //bound and modify to range [0,1]
+    Vec2D range( const Vec2D& v) const{
+        Vec2D t = v;
+
+        double minx = px(0);
+        double maxx = px(mWidth-1);
+        double miny = py(0);
+        double maxy = py(mHeight-1);
+        
+        if (t[0] < minx) t[0] = minx;
+        else if (t[0] > maxx) t[0] = maxx;
+        if (t[1] < miny) t[1] = miny;
+        else if (t[1] > maxy) t[1] = maxy;
+        
+        double dx = (t[0] - minx)/tw();
+        double dy = (t[1] - miny)/th();
+        
+        return Vec2D(dx,dy);
+    }
+
+    //bound and modify to range [0,1]
     Vec range( const Vec& v) const{
         Vec t = v;
 
