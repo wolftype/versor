@@ -109,7 +109,7 @@ struct GLVApp : public View3D{
 	initView();
   }  
 
-  ~GLVApp(){}
+	virtual ~GLVApp();
 
 	void initGL(){
 	    string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
@@ -163,7 +163,7 @@ struct GLVApp : public View3D{
 		//scene.camera.set( cam ); 
 		//scene.model.set( model ); 
 		
-		renderD();
+		renderC();
  } 
 
 	 void renderA(){
@@ -255,8 +255,8 @@ struct GLVApp : public View3D{
 	
  }                                                                                             
 	
-	
-	
-};   
+};
+
+GLVApp::~GLVApp(){}  
 
 #endif
