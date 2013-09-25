@@ -3,17 +3,22 @@
                       
 #include <vector>
 #include <iostream>
-#include "operations.h"  
+#include "vsr_products.h"  
 
 
 using namespace std;
 
-namespace vsr{  
+namespace vsr{
+          
+// template<class A, class B>
+// auto ref(const A& a, const B& b) RETURNS(
+// 	egp( egp(b, a.involution() ), 
+// )    
 	
 template<int DIM, class ... R >
-vector< typename EGA<DIM>::Vec > rootSystem( R ... v ){   
+vector< EGAMV<typename EGA<DIM>::Vec>  > rootSystem( R ... v ){   
 	
-	typedef typename EGA<DIM>::Vec V;
+	typedef EGAMV<typename EGA<DIM>::Vec> V;
 	 
 	int n = sizeof...(R);
 	
@@ -28,7 +33,7 @@ vector< typename EGA<DIM>::Vec > rootSystem( R ... v ){
 	for (int i = 0; i < n; ++i){
 	   	for (int j = 0; j < n; ++j){
 
-			V nr = ref(root[i],root[j]);//-!root[j] * root[i] * root[j];
+			V nr = root[i].re(root[j]);//ref(root[i],root[j]);//-!root[j] * root[i] * root[j];
 			 
 			bool exists = 0;
 			for ( int k = 0; k < results.size(); ++k){
@@ -52,7 +57,7 @@ vector< typename EGA<DIM>::Vec > rootSystem( R ... v ){
 			for (int j = 0; j < cs; ++j ){
 			 
 				bool done = 1;
-			    V nr = ref(results[j],root[i]);; 
+			    V nr = results[j].re( root[i] );//ref(results[j],root[i]);; 
 	                
                 bool exists = 0; 
 				for ( int k = 0; k < cs; ++k){ 
@@ -88,7 +93,7 @@ vector< typename EGA<DIM>::Vec > rootSystem( R ... v ){
 			for (int j = 0; j < ns; ++j ){
 
 				bool done = 1;
-			    V nr = ref(results[j],results[i]);; 
+			    V nr = results[j].re( results[i] ); //ref(results[j],results[i]);; 
 
                 bool exists = 0; 
 				for ( int k = 0; k < ns; ++k){ 

@@ -1,7 +1,6 @@
 #ifndef GLV_APP_INCLUDED
 #define GLV_APP_INCLUDED     
 
-
 /*
 
 	IMPLEMENTATION FILE  - This implements GLV library 
@@ -87,6 +86,8 @@ struct GLVInterface : public Interface {
 };
 
 struct GLVApp : public View3D{  
+  
+	int renderMode;
 
   GLVInterface interface;
               
@@ -99,19 +100,21 @@ struct GLVApp : public View3D{
   Frame model;    // ModelView
     
   GLVApp() : View3D(), 
-    cam(0,0,5)
+    cam(0,0,5), renderMode(0)
  {
 	
 	stretch(1,1);
 	colors().back.set(.1,.3,.3); 
 	
 	scene.camera.bUseFrust = false; 
-	initView();
+	initView(); 
+	
+	printf("GLVAPP done\n");
   }  
 
 	virtual ~GLVApp();
 
-	void initGL(){
+	virtual void initGL(){
 	    string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
 	   // string Vert = SimpleVertex;//SimpleVertex;//AVertex + VaryingN + MVertN; 
 		string Frag = MFragN;//TFragMix; //mFrag   //SimpleFragment;//
@@ -132,7 +135,7 @@ struct GLVApp : public View3D{
 		void initView(){
             
 
-			cout << width() << " " << height() << endl; 
+			cout << width() << " by  " << height() << endl; 
 			float tw =  width();
 			float th = height();     
 
@@ -146,7 +149,7 @@ struct GLVApp : public View3D{
 
 			scene.camera.view = gfx::View( scene.camera.pos(), p, aspect, th ); 
 			
-		   // cout << scene.xf.projMatrixf() << endl;  
+		    //cout << scene.xf.projMatrixf() << endl;  
     }
 
   virtual void onDraw();
@@ -162,10 +165,13 @@ struct GLVApp : public View3D{
  
 		//scene.camera.set( cam ); 
 		//scene.model.set( model ); 
-		
-		renderC();
+		switch( renderMode ){
+			case 0: renderA(); break;
+			case 1: renderB(); break;
+			case 2: renderC(); break;
+		}
  } 
-
+     //immediate mode
 	 void renderA(){
 	
 		 	scene.push();
@@ -178,6 +184,7 @@ struct GLVApp : public View3D{
 			scene.pop();
 	}  
 	
+	//vbo render (opengl es 2.0)
 	void renderB(){                 	  
 			 // glViewport(0,0,surface.width,surface.height); 
 			 // 	         glClearColor(background[0],background[1],background[2],background[3]);
@@ -196,10 +203,11 @@ struct GLVApp : public View3D{
 		     pipe.unbind();
 			 //swapBuffers();
 
-	} 
+	}     
+	
 	//simple render (point)
 	void renderC(){
-		 scene.onFrame(); 
+		scene.onFrame(); 
 		update();
 		pipe.bind();
 		onDraw();   

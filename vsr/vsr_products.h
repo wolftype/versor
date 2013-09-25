@@ -377,7 +377,7 @@ CA eip(const A& a, const B& b) RETURNS(
 	( EIProd<A,B>().ip(a, b) )
 )
 
-//NON-EUCLIDEAN
+//NON-EUCLIDEAN BUT FLAT
 template<class M, class A, class B > 
 CA mgp(const A& a, const B& b) RETURNS(
 	( Prod<A,B,M,false>().gp(a, b) )
@@ -391,7 +391,7 @@ CA mip(const A& a, const B& b) RETURNS(
 	( IProd<A,B,M,false>().ip(a, b) )
 )
 
-//CONFORMAL
+//CONFORMAL, NOT FLAT
 template<class M, class A, class B>
 CA cgp(const A& a, const B& b) RETURNS(
 	( Prod<A,B,M,true>().gp(a, b) )
@@ -430,7 +430,7 @@ struct EGA{
 	typedef MV< pss(DIM) > Pss; //same as tri in EGA<3>
 };  
 
-//Metric GA (e.g. Spacetime Algebra)
+//Metric GA (e.g. SpaceTime Algebra)
 template<class M>
 struct MGA{   
 	static const int DIM = M::Num;
@@ -499,30 +499,37 @@ struct CGAMV : public A {
 	typedef typename RMetric<DIM-1,1>::Type M;
 
 	template< class ... Args >
-	constexpr CGAMV(Args...v) : A(v...) {} 
+	constexpr CGAMV(Args...v) : A(v...) {}   
+	
 	constexpr CGAMV(const A& a) : A(a) {}   
+	
 	template<class B>
 	constexpr CGAMV(const CGAMV<DIM,B>& b) : A( b.template cast<A>() ) {}   
 	 
 	template< class B >
-	CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,B>::Type, M, true>::Type> operator * (const CGAMV<DIM, B>& b) const {
+	CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,B>::Type, M, true>::Type> 
+	operator * (const CGAMV<DIM, B>& b) const {
 		return CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,  B>::Type, M, true>::Type>( cgp<M>( *this, b ) );
 	} 
 	
 	template<class B>
-	CGAMV<DIM, typename OProd<A, typename B::Type, M, true>::Type> operator ^ (const B& b) const {
+	CGAMV<DIM, typename OProd<A, typename B::Type, M, true>::Type> 
+	operator ^ (const B& b) const {
 		return CGAMV<DIM, typename OProd<A, typename B::Type, M, true>::Type>( cop<M>( *this, b ) );
 	}
  
 	template<class B>
-	CGAMV<DIM, typename IProd<A, typename B::Type, M, true>::Type> operator <= (const B& b) const {
+	CGAMV<DIM, typename IProd<A, typename B::Type, M, true>::Type> 
+	operator <= (const B& b) const {
 		return CGAMV<DIM, typename IProd<A, typename B::Type, M, true>::Type>( cip<M>( *this, b ) );
 	}  
 	 
-	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > dual() const{
+	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > 
+	dual() const{
 		return  CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type >( cgp<M>( *this,  typename CGA<DIM>::Pss(-1) )  );
 	} 
-	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > undual() const{
+	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > 
+	undual() const{
 		return  CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type >( cgp<M>( *this,  typename CGA<DIM>::Pss(1) )  );
 	}    
 	 
@@ -594,37 +601,39 @@ struct CGAMV : public A {
 	
    static CGAMV x, y, z, xy, xz, yz;   
               
-template<typename T>
-CGAMV trs( const T& );
-template<typename T>
-CGAMV rot( const T& );
-template<typename T>
-CGAMV rot( VT a, const T& );
-template<typename T>
-CGAMV mot( const T& ); 
-template<typename T>
-CGAMV dil( const T& );
-template<typename P, typename T>
-CGAMV dil( const P&, const T& ); 
-template<typename T>
-CGAMV bst( const T& );   
+	template<typename T>
+	CGAMV trs( const T& );
+	template<typename T>
+	CGAMV rot( const T& );
+	template<typename T>
+	CGAMV rot( VT a, const T& );
+	template<typename T>
+	CGAMV mot( const T& ); 
+	template<typename T>
+	CGAMV dil( const T& );
+	template<typename P, typename T>
+	CGAMV dil( const P&, const T& ); 
+	template<typename T>
+	CGAMV bst( const T& );   
 
-template<typename T>  
-CGAMV translate( const T& );
-template<typename T>
-CGAMV rotate( const T& );
-template<typename T>
-CGAMV rotate( VT a, const T& );
-template<typename T>
-CGAMV motor( const T& ); 
-template<typename T>
-CGAMV twist( const T& ); //same as motor
-template<typename T>
-CGAMV dilate( const T& );
-template<typename P, typename T>
-CGAMV dilate( const P&, const T& ); 
-template<typename T>
-CGAMV boost( const T& ); 
+	template<typename T>  
+	CGAMV translate( const T& );   
+	CGAMV translate( VT x, VT y, VT z);
+	
+	template<typename T>
+	CGAMV rotate( const T& );
+	template<typename T>
+	CGAMV rotate( VT a, const T& );
+	template<typename T>
+	CGAMV motor( const T& ); 
+	template<typename T>
+	CGAMV twist( const T& ); //same as motor
+	template<typename T>
+	CGAMV dilate( const T& );
+	template<typename P, typename T>
+	CGAMV dilate( const P&, const T& ); 
+	template<typename T>
+	CGAMV boost( const T& );   
 };
 
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().template set<1>(1);
@@ -674,22 +683,52 @@ struct EGAMV : public A {
     typedef A Type;
 
 	template< class ... Args >
-	constexpr EGAMV(Args...v) : A(v...) {}
+	constexpr EGAMV(Args...v) : A(v...) {}  
+	
+	constexpr EGAMV(const A& a) : A(a) {}   
+	
+	template<class B>
+	constexpr EGAMV(const EGAMV<B>& b) : A( b.template cast<A>() ) {}
 	 
 	template<class B>
-	EGAMV<typename EProd<A, typename B::Type>::Type> operator * (const B& b) {
+	EGAMV<typename EProd<A, typename B::Type>::Type> 
+	operator * (const B& b) const {
 		return EGAMV<typename EProd<A, typename B::Type>::Type>( egp( *this, b ) );
 	}     
 
 	template<class B>
-	EGAMV<typename EOProd<A, typename B::Type>::Type> operator ^ (const B& b) {
+	EGAMV<typename EOProd<A, typename B::Type>::Type> 
+	operator ^ (const B& b) const {
 		return EGAMV<typename EOProd<A, typename B::Type>::Type>( eop( *this, b ) );
 	}
  
 	template<class B>
-	EGAMV<typename EIProd<A, typename B::Type>::Type> operator <= (const B& b) {
+	EGAMV<typename EIProd<A, typename B::Type>::Type> 
+	operator <= (const B& b) const {
 		return EGAMV<typename EIProd<A, typename B::Type>::Type>( eip( *this, b ) );
-	}   
+	} 
+	
+	EGAMV operator ~() const {
+		return Reverse< A >::Type::template Make(*this) ;
+	}
+	
+	EGAMV operator !() const {    
+		EGAMV tmp = ~(*this); 
+		VT v = ((*this) * tmp)[0];    
+		return (v==0) ? tmp : tmp / v;
+	}
+	
+	template<class B>
+	auto operator / (const EGAMV<B>& b) const RETURNS(
+		(  *this * !b )
+	)
+	
+	EGAMV conj() const { return this -> conjugation(); }
+	EGAMV inv() const { return this -> involution(); }
+	template<typename B>
+	EGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
+	template<typename B>
+	EGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
 	
 };
 
@@ -700,17 +739,6 @@ template<TT N> using NEBiv = EGAMV<typename EGA<N>::Biv>;
 template<TT N> using NETri = EGAMV<typename EGA<N>::Tri>; 
 template<TT N> using NERot = EGAMV<typename EGA<N>::Rot>; 
 template<TT N> using NEe   = EGAMV<typename EGA<N>::template e<N> >;   
-
-//3D Euclidean
-// typedef NESca<3> Sca; 
-// typedef NEVec<3> Vec; 
-// typedef NEBiv<3> Biv; 
-// typedef NETri<3> Tri; 
-// typedef NERot<3> Rot;
-// typedef NEe<1> e1; 
-// typedef NEe<2> e2; 
-// typedef NEe<3> e3;  
-
 
 //N-Dimensional Conformal Candidates                        
 template<TT N, TT E> using Ne  =  CGAMV<N,typename CGA<N>::template e<E> >; 
@@ -745,50 +773,6 @@ template<TT N> using NTrv = CGAMV<N, typename CGA<N>::Trv>;
 template<TT N> using NBst = CGAMV<N, typename CGA<N>::Bst>; 
 template<TT N> using NDil = CGAMV<N, typename CGA<N>::Dil>;
 template<TT N> using NTsd = CGAMV<N, typename CGA<N>::Tsd>;
-
-//3D CONFORMAL 
-typedef Ne<5,1> e1; 
-typedef Ne<5,2> e2; 
-typedef Ne<5,3> e3; 
-
-typedef NSca<5> Sca; 
-typedef NVec<5> Vec; 
-typedef NVec2D<5> Vec2D; 
-typedef NBiv<5> Biv; 
-typedef NTri<5> Tri; 
-typedef NRot<5> Rot;
-
-typedef NOri<5> Ori; //Origin
-typedef NInf<5> Inf; //Infinity
-typedef NMnk<5> Mnk; //E Plane
-typedef NPss<5> Pss; //E Plane
-
-typedef NPnt<5> Pnt; 	 //Homogenous Point in 3D  
-typedef Pnt Dls; 		 //Dual Sphere    
-
-typedef NPar<5> Par;	 //Point Pair
-typedef NCir<5> Cir;	 //Circle
-typedef NSph<5> Sph;	 //Sphere
-                    	
-typedef NDrv<5> Drv;	 //Direction Vector
-typedef NTnv<5> Tnv;	 //Tangent Vector   
-typedef NDrb<5> Drb;	 //Direction Bivector
-typedef NTnb<5> Tnb;	 //Tangent Bivector  
-typedef NDrt<5> Drt;	 //Direction Trivector
-typedef NTnt<5> Tnt;	 //Tangent Trivector  
-                    	
-typedef NDll<5> Dll;	 //Dual Line        
-typedef NLin<5> Lin;	 //Dual Line    
-typedef NFlp<5> Flp;	 //Flat Plane
-typedef NPln<5> Pln;	 //Plane 
-typedef NDlp<5> Dlp;	 //Plane   
-                    	
-typedef NTrs<5> Trs;	 //Translator 
-typedef NMot<5> Mot;	 //Motor 
-typedef NTrv<5> Trv;	 //Transversor 
-typedef NBst<5> Bst;	 //Boost 
-typedef NDil<5> Dil;	 //Dilator 
-typedef NTsd<5> Tsd;	 //Translated Dilator  
 
  
 } //vsr::

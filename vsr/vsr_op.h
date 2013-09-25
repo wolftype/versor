@@ -5,51 +5,51 @@
 
 #include <math.h> 
 #include <vector>  
-#include "vsr_products.h"  
+#include "vsr_cga3D_types.h"  
 #include "vsr_constants.h" 
 #include "vsr_math.h"
 
 namespace vsr{
                      
-namespace Op{   
+struct Op{   
    
 	template< class A>
-	constexpr auto dle(const A& a) RETURNS(
+	static constexpr auto dle(const A& a) RETURNS(
 		a * Tri(-1)
 	)  
 	template< class A>
-	constexpr auto udle(const A& a) RETURNS(
+	static constexpr auto udle(const A& a) RETURNS(
 		a * Tri(1)
 	)
 	
 	template< class A>
-	constexpr auto dl(const A& a) RETURNS(
+	static constexpr auto dl(const A& a) RETURNS(
 		a * Pss(-1)
 	) 
 	template< class A>
-	constexpr auto udl(const A& a) RETURNS(
+	static constexpr auto udl(const A& a) RETURNS(
 		a * Pss(1)
 	)  
 	
 	//PROJECT A onto B
 	template< class A, class B>
-	constexpr auto pj(const A& a, const B& b) RETURNS ( 
+	static constexpr auto pj(const A& a, const B& b) RETURNS ( 
 		(a <= b ) / b
 	) 
 	template< class A, class B>
-	constexpr auto rj(const A& a, const B& b) RETURNS ( 
+	static constexpr auto rj(const A& a, const B& b) RETURNS ( 
 		(a ^ b ) / b
 	)
 	
-} //OP::
+};
 
-namespace Gen{               
+struct Gen{               
 	
     /*! Generate a Translator (to be applied with sp() function)
         @param X Y and Z direction coordinates
     */
     template<class T, class U, class V>
-    constexpr Trs trs(T x, U y, V z){
+    static constexpr Trs trs(T x, U y, V z){
         return Trs(1, x*-.5, y*-.5, z*-.5);
     }
 
@@ -57,13 +57,13 @@ namespace Gen{
         @param Any Vector type (typically vector or direction)
     */
     template<class B>
-    constexpr Trs trs(const B& d){
+    static constexpr Trs trs(const B& d){
         return trs(d[0], d[1], d[2]);
     }
 	 
 	// GENERIC
 	template< class B >
-	auto nrot( const B& b) -> decltype(1+B()){ 	
+	static auto nrot( const B& b) -> decltype(1+B()){ 	
 		VT  c = sqrt(- ( b.wt() ) );
 	    VT sc = -sin(c);
 	    if (c != 0) sc /= c;
@@ -72,7 +72,7 @@ namespace Gen{
     /*! Generate a Rotor (i.e. quaternion) from a Bivector 
         @param Bivector generator (the plane of rotation, AKA dual of the axis of rotation) 
     */
-	Rot rot( const Biv& b){
+	static Rot rot( const Biv& b){
     	VT  c = sqrt(- ( b.wt() ) );
         VT sc = -sin(c);
         if (c != 0) sc /= c;
@@ -82,7 +82,7 @@ namespace Gen{
 	/*! Generate a Rotor (i.e. quaternion) from a Vector 
         @param Vector axis generator (the axis of rotation, AKA dual of the bivector of rotation) 
     */
-	Rot rot( const Vec& v){
+	static Rot rot( const Vec& v){
 		Biv b = Op::dle( v );
     	VT  c = sqrt(- ( b.wt() ) );
         VT sc = -sin(c);
@@ -90,18 +90,18 @@ namespace Gen{
         return Rot( cos(c), b[0]*sc, b[1]*sc, b[2]*sc );	
 	} 
 	
-	Rot rot( VT angle, const Vec& v){
+	static Rot rot( VT angle, const Vec& v){
 		return rot( v * angle );
 	}  
 	
-	Rot rot( VT angle, const Biv& v){
+	static Rot rot( VT angle, const Biv& v){
 		return rot( v * angle );
 	}                    
 	
     /*! Get Bivector Generator from a Rotor 
         @param Rotor r
     */
-    Biv log(const Rot& r){
+    static Biv log(const Rot& r){
     	
         VT t = r.get<0>();                           //<--- Scalar Value from Rotor
         
@@ -125,7 +125,7 @@ namespace Gen{
         @param Vec a
         @param Vec b
     */	
-	Rot ratio( const Vec& a, const Vec& b ){
+	static Rot ratio( const Vec& a, const Vec& b ){
 
         VT s = ( a <= b ).get<0>();
 
@@ -142,14 +142,14 @@ namespace Gen{
         return r;
     }
  
-    Rot ratio(const Biv& a, const Biv& b){
+    static Rot ratio(const Biv& a, const Biv& b){
         return ratio( Op::dle(a), Op::dle(b) );
     } 
 
     /*! Bivector plane of Rotation from Rotor 
         @param Rotor r
     */
-    Biv pl( const Rot& r) {
+    static Biv pl( const Rot& r) {
         Biv b = r.cast<Biv>();
         VT t = b.rnorm(); // use rnorm or norm here?
         if (t == 0 ) return Biv(1,0,0);
@@ -158,14 +158,14 @@ namespace Gen{
     /*! Angle of Rotation from Rotor 
         @param Rotor r
     */
-    VT iphi( const Rot& r) {
+    static VT iphi( const Rot& r) {
         return Biv ( log(r) * -2 ).norm();
     }
 
     /*! Axis Angle from Rotor
         @param Rotor input
     */
-	Rot aa (const Rot& r) {
+	static Rot aa (const Rot& r) {
 
         Vec v = Op::dle( Gen::pl( r ) ) ;		
         VT deg = iphi(r) * ( -180 / PI );
@@ -176,7 +176,7 @@ namespace Gen{
 	    /*! Generate a Motor from a Dual Line Axis
 	        @param Dual Line Generator (the axis of rotation, including pitch and period)
 	    */
-	    Mot mot( const Dll& dll){
+	    static Mot mot( const Dll& dll){
  
 	        Dll b = dll;
 	        Biv B(b[0],b[1],b[2]); //Biv B(dll);  
@@ -209,7 +209,7 @@ namespace Gen{
 	    /*! Dual Line Generator from a Motor 
 	        @param Motor m (a concatenation of rotation and translation)
 	    */
-	    Dll log( const Mot& m){
+	    static Dll log( const Mot& m){
 	    	       								//tmp dll
 	        Drv cperp, cpara;
 			Dll rq,q,tq;
@@ -244,7 +244,7 @@ namespace Gen{
 	    /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
 	    */
-	    Dll log(const Dll& a, const Dll& b, VT t = 1.0){
+	    static Dll log(const Dll& a, const Dll& b, VT t = 1.0){
 	        Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n;
 	        return Gen::log( m ) * (t/2.0) ;
 	    }
@@ -252,7 +252,7 @@ namespace Gen{
 	    /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
 	    */
-	    Mot ratio( const Dll& a, const Dll& b, VT t = 1.0){
+	    static Mot ratio( const Dll& a, const Dll& b, VT t = 1.0){
 	        //Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
 	        return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
 	    }
@@ -261,14 +261,14 @@ namespace Gen{
 	        @param any multivector (typically a vector or direction vector)
 	    */
 	    template <class B>
-	    Trv trv(const B& b){
+	    static Trv trv(const B& b){
 	        return trv(b[0], b[1], b[2]);
 	    }
 	    /*! Transversor Generator from arbitrary Vector
 	        @param x,y,z direction coordinates
 	    */
 	    template <class T>
-	    Trv trv(T x, T y, T z){
+	    static Trv trv(T x, T y, T z){
 	        return Trv(1.0, x, y, z);
 	    }
 
@@ -290,7 +290,7 @@ namespace Gen{
 	        @param scalar amt (typically 0 or 1)
 	    */
 	    template <class T>
-	    Bst bst(const Tnv& tnv, const Vec& drv, T t){
+	    static Bst bst(const Tnv& tnv, const Vec& drv, T t){
 	        Par s = tnv.cast<Par>().sp( Gen::trs(drv) );
 	        return Gen::bst(s * t);
 	    } 
@@ -300,7 +300,7 @@ namespace Gen{
 	        Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
 	        @param Point Pair generator
 	    */
-	    Bst bst(const Par& tp){
+	    static Bst bst(const Par& tp){
 
 	        VT norm; VT sn; VT cn;
 
@@ -318,7 +318,7 @@ namespace Gen{
 	        Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
 	        @param Boost Spinor 
 	    */
-	    Par log(const Bst& b){
+	    static Par log(const Bst& b){
 
 	        VT n;
 
@@ -348,7 +348,7 @@ namespace Gen{
 	        @param Amt t
 	    */
 	    template<class T>
-	    constexpr Dil dil(T t){
+	    static constexpr Dil dil(T t){
 	        return Dil( cosh( t *.5 ), sinh( t * .5 ) );
 	    }
 	    /*! Generate a Dilation from a point p by amt t 
@@ -356,28 +356,28 @@ namespace Gen{
 	        @param Amt t -- to pass in a relative amt (i.e. t=.5 for half size or t=2 for VT), pass in std::log(t)
 	    */
 	    template<class P, class T>
-	    Tsd dil(const P& p, T t){
+	    static Tsd dil(const P& p, T t){
 	        return sp( ( Dil( cosh( t*.5 ), sinh( t*.5 ) ) ).cast<Tsd>(), Gen::trs(p) );
 	    }  
 	
 	    template<TT ... XS>
-	    Dil dil(const MV<XS...>& s){
+	    static Dil dil(const MV<XS...>& s){
 	        return Gen::dil(s[0]);
 	    }
    
-} // Gen::
- 
-namespace Ro {
+}; 
+
+struct Ro {
 	
 
     /*! Null Point from x, y, z */
     template< class A, class B, class C >
-    constexpr Pnt null( A x, B y, C z){	
+    static constexpr Pnt null( A x, B y, C z){	
         return Pnt(x, y, z, 1 , (x*x + y*y + z*z) / 2.0 );
     }  
 	/*! Null Point from Arbirtary Multivector */
     template< class B >
-    constexpr Pnt null( const B& b){	
+    static constexpr Pnt null( const B& b){	
         return null( b[0], b[1], b[2] );
     }  
 
@@ -386,7 +386,7 @@ namespace Ro {
         @param Radius (enter a negative radius for an imaginary sphere)
     */
     template< class S >
-    Dls dls( const S& v, VT r = 1.0 ) {
+    static Dls dls( const S& v, VT r = 1.0 ) {
         Dls s = null(v);
         (r > 0) ? s[4] -= .5 * (r * r) : s[4] += .5 * (r*r);
         return s;
@@ -397,7 +397,7 @@ namespace Ro {
         @param Radius (enter a negative radius for an imaginary sphere)
     */
    
-    Dls dls( VT x, VT y, VT z, VT r = 1.0 ) {
+    static Dls dls( VT x, VT y, VT z, VT r = 1.0 ) {
         Dls s = Ro::null( x, y, z);
         (r > 0) ? s[4] -= .5 * (r * r) : s[4] += .5 * (r*r);
         return s;
@@ -407,7 +407,7 @@ namespace Ro {
         @param Point
         @param Radius (enter a negative radius for an imaginary sphere)
     */
-    Dls dls_pnt( const Pnt& p, double r = 1.0 ) {
+    static Dls dls_pnt( const Pnt& p, double r = 1.0 ) {
         Dls s = p;
         (r > 0) ? s[4] -= .5 * (r * r) : s[4] += .5 * (r*r);
         return s;
@@ -417,33 +417,33 @@ namespace Ro {
         @param input real or imaginary round (sphere, dual sphere, circle, point pair)
     */
     template<class T>
-    constexpr Dls cen( const T& s) {
+    static constexpr Dls cen( const T& s) {
         return  ( s  / ( Inf(-1) <= s ) ).template cast<Dls>();
     }
 	                  
 	template<class T>
-	constexpr Pnt loc(const T& s){
+	static constexpr Pnt loc(const T& s){
 		return null ( cen ( s ) ); 
 	}   
 	
-    VT sqd(const Pnt& a, const Pnt& b){
+    static VT sqd(const Pnt& a, const Pnt& b){
         return ( (a <= b)[0] ) * -2.0;
     }
     
     /*! squared Distance between points a and b */
-    VT dist(const Pnt& a, const Pnt& b){
+    static VT dist(const Pnt& a, const Pnt& b){
         return sqrt( fabs(sqd(a,b) ) );
     }
 
     /*! squared Distance between points a and b (deprecated) */
-    VT dst(const Pnt& a, const Pnt& b){
+    static VT dst(const Pnt& a, const Pnt& b){
         return sqrt( fabs(sqd(a,b) ) );
     }    
     
     /*! Split Points from Point Pair 
         @param PointPair input
     */
-    std::vector<Pnt> split(const Par& pp){
+    static std::vector<Pnt> split(const Par& pp){
         
 		std::vector<Pnt> pair;
         
@@ -471,7 +471,7 @@ namespace Ro {
     /*! Split Points from Point Pair 
         @param PointPair input
     */
-    Pnt split(const Par& pp, bool bFirst){
+    static Pnt split(const Par& pp, bool bFirst){
         
         double r = sqrt( fabs( ( pp <= pp )[0] ) );
         
@@ -491,7 +491,7 @@ namespace Ro {
         @param duality flag 
     */
     template< class T >
-    VT size( const T& r, bool dual){
+    static VT size( const T& r, bool dual){
         auto s = Inf(1) <= r;
         return ( ( r * r.inv() ) / ( s * s ) * ( (dual) ? -1.0 : 1.0 )  )[0];
     }
@@ -499,7 +499,7 @@ namespace Ro {
     /*! Squared Size of Normalized Dual Sphere (faster than general case)
         @param Normalized Dual Sphere
     */
-    VT dsize( const Dls& dls ){
+    static VT dsize( const Dls& dls ){
         return (dls * dls)[0];
     }
     
@@ -507,7 +507,7 @@ namespace Ro {
         @param input round (dual sphere, point pair, circle, or direct sphere)
     */
     template< class T >
-    VT rad( const T& s ){
+    static VT rad( const T& s ){
         return sqrt ( fabs ( Ro::size(s, false) ) );
     }  
     
@@ -515,25 +515,25 @@ namespace Ro {
         @param Direct Round
     */    
 	template<class A>
-    auto dir( const A& s ) RETURNS(
+    static auto dir( const A& s ) RETURNS(
         ( ( Inf(-1) <= s ) ^ Inf(1) )
     )
 
     /*! Carrier Flat of Round Element */
     template<class A>
-    auto car(const A& s) RETURNS(
+    static auto car(const A& s) RETURNS(
         s ^ Inf(1)
     )
 
     template<class A>
-    Dls sur( const A& s) {
+    static Dls sur( const A& s) {
         return Dls( s / ( s ^ Inf(1) ));
     } 
 
     /*!
      Direct (imaginary?) Circle From Dual Sphere and Euclidean Bivector
      */    
-     Cir cir(const Dls& dls, const Biv& flat){
+     static Cir cir(const Dls& dls, const Biv& flat){
         return dls ^ ( ( dls <= ( flat.inv() * Inf(1) ) )  * -1.0 );  
      }
      /*!
@@ -542,13 +542,13 @@ namespace Ro {
     /*!
      Direct (imaginary?) Point Pair From Dual Sphere and Euclidean Vector
      */    
-      Par par(const Dls& dls, const Vec& flat){
+      static Par par(const Dls& dls, const Vec& flat){
         return dls ^ ( ( dls <= ( flat.inv() * Inf(1) ) )  * -1.0 ); // cout << "y" << endl; 
      }
     /*!
      Direct Point From Dual Sphere and Euclidean Carrier Flat
      */    
-      Pnt pnt(const Dls& dls, const Vec& flat){
+      static Pnt pnt(const Dls& dls, const Vec& flat){
         return Ro::split( par(dls, flat), true ); // cout << "y" << endl; 
      }
     
@@ -557,7 +557,7 @@ namespace Ro {
         @param Carrier Bivector 
         @param Radius r
     */
-     Cir cir(const Pnt& pnt, const Biv& flat, double r){
+     static Cir cir(const Pnt& pnt, const Biv& flat, double r){
         //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
         return cir( Ro::dls_pnt(pnt,r),flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
     }
@@ -567,20 +567,20 @@ namespace Ro {
         @param Carrier Vector 
         @param Radius r
     */
-    Par par(const Pnt& pnt, const Vec& flat, double r){
+    static Par par(const Pnt& pnt, const Vec& flat, double r){
         //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
         return par( Ro::dls_pnt(pnt,r), flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
     }
 	
-} // Ro::     
+};     
 
-namespace Fl {          
+struct Fl {          
 	
 	/*! Direction of Direct Flat 
         @param Direct Flat [ Plane (Pln) or Line (Lin) ]
     */
     template<class A> 
-    constexpr auto dir( const A& f) RETURNS(
+    static constexpr auto dir( const A& f) RETURNS(
         Inf(-1) <= f
     )
 	/*! Location of Flat A closest to Point p 
@@ -589,7 +589,7 @@ namespace Fl {
         @param Duality Flag
     */
     template<class A>
-    constexpr Pnt loc(const A& f, const Pnt& p, bool dual){
+    static constexpr Pnt loc(const A& f, const Pnt& p, bool dual){
         return dual ? Pnt( ( p ^ f ) / f ) : Pnt ( ( p <= f ) / f );
     } 
 	/*! Location of Flat A closest to Point p 
@@ -597,7 +597,7 @@ namespace Fl {
         @param Point p (could be Ori(1) )
     */
     template<class A, class B>
-    constexpr Pnt locd(const A& f, const B& p){
+    static constexpr Pnt locd(const A& f, const B& p){
         return ( p ^ f ) / f;
     }
 
@@ -606,51 +606,10 @@ namespace Fl {
        @param boolean flag for duality
    */ 
 	 template<class A>
-	 constexpr VT wt(const A& f, bool dual){
+	 static constexpr VT wt(const A& f, bool dual){
     	return dual ? ( Ori(1) <= Fl::dir( f.undual() ) ).wt() : ( Ori(1) <= Fl::dir(f) ).wt();
 	 }
-}   // Fl ::
-
-Pnt Point(VT x, VT y, VT z){
-	return Ro::null(x,y,z);
-}
-Par Pair( const Pnt& a, const Pnt& b){
-	return a ^ b;
-}
-Cir Circle(const Pnt& a, const Pnt& b, const Pnt& c){
-	return a ^ b ^ c; 
-}
-Cir Circle(const Biv& B){
-	return Ro::cir( Ro::dls(0,0,0,1), B);//a ^ b ^ c; 
-} 
-Cir Circle(const Vec& v){
-	return Ro::cir( Ro::dls(0,0,0,1), Op::dle(v) );//a ^ b ^ c; 
-}
-Sph Sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
-	return a ^ b ^ c ^ d;
-}
-Dlp Plane( VT a, VT b, VT c, VT d = 0.0){
-	return Dlp(a,b,c,d);
-}
-Lin Line( const Pnt& a, const Pnt& b){
-	return a ^ b ^ Inf(1);
-} 
-// template<class T>  
-// Lin Line( const T& v ){
-// 	return Pnt(0,0,0,1,0) ^ Drv(v[0],v[1],v[2]) ^ Inf(1);
-// } 
-Cir Meet( Dls& s, Dlp& d){
-	return (s ^ d).dual();
-} 
-Cir Meet( Dls& s, Pln& d){
-	return (s ^ d.dual()).dual();
-}
-Cir Meet( Sph& s, Dlp& d){
-	return (s.dual() ^ d).dual();
-}
-Cir Meet( Sph& s, Pln& d){
-	return (s.dual() ^ d.dual()).dual();
-}
+};
 
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t){
@@ -659,6 +618,10 @@ CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t){
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t){
 	return this -> trs(t);  
+} 
+template<TT DIM, typename A>
+CGAMV<DIM,A> CGAMV<DIM,A>::translate( VT x, VT y, VT z){
+	return this -> sp ( Gen::trs(x,y,z) );  
 }
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t){
@@ -713,6 +676,7 @@ template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t){
 	  	return this -> bst(t);  
 }
+
  
 #define E1 e1(1)
 #define E2 e2(1)

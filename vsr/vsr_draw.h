@@ -9,9 +9,7 @@
 #define VSR_DRAW_H_INCLUDED  
 
 #include "gfx/gfx_glyphs.h" 
-#include "vsr_constants.h"
-    
-//#include "gfx/gfx_pipe.h"
+
 
 namespace vsr{
 	
@@ -83,19 +81,20 @@ namespace vsr{
 	
 	void Immediate (const Pnt& s){
  
-	    double ta = Ro::size( s, true );
+	    VT ta = Ro::size( s, true );
 
-	    //Draw as dual Sphere (if |radius| > 0.000001);
+	    //Draw as dual Sphere (if |radius^2| > 0.000001);
 	    if ( fabs(ta) >  FPERROR ) {
-
+		   // printf("spehere!!!!!!!!!!!!!!!!!!!!\n");
 	        bool real = ta > 0 ? 1 : 0;	
 
 	        Pnt p = Ro::cen( s );
-	        double t = sqrt ( fabs ( ta ) );
+	        VT t = sqrt ( fabs ( ta ) );
 
 	        gfx::GL::translate ( p.begin() );
 	        (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t);	
-	    } else {
+	    } else {  
+		   // printf("NOOOOOO\n");
 	        gfx::Glyph::Point(s);
 	    }
 	}

@@ -30,7 +30,7 @@ namespace vsr{
 #define LARGERAD (PI * 108 / 180)
 #define ROOT2 1.41421
 #define ROOT3 1.73205
-#define FPERROR .00000001
+#define FPERROR 1//0.000001
 #define ERROR(x,y) (x<=y && x>=-y)
 #define MAXRADIUS 100000
 

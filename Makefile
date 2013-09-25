@@ -7,7 +7,7 @@ NAME = main
 
 PIROOT = $(HOME)/code/pi/root/
 
-CLANG = 0
+CLANG = /usr/local/bin/
 
 #COMPILER VERSION  
 
@@ -62,27 +62,31 @@ endif
 LDFLAGS := $(LDFLAGS)  
 
 SRC_DIR = src/
-INCLUDE_DIR = include/
+INCLUDE_DIR = vsr/
  
 VPATH = $(SRC_DIR):\
 		$(INCLUDE_DIR) 
 
-EXEC = tests/%.cpp  
+EXEC = tests/%.cpp 
+
+OBJ = vsr_cga3D.o 
 
 OBJ_DIR = build/obj/
 LIB_DIR = build/lib/
 BIN_DIR = build/bin/
 
-LIB_NAME = vsr11
-LIB_FILE = libvsr11.a  
+LIB_NAME = vsr
+LIB_FILE = libvsr.a
 
-$(OBJ_DIR)%.o: %.cpp  
-	@echo compiling $@ using $< 
-	$(CXX) -c $< -o $@ 
+#LDFLAGS += -l$(LIB_NAME)  
+
+$(OBJ_DIR)%.o: %.cpp 
+	@echo hey compiling $@ using $< 
+	$(CXX) $(IPATH) -c $< -o $@ 
 
 $(LIB_NAME): dir $(addprefix $(OBJ_DIR),$(OBJ)) 
 	@echo archiving $@
-	$(AR) $(LIB_DIR)$(LIB_FILE) $(addprefix $(OBJ_DIR), $(OBJ))
+	$(AR) $(LIB_DIR)$(LIB_FILE) $(addprefix $(OBJ_DIR), $(OBJ))  
 
 FORCE:
 

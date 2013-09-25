@@ -1,8 +1,8 @@
-#define __EUC__
+#include "vsr_root.h"  
 
-#include "root.h"
+using namespace vsr;  
 
-using namespace vsr;   
+ 
 
 typedef Blade1<4>::VEC Vec4;
 
@@ -12,7 +12,7 @@ auto D4 = rootSystem<4>( Vec4(1,0,0,0), Vec4(0,1,0,0), Vec4(0,0,1,0), ( Vec4(-1,
 auto F4 = rootSystem<4>( Vec4(0,1,-1,0), Vec4(1,-1,0,0), Vec4(0,0,1,0), ( Vec4(-1,-1,-1, 1) * .5 ) );
 
 int main(){
-    
+
 	cout << "D4: NumRoots =" << D4.size() << endl;
    for (auto i : D4 ){
 		

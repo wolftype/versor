@@ -281,10 +281,11 @@ A operator / (const A& a, VT f){
 	A tmp = a;
 	for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
 	return tmp;
-}
-template<class A>
-A& operator *= (A& a, VT f){
-	for (int i = 0; i < A::Num; ++i){ a[i] *= f; }
+}    
+
+template<TT X, TT ... XS>
+MV<X,XS...>& operator *= (MV<X,XS...>& a, VT f){
+	for (int i = 0; i < MV<X,XS...>::Num; ++i){ a[i] *= f; }
 	return a;
 } 
 

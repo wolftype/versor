@@ -297,8 +297,9 @@ namespace vsr{
 		points.update();
 		pipe.line(points);
 	
-	}  
+	}                   
 	
+	//with a color field
 	void Render( Field<Vec2D>& f, const Mat4f& mvm, Pipe& pipe, Field< Sca >& r, Field< Sca >& g, Field< Sca >& b ){
 	
 		static MBO points ( Mesh::Points2D( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
