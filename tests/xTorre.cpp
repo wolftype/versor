@@ -2,7 +2,7 @@
 #include "vsr_cga3D_draw.h" 
 #include "vsr_cga3D_interface.h"  
 
-#include "vsr_GLVimpl2.h"   
+#include "vsr_GLVimpl.h"   
 
 #include "vsr_field.h" 
 #include "vsr_knot.h"  

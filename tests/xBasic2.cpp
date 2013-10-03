@@ -1,4 +1,4 @@
-#include "vsr_GLVimpl2.h"  
+#include "vsr_GLVimpl.h"  
 #include "gfx/gfx_glyphs.h"
 
 
@@ -13,15 +13,12 @@ void GLVApp :: onDraw(){
                         
 GLVApp * myApp;
 
-int main(){
-
-	myApp = new GLVApp();
-	myApp -> stretch(1,1);
-	
+int main(){               
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"Versor",&glv);    
-    
+	myApp = new GLVApp(win);
+	myApp -> stretch(1,1);    
 	glv << *myApp;
 
 	Application::run();

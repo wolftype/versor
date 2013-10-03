@@ -24,7 +24,7 @@ struct MyApp : public GLVApp {
 	Texture * textureA;    
 	Texture * textureB;   
 	                
-	MyApp() : GLVApp() {
+	MyApp(Window * w) : GLVApp(w) {
 		
 		printf("MyApp Construct\n");
 	}   
@@ -139,15 +139,15 @@ int main(){
 	
 	printf("myapp"); 
 	
-	myApp = new MyApp();
-	
-	printf("myapp made\n"); 
-	myApp -> stretch(1,1);
-	
+
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"Versor",&glv);  
-                    
+    myApp = new MyApp(win);
+	
+	printf("myapp made\n"); 
+	myApp -> stretch(1,1);
+	                
 	glv << *myApp;  
 
 	myApp -> initGL(); 

@@ -29,15 +29,15 @@ GLVApp * myApp;
 
 int main(){
     
-	myApp = new GLVApp();
-	myApp -> stretch(1,1); 
-	myApp -> renderMode = 1;
+
 	
 	GLV glv(0,0);	
 	//glv.colors().back.set(.3,.3,.3);
     		        
 	Window * win = new Window(500,500,"Versor",&glv);    
-    
+    myApp = new GLVApp(win);
+	myApp -> stretch(1,1); 
+	myApp -> renderMode = 1;
 	
 	glv << *myApp;
 

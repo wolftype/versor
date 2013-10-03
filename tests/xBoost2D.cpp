@@ -1,6 +1,6 @@
 #include "vsr_cga2D_types.h"  
 #include "vsr_cga2D_draw.h" 
-#include "vsr_GLVimpl2.h" 
+#include "vsr_GLVimpl.h" 
 
 using namespace vsr;
 
@@ -25,13 +25,12 @@ GLVApp * myApp;
 
 int main(){
 
-	myApp = new GLVApp();
-	myApp -> stretch(1,1);
-	
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"CGA2D",&glv);    
-    
+	myApp = new GLVApp(win);
+	myApp -> stretch(1,1);
+	    
 	glv << *myApp;
 
 	Application::run();
