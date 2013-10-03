@@ -1,7 +1,7 @@
 #ifndef OPERATIONS_H_INCLUDED
 #define OPERATIONS_H_INCLUDED  
 
-//CONFORMAL OPERATIONS (assumes 3D . . . )
+//USEFUL CONFORMAL OPERATIONS (assumes 3D . . . )
 
 #include <math.h> 
 #include <vector>  
@@ -39,6 +39,11 @@ struct Op{
 	template< class A, class B>
 	static constexpr auto rj(const A& a, const B& b) RETURNS ( 
 		(a ^ b ) / b
+	)  
+	
+	template< class A, class B>
+	static constexpr auto sp(const A& a, const B& b) RETURNS(
+		a.sp(b)
 	)
 	
 };
@@ -96,7 +101,21 @@ struct Gen{
 	
 	static Rot rot( VT angle, const Biv& v){
 		return rot( v * angle );
-	}                    
+	} 
+	
+	/*! Generate a Rotor (i.e quaternion) from spherical coordinates
+        @param[in] theta in xz plane from (1,0,0) in range [0,PI]
+        @param[in] phi in rotated xy plane in range []
+    */
+    static Rot rot(double theta, double phi){
+       // double ptheta = (PIOVERTWO * theta);
+       // double pphi = (PIOVERFOUR * phi);
+        
+        Rot rt = Gen::rot( Biv::xz * theta );
+        Rot rp = Gen::rot( Biv::xy.sp( rt ) * phi  );
+        
+        return rp * rt;
+    }                   
 	
     /*! Get Bivector Generator from a Rotor 
         @param Rotor r
@@ -289,9 +308,10 @@ struct Gen{
 	        @param Position in space
 	        @param scalar amt (typically 0 or 1)
 	    */
-	    template <class T>
-	    static Bst bst(const Tnv& tnv, const Vec& drv, T t){
-	        Par s = tnv.cast<Par>().sp( Gen::trs(drv) );
+	    template <class A, class T>
+	    static Bst bst(const A& tnv, const Vec& drv, T t){
+	        Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
+		   // s.vprint();
 	        return Gen::bst(s * t);
 	    } 
 
@@ -314,7 +334,7 @@ struct Gen{
 	    }
 
 	    /*!
-	        Get Point Pair Generator of Basic Boost
+	        Get Point Pair Generator of Basic Boost (in progress)
 	        Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
 	        @param Boost Spinor 
 	    */
@@ -357,7 +377,7 @@ struct Gen{
 	    */
 	    template<class P, class T>
 	    static Tsd dil(const P& p, T t){
-	        return sp( ( Dil( cosh( t*.5 ), sinh( t*.5 ) ) ).cast<Tsd>(), Gen::trs(p) );
+	        return Tsd( Dil( cosh( t*.5 ), sinh( t*.5 ) ) ).trs( p );
 	    }  
 	
 	    template<TT ... XS>
@@ -477,7 +497,7 @@ struct Ro {
         
 		Dlp dlp; dlp = Inf(-1) <= pp;
         
-        Bst bst = ( bFirst ? r : -r ) + pp; 
+        Bst bst = pp + ( bFirst ? r : -r ); 
         //bst += bFirst ? Sca(r) : Sca(-r);
         
         return ( ( bst ) / dlp ).cast<Pnt>();  
@@ -571,6 +591,36 @@ struct Ro {
         //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
         return par( Ro::dls_pnt(pnt,r), flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
     }
+
+    /*! Curvature of Round 
+        @param Round Element
+    */
+    template<class A>
+    static double  cur(const A& s){
+        double r = Ro::rad( s);     
+        return (r==0) ? 10000 : 1.0 / Ro::rad(s);
+    }
+    
+    /*! Euclidean Vector of Circle at theta */
+    static Vec vec(const Cir& c, double theta = 0){
+        Dll axis = (Inf(1) <= c).runit();        
+        return Vec::x.sp( Gen::ratio( Biv::xz, Biv(axis) ) * Gen::rot(Biv::xz * theta) );    
+    }    
+
+
+    /*! Point Pair on Circle at angle t*/
+    static Par par_cir(const Cir& c, double t){
+	    Dll axis = (Inf(1) <= c).runit();			
+        
+        Rot rot = Gen::ratio( Biv::xz, Biv(axis) );
+        Vec vec = Vec::x.sp( rot * Gen::rot(Biv::xz * t));
+        
+        return Ro::par( Ro::sur(c), vec );
+	 }
+    /*! Point on Circle at angle t*/
+    static Pnt pnt_cir(const Cir& c, double t){
+	    return Ro::split( Ro::par_cir(c,t), true).null();
+	}
 	
 };     
 
@@ -619,6 +669,10 @@ template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t){
 	return this -> trs(t);  
 } 
+template<TT DIM, typename A> 
+CGAMV<DIM,A> CGAMV<DIM,A>::trs( VT x, VT y, VT z){
+	return this -> sp ( Gen::trs(x,y,z) );  
+}
 template<TT DIM, typename A>
 CGAMV<DIM,A> CGAMV<DIM,A>::translate( VT x, VT y, VT z){
 	return this -> sp ( Gen::trs(x,y,z) );  
@@ -677,6 +731,10 @@ CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t){
 	  	return this -> bst(t);  
 }
 
+template<TT DIM, typename A>
+CGAMV<DIM, typename CGA<DIM>::Pnt > CGAMV<DIM,A>::null(){
+	  	return Ro::null(*this);  
+}
  
 #define E1 e1(1)
 #define E2 e2(1)

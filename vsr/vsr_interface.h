@@ -18,6 +18,7 @@
 #include "gfx/gfx_scene.h"
 
 #include "vsr_op.h"
+#include "vsr_frame.h"  
 #include <map>  
 
 
@@ -77,8 +78,12 @@ namespace vsr  {
     /*! Abstract Interface Class */
     class Interface {
         
-        int mMode;  ///< Edit Mode State (not implemented)
-        
+        int mMode;  ///< Edit Mode State (not implemented)  
+
+		VT mModelRotVel;
+		VT mVel;
+		VT mRotVel; 
+		        
     public:
     
         
@@ -98,7 +103,10 @@ namespace vsr  {
             //ViewData holds Window Information
            // ViewData data;            
             
-            virtual ~Impl(){}
+            virtual ~Impl(){} 
+
+			MFrame * camera;
+			MFrame * model;
 
             // All implementations should define fullScreenToggle method and getData methods
             virtual void fullScreenToggle() {};            
@@ -109,7 +117,7 @@ namespace vsr  {
         };
         
         
-        Interface(){};     
+        Interface() : mVel(.1), mModelRotVel(.05), mRotVel(.01) {};     
 
 
         virtual void init() = 0;
@@ -117,18 +125,20 @@ namespace vsr  {
         void inputCalc();        ///< Calculate Mouse Movements based on x and dx
         void viewCalc();         ///< Calculate Window Matrices, Screen Coordinates of Mouse
         
-        Impl * impl;       		 ///< Implementation of Window Information (Width, Height) and Inputs (Keyboard, Mouse)  
-        
+        Impl * impl;       		 ///< Implementation of Window Information (Width, Height) and Inputs (Keyboard, Mouse) 
+	   // Scene * scene;			///< Pointer to scene  
+
+		
+		MFrame& camera() { return *(impl -> camera); }		
+		MFrame& model() { return *(impl -> model); }
+		   
 		ViewData		view;
         MouseData       mouse;
         KeyboardData    keyboard;
         
-		ViewData& vd() { return view; }//vimpl -> data; }
-        //ViewData vd() const { return vimpl -> data; }
-  
+		ViewData& vd() { return view; }
         KeyboardData& kd() { return keyboard; }
         MouseData& md() { return mouse; }
-
         
         // template <class A> static Vec screenCoord(const A& p, const XformMat& );
         // template <class A> bool pntClicked(const A&, double rad = .05);  
@@ -150,8 +160,140 @@ namespace vsr  {
         template <class A > bool isSelected( A * );
         template <class A > void select( A * );
         template <class A > void deselect( A * );
-        template <class A > void toggleSelect( A * );
-    };
+        template <class A > void toggleSelect( A * );  
+
+        //NAVIGATION
+        void keyboardCamSpin(float acc, bool trigger);
+        void keyboardCamTranslate(float acc, bool trigger);
+        void keyboardModelTransform(float acc, bool trigger);
+        void mouseModelTransform(float acc, bool trigger);
+        void mouseCamTranslate(float acc, bool trigger);
+        void mouseCamSpin(float acc, bool trigger);
+        
+        void onMouseMove();        
+        void onMouseDown();
+        void onMouseDrag();
+        void onMouseUp();        
+        void onKeyDown();
+        void onKeyUp();  
+
+        void windowTransform(){}
+    };    
+   
+    inline void Interface :: onKeyDown(){
+        
+		printf("keydown\n");
+
+        keyboard.down = true;
+        //fullscreen, etc (windowing controls)
+        windowTransform();
+                
+        //stateTransform();
+        switch(keyboard.code){
+            case 'c':
+                camera().reset(); 
+                model().reset();
+                break;
+                
+        }
+                
+        //Camera Controls			
+        if (keyboard.alt) {	
+		   // printf("alt\n");
+            keyboardModelTransform(1.0, true);
+        } else if (keyboard.shift){  
+			//printf("shift\n"); 
+            keyboardCamTranslate(1.0, true);
+        } else {                         
+            keyboardCamSpin(1.0, true);
+        }        
+                
+    }
+
+
+   inline void Interface :: onKeyUp(){
+        
+        keyboard.down = false;
+            
+        keyboardModelTransform(.7, false);
+        keyboardCamTranslate(.7, false);
+        keyboardCamSpin(.7, false);
+                    
+    }
+
+   inline void Interface :: keyboardModelTransform(float acc, bool trigger){
+
+        model().ab() = acc;
+
+        if (trigger) {
+			printf("do\n");
+            // Get Rotor Ratio between camera and model view
+            Rot ryz = Gen::ratio( model().yz(), camera().yz() );
+            Rot rxz = Gen::ratio( model().xz(), camera().xz() );
+
+            // Rotate By said Rotor
+            Biv tyz = Op::sp( model().yz(), ryz );
+            Biv txz = Op::sp( model().xz(), rxz );
+
+            switch( keyboard.code ){
+                case Key::Up:
+                {    
+                    // camera().modelView().yz()
+                    model().db() -= tyz * mModelRotVel;	
+                    break;
+                }
+                case Key::Down:  
+                {
+                    model().db() += tyz * mModelRotVel;	
+                    break;
+                }
+                case Key::Left:
+                {
+                    model().db() += txz * mModelRotVel;	
+                    break;
+                }
+                case Key::Right: 
+                {
+                    model().db() -= txz * mModelRotVel;	
+                    break;
+                }
+            }
+        }
+    }
+
+    inline void Interface :: keyboardCamTranslate(float acc, bool trigger){
+        camera().ax() = acc; 
+ 
+        if (trigger){  
+	   		
+            switch(keyboard.code){
+                case Key::Up: 
+					//printf("cam translate\n %f", acc);
+                    if (keyboard.ctrl) camera().dx() += camera().up() * mVel;
+                    else camera().dx() += camera().forward() * mVel;	
+                    break;
+                case Key::Down:
+                    if (keyboard.ctrl) camera().dx() -= camera().up() * mVel;  
+                    else camera().dx() -= camera().forward() * mVel; 
+                    break;
+                case Key::Left:  camera().dx() -= camera().right() * mVel; break;
+                case Key::Right: camera().dx() += camera().right() * mVel; break;							
+            }
+        }
+    }
+
+    inline void Interface :: keyboardCamSpin(float acc, bool trigger){
+        camera().ab() = acc; 
+        if (trigger){
+            switch(keyboard.code){
+                case Key::Up:    camera().db() += camera().yz() * mRotVel;	break;
+                case Key::Down:  camera().db() -= camera().yz() * mRotVel; break;
+                case Key::Left:  camera().db() -= camera().xz() * mRotVel; break;
+                case Key::Right: camera().db() += camera().xz() * mRotVel; break;							
+            }
+        }
+    }
+
 
     // template< class A > bool Interface :: isSelected ( A * a ){
     //     stringstream s; s << a;

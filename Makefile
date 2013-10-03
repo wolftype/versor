@@ -21,7 +21,7 @@ else
 ifeq ($(CLANG),0) 
 	CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11  
 else 
-	CXX = $(CLANG)/clang++ -std=c++11   
+	CXX = $(CLANG)/clang++ -std=c++11 -v  
 endif 
 	CXX += -arch x86_64
 endif

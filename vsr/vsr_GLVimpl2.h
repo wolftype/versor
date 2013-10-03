@@ -15,21 +15,20 @@
 #include "gfx/gfx_gl.h"  
 #include "gfx/gfx_scene.h" 
 #include "gfx/gfx_pipe.h" 
+#include "gfx/gfx_interface.h"  
 
-
-#include "vsr_interface.h"  
-
-//#include <iostream>
 
 using namespace std;
-using namespace vsr;
 using namespace glv;
-using namespace gfx::GLSL;    
+using namespace gfx;
+
+using namespace gfx::GLSL; 
+                          
 
 struct GLVImpl : public Interface::Impl {    
 	
 	Window * win; 
-    
+	
 	GLVImpl( Interface * i ) : Interface::Impl(i) {}
 
 	virtual void getViewData(void * udata) {
@@ -70,9 +69,9 @@ struct GLVImpl : public Interface::Impl {
            interface -> mouse.xrel         =  glv.mouse().xRel() / glv.width();
            interface -> mouse.yrel         = 1 - glv.mouse().yRel() / glv.height();
            
-           interface -> mouse.pos          = Vec( glv.mouse().x() / glv.width(), 1 - glv.mouse().y() / glv.height(), 0 ) ;
-           interface -> mouse.move         = Vec( glv.mouse().dx()/ glv.width(), - glv.mouse().dy()/glv.height(), 0 ) ;
-           interface -> mouse.accel        = Vec( glv.mouse().ddx(), -glv.mouse().ddy(),0);
+           interface -> mouse.pos          = Vec3f( glv.mouse().x() / glv.width(), 1 - glv.mouse().y() / glv.height(), 0 ) ;
+           interface -> mouse.move         = Vec3f( glv.mouse().dx()/ glv.width(), - glv.mouse().dy()/glv.height(), 0 ) ;
+           interface -> mouse.accel        = Vec3f( glv.mouse().ddx(), -glv.mouse().ddy(),0);
        }
 }; 
 
@@ -87,26 +86,23 @@ struct GLVInterface : public Interface {
 
 struct GLVApp : public View3D{  
   
-		int renderMode;
+	  int renderMode;
 
-	  	GLVInterface interface;
+	  GLVInterface interface;
               
-	  	gfx::Scene scene;
-	  	Pipe pipe; 
-		Mat4f mvm;
+	  gfx::Scene scene;
+	  Pipe pipe; 
 
-		 MFrame camera; 		// Camera
-		 MFrame model;    // ModelView
-                                   
+	  Mat4f mvm;
+    
   GLVApp() : View3D(), 
-    renderMode(0), camera(0,0,5)
+    renderMode(0)
  {
 	
 	stretch(1,1);
 	colors().back.set(.1,.3,.3); 
 	
-	interface.impl -> camera = &camera;
- 	interface.impl -> model = &model;     
+	interface.scene = &scene;
 	
 	scene.camera.bUseFrust = false; 
 	initView(); 
@@ -145,7 +141,7 @@ struct GLVApp : public View3D{
           
 			scene.fit(tw,th);
 
-			int numscreens = 1;
+			int numscreens = 4;
 
 			Pose p(-tw/2.0,-th/2.0, 0); //bottom left of screen
 
@@ -164,13 +160,9 @@ struct GLVApp : public View3D{
 	
 	   //cout << interface.vd().w << " " << interface.vd().h << endl; 
 		scene.resize( interface.vd().w, interface.vd().h );
-        
-		camera.step(); //model.step();
-		model.step();
-		
-		scene.camera.set( camera ); 
-		scene.model.set( model );   
-		
+ 
+		//scene.camera.set( cam ); 
+		//scene.model.set( model ); 
 		switch( renderMode ){
 			case 0: renderA(); break;
 			case 1: renderB(); break;
@@ -179,16 +171,22 @@ struct GLVApp : public View3D{
  } 
      //immediate mode
 	 void renderA(){
-	
-		 	scene.push();	     
-            
-    		onDraw();
+	        
+			scene.camera.step();
+			scene.model.step();
+		
+		 	scene.push();    	
+			scene.getMatrices();  
+		    interface.viewCalc(); 
+			
+			onDraw();
      
 			scene.pop();
 	}  
 	
 	//vbo render (opengl es 2.0)
-	void renderB(){                 	  
+	void renderB(){     
+		            	  
 			 // glViewport(0,0,surface.width,surface.height); 
 			 // 	         glClearColor(background[0],background[1],background[2],background[3]);
 			 // 	         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     
@@ -229,16 +227,16 @@ struct GLVApp : public View3D{
      
      switch(e){
          case Event::MouseMove:
-           // interface.onMouseMove();
+             interface.onMouseMove();
              break;
          case Event::MouseDown:
-            // interface.onMouseDown();
+             interface.onMouseDown();
              break;
          case Event::MouseDrag:
-            // interface.onMouseDrag();
+             interface.onMouseDrag();
              break;
          case Event::MouseUp:
-             //interface.onMouseUp();
+             interface.onMouseUp();
              break;
          case Event::KeyDown:
              //onKeyDown(glv);
@@ -248,19 +246,19 @@ struct GLVApp : public View3D{
              interface.onKeyUp();
              break;
              
-     }   
+     }
      
      return false;
  }   
 
   virtual bool onKeyDown(GLV& glv){ 
 	
-	//cout << "key down" << endl;
-	// switch( glv.keyboard().key() ){
-	// 	case glv::Key::Up : {
-	// 		cout << "up" << endl;
-	// 	}
-	// } 
+	cout << "key down" << endl;
+	switch( glv.keyboard().key() ){
+		case glv::Key::Up : {
+			cout << "up" << endl;
+		}
+	}
 	  
 	return true;    
 	

@@ -1,6 +1,7 @@
-#include "vsr_cga3D.h"
+#include "vsr_cga3D.h" 
+#include "vsr_cga3D_draw.h"  
+#include "vsr_cga3D_interface.h" 
 #include "vsr_GLVimpl.h" 
-#include "vsr_draw.h"
 #include "vsr_twist.h"
 
 using namespace vsr;
@@ -9,22 +10,23 @@ using namespace glv;
 
 void GLVApp :: onDraw(){
 	
-	auto a = Point(1,0,0);
-	auto b = Point(-1,0,0);
-	auto c = Point(0,1,0);
+	static MFrame f;        
 
-	static float time = 0; time +=.01;
+	Draw(f);  
 	
-	a = Point(1,0,0).motor( Twist::Along( DLN(0,1,0), cos(time), sin(time) ) );
+	static Cir cir = CXY(1).trs(1,0,0);   
 
-	auto d = Circle(a, b, c);  
-	
-	   
-	Draw(a,1,0,0); Draw(b); Draw(c);
-	Draw(d);
-	
-	Draw( DLN(0,1,0), 0,1,0 );
-	
+	static auto dlp = Plane(0,1,0);
+
+	Draw(cir,0,1,0);  
+	Draw(dlp,0,0,1);
+
+	Touch( interface, cir );
+	Touch( interface, dlp );
+
+	auto p = Meet(cir,dlp);
+
+	Draw(p,1,0,0);
 	
 }
                         

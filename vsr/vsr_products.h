@@ -425,7 +425,7 @@ struct EGA{
 	typedef typename EOProd<Vec,Vec>::Type Biv;
 	typedef typename EOProd<Biv,Vec>::Type Tri;
 	 	
-	typedef decltype( 1 + Biv() ) Rot; 
+	typedef decltype( sumv(1,Biv()) ) Rot; 
 	
 	typedef MV< pss(DIM) > Pss; //same as tri in EGA<3>
 };  
@@ -453,11 +453,11 @@ struct CGA{
    // template<TT M, TT N> using ee = MV< (1<<(M-1)) (1<<(N-1)) >; 
 	typedef MV< pss(DIM) > Pss;  
 		
-	typedef typename Blade1<DIM-2>::VEC 	Vec;
+	typedef typename Blade1<DIM-2>::VEC 	Vec;         //Euclidean Vector
 	typedef typename Blade1<2>::VEC 	Vec2D;  
-	typedef typename EOProd<Vec,Vec>::Type 	Biv;
-	typedef typename EOProd<Biv,Vec>::Type 	Tri; 	
-	typedef typename EProd<Vec,Vec>::Type 	Rot;
+	typedef typename EOProd<Vec,Vec>::Type 	Biv;      	//Euclidean Bivector
+	typedef typename EOProd<Biv,Vec>::Type 	Tri; 	    //Euclidean Trivector
+	typedef typename EProd<Vec,Vec>::Type 	Rot;        //Euclidean Rotor (Complex number in 2d, Quaternion in 3d)
 		
 	typedef MV< origin<DIM>() > Ori;
 	typedef MV< infinity<DIM>() > Inf; 
@@ -470,24 +470,29 @@ struct CGA{
 	typedef typename OProd<Tri, Inf, M, true>::Type Drt; 
 
 	 	 
-	typedef decltype( Vec() + Inf() ) Dlp;
-	typedef decltype( Biv() + Drv() ) Dll;    
-	typedef decltype( Dll() + Mnk() + Tnv()  ) Par;  
+	//typedef decltype( sum( Vec(), Inf() ) ) Dlp;
+	//typedef decltype( sum( Biv(), Drv() ) ) Dll;    
+	//typedef decltype( sum( sum( Dll(), Mnk() ), Tnv() ) ) Par;  
+	
 	   
-	typedef typename Blade1<DIM>::VEC Pnt;
+	typedef typename Blade1<DIM>::VEC Pnt; 
+	typedef typename OProd< Pnt, Pnt, M, true>::Type Par;
 	typedef typename OProd<Pnt, Inf, M, true>::Type Flp;
 
-	typedef typename Prod<Pnt,Pss, M, true>::Type Sph;   
-    typedef typename Prod<Dlp,Pss,M, true>::Type Pln;   
-    typedef typename Prod<Dll,Pss,M, true>::Type Lin;   
-    typedef typename Prod<Par,Pss,M, true>::Type Cir;   
+    typedef typename OProd< Par, Inf, M, true>::Type Lin;    
+	typedef typename OProd< Par, Pnt, M, true>::Type Cir;
+	typedef typename OProd< Cir, Pnt, M, true>::Type Sph; 
+	typedef typename OProd< Cir, Inf,M, true>::Type Pln;  
+	
+	typedef typename Prod< Lin, Pss, M, true>::Type Dll;
+	typedef typename Prod< Pln, Pss, M, true>::Type Dlp;
     
-	typedef decltype( 1 + Drv()  ) Trs;
-	typedef decltype( 1 + Tnv()  ) Trv;
-	typedef decltype( 1 + Mnk()  ) Dil; 
+	typedef decltype( sumv(1., Drv() ) ) Trs;
+	typedef decltype( sumv(1.,  Tnv() ) ) Trv;
+	typedef decltype( sumv(1.,  Mnk() ) ) Dil; 
 	typedef typename Prod<Rot,Trs,M,true>::Type Mot;    
-	typedef decltype( 1 + Par()  ) Bst; 
-	typedef decltype( 1 + Flp()  ) Tsd;   
+	typedef decltype( sumv(1.,  Par() ) ) Bst; 
+	typedef decltype( sumv(1.,  Flp() ) ) Tsd;   
 	
 };  
 
@@ -565,20 +570,21 @@ struct CGAMV : public A {
 	template<typename B>
 	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
 	template<typename B>
-	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }
-	                                                                                     
+	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }   
+	                                                                                  
 	// template<typename B>
 	// CGAMV sp2( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
 	// template<typename B>
 	// CGAMV re2( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
 	
-	CGAMV operator + (const CGAMV& a) {
+	CGAMV operator + (const CGAMV& a) const {  
+	   // printf("sum same\n");
 		CGAMV tmp;
 		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] + a[i];
 		return tmp;
 	}  
 	
-	CGAMV operator - (const CGAMV& a) {
+	CGAMV operator - (const CGAMV& a) const {
 		CGAMV tmp;
 		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] - a[i];
 		return tmp;
@@ -597,12 +603,52 @@ struct CGAMV : public A {
 	CGAMV& operator +=(const CGAMV& b){ 
 		for (int i = 0; i < A::Num; ++i) (*this)[i] += b[i];
 		return *this;
-	}                             
+	}  
+	
+	CGAMV operator / (VT f) const{   
+		CGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
+		return tmp;
+	}
+	
+	CGAMV& operator /= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] /= f; }
+		return *this;
+	}
+    
+	CGAMV operator * (VT f) const {
+		CGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] *= f; }
+		return tmp;
+	}
+	CGAMV& operator *= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] *= f; }
+		return *this;
+	}  
+	
+	//template<class B>
+	//friend auto operator + (VT b, const CGAMV& a) -> CGAMV< DIM, decltype( sumv( b, A() ) ) >;  
+	 
+	auto operator + (VT a) const -> CGAMV< DIM, decltype( sumv( a, A() ) ) >  {
+	   // printf("sumv\n");
+		return sumv(a, *this); 
+	}
+	// template<class B>
+	// friend auto operator + (const CGAMV& a, const B& b) -> CGAMV< DIM, decltype( sum( a, b ) ) >;  
+	
+	template<class B>
+	auto operator + (const CGAMV<DIM, B>& b) const -> CGAMV< DIM, decltype( sum( *this, B() ) ) >  {
+	   // printf("sum\n");
+		return sum(*this, b); 
+	}                       
 	
    static CGAMV x, y, z, xy, xz, yz;   
+
+	CGAMV<DIM, typename CGA<DIM>::Pnt > null();
               
 	template<typename T>
-	CGAMV trs( const T& );
+	CGAMV trs( const T& ); 
+	CGAMV trs( VT x, VT y, VT z );
 	template<typename T>
 	CGAMV rot( const T& );
 	template<typename T>
@@ -643,6 +689,16 @@ template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xy = A().template set<3>(1)
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xz = A().template set<5>(1);  
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::yz = A().template set<6>(1);    
 
+
+// template<TT DIM, class A> 
+// auto operator + ( VT b, const CGAMV<DIM,A>& a) -> CGAMV< DIM, decltype( sumv( b, A() ) ) >{
+// 	printf("sum!!!!\n");
+// 	return sumv(b, a );
+// }    
+// template<class B, TT DIM, class A> 
+// auto operator + (const CGAMV<DIM,A>& a, const B& b) -> CGAMV< DIM, decltype( sum( a, b ) ) >{
+// 	return sum(a,b);
+// }
 
 template<class M, class A>
 struct MGAMV : public A {  
@@ -728,9 +784,81 @@ struct EGAMV : public A {
 	template<typename B>
 	EGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
 	template<typename B>
-	EGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
+	EGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
 	
-};
+	VT wt() const{ return (*this <= *this)[0]; }
+	VT rwt() const{ return (*this <= ~(*this))[0]; }
+	VT norm() const { VT a = rwt(); if(a<0) return 0; return sqrt( a ); } 
+	VT rnorm() const{ VT a = rwt(); if(a<0) return -sqrt( -a ); return sqrt( a );  }  
+	
+
+	template<class B>
+	auto operator + (const EGAMV<B>& b) -> EGAMV< decltype( sum( A(), B() ) ) > {
+		return sum(*this,b);
+	}   
+	
+	EGAMV operator + (const EGAMV& a) const {
+		EGAMV tmp;
+		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] + a[i];
+		return tmp;
+	}  
+	
+	EGAMV operator - (const EGAMV& a) const {
+		EGAMV tmp;
+		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] - a[i];
+		return tmp;
+	}
+	 
+	EGAMV operator -() const{
+		EGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] = -tmp[i]; }
+		return tmp;
+	}  
+	
+	EGAMV& operator -=(const EGAMV& b){ 
+		for (int i = 0; i < A::Num; ++i) (*this)[i] -= b[i];
+		return *this;
+	}   
+	EGAMV& operator +=(const EGAMV& b){ 
+		for (int i = 0; i < A::Num; ++i) (*this)[i] += b[i];
+		return *this;
+	}  
+	
+	EGAMV operator / (VT f) const{   
+		EGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
+		return tmp;
+	}
+	
+	EGAMV& operator /= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] /= f; }
+		return *this;
+	}
+    
+	EGAMV operator * (VT f) const {
+		EGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] *= f; }
+		return tmp;
+	}
+	EGAMV& operator *= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] *= f; }
+		return *this;
+	}  
+	
+	auto operator + (VT a) const -> EGAMV< decltype( sumv( a, A() ) ) >  {
+	   // printf("sumv\n");
+		return sumv(a, *this); 
+	}
+	
+	// template<class B>
+	// friend auto operator + (const B& b, const EGAMV& a) -> EGAMV<decltype( sum( b, a ) ) >;  
+	// 
+	// template<class B>
+	// friend auto operator + (const EGAMV& a, const B& b) -> EGAMV<decltype( sum( a, b ) ) >;
+	//                                                                                            
+};   
+
+
 
 //EUCLIDEAN CANDIDATES
 template<TT N> using NESca = EGAMV<typename EGA<N>::Sca>;   

@@ -473,9 +473,14 @@ namespace vsr{
     template<> void Field< Sca > :: init() {
         ITN  mData[i] = Sca(0); END
     }
+
+    template<> void Field< Dll > :: init(){
+        ITN mData[i] = Frame( mPoint[i] ).dll(); END
+    }
     
-    template<> void Field< Frame > :: init(){
-        ITN mData[i].pos() = mPoint[i]; END
+    template<> void Field< Frame > :: init(){  
+		//printf("FRAME FIELD INIT\n");
+		ITN mData[i].pos() = mPoint[i]; END
     }
 
 

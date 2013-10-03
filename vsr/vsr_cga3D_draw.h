@@ -9,10 +9,14 @@
 #define VSR_DRAW_H_INCLUDED  
 
 #include "gfx/gfx_glyphs.h" 
-
+ 
+#include "vsr_op.h"
+#include "vsr_frame.h" 
+#include "vsr_field.h"
 
 namespace vsr{
-	
+	                         
+	using namespace gfx;
 	
 	template<class A>
 	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
@@ -21,7 +25,9 @@ namespace vsr{
 		glColor4f(r,g,b,a);
 			Immediate(s);
 		glPopMatrix();
-	} 
+	}  
+	
+   // void Seg( const Cir& c )
 	
            
 	// FEATURE ExTRAcTION (ROTATION AND POSITION)
@@ -65,7 +71,7 @@ namespace vsr{
 	void Immediate (const Dlp& s){
 	    gfx::GL::translate( Pos(s).begin() );
 		gfx::GL::rotate( AA(s).begin() ); 
-	    Glyph::SolidGrid();
+	    Glyph::SolidGrid(5,5,5);
 	}
 
     void Immediate( const Cir& s )	{  
@@ -97,6 +103,10 @@ namespace vsr{
 		   // printf("NOOOOOO\n");
 	        gfx::Glyph::Point(s);
 	    }
+	} 
+	
+	void Immediate (const Flp& s){
+		Immediate( Ro::null( s[0], s[1], s[2] ) );
 	}
 	
      void Immediate (const Par& s){
@@ -106,7 +116,7 @@ namespace vsr{
 
 	        double ta = Ro::size( pp[0], true );   
 	
-			pp[0].vprint(); pp[1].vprint();
+			//pp[0].vprint(); pp[1].vprint();
 
 	        if ( fabs(ta) >  FPERROR ) {				
 	            Pnt p1 = Ro::cen( pp[0] );
@@ -133,6 +143,29 @@ namespace vsr{
 	    Dls v = Fl::loc( s , PAO, true);
 	    gfx::GL::translate (v.begin());
 	    gfx::Glyph::DashedLine(d * 10, d * -10);	
+	}  
+	
+	void Immediate (const Lin& s){
+	    Drv d = Fl::dir( s );
+	    Dls v = Fl::loc( s , PAO, false);
+	    gfx::GL::translate (v.begin());
+	    gfx::Glyph::Line(d * 10, d * -10);	
+	}
+	
+	void Immediate( const Frame& f){
+		 gfx::GL::translate ( f.pos().begin() );
+		 gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); 
+		
+		 gfx::Glyph::Axes( f.x(), f.y(), f.z() );
+	}  
+	
+	
+	void Immediate( const Field<Frame>& f){
+		for (int i = 0; i < f.num(); ++i){  
+			glPushMatrix(); 
+			Immediate( f[i] ); 
+			glPopMatrix(); 
+		}
 	}
 }
 

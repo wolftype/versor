@@ -9,7 +9,10 @@ typedef Blade1<4>::VEC Vec4;
 //idositetrachoron 24 cell
 auto D4 = rootSystem<4>( Vec4(1,0,0,0), Vec4(0,1,0,0), Vec4(0,0,1,0), ( Vec4(-1,-1,-1, 1) * .5 ) );
  
-auto F4 = rootSystem<4>( Vec4(0,1,-1,0), Vec4(1,-1,0,0), Vec4(0,0,1,0), ( Vec4(-1,-1,-1, 1) * .5 ) );
+auto F4 = rootSystem<4>( Vec4(0,1,-1,0), Vec4(1,-1,0,0), Vec4(0,0,1,0), ( Vec4(-1,-1,-1, 1) * .5 ) );  
+
+
+
 
 int main(){
 

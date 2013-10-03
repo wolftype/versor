@@ -232,20 +232,60 @@ template<TT N>
 struct Exists< N, MV<> >{  
 	static constexpr bool Call() { return false; }
 };
- 
 
 
-
+template<TT...XS> MV<XS...> 
+sum( const MV<XS...> & a, const MV<XS...>& b) {
+	MV<XS...> c;
+	for (int i = 0; i < MV<XS...>::Num; ++i) c[i] = a[i] + b[i];
+	return c;
+} 
+template<TT...XS> MV<XS...> 
+diff( const MV<XS...> & a, const MV<XS...>& b) {
+	MV<XS...> c;
+	for (int i = 0; i < MV<XS...>::Num; ++i) c[i] = a[i] - b[i];
+	return c;
+}
 template<TT...XS, TT...YS> 
-typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type operator + ( const MV<XS...> & a, const MV<YS...>& b) {
-	typedef typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type Ret;
-	return a.template cast<Ret>() + b.template cast<Ret>();
+typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type 
+sum( const MV<XS...> & a, const MV<YS...>& b) {
+	typedef typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type Ret; 
+	return sum( a.template cast<Ret>() ,  b.template cast<Ret>() );
 } 
 template<TT...XS, TT...YS> 
-typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type operator - ( const MV<XS...> & a, const MV<YS...>& b) {
+typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type 
+diff( const MV<XS...> & a, const MV<YS...>& b) {
 	typedef typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type Ret;
-	return a.template cast<Ret>() - b.template cast<Ret>();
+	return diff( a.template cast<Ret>() ,  b.template cast<Ret>() );
 }
+
+template<TT ... XS>
+typename ICat< typename NotType< MV<0>, MV<XS...> >::Type, MV<0> >::Type 
+sumv( VT a, const  MV<XS...>& b) {
+	typedef typename ICat< typename NotType< MV<0>,  MV<XS...> >::Type, MV<0> >::Type Ret;
+	return sum( Ret(a) , b.template cast<Ret>() );
+}
+
+         
+// template<class A>
+// A operator / (const A& a, VT f){
+// 	A tmp = a;
+// 	for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
+// 	return tmp;
+// }    
+// 
+// template<TT X, TT ... XS>
+// MV<X,XS...>& operator *= (MV<X,XS...>& a, VT f){
+// 	for (int i = 0; i < MV<X,XS...>::Num; ++i){ a[i] *= f; }
+// 	return a;
+// } 
+// 
+// template<class A>
+// A& operator /= (A& a, VT f){
+// 	for (int i = 0; i < A::Num; ++i){ a[i] /= f; }
+// 	return a;
+// } 
+ 
 
 // template<TT...XS, TT...YS> 
 // MV<XS...> operator += ( MV<XS...> & a, const MV<YS...>& b) {
@@ -260,55 +300,7 @@ typename ICat< typename NotType< MV<XS...>, MV<YS...> >::Type, MV<XS...> >::Type
 // typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type operator + ( VT a, const B& b) {
 // 	typedef typename ICat< typename NotType< MV<0>, B >::Type, MV<0> >::Type Ret;
 // 	return Ret(a) + b.template cast<Ret>();
-// } 
-template<TT ... XS>
-typename ICat< typename NotType< MV<0>, MV<XS...> >::Type, MV<0> >::Type operator + ( VT a, const  MV<XS...>& b) {
-	typedef typename ICat< typename NotType< MV<0>,  MV<XS...> >::Type, MV<0> >::Type Ret;
-	return Ret(a) + b.template cast<Ret>();
-}
-
-         
-
-template<class A>
-A operator * (const A& a, VT f){
-	A tmp = a;
-	for (int i = 0; i < A::Num; ++i){ tmp[i] *= f; }
-	return tmp;
-}     
-
-template<class A>
-A operator / (const A& a, VT f){
-	A tmp = a;
-	for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
-	return tmp;
-}    
-
-template<TT X, TT ... XS>
-MV<X,XS...>& operator *= (MV<X,XS...>& a, VT f){
-	for (int i = 0; i < MV<X,XS...>::Num; ++i){ a[i] *= f; }
-	return a;
-} 
-
-template<class A>
-A& operator /= (A& a, VT f){
-	for (int i = 0; i < A::Num; ++i){ a[i] /= f; }
-	return a;
-}
- 
-
-
-// template< class A>
-// A& operator -=(A& a, const A& b){ 
-// 	for (int i = 0; i < A::Num; ++i) a[i] -= b[i];
-// 	return a;
 // }
-// template< class A>
-// A& operator +=(A& a, const A& b){ 
-// 	for (int i = 0; i < A::Num; ++i) a[i] += b[i];
-// 	return a;
-// }   
-
-
   
 
 } //vsr::   
