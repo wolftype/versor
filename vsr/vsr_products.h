@@ -420,7 +420,8 @@ auto mgp_inst(const A&, const B&) RETURNS(
 template<TT DIM>
 struct EGA{    
 	typedef MV<0> Sca; 
-	template<TT N> using e = MV< 1<<(N-1) >;
+	//template<TT N> using e = MV< 1<<(N-1) >;
+    template<TT ... N> using e = MV< blade( (1<<(N-1))... ) >;  
 	typedef typename Blade1<DIM>::VEC Vec;
 	typedef typename EOProd<Vec,Vec>::Type Biv;
 	typedef typename EOProd<Biv,Vec>::Type Tri;
@@ -866,7 +867,7 @@ template<TT N> using NEVec = EGAMV<typename EGA<N>::Vec>;
 template<TT N> using NEBiv = EGAMV<typename EGA<N>::Biv>; 
 template<TT N> using NETri = EGAMV<typename EGA<N>::Tri>; 
 template<TT N> using NERot = EGAMV<typename EGA<N>::Rot>; 
-template<TT N> using NEe   = EGAMV<typename EGA<N>::template e<N> >;   
+template<TT N, TT ... NN> using NEe   = EGAMV<typename EGA<N>::template e<NN...> >;   
 
 //N-Dimensional Conformal Candidates                        
 template<TT N, TT E> using Ne  =  CGAMV<N,typename CGA<N>::template e<E> >; 

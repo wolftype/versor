@@ -155,7 +155,7 @@ namespace vsr{
 	void Immediate( const Frame& f){
 		 gfx::GL::translate ( f.pos().begin() );
 		 gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); 
-		
+		 gfx::GL::scale( f.scale() );	
 		 gfx::Glyph::Axes( f.x(), f.y(), f.z() );
 	}  
 	
@@ -165,6 +165,12 @@ namespace vsr{
 			glPushMatrix(); 
 			Immediate( f[i] ); 
 			glPopMatrix(); 
+		}
+	} 
+	template<class T>
+	void Immediate( const Field<T>& f){
+		for (int i = 0; i < f.num(); ++i){  
+			Immediate( f[i] ); 
 		}
 	}
 }

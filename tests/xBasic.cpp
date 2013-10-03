@@ -12,7 +12,8 @@ void GLVApp :: onDraw(){
 	
 	static MFrame f;        
 
-	Draw(f);  
+	Draw(f); 
+	Touch(interface, f); 
 	
 	static Cir cir = CXY(1).trs(1,0,0);   
 

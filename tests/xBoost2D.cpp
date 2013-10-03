@@ -1,6 +1,5 @@
 #include "vsr_cga2D_types.h"  
 #include "vsr_cga2D_draw.h" 
-
 #include "vsr_GLVimpl2.h" 
 
 using namespace vsr;

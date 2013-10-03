@@ -17,7 +17,7 @@ To build with the 5D Conformal Model
 
 To draw to screen
 
-	#include "vsr_draw.h" 
+	#include "vsr_cga3D_draw.h" 
 	
 To use the submodule windowing system (I use GLV) You'll want to 
 

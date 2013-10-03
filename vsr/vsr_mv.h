@@ -58,7 +58,7 @@ struct MV<X, XS...>{
 	static const TT HEAD = X;
 	typedef MV<XS...> TAIL;  
 	
-	// template<typename...Args>     
+	
 	template<typename...Args>     
 	constexpr explicit MV(Args...v) : val{ static_cast<VT>(v)...} {}    
 	  

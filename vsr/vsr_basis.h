@@ -11,7 +11,15 @@ using namespace std;
 	
 
 typedef float VT; 
-typedef short TT;
+typedef short TT;  
+
+constexpr TT blade(){ return 0; }
+
+template<class X, class...XS>
+constexpr TT blade( X x, XS ... xs){
+	return x | blade(xs...);  
+}
+
 
 template<int N>
 inline string bitString( int b ){
@@ -20,7 +28,7 @@ inline string bitString( int b ){
 }
 
 inline void bsprint(int x){
-	printf("%s\n", bitString<8>(x).c_str() );
+	printf("%s\n", bitString<5>(x).c_str() );
 }
 	
 constexpr TT grade (TT a, TT c = 0){

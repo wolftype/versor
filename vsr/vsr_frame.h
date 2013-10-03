@@ -52,7 +52,12 @@ namespace vsr {
 		
 		Biv xy()  const { return x() ^ y(); }
 		Biv xz()  const { return x() ^ z(); }
-		Biv yz()  const { return y() ^ z(); }
+		Biv yz()  const { return y() ^ z(); }   
+		
+		Cir cxy() const { return Ro::cir( bound(), xy() ); }
+		Cir cxz() const { return Ro::cir( bound(), xz() ); }
+		Cir cyz() const { return Ro::cir( bound(), yz() ); } 
+	   
 		
 		Vec right() const { return x(); }
 		Vec up() const { return y(); }   
@@ -69,9 +74,19 @@ namespace vsr {
 			Mot m(trs() * rot()); 
 			VT n = m.rnorm();
 			return (n !=0 ) ? m / n : m ; 
-		} 
+		}  
 		
-		Dll dll() const { return Gen::log( mot() ); }       ///< get dll log of motor (for interpolating)
+		Dls bound() const{
+			return Ro::dls( mPos, mScale );
+		}
+		
+		Dll dll() const { return Gen::log( mot() ); }       ///< get dll log of motor (for interpolating)  
+		
+		Frame& dilate(double t) { 
+			Dls s =  bound().dil( bound(), t ) ;
+			mScale = Ro::rad(s);
+			return *this;
+		}
 
 	};
    

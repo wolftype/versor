@@ -1,6 +1,9 @@
 //
 //  vsr_lattice.h
 //  Versor
+//           
+
+// Should not assume a metric . . .
 //
 //  Created by Pablo Colapinto on 3/7/13.
 //  Copyright (c) 2013 __MyCompanyName__. All rights reserved.
@@ -38,7 +41,11 @@ namespace vsr {
                 for (int k = 0; k < mDepth; ++k){\
                     double w = 1.0 * k/mDepth; \
                     int tidx = idx(i,j,k);
-        
+
+	#define BOUNDITER0\
+				for (int i = 0; i < mWidth-1; ++i){ \
+				for (int j = 0; j < mHeight-1; ++j){ \
+				for (int k = 0; k < mDepth-1; ++k){ \        
     
 	#define BOUNDITER\
 				for (int i = 1; i < mWidth-1; ++i){ \
@@ -129,7 +136,7 @@ namespace vsr {
         void spacing( double amt ) { mSpacing = amt; init(); }
         
         int num() const { return mNum; }
-        
+        int numVxl() const { return mNumVxl; }    
         /*! Get Index In Array */
         int idx(int i, int j, int k) const { 
             if (i > w() - 1) i = w()  -1;
@@ -144,6 +151,7 @@ namespace vsr {
         }
         
         
+	   
         //VOXEL IDX
         Vxl vxl(int ix) const { return mVxl[ix]; }
         Vxl& vxl(int ix)  { return mVxl[ix]; }
@@ -202,7 +210,7 @@ namespace vsr {
 
         
             //VXLS
-            BOUNDITER
+            BOUNDITER0
             
                 int ix = i * (mHeight-1) * (mDepth-1) + j * (mDepth-1) + k;
                 Vec v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
@@ -211,11 +219,11 @@ namespace vsr {
                 
                 //assign face information
                 int type = 0;
-                type |= (k==1) ? FRONT : 0;
+                type |= (k==0) ? FRONT : 0;
                 type |= (k==mDepth-2) ? BACK: 0;					
-                type |= (j==1) ? BOTTOM : 0;
+                type |= (j==0) ? BOTTOM : 0;
                 type |= (j==mHeight-2) ? TOP: 0;					
-                type |= (i==1) ? LEFT : 0;
+                type |= (i==0) ? LEFT : 0;
                 type |= (i==mWidth-2) ? RIGHT: 0;	
                 
                 mVxl[ix].type = type;					
@@ -522,6 +530,13 @@ namespace vsr {
 
         vector<int>& face() { return mFace; }
         int face(int ix) const { return mFace[ix]; }
+
+		 vector<int>& faceVxl() { return mFaceVxl; } 
+		 Vxl faceVxl(int ix) { return mVxl[ mFaceVxl[ix] ]; }    
+		
+	   // Vxl vxl(int ix) const { return mVxl[ix]; }
+
+
      protected:
         
         int mWidth, mHeight, mDepth;

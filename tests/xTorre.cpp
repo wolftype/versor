@@ -53,33 +53,57 @@ void knot(){
 	  
 }   
 
-void twist(){
+void twist(GLVApp& app){
 	
-	static Field< Dll > f(2,2,2,5); 
-	
-	
+	static Field< Frame > f(2,2,2,5); 
+	static Field< Dll > f2(2,2,2,5); 
 	
 	int num = 10;
+	
+	static Field< Pnt > f3(num+1,num+1,num+1);
+	
+	for (int i = 0; i < f.num(); ++i){
+		Touch(app.interface, f[i]); 
+		Draw(f[i]);
+		f2[i] = f[i].dll();
+	}  
 	  
-	for (int i = 0; i < num; ++i ){ 
+	for (int i = 0; i <= num; ++i ){ 
 		float tu = 1.0 * i/num;
-		for (int j = 0; j < num; ++j ){
+		for (int j = 0; j <= num; ++j ){
 			float tv = 1.0 * j/num;  
-            for (int k = 0; k < num; ++k ){   
+	            for (int k = 0; k <= num; ++k ){   
 				float tw = 1.0 * k/num;  
-				Dll dll = f.vol(tu,tv,tw); 
-				
-				Draw( Frame( dll ) );
+				Dll dll = f2.vol(tu,tv,tw); 
+				Frame fr(dll);
+				Draw( fr );   
+				f3.at(i,j,k) = fr.pos();
 			}
 		}
-	}
+	}  
+	
+   // glBegin(GL_QUADS);  
+	for (int i = 0; i < f3.face().size(); ++i ){
+	   // Draw( f3[ f3.face(i) ] ); 
+		//cout << vxl << endl; 
+		//cout << vxl << endl; 
+		//Draw( f3[vxl.a] );
+		//gfx::GL::Quad( f3[vxl.a],f3[vxl.b], f3[vxl.c], f3[vxl.d]);
+	} 
+   
+   glBegin(GL_QUADS);
+	for (int i = 0; i < f3.faceVxl().size(); ++i ){
+		Vxl vxl = f3.faceVxl(i); 
+		gfx::GL::Quad( f3[vxl.a],f3[vxl.b], f3[vxl.c], f3[vxl.d]);
+	} 
+   glEnd(); 
 	
 }
 
 void GLVApp :: onDraw(){
 	      
 	//bend();
-   // twist();
+    twist(*this);
    // knot();  
 
 	
@@ -90,13 +114,14 @@ GLVApp * myApp;
 
 int main(){
 
-	myApp = new GLVApp();
-	myApp -> stretch(1,1);
+
+
 	
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"CGA2D",&glv);    
-    
+    myApp = new GLVApp(win); 
+  
 	glv << *myApp;
 
 	Application::run();
