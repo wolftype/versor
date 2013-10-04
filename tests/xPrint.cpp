@@ -48,7 +48,6 @@ int main(){
 	EGA<3>::Rot rot;
 	printf("Rotor:\n"); rot.bprint();  
 	
-	EGAMV< EGA<3>::Vec >
 	
 	 
 	

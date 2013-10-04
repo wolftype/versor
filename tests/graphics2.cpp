@@ -1,8 +1,6 @@
-// #define __CON__ //must define global metric !
-// #define GLOBAL_METRIC RMetric<4,1>::Type()     
 
 #include "vsr_op.h"
-#include "vsr_GLVimpl2.h" 
+#include "vsr_GLVimpl.h" 
 #include "vsr_cga3D_draw.h"
 
 using namespace vsr;

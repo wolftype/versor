@@ -1,9 +1,9 @@
 GCC = 0 
-GFX = 0  
 RPI = 0
 PORT = 22
 HOST = pi-la
 NAME = main    
+GFX=1
 
 PIROOT = $(HOME)/code/pi/root/
 
@@ -21,7 +21,7 @@ else
 ifeq ($(CLANG),0) 
 	CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11  
 else 
-	CXX = $(CLANG)/clang++ -std=c++11 -v  
+	CXX = clang++ -std=c++11 -v  
 endif 
 	CXX += -arch x86_64
 endif
@@ -90,10 +90,19 @@ $(LIB_NAME): dir $(addprefix $(OBJ_DIR),$(OBJ))
 
 FORCE:
 
-.PRECIOUS: $(EXEC)
+.PRECIOUS: $(EXEC)  
+ 
+glv: 
+	@echo "glv"
+	@echo "building external GUI library GLV . . . if there are errors, make sure you have entered:\n\n"
+	@echo "git submodule init"
+	@echo "git submodule update\n\n"
+	$(MAKE) --no-print-directory -C ext/glv install DESTDIR=../../$(BUILD_DIR)
 
-$(EXEC): dir FORCE 
-	$(CXX) -o $(BIN_DIR)$(NAME) $@ $(IPATH) $(LDFLAGS) 
+$(EXEC): dir glv FORCE 
+	@echo Building $@
+	$(CXX) -o $(BIN_DIR)$(*F) $@ $(IPATH) $(LDFLAGS)
+	@cd $(BIN_DIR) && ./$(*F)
 
 run:
 	./$(BIN_DIR)$(NAME) 

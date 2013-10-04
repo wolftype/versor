@@ -45,12 +45,12 @@ namespace vsr {
 	#define BOUNDITER0\
 				for (int i = 0; i < mWidth-1; ++i){ \
 				for (int j = 0; j < mHeight-1; ++j){ \
-				for (int k = 0; k < mDepth-1; ++k){ \        
+				for (int k = 0; k < mDepth-1; ++k){        
     
 	#define BOUNDITER\
 				for (int i = 1; i < mWidth-1; ++i){ \
 				for (int j = 1; j < mHeight-1; ++j){ \
-				for (int k = 1; k < mDepth-1; ++k){ \
+				for (int k = 1; k < mDepth-1; ++k){
 
 	#define BOUNDEND \
 				}}}

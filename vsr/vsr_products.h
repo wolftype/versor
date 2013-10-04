@@ -361,7 +361,33 @@ struct EIProd{
 		return DO::template Make<Type>(a, b);
 	}
 }; 
+      
 
+//Reduced Product input a and b and known return type r (i.e. for spinors)
+template<class A, class B, class R, class Metric, bool SplitIt>
+struct RProd{
+	typedef typename MGP<A,B,Metric>::Type AB; //A*B Type
+	
+	//Instructions for (type A*B) 
+	typedef typename Index< AB, R>::Type DO; 
+	   
+	constexpr R gp(const A& a, const B& b) const{
+		return DO::template Make<R>(a, b);
+	}
+}; 
+
+//Reduced Product input a and b and known return type r
+template<class A, class B, class R, class Metric>
+struct RProd<A, B, R, Metric, true>   {
+	typedef typename CGP<A,B,Metric>::Type AB; //A*B Type
+	
+	//Instructions for (type A*B) 
+	typedef typename Index< AB, R>::Type DO; 
+	   
+	constexpr R gp(const A& a, const B& b) const{
+		return DO::template Make<R>(a, b);
+	}
+};
 
 //EUCLIDEAN
 template<class A, class B>
@@ -403,7 +429,12 @@ CA cop(const A& a, const B& b) RETURNS(
 template<class M, class A, class B>
 CA cip(const A& a, const B& b) RETURNS(
 	( IProd<A,B,M,true>().ip(a, b) )
-)
+) 
+//spin a by b, return a
+template<class M, class A, class B>
+constexpr A csp(const A& a, const B& b) {
+	return RProd< typename Prod<B,A,M,true>::Type, B, A, M, true>().gp( cgp<M>(b, a),   Reverse< B >::Type::template Make(b) );
+}
                      
                 
 template<class A, class B>
@@ -569,7 +600,9 @@ struct CGAMV : public A {
     CGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }  
 
 	template<typename B>
-	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
+	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 
+	template<typename B>
+	CGAMV sptest( const B& b) const { return csp<M>(*this, b); } 
 	template<typename B>
 	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }   
 	                                                                                  

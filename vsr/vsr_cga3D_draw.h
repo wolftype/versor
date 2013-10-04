@@ -111,14 +111,12 @@ namespace vsr{
 	
      void Immediate (const Par& s){
 	        //Is Imaginary?
-	        double size = Ro::size( s, false );
+	        VT size = Ro::size( s, false );
 	        std::vector<Pnt> pp = Ro::split( s );
 
-	        double ta = Ro::size( pp[0], true );   
-	
-			//pp[0].vprint(); pp[1].vprint();
-
-	        if ( fabs(ta) >  FPERROR ) {				
+	        VT ta = Ro::size( pp[0], true );   
+	                                     
+	        if ( fabs(ta) >  FPERROR ) {    
 	            Pnt p1 = Ro::cen( pp[0] );
 	            Pnt p2 = Ro::cen( pp[1] );
 	            double t = sqrt ( fabs ( ta ) );
