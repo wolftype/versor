@@ -62,7 +62,7 @@ endif
 ifeq ($(GFX),1) 
 IPATH += -Iext/glv/ -Iext/gfx/ 
 ifeq ($(PLATFORM),Linux)
-	LDFLAGS += -lglv -lGL -lglut 
+	LDFLAGS += -lGLV -lGLEW -lGLU -lGL -lglut 
 else
 	LDFLAGS += -lglv -framework OpenGL -framework GLUT 
 endif
