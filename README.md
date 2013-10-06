@@ -56,20 +56,16 @@ and let me know what you think.  If you don't, then I wouldn't . . .
 
 IMPORTANT NOTE ON MAKEFILE FLAGS
 
-1. CLANG=path/to/clang/ 
+1. CLANG=path/to/clang/ (default usr/local/bin)
 		The makefile assumes clang is at usr/local/bin/ -- if you want to change that set this flag  
 
-2. GCC=1 
+2. GCC=1  (default 0)
 		If you want to build with GCC set GCC=1.
 
-3. RPI=1
+3. RPI=1 (default 0)
         vsr also builds on the Raspberry Pi with a cross-compiler (GCC=1 RPI=1)
 		(note you cannot build from the pi itself, you must use a cross-compiler)
 
-3. GFX=1 
-		if you want to build with graphics you have to make with GFX=1
-
-4. NAME=myapp
-		if you want to name the binary you are making something other than main, use NAME=myappname
-
-5. "make run" to run the "main" binary (or "make run NAME=myapp")
+3. GFX=0 (default 1) 
+		if you want to build without graphics support you can set GFX=0
+                                                                       
