@@ -1,15 +1,24 @@
 Versor 2.0 is a C++11 Library that generates optimized geometric algebra code at compile-time.
 It can handle arbitrary metrics and dimensions (limited by your compiler...).
 
+To use the submodule windowing system (I use GLV) You'll want to 
+                        
+	git clone git://github.com/wolftype/vsr2.0.git
+	cd vsr2.0
+	git submodule init
+	git submodule update
+
 To test a graphics example
 
-	make tests/xElements.cpp GFX=1 
+	make tests/xElements.cpp
 	
 If you have errors see important makefile notes below
 
 You need clang 3.2 or above or gcc 4.6 or above.  NOT tested on windows. 
 If you don't want to or can't compile C++11 code try an older flavor of vsr
-(github.com/wolftype/vsr.git)
+(github.com/wolftype/vsr.git) 
+
+Homepage at versor.mat.ucsb.edu
                                                                       
 To build with the 5D Conformal Model
 
@@ -17,12 +26,13 @@ To build with the 5D Conformal Model
 
 To draw to screen
 
-	#include "vsr_cga3D_draw.h" 
-	
-To use the submodule windowing system (I use GLV) You'll want to 
+	#include "vsr_cga3D_draw.h"  
 
-	git submodule init
-	git submodule update
+To inferface with elements using "G", "R", "S" keys to Grab, Rotate, or Scale:
+                                   
+	#include "vsr_cga3D_interface.h"
+	
+
 	
 What's new? 
 
