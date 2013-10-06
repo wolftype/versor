@@ -4,6 +4,11 @@ PORT = 22
 HOST = pi-la
 NAME = main    
 GFX=1
+PLATFORM=$(shell uname)
+
+ifeq ($(PLATFORM),Linux)
+	GCC = 1
+endif
 
 PIROOT = $(HOME)/code/pi/root/
 
@@ -56,7 +61,11 @@ endif
 
 ifeq ($(GFX),1) 
 IPATH += -Iext/glv/ -Iext/gfx/ 
-LDFLAGS += -lglv -framework OpenGL -framework GLUT 
+ifeq ($(PLATFORM),Linux)
+	LDFLAGS += -lGLV -lGLEW -lGLU -lGL -lglut 
+else
+	LDFLAGS += -lglv -framework OpenGL -framework GLUT 
+endif
 endif
                            
 LDFLAGS := $(LDFLAGS)  
@@ -119,4 +128,3 @@ dir:
 clean:
 	@rm -r $(OBJ_DIR)
 	@rm -r $(LIB_DIR)
-
