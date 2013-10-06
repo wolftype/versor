@@ -12,7 +12,7 @@ endif
 
 PIROOT = $(HOME)/code/pi/root/
 
-CLANG = 1
+CLANG = 0
 
 #COMPILER VERSION  
 
@@ -23,8 +23,8 @@ else
    CXX = g++ -std=c++0x 
 endif
 else  
-ifeq ($(CLANG),0) 
-	CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11  
+ifneq ($(CLANG),0) 
+	CXX = $(CLANG)/clang++ -std=c++11  
 else 
 	CXX = clang++ -std=c++11 -v  
 endif 

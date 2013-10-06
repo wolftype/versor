@@ -10,7 +10,7 @@ To use the submodule windowing system (I use GLV) You'll want to
 
 To test a graphics example
 
-	make tests/xElements.cpp
+	make tests/xBasics.cpp
 	
 If you have errors see important makefile notes below
 
@@ -60,7 +60,7 @@ IMPORTANT NOTE ON MAKEFILE FLAGS
 		The makefile assumes clang is at usr/local/bin/ -- if you want to change that set this flag  
 
 2. GCC=1 
-		If you are building on linux, set GCC=1.
+		If you want to build with GCC set GCC=1.
 
 3. RPI=1
         vsr also builds on the Raspberry Pi with a cross-compiler (GCC=1 RPI=1)
