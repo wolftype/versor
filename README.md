@@ -1,7 +1,5 @@
 Versor 2.0 is a C++11 Library that generates optimized geometric algebra code at compile-time.
 It can handle arbitrary metrics and dimensions (limited by your compiler...).
-
-To use the submodule windowing system (I use GLV) You'll want to 
                         
 	git clone git://github.com/wolftype/vsr2.0.git
 	cd vsr2.0
