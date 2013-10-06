@@ -17,15 +17,30 @@ auto nrot( const B& b) -> EGAMV<decltype( B() + 1 )> {
 	return  (b*sc) + cos(c);
 } 
 
-static const int DIM = 4; 
 
-NCube<DIM> tetra;  
-  
-void GLVApp :: onDraw(){ 
+struct MyApp : App {
+	         
+	
+	bool bOrtho;
+	static const int DIM = 6; 
+
+	NCube<DIM> tetra;
+   	
+	MyApp(Window * w ) : App(w) {
+		initGui();
+	}
+	
+	virtual void initGui(){  
+		printf("init gui\n");
+		gui(bOrtho); 
+	}   
+	
+	virtual void onDraw(){
+	   	// EGAMV< MV<9,12,34,96> > b( .01,.01,.01,.01 );// .01, .01 );   
+		// 
 		
-
-		// EGAMV< MV<9,12,34,96> > b( .01,.01,.01,.01 );// .01, .01 );   
-		//
+		scene.camera.lens.bOrtho = bOrtho;
+		
 		EGAMV< MV<12> > b(.01);
 		typedef EGAMV< typename EGA<3>::Vec > Vec; 
 		
@@ -34,7 +49,7 @@ void GLVApp :: onDraw(){
 		// 
 		VT dist = scene.camera.pos().len();
 		
-		printf("dist: %f\n", dist);  
+		//printf("dist: %f\n", dist);  
 		// 		 
 		auto& res = tetra.roots; 
 		// 
@@ -42,9 +57,11 @@ void GLVApp :: onDraw(){
 		
 			i = i.sp( nrot( b ) ); 
 		
-			auto tmp = Proj<DIM>::Call(dist,i); 
+			auto tmp = Proj<DIM>::Call(dist,i);
+			auto tort = Proj<DIM>::Ortho<3>(i); 
+			 
 			auto val = Proj<DIM>::Val(dist,i );
-			proj.push_back(tmp);
+			proj.push_back( bOrtho ? tort : tmp);
 			col.push_back( val );
 		} 
 		// 
@@ -60,28 +77,26 @@ void GLVApp :: onDraw(){
 		// 
 		for (auto i : tetra.edges ) gfx::Glyph::Line( proj[i.a], proj[i.b] );     
 
+	 
+		
+		}
 
-} 
+};
+  
 
-	   
+MyApp * app; 
 
-    
-	GLVApp * myApp;
+int main(){
+                             
+	GLV glv(0,0);	
 
-	int main(){
-                              
-		GLV glv(0,0);	
+	Window * win = new Window(500,500,"Versor",&glv);    
+	app = new MyApp(win); 
+	
+	glv << *app;
 
-		Window * win = new Window(500,500,"Versor",&glv);    
-		myApp = new GLVApp(win);
-		myApp -> stretch(1,1);
-		glv << *myApp;
-        
-	   printf("DIM: %d\n", DIM);
+	Application::run();
 
+	return 0;
 
-		Application::run();
-
-		return 0;
-
-	}
+}  

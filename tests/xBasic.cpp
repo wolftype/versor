@@ -8,30 +8,31 @@ using namespace vsr;
 using namespace glv;  
 
 
-void GLVApp :: onDraw(){
+struct MyApp : public App {  
 	
-	static MFrame f;        
-
-	Draw(f); 
-	Touch(interface, f); 
 	
-	static Cir cir = CXY(1).trs(1,0,0);   
 
-	static auto dlp = Plane(0,1,0);
-
-	Draw(cir,0,1,0);  
-	Draw(dlp,0,0,1);
-
-	Touch( interface, cir );
-	Touch( interface, dlp );
-
-	auto p = Meet(cir,dlp);
-
-	Draw(p,1,0,0);
+	void onDraw(){
 	
-}
+		static Cir cir = CXY(1).trs(1,0,0);   
+
+		static auto dlp = Plane(0,1,0);
+
+		Draw(cir,0,1,0);  
+		Draw(dlp,0,0,1);
+
+		Touch( interface, cir );
+		Touch( interface, dlp );
+
+		auto p = Meet(cir,dlp);
+
+		Draw(p,1,0,0);
+	
+	} 
+
+};
                         
-GLVApp * myApp;
+MyApp * myApp;
 
 int main(){
 
@@ -40,8 +41,9 @@ int main(){
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"Versor",&glv);    
-	myApp = new GLVApp(win);
-	myApp -> stretch(1,1);
+	
+	myApp = new MyApp;
+	myApp -> init(win);
 	    
 	glv << *myApp;
 

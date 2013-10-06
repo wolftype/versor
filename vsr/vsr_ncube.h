@@ -2,6 +2,7 @@
 #define VSR_NCUBE_H_INCLUDED
 
 #include "vsr_products.h"
+#include "vsr_generic_op.h"
 #include <vector> 
 
 namespace vsr{    
@@ -10,28 +11,6 @@ using namespace std;
 	
 //typedef EGAMV< typename Blade1<3>::VEC > Vec;
 
-template<int DIM>
-struct Proj{
-   	typedef EGAMV< typename Blade1<DIM>::VEC > TVec;
-	typedef EGAMV< typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
-  	 
-	static auto Call( VT dist, const TVec& v ) RETURNS (
-		( Proj<DIM-1>::Call( dist, v.template cast<OneDown>() * ( dist / (dist - v[DIM-1] ) ) ) )
-	)  
-	 
-	
-	static VT Val( VT dist, const TVec & v ) { return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); }
-	// static VT Val( VT dist, const Vec& v) {
-	// 	return Proj< DIM, 4, DIM==TARGET >::Call(dist, v);
-	// } 
-};    
-     
-template<>
-struct Proj<3>{  
-    typedef EGAMV< typename Blade1<3>::VEC > TVec;
-	static TVec Call(VT dist, const TVec& v) { return v; }  
-	static VT Val(VT dist, const TVec & v ) { return 1.0; }
-}; 
 
  
 struct Edge{                                            

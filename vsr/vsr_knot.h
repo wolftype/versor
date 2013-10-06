@@ -65,7 +65,26 @@ struct TorusKnot  {
     
     Bst bst(double t) { amt = t; return bst(); }
     
-    TorusKnot(double p = 3, double q = 2, double a = .001) : P(p), Q(q), amt(a) {}
+    TorusKnot(double p = 3, double q = 2, double a = .01) : P(p), Q(q), amt(a) {}   
+                     
+	//calculate full orbit from point p
+	void calc( const Pnt& p){
+		Pnt np = p; 
+		Bst tbst = bst();
+		for (int i = 0; i < iter(); ++ i ){
+			np = Ro::loc( np.sp( tbst ) );  
+			add(np);
+		}                   
+		//Tube Neighborhood
+		for (int i = 0; i < iter(); ++i ){ 
+			double t = -1 + 2.0 * i/ iter();
+	        double tt = 1 + t * t;
+	        int idx = i < iter() ? i + 1 : 0;  
+			Par tpar = pnt[i] ^ pnt[idx];
+			Cir c = tpar.dual();//.dil(tk.pnt[i], );
+			add ( c );
+		}
+	}
 
 	double energy(int idx, int num){
 

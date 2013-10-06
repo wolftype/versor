@@ -3,36 +3,39 @@
 #include "vsr_GLVimpl.h" 
 
 using namespace vsr;
+     
 
-void GLVApp :: onDraw(){
+struct MyApp : App {
+
+	void onDraw(){
 	      
-	Dls a = Ro::dls( Vec(1,0),  1.0);
+		Dls a = Ro::dls( Vec(1,0),  1.0);
 	
-	Draw(a);
+		Draw(a);  
 	
-	a.bprint();  
+		for (int i = 0; i < 10; ++i){          
+			float t = 1.0 * i/10; 
+			auto tmp = a.sp( Gen::trv( Tnv(1,0) * t ) ); 
+		   
+			Draw(  tmp );		
+		}           
 	
-	for (int i = 0; i < 10; ++i){          
-		float t = 1.0 * i/10; 
-		auto tmp = a.sp( Gen::trv( Tnv(0,1) * t ) ); 
-		tmp.vprint();
-		Draw(  tmp );		
-	}           
-	
-}
+	}  
+
+};
                         
-GLVApp * myApp;
+MyApp * app;
 
 int main(){
 
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"CGA2D",&glv);    
-	myApp = new GLVApp(win);
-	myApp -> stretch(1,1);
-	    
-	glv << *myApp;
-
+	app = new MyApp;   
+	
+	app -> init(win); 
+	       
+	glv << *app;
 	Application::run();
 	
 	return 0;

@@ -10,7 +10,7 @@ namespace vsr{
 using namespace std;
 	
 
-typedef float VT; 
+typedef double VT; 
 typedef short TT;  
 
 constexpr TT blade(){ return 0; }

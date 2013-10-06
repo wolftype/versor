@@ -2,23 +2,20 @@
 #define ROOT_SYSTEM_INCLUDED
                       
 #include <vector>
-#include <iostream>
-#include "vsr_products.h"  
+//#include <iostream>
+#include "vsr_products.h"   
+#include "vsr_generic_op.h"
 
 
 using namespace std;
 
 namespace vsr{
-          
-// template<class A, class B>
-// auto ref(const A& a, const B& b) RETURNS(
-// 	egp( egp(b, a.involution() ), 
-// )    
+             
 	
 template<int DIM, class ... R >
-vector< EGAMV<typename EGA<DIM>::Vec>  > rootSystem( R ... v ){   
+vector< EGAMV< typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){   
 	
-	typedef EGAMV<typename EGA<DIM>::Vec> V;
+	typedef EGAMV< typename Blade1<DIM>::VEC > V;
 	 
 	int n = sizeof...(R);
 	

@@ -105,6 +105,26 @@ namespace vsr{
 	    }
 	} 
 	
+	void Immediate (const Sph& s){
+ 
+	    VT ta = Ro::size( s, false );
+
+	    //Draw as dual Sphere (if |radius^2| > 0.000001);
+	    if ( fabs(ta) >  FPERROR ) {
+		   // printf("spehere!!!!!!!!!!!!!!!!!!!!\n");
+	        bool real = ta > 0 ? 1 : 0;	
+
+	        Pnt p = Ro::cen( s );
+	        VT t = sqrt ( fabs ( ta ) );
+
+	        gfx::GL::translate ( p.begin() );
+	        (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t);	
+	    } else {  
+		   // printf("NOOOOOO\n");
+	        gfx::Glyph::Point(s);
+	    }
+	}
+	
 	void Immediate (const Flp& s){
 		Immediate( Ro::null( s[0], s[1], s[2] ) );
 	}

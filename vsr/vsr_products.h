@@ -453,13 +453,19 @@ struct EGA{
 	typedef MV<0> Sca; 
 	//template<TT N> using e = MV< 1<<(N-1) >;
     template<TT ... N> using e = MV< blade( (1<<(N-1))... ) >;  
-	typedef typename Blade1<DIM>::VEC Vec;
-	typedef typename EOProd<Vec,Vec>::Type Biv;
-	typedef typename EOProd<Biv,Vec>::Type Tri;
-	 	
-	typedef decltype( sumv(1,Biv()) ) Rot; 
 	
-	typedef MV< pss(DIM) > Pss; //same as tri in EGA<3>
+	using Vec = typename Blade1<DIM>::VEC; 
+	using Biv = typename EOProd<Vec,Vec>::Type;
+	using Tri = typename EOProd<Biv,Vec>::Type;
+	using Rot =  decltype( sumv(1,Biv()) );
+	//typedef typename Blade1<DIM>::VEC Vec;
+	//typedef typename EOProd<Vec,Vec>::Type Biv;
+	//typedef typename EOProd<Biv,Vec>::Type Tri;
+	 	
+	//typedef decltype( sumv(1,Biv()) ) Rot; 
+	using Pss = MV< pss(DIM) >;
+	
+	//typedef MV< pss(DIM) > Pss; //same as tri in EGA<3>
 };  
 
 //Metric GA (e.g. SpaceTime Algebra)

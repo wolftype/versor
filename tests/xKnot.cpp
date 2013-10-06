@@ -1,6 +1,7 @@
 #include "vsr_cga3D.h"
 #include "vsr_GLVimpl.h" 
 #include "vsr_cga3D_draw.h" 
+#include "vsr_cga3D_interface.h"  
 
 #include "vsr_knot.h"
 
@@ -8,25 +9,30 @@
 using namespace vsr;
 using namespace glv;  
 
-
-void GLVApp :: onDraw(){
-
-	static auto a = Point(2,0,0);  
-	auto b = a;
-
-	TorusKnot tk(3,2);           
+struct MyApp : App {
 	
-	a = a.sptest( tk.bst() );
+
+	void onDraw(){
+     
+
+		TorusKnot tk(3,2); 
 	
-	for (int i = 0; i < tk.iter(); ++i){  
-		float t = 1.0 * i/tk.iter();
-	    b = Ro::loc( b.sptest( tk.bst() ) ); 
-		Draw(b, t, .5, 1-(t*.5));
-	}                                        
+		static auto a = Point(2,0,0);  
 	
-}
+		Touch(interface, a);
+	
+		Draw( Sphere(a,.5), 1, 0, 0 );
+
+		tk.calc( a );
+	
+		for (int i = 0; i < tk.iter(); ++i){
+			Draw( tk.cir[i],0,1,0 );
+		}                        
+	
+	}
+};
                         
-GLVApp * myApp;
+MyApp * myApp;
 
 int main(){
                           
@@ -35,8 +41,8 @@ int main(){
     		        
 	Window * win = new Window(500,500,"Versor",&glv);    
                           
-	myApp = new GLVApp(win);
-	myApp -> stretch(1,1);
+	myApp = new MyApp;
+	myApp -> init(win);
 	
 	glv << *myApp;
 

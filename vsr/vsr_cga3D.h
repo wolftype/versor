@@ -29,6 +29,10 @@ namespace vsr{
 	}
 	Sph Sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
 		return a ^ b ^ c ^ d;
+	}  
+	
+	Dls Sphere(const Pnt& a, VT r){
+		return Ro::dls_pnt( a, r );
 	}                            
 	///Dual Plane with normal and distance from center
 	Dlp Plane( VT a, VT b, VT c, VT d=0.0){

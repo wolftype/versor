@@ -7,7 +7,7 @@ GFX=1
 
 PIROOT = $(HOME)/code/pi/root/
 
-CLANG = /usr/local/bin/
+CLANG = 1
 
 #COMPILER VERSION  
 

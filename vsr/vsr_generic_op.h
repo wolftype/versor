@@ -15,8 +15,37 @@ IN PROGRESS!!!
 
 namespace vsr {           
 	
-	// typedef EGAMV< typename EGA<3>::Vec > Vec;
-	// typedef EGAMV< typename EGA<3>::Rot > Rot;   
+ 
+//Projection Down
+template<int DIM>
+struct Proj{
+   	typedef EGAMV< typename Blade1<DIM>::VEC > TVec;
+	typedef EGAMV< typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
+  	 
+	static auto Call( VT dist, const TVec& v ) RETURNS (
+		( Proj<DIM-1>::Call( dist, v.template cast<OneDown>() * ( dist / (dist - v[DIM-1] ) ) ) )
+	)  
+    
+	template<int DIM2>
+	static auto Ortho( const TVec& v ) RETURNS (
+		( v.template cast<typename Blade1<DIM2>::VEC >() )
+	)	 
+	
+	static VT Val( VT dist, const TVec & v ) { return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); }
+	// static VT Val( VT dist, const Vec& v) {
+	// 	return Proj< DIM, 4, DIM==TARGET >::Call(dist, v);
+	// } 
+};    
+     
+template<>
+struct Proj<3>{  
+    typedef EGAMV< typename Blade1<3>::VEC > TVec;
+	static TVec Call(VT dist, const TVec& v) { return v; }  
+	static VT Val(VT dist, const TVec & v ) { return 1.0; }
+}; 
+
+
+ 
 
  template< class X>
  constexpr VT dot(X x){
@@ -52,6 +81,17 @@ namespace Op{
 	    */
 		template<TT DIM, class A>
 		auto rot ( const CGAMV<DIM,A>& b ) -> decltype( b + 1 ) {
+			VT  c = sqrt(- ( b.wt() ) );
+	        VT sc = -sin(c);
+	        if (c != 0) sc /= c;
+			return b * sc + cos(c);
+		} 
+		/*!
+	        Generate Rotaion at origin as exponential of a bivector
+	        @param a bivector
+	    */
+		template<class A>
+		auto rot ( const EGAMV<A>& b ) -> decltype( b + 1 ) {
 			VT  c = sqrt(- ( b.wt() ) );
 	        VT sc = -sin(c);
 	        if (c != 0) sc /= c;
