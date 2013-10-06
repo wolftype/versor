@@ -32,14 +32,13 @@ To inferface with elements using "G", "R", "S" keys to Grab, Rotate, or Scale:
                                    
 	#include "vsr_cga3D_interface.h"
 	
-
-	
+   
 What's new? 
 
 This compiles much faster than before, and without any silly predetermined list
 of allowable operations or types.  Most notably, arbitrary metrics are now possible.  For example, 
 the xRoots.cpp example calculates all the Euclidean 4D reflections of a couple of point groups
-(F4 and D4, namely). So you can hypercube and polychoron away (10D cubes no problem!).  
+(F4 and D4, namely). So you can hypercube and polychoron away (8D cubes no problem!).  
 
 As for CGA, all the Pnt, Vec, Dll notation remains as before, but i've started adding utility functions
 since it helps people out. 
