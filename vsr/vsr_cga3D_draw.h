@@ -185,6 +185,18 @@ namespace vsr{
 			glPopMatrix(); 
 		}
 	} 
+	void Immediate( const Field<Vec>& f){ 
+	   // printf("draw vec field\n");
+		for (int i = 0; i < f.num(); ++i){  
+			glPushMatrix();
+				gfx::GL::translate( f.grid(i).begin() ); 
+			 	//glPushMatrix(); 
+					Immediate( f[i] ); 
+				//glPopMatrix(); 
+			glPopMatrix();   
+			
+		}
+	}
 	template<class T>
 	void Immediate( const Field<T>& f){
 		for (int i = 0; i < f.num(); ++i){  

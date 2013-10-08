@@ -309,7 +309,7 @@ struct App : public View3D{
 	virtual void initGL(){
 	    string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
 	   // string Vert = SimpleVertex;//SimpleVertex;//AVertex + VaryingN + MVertN; 
-		string Frag = MFragN;//TFragMix; //mFrag   //SimpleFragment;//
+		string Frag = MFrag;//TFragMix; //mFrag   //SimpleFragment;//
          
                                
 		printf("%s\n", "initGL");
@@ -451,7 +451,11 @@ struct App : public View3D{
         case 96: //tilde
             //printf("TILDE!\n");
             interface.impl -> fullScreenToggle();
-			break;
+			break; 
+		case 'v':
+		gui.toggle(Visible);
+		    break;
+	  
 	}
 	  
 	return true;    

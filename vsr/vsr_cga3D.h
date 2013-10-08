@@ -5,7 +5,10 @@
 
 namespace vsr{
 
-	
+
+	Pnt Point(const Vec& v){
+		return Ro::null(v);
+	}	
 	Pnt Point(VT x, VT y, VT z){
 		return Ro::null(x,y,z);
 	}  
@@ -84,6 +87,11 @@ namespace vsr{
 	Par Meet( const Cir& cir, const Dlp& dlp){ 
 		return ( (cir).dual() ^ dlp).dual();
 	} 
+   
+ 	//Squared Distances
+	VT Distance( const Lin& lin, const Pnt& pnt){
+		return ( pnt <= lin.dual() )[0] * -2.0;
+	}
 	
 	
 	// Pnt Point(VT x, VT y, VT z);

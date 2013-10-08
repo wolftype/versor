@@ -1,5 +1,8 @@
  // #define __CON__ //must define global metric !
 // #define GLOBAL_METRIC RMetric<4,1>::Type()     
+ 
+
+#include <fstream>
 
 #include "vsr_cga3D.h"  
 #include "vsr_GLVimpl.h" 
@@ -12,9 +15,8 @@ using namespace vsr;
 using namespace glv;  
 
  
-void GLVApp::onDraw(){}
 
-struct MyApp : public GLVApp {
+struct MyApp :  App {
     
 	//ALL THIS IS THE GL PIPELINE STUFF.
 	MBO * rect;   
@@ -22,14 +24,15 @@ struct MyApp : public GLVApp {
 	   
 	FBO * fboA;
 	Texture * textureA;    
-	Texture * textureB;   
+	Texture * textureB; 
+	
+	unsigned char * pixels; 
 	                
-	MyApp(Window * w) : GLVApp(w) {
+	MyApp(Window * w) : App(w) {
 		
 		printf("MyApp Construct\n");
 	}   
-	
-    virtual ~MyApp(); 
+   
 
 	void swapTextures(){
 		Texture * tmp = textureA; textureA = textureB; textureB = tmp;
@@ -44,7 +47,7 @@ struct MyApp : public GLVApp {
 		printf("INITGL\n");
 	
 		string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
-		string Frag = MFragN;
+		string Frag = MFrag;
 	
 		pipe.program = new ShaderProgram(Vert,Frag,0);
 		pipe.bind();
@@ -63,12 +66,14 @@ struct MyApp : public GLVApp {
 		texpipe.bindAll();
 	 	fboA -> attach(*textureA, GL::COLOR);  
 	
-		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,1.0) );  
+		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,1.0) );   
+		
+		pixels = new unsigned char[ int(tw * th * 4) ];
 	}  
 	
 	virtual void onDraw3D(GLV& glv){   
 
-		interface().getViewData(&glv);    
+		interface.glv().getViewData(&glv);    
 		// 
 		// //cout << interface.vd().w << " " << interface.vd().h << endl; 
 		scene.resize( interface.vd().w, interface.vd().h );  
@@ -83,7 +88,12 @@ struct MyApp : public GLVApp {
 		// 
 		 	render(); 
 		// 
-		fboA -> unbind();  
+
+		//test read back
+		save();
+		fboA -> unbind(); 
+		
+
 		// 
 		// //Switch to full Viewport and Bind Texture to Rect 
  		glViewport(0,0,scene.camera.lens.width(),scene.camera.lens.height());     
@@ -116,9 +126,9 @@ struct MyApp : public GLVApp {
 		 
 	   // cout <<   scene.xf.projMatrixf()  << endl; 
 
-		auto a = Point(1,0,0);
-		auto b = Point(0,1,0);
-		auto c = Point(0,-1,0);
+		auto a = Point(2,0,0);
+		auto b = Point(0,2,0);
+		auto c = Point(0,-2,0);
 		// 
 		auto cir = Circle(a,b,c);
 		// 
@@ -126,11 +136,45 @@ struct MyApp : public GLVApp {
 	    DRAWCOLOR(cir,1,0,0);   
 		//                                
 	   // pipe.line(*mbo); 
+	}   
+	
+	void save(){ 
+		static int fnum = -1; fnum++;
+		stringstream os; os << "test_" << fnum << ".ppm";   
+		string filename = os.str();
+		int tw = textureA->width();
+		int th = textureA->height();
+		glReadPixels(0,0,tw,th ,GL_RGBA, GL::UBYTE, pixels); 
+
+		ofstream frame(filename.c_str(),ios::binary);
+		frame << "P6\n" <<  tw << " " << th << "\n255\n";
+		for (int j=th-1; j>=0; j--) {
+			for (int i=0; i < tw; i++) {
+				//gfx::Color c( pixels[idx],pixels[idx+1],pixels[idx+1] )
+				frame.write((char*)(pixels + tw*4*j+4*i), 3);
+				//frame << pixels[idx] << pixels[idx+1] << pixesl[idx+2];
+			}
+	    }
+		frame.close(); 
+		                       
+		stringstream cmd; cmd << "convert " << os.str() << " test_" << fnum << ".png";
+		FILE * convert = popen(cmd.str().c_str(), "r");	
+		
+		// FILE * frame = fopen(filename.c_str(),"w");
+		// 
+		// for (int j=th-1; j>=0; j--) {
+		// 	for (int i=0; i < tw; i++) {
+		// 	  fprintf(frame,"%u %u %u ",
+		// 		  (unsigned char)pixels[tw*4*j+4*i],
+		// 		  (unsigned char)pixels[tw*4*j+4*i+1],
+		// 		  (unsigned char)pixels[tw*4*j+4*i+2]);
+		// 	}
+		// 	fprintf(frame,"\n");
+		// 	    }
+		// fclose(frame); 	
 	}
 };  
 
- 
-MyApp::~MyApp(){}
 
                         
 MyApp * myApp;

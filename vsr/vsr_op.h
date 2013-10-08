@@ -450,7 +450,7 @@ struct Ro {
         return ( (a <= b)[0] ) * -2.0;
     }
     
-    /*! squared Distance between points a and b */
+    /*! Distance between points a and b */
     static VT dist(const Pnt& a, const Pnt& b){
         return sqrt( fabs(sqd(a,b) ) );
     }

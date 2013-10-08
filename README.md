@@ -1,5 +1,11 @@
-Versor 2.0 is a C++11 Library that generates optimized geometric algebra code at compile-time.
-It can handle arbitrary metrics and dimensions (limited by your compiler...).
+Versor 2.0 is a C++11 Library that generates optimized geometric algebra code at compile-time
+through template metaprogramming.  More information at versor.mat.ucsb.edu 
+
+- You'll need C++11 support (See important makefile notes below).  
+
+It can handle arbitrary metrics and dimensions (limited by your compiler... currently
+I can get up to about 10 dimensions in flat euclidean space, and 6 dimensions in 
+conformal space).
                         
 	git clone git://github.com/wolftype/vsr2.0.git
 	cd vsr2.0
@@ -8,13 +14,18 @@ It can handle arbitrary metrics and dimensions (limited by your compiler...).
 
 To test a graphics example
 
-	make tests/xBasics.cpp
-	
-If you have errors see important makefile notes below
+	make tests/xBasics.cpp 
+		 
+This builds and runs the file.  
 
-You need clang 3.2 or above or gcc 4.6 or above.  NOT tested on windows. 
-If you don't want to or can't compile C++11 code try an older flavor of vsr
-(github.com/wolftype/vsr.git) 
+  
+
+Standard camera controls: 
+
+- TRANSLATE CAMERA: SHIFT + arrows or mouse
+- ROTATE CAMERA:	CTRL + arrows or mouse   
+- ROTATE MODEL: 	ALT + arrows or mouse
+
 
 Homepage at versor.mat.ucsb.edu
                                                                       
@@ -22,12 +33,16 @@ To build with the 5D Conformal Model
 
 	#include "vsr_cga3D.h"
 
-To draw to screen
+To bind with glut, GLV interface, and draw to screen
+                             
+	#include "vsr_cga3D_draw.h"
 
-	#include "vsr_cga3D_draw.h"  
+To bind with Glut, GLV interface
+
+	#include "vsr_GLVimpl.h"                           
 
 To inferface with elements using "G", "R", "S" keys to Grab, Rotate, or Scale:
-                                   
+
 	#include "vsr_cga3D_interface.h"
 	
    
@@ -44,13 +59,22 @@ since it helps people out.
 	auto pa = Point( 1,0,0 ); 
 	auto pb = Point( 0,1,0 ); 
 	auto pc = Point(-1,0,0 ); 
-	auto c = Circle(pa, pb, pc); 
+	auto c = Circle(pa, pb, pc);
+	
+	Draw(c); 
 	
 How does it work?
 
 If you like mind-numbing functional template metaprogramming, take a look at the code
 and let me know what you think.  If you don't, then I wouldn't . . .
 	 
+
+BUILD NOTES:                 
+
+You need clang 3.2 or above or gcc 4.6 or above.  NOT tested on windows. 
+If you don't want to or can't compile C++11 code try an older flavor of vsr
+(github.com/wolftype/vsr.git). This older version runs just as fast, but is 
+strictly 3D CGA (i.e. R4,1 metric) since I generate headers ahead of time.
 
 IMPORTANT NOTE ON MAKEFILE FLAGS
 
