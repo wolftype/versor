@@ -1,6 +1,5 @@
- // #define __CON__ //must define global metric !
-// #define GLOBAL_METRIC RMetric<4,1>::Type()     
- 
+// Render to Texture and save FBO
+//
 
 #include <fstream>
 
@@ -90,7 +89,7 @@ struct MyApp :  App {
 		// 
 
 		//test read back
-		save();
+		//save();
 		fboA -> unbind(); 
 		
 
@@ -160,18 +159,6 @@ struct MyApp :  App {
 		stringstream cmd; cmd << "convert " << os.str() << " test_" << fnum << ".png";
 		FILE * convert = popen(cmd.str().c_str(), "r");	
 		
-		// FILE * frame = fopen(filename.c_str(),"w");
-		// 
-		// for (int j=th-1; j>=0; j--) {
-		// 	for (int i=0; i < tw; i++) {
-		// 	  fprintf(frame,"%u %u %u ",
-		// 		  (unsigned char)pixels[tw*4*j+4*i],
-		// 		  (unsigned char)pixels[tw*4*j+4*i+1],
-		// 		  (unsigned char)pixels[tw*4*j+4*i+2]);
-		// 	}
-		// 	fprintf(frame,"\n");
-		// 	    }
-		// fclose(frame); 	
 	}
 };  
 
