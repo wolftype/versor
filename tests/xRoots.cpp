@@ -1,12 +1,12 @@
 #include "vsr_root.h"  
 #include "vsr_GLVimpl.h" 
-#include "gfx/gfx_glyphs.h"
+#include "vsr_ega3D_draw.h"
 
 using namespace vsr;  
 
  
 
-typedef EGAMV< Blade1<4>::VEC > V4;
+typedef EGAMV< 4, Blade1<4>::VEC > V4;
 
 //idositetrachoron 24 cell                                                                         
 
@@ -19,9 +19,9 @@ struct MyApp : App {
 	void onDraw(){
 	      
 	   for (auto &i : D4 ){
-			i = i.sp( Gen::rot( EGAMV< MV<10,12> > (.01,.01) ) );
+			i = i.sp( Gen::rot( EGAMV<4, MV<10,12> > (.01,.01) ) );
 			auto r = Proj<4>::Call(5.0 , i);
-			gfx::Glyph::Dir( r );
+			Draw( r );
 
 		}    
 	} 
@@ -49,7 +49,7 @@ int main(){
 	
 	GLV glv(0,0);	
     		        
-	Window * win = new Window(500,500,"CGA2D",&glv);    
+	Window * win = new Window(500,500,"4D ROOTS",&glv);    
     myApp = new MyApp;
 	myApp -> init( win );
   

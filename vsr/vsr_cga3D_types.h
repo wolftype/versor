@@ -3,6 +3,8 @@
 
 #include "vsr_products.h"
 
+
+
 namespace vsr{
 
 //3D Euclidean

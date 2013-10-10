@@ -1,16 +1,19 @@
-
 #include "vsr_products.h"
-#include "vsr_GLVimpl.h" 
-#include "vsr_ncube.h"
+                                
+//nd cubes
+#include "vsr_ncube.h"  
 
-#include "gfx/gfx_glyphs.h"  
+//it all gets projected down to 3d eventually so
+#include "vsr_ega3D_draw.h"
 
+//handle window events and stuff
+#include "vsr_GLVimpl.h"  
 
 using namespace vsr;
 using namespace std;    
 
-template< class B >
-auto nrot( const B& b) -> EGAMV<decltype( B() + 1 )> { 	
+template<  class B >
+auto nrot( const B& b) ->  decltype( B() + 1 ) { 	
 	VT  c = sqrt(- ( b.wt() ) );
     VT sc = -sin(c);
     if (c != 0) sc /= c;
@@ -22,7 +25,7 @@ struct MyApp : App {
 	         
 	
 	bool bOrtho;
-	static const int DIM = 6; 
+	static const int DIM = 4; 
 
 	NCube<DIM> tetra;
    	
@@ -32,7 +35,7 @@ struct MyApp : App {
 	
 	virtual void initGui(){  
 		printf("init gui\n");
-		gui(bOrtho); 
+		gui(bOrtho, "ortho"); 
 	}   
 	
 	virtual void onDraw(){
@@ -41,8 +44,8 @@ struct MyApp : App {
 		
 		scene.camera.lens.bOrtho = bOrtho;
 		
-		EGAMV< MV<12> > b(.01);
-		typedef EGAMV< typename EGA<3>::Vec > Vec; 
+		EGAMV<DIM, MV<24,12> > b(.01,.01);
+		//typedef EGAMV< DIM,typename EGA<3>::Vec > Vec; 
 		
 		vector<Vec> proj;  
 		vector<VT> col;   	  
@@ -69,8 +72,9 @@ struct MyApp : App {
 		for (auto i : proj ) { 
 			float t = ( 1.0 * it) / proj.size();
 			it++;
-		 	 glColor4f(t,1,1-t, col[it]);
-		     gfx::Glyph::Dir( i ); 
+		   //   glColor4f(t,1,1-t, col[it]);
+			Draw(i, t, 1, 1-t, col[it] ); 
+			//gfx::Glyph::Dir( i ); 
 		 } 
 		// 
 		glColor3f(0,1,0);                             
@@ -78,7 +82,7 @@ struct MyApp : App {
 		for (auto i : tetra.edges ) gfx::Glyph::Line( proj[i.a], proj[i.b] );     
 
 	 
-		
+		text("Alt + Mouse Drag to Rotate View");
 		}
 
 };

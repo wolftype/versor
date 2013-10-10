@@ -27,7 +27,8 @@ struct MyApp : public App {
 		auto p = Meet(cir,dlp);
 
 		Draw(p,1,0,0);
-	
+	     
+		text("use G, R and S keys to Grab Rotate and Scale the Circle");
 	} 
 
 };

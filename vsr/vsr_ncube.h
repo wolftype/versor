@@ -23,9 +23,9 @@ struct Edge{
 template<int DIM>
 struct NCube{         
 	
-	typedef EGAMV< typename Blade1<DIM>::VEC > TVec;
+	typedef EGAMV< DIM, typename Blade1<DIM>::VEC > TVec;
    // typedef typename Blade1<DIM-1>::VEC Proj; //Projection Down  
-	typedef EGAMV< typename Blade1<3>::VEC > Vec3;
+	typedef EGAMV< 3, typename Blade1<3>::VEC > Vec3;
 	
 	int NumVert = pow(2.f,DIM);
 	
@@ -81,7 +81,7 @@ struct NCube{
 
 template<>
 struct NCube<1>{
-	typedef EGAMV< typename Blade1<1>::VEC > TVec; 
+	typedef EGAMV< 1, typename Blade1<1>::VEC > TVec; 
 	int NumVert = 2;
 	
 	vector<TVec> roots;

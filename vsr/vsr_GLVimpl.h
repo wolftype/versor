@@ -289,7 +289,7 @@ struct App : public View3D{
 
 	virtual void init(Window * win){
 		stretch(1,1);
-		colors().back.set(0,.1,.1);
+		colors().back.set(.1,.1,.1);
 	    *this << gui; 
 
 	    set(win); 
@@ -412,7 +412,15 @@ struct App : public View3D{
  	//render to texture
 	void renderD(){
 		
-	}
+	}  
+	
+	void text(string s, int ow = 50, int oh = 100){
+        	draw::enter2D(w, h);
+            glTranslated(ow,h-oh,0);
+            glColor3f(1,1,1);
+            draw::text( s.c_str() );
+        //draw::pop2D();
+    }
 
  virtual bool onEvent(Event::t e, GLV& glv){
 

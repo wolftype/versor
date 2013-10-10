@@ -19,8 +19,8 @@ namespace vsr {
 //Projection Down
 template<int DIM>
 struct Proj{
-   	typedef EGAMV< typename Blade1<DIM>::VEC > TVec;
-	typedef EGAMV< typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
+   	typedef EGAMV<DIM, typename Blade1<DIM>::VEC > TVec;
+	typedef EGAMV<DIM-1, typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
   	 
 	static auto Call( VT dist, const TVec& v ) RETURNS (
 		( Proj<DIM-1>::Call( dist, v.template cast<OneDown>() * ( dist / (dist - v[DIM-1] ) ) ) )
@@ -39,7 +39,7 @@ struct Proj{
      
 template<>
 struct Proj<3>{  
-    typedef EGAMV< typename Blade1<3>::VEC > TVec;
+    typedef EGAMV<3, typename Blade1<3>::VEC > TVec;
 	static TVec Call(VT dist, const TVec& v) { return v; }  
 	static VT Val(VT dist, const TVec & v ) { return 1.0; }
 }; 
@@ -57,7 +57,8 @@ struct Proj<3>{
 	return (x*x) + dot(xs...);
  }  
 
-namespace Op{
+namespace Op{  
+	
 	template<TT DIM, class A>  
 	auto dl( const CGAMV<DIM,A>& a ) RETURNS (
 		a * ( CGAMV<DIM, typename CGA<DIM>::Pss >(-1) )
@@ -66,6 +67,20 @@ namespace Op{
 	auto udl( const CGAMV<DIM,A>& a ) RETURNS (
 		a * ( CGAMV<DIM, typename CGA<DIM>::Pss >(1) ) 
 	)
+	
+	// template<TT DIM, class A>  
+	// auto dle( const A<DIM>& a ) RETURNS (
+	// 	a * ( NEPss< DIM >(-1) )
+	// ) 
+	// template<TT DIM, class A>  
+	// auto udle( const A<DIM>& a ) RETURNS (   
+	// 	a * ( NEPss< DIM >(1) )   
+	// )  
+	
+	template<class A>
+    static bool sn(const A& a, const A& b) {
+        return (a / b)[0] > 0 ? 1 : 0;
+    }
 }   
 
 // template<TT DIM, class A>
@@ -90,8 +105,8 @@ namespace Op{
 	        Generate Rotaion at origin as exponential of a bivector
 	        @param a bivector
 	    */
-		template<class A>
-		auto rot ( const EGAMV<A>& b ) -> decltype( b + 1 ) {
+		template<TT DIM, class A>
+		auto rot ( const EGAMV<DIM, A>& b ) -> decltype( b + 1 ) {
 			VT  c = sqrt(- ( b.wt() ) );
 	        VT sc = -sin(c);
 	        if (c != 0) sc /= c;
@@ -161,19 +176,7 @@ namespace Op{
 	        return r;    
 	    } 
 	    
-		// template<class R>
-		// auto pl( const R& r){
-		// 	
-		// }
-		// 	 
-		// template<class R>
-		// 	     R aa (const R& r) {
-		// 
-		// 	        Vec v = Op::dle( Gen::pl( r ) ) ;		
-		// 	        VT deg = iphi(r) * ( -180 / PI );
-		// 
-		// 	        return Rot(deg, v[0], v[1], v[2]);
-		// 	    }  
+
 
  } //Gen::  
 
@@ -287,7 +290,12 @@ namespace Op{
 		 // constexpr VT wt(const A& f, bool dual){
 		 // 	    	return dual ? ( Ori(1) <= Fl::dir( f.undual() ) ).wt() : ( Ori(1) <= Fl::dir(f) ).wt();
 		 // }  
-	}   // Fl ::  
+	}   // Fl :: 
+	             
+	template<TT DIM, class A> template< class T>
+	EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t){
+		return this->sp( Gen::rot(t) );
+	}
 	
 }   //vsr::
 

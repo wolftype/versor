@@ -13,9 +13,9 @@ namespace vsr{
              
 	
 template<int DIM, class ... R >
-vector< EGAMV< typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){   
+vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){   
 	
-	typedef EGAMV< typename Blade1<DIM>::VEC > V;
+	typedef EGAMV<DIM, typename Blade1<DIM>::VEC > V;
 	 
 	int n = sizeof...(R);
 	

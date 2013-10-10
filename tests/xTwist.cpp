@@ -10,6 +10,10 @@ using namespace vsr;
 
 
 struct MyApp : App {    
+   
+	MyApp(Window * win ) : App(win){
+		scene.camera.pos( 0,0,10 ); 
+	}
 
   virtual void onDraw(){
 	
@@ -51,10 +55,13 @@ struct MyApp : App {
 
    glBegin(GL_QUADS);
 	for (int i = 0; i < f3.faceVxl().size(); ++i ){
-		Vxl vxl = f3.faceVxl(i); 
+		Vxl vxl = f3.faceVxl(i);  
+		Biv b = Ro::dir( f3[vxl.a] ^ f3[vxl.b] ^ f3[vxl.c] ).copy<Biv>(); 
+		gfx::GL::normal( Op::dle(b).unit().begin() );
 		gfx::GL::Quad( f3[vxl.a],f3[vxl.b], f3[vxl.c], f3[vxl.d]);
 	} 
    glEnd();
+	   
 	
 	}
    
@@ -71,8 +78,8 @@ int main(){
 	GLV glv(0,0);	
 
 	Window * win = new Window(500,500,"Versor",&glv);    
-	app = new MyApp(); 
-	app -> init( win ); 
+	app = new MyApp( win ); 
+  
 	
 	glv << *app;
 

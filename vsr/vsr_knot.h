@@ -75,11 +75,12 @@ struct TorusKnot  {
 			np = Ro::loc( np.sp( tbst ) );  
 			add(np);
 		}                   
-		//Tube Neighborhood
-		for (int i = 0; i < iter(); ++i ){ 
-			double t = -1 + 2.0 * i/ iter();
+		//Tube Neighborhood  
+		int tnum = iter();
+		for (int i = 0; i < tnum; ++i ){ 
+			double t = -1 + 2.0 * i/ tnum;
 	        double tt = 1 + t * t;
-	        int idx = i < iter() ? i + 1 : 0;  
+	        int idx = i < tnum -1 ? i + 1 : 0;  
 			Par tpar = pnt[i] ^ pnt[idx];
 			Cir c = tpar.dual();//.dil(tk.pnt[i], );
 			add ( c );

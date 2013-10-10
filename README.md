@@ -1,12 +1,45 @@
-Versor 2.0 is a C++11 Library that generates optimized geometric algebra code at compile-time
-through template metaprogramming.  More information at versor.mat.ucsb.edu 
+CSS: style0.css
+	 
+<script type="text/javascript"
+  src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
-- You'll need C++11 support (See important makefile notes below).  
+Versor (vsr)
+===
+A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.  
+---
+### Currently tested on Linux and Mac OS X ###
 
-It can handle arbitrary metrics and dimensions (limited by your compiler... currently
-I can get up to about 10 dimensions in flat euclidean space, and 6 dimensions in 
-conformal space).
-                        
+[Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu)       
+
+Versor is a C++ Library that generates optimized geometric algebra code at compile-time
+through template metaprogramming.  The current version (2.0) now supports arbitrary dimensions and 
+metrics (limited by your compiler...).  
+
+Developer: Pablo Colapinto  
+`gmail: wolftype`
+
+
+## CONTENTS: ##
+
+* [Quickstart](#quickstart)                        
+* [Introduction](#introduction)
+* [Generators](#generators) 
+* [Build Notes](#build)
+
+
+[Reference Guide to the Elements](http://versor.mat.ucsb.edu/masters_appendix.pdf)
+
+[Mailing List (for update notifications, to ask questions, discuss bugs, etc)](http://lists.create.ucsb.edu/mailman/listinfo/versor)  
+
+[My Master's Thesis on the Subject](http://wolftype.com/versor/colapinto_masters_final_02.pdf)
+
+[versor.js - a Javascript Port of Versor](http://github.com/weshoke/versor.js)   
+      
+
+Quickstart
+---
+              
 	git clone git://github.com/wolftype/vsr2.0.git
 	cd vsr2.0
 	git submodule init
@@ -18,13 +51,38 @@ To test a graphics example
 		 
 This builds and runs the file.  
 
-  
 
-Standard camera controls: 
+[**BUILT-IN INTERFACE**]
+| 	                            	| 	                                          | 
+Key                                 | Response  
+------------------------------      | ------------------------------------------  
+`~`                                 | Toggle full screen.  
+`SHIFT` + `Mouse` or `Arrow Keys`   | translates the camera  in x and z directions.  
+`CTRL`+ `Mouse` or `Arrow Keys` | rotates the camera  
+`ALT` +`Arrow Keys`              | spins the model view around.  
+`G`                                 | Grab an Element  
+`R`                                 | Rotate an Element  
+`S`                                 | Scale an Element  
+ 
 
-- TRANSLATE CAMERA: SHIFT + arrows or mouse
-- ROTATE CAMERA:	CTRL + arrows or mouse   
-- ROTATE MODEL: 	ALT + arrows or mouse
+
+
+
+INTRODUCTION
+---
+
+This package provides operations and draw routines for conformal geometric algebra, 
+a relatively new spatial computing model used by physicists, engineers, and artists. _Versor_ is designed to make graphical 
+experimentation of conformal geometric algebra within a C++ environment easier. 
+You can use this library to draw geometrical things, explore spherical and hyperbolic spaces, transformations, design robots, etc. 
+I am using it for my PhD on bio-inspired engineering.
+
+I first developed _Versor_ while reading "Geometric Algebra for Computer Science" by Leo Dorst, Daniel Fontijne, and Stephen Mann. 
+It's a fantastic book and if you're reading this you should also consider reading that.  
+
+Built to aid in my modelling of organic forms, the initial development was funded in large part by the Olivia Long Converse Fellowship for Botanic research, 
+courtesy of the Graduate Division at the University of California in Santa Barbara.  So this software is under a UC Regents General Public License.
+
 
 
 Homepage at versor.mat.ucsb.edu
@@ -46,7 +104,8 @@ To inferface with elements using "G", "R", "S" keys to Grab, Rotate, or Scale:
 	#include "vsr_cga3D_interface.h"
 	
    
-What's new? 
+What's new?
+--- 
 
 This compiles much faster than before, and without any silly predetermined list
 of allowable operations or types.  Most notably, arbitrary metrics are now possible.  For example, 
@@ -64,17 +123,45 @@ since it helps people out.
 	Draw(c); 
 	
 How does it work?
+---
 
 If you like mind-numbing functional template metaprogramming, take a look at the code
-and let me know what you think.  If you don't, then I wouldn't . . .
+and let me know what you think.  If you don't, then I wouldn't . . .  But if you have ideas or questions please do not hesitate
+to contact me.
+
+METHODS
+---
+
+`vsr_op.h` contains the bulk of the functions for generating elements from other elements.  Some guidelines:
+
+* `Gen::` methods **generate** or otherwise operate on versors
+* `Ro::` methods create or otherwise operate on **Round** elements (Points, Point Pairs, Circles, Spheres)
+* `Fl::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
+* `Ta::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
+
+You notice I've been throwing around the `null()` method a lot, 
+
+GENERATORS 
+---
+
+	Rot Gen::rot( const Biv& b ); 					//<-- Generate a Rotor from a Bivector
+	Trs Gen::trs( const Drv& v);					//<-- Generate a Translator from a Direction Vector
+	Mot Gen::mot( const Dll& d);					//<-- Generate a Motor from a Dual Line
+	Dil Gen::dil( const Pnt& p, double amt );		//<-- Generate a Dilator from a Point and an amount
+	Trv Gen::trv( cont Tnv& v);						//<-- Generate a Transveror from a Tangent Vector
+	Bst Gen::bst( const Par& p); 			   		 //<-- Generate a Booster from a Point Pair
 	 
 
-BUILD NOTES:                 
+BUILD
+---                 
 
-You need clang 3.2 or above or gcc 4.6 or above.  NOT tested on windows. 
-If you don't want to or can't compile C++11 code try an older flavor of vsr
-(github.com/wolftype/vsr.git). This older version runs just as fast, but is 
-strictly 3D CGA (i.e. R4,1 metric) since I generate headers ahead of time.
+- For Versor 2.0 You'll need C++11 support (See important makefile notes below). 
+- Alternatively Versor 1.0 is available at github.com/wolftype/vsr.git
+
+For C++11 you'll want clang 3.2 (mac) or above or gcc 4.6 or above (linux).  
+NOT tested on windows. 
+If you don't want to or can't compile C++11 code try an [older flavor of vsr](github.com/wolftype/vsr.git). 
+This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
 
 IMPORTANT NOTE ON MAKEFILE FLAGS
 

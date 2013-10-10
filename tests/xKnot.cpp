@@ -11,17 +11,23 @@ using namespace glv;
 
 struct MyApp : App {
 	
+	float amt;
+	
+	virtual void initGui(){
+		gui(amt,"amt",0,10);
+		
+		amt = .001; 
+	}
 
 	void onDraw(){
      
 
-		TorusKnot tk(3,2); 
+		TorusKnot tk(3,2,amt); 
 	
-		static auto a = Point(2,0,0);  
-	
-		Touch(interface, a);
-	
-		Draw( Sphere(a,.5), 1, 0, 0 );
+		static auto a = Point(2,0,0);     
+
+		Touch(interface, a);   
+		Draw( Sphere(a,.2), 1, 1, 0 );
 
 		tk.calc( a );
 	
@@ -43,6 +49,7 @@ int main(){
                           
 	myApp = new MyApp;
 	myApp -> init(win);
+	myApp -> initGui();
 	
 	glv << *myApp;
 

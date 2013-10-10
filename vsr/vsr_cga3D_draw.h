@@ -132,6 +132,7 @@ namespace vsr{
      void Immediate (const Par& s){
 	        //Is Imaginary?
 	        VT size = Ro::size( s, false );
+		  //  printf("size: %fn", size);
 	        std::vector<Pnt> pp = Ro::split( s );
 
 	        VT ta = Ro::size( pp[0], true );   
@@ -151,6 +152,7 @@ namespace vsr{
 	            (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);	
 
 	        } else {
+				pp[0].vprint(); pp[1].vprint();
 	            gfx::Glyph::Point(pp[0]);
 	            gfx::Glyph::Point(pp[1]);
 	        }

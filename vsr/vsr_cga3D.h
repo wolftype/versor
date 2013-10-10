@@ -26,9 +26,14 @@ namespace vsr{
 	}
 	Cir Circle(const Biv& B){
 		return Ro::cir( Ro::dls(0,0,0,1), B);//a ^ b ^ c; 
-	} 
-	Cir Circle(const Vec& v){
-		return Ro::cir( Ro::dls(0,0,0,1), Op::dle(v) );//a ^ b ^ c; 
+	}                          
+	//Circle Facing v
+	Cir Circle(const Vec& v, VT r=1.0){
+		return Ro::cir( Ro::dls(0,0,0,r*-1), Op::dle(v) );//a ^ b ^ c; 
+	}                    
+	//Circle at x,y,z
+	Cir Circle(VT x, VT y, VT z, VT r=1.0){
+		return Ro::cir( Ro::dls(x,y,z,r*-1), Biv::xy );//a ^ b ^ c; 
 	}
 	Sph Sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
 		return a ^ b ^ c ^ d;

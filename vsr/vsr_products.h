@@ -458,11 +458,6 @@ struct EGA{
 	using Biv = typename EOProd<Vec,Vec>::Type;
 	using Tri = typename EOProd<Biv,Vec>::Type;
 	using Rot =  decltype( sumv(1,Biv()) );
-	//typedef typename Blade1<DIM>::VEC Vec;
-	//typedef typename EOProd<Vec,Vec>::Type Biv;
-	//typedef typename EOProd<Biv,Vec>::Type Tri;
-	 	
-	//typedef decltype( sumv(1,Biv()) ) Rot; 
 	using Pss = MV< pss(DIM) >;
 	
 	//typedef MV< pss(DIM) > Pss; //same as tri in EGA<3>
@@ -773,7 +768,7 @@ struct MGAMV : public A {
 	
 }; 
 
-template<class A>
+template<TT DIM, class A>
 struct EGAMV : public A {  
  
     typedef A Type;
@@ -783,25 +778,25 @@ struct EGAMV : public A {
 	
 	constexpr EGAMV(const A& a) : A(a) {}   
 	
-	template<class B>
-	constexpr EGAMV(const EGAMV<B>& b) : A( b.template cast<A>() ) {}
+	template<TT BDIM, class B>
+	constexpr EGAMV(const EGAMV<BDIM, B>& b) : A( b.template cast<A>() ) {}
 	 
 	template<class B>
-	EGAMV<typename EProd<A, typename B::Type>::Type> 
+	EGAMV<DIM, typename EProd<A, typename B::Type>::Type> 
 	operator * (const B& b) const {
-		return EGAMV<typename EProd<A, typename B::Type>::Type>( egp( *this, b ) );
+		return EGAMV<DIM, typename EProd<A, typename B::Type>::Type>( egp( *this, b ) );
 	}     
 
 	template<class B>
-	EGAMV<typename EOProd<A, typename B::Type>::Type> 
+	EGAMV<DIM, typename EOProd<A, typename B::Type>::Type> 
 	operator ^ (const B& b) const {
-		return EGAMV<typename EOProd<A, typename B::Type>::Type>( eop( *this, b ) );
+		return EGAMV<DIM, typename EOProd<A, typename B::Type>::Type>( eop( *this, b ) );
 	}
  
 	template<class B>
-	EGAMV<typename EIProd<A, typename B::Type>::Type> 
+	EGAMV<DIM, typename EIProd<A, typename B::Type>::Type> 
 	operator <= (const B& b) const {
-		return EGAMV<typename EIProd<A, typename B::Type>::Type>( eip( *this, b ) );
+		return EGAMV<DIM, typename EIProd<A, typename B::Type>::Type>( eip( *this, b ) );
 	} 
 	
 	EGAMV operator ~() const {
@@ -815,7 +810,7 @@ struct EGAMV : public A {
 	}
 	
 	template<class B>
-	auto operator / (const EGAMV<B>& b) const RETURNS(
+	auto operator / (const EGAMV<DIM, B>& b) const RETURNS(
 		(  *this * !b )
 	)
 	
@@ -830,10 +825,12 @@ struct EGAMV : public A {
 	VT rwt() const{ return (*this <= ~(*this))[0]; }
 	VT norm() const { VT a = rwt(); if(a<0) return 0; return sqrt( a ); } 
 	VT rnorm() const{ VT a = rwt(); if(a<0) return -sqrt( -a ); return sqrt( a );  }  
-	
+	EGAMV unit() const { VT t = sqrt( fabs( (*this <= *this)[0] ) ); if (t == 0) return A(); return *this / t; }
+	EGAMV runit() const { VT t = rnorm(); if (t == 0) return  A(); return *this / t; }
+    EGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }	
 
-	template<class B>
-	auto operator + (const EGAMV<B>& b) -> EGAMV< decltype( sum( A(), B() ) ) > {
+	template<TT BDIM, class B>
+	auto operator + (const EGAMV<BDIM, B>& b) -> EGAMV< (DIM>BDIM)?DIM:BDIM, decltype( sum( A(), B() ) ) > {
 		return sum(*this,b);
 	}   
 	
@@ -885,28 +882,49 @@ struct EGAMV : public A {
 		return *this;
 	}  
 	
-	auto operator + (VT a) const -> EGAMV< decltype( sumv( a, A() ) ) >  {
+	auto operator + (VT a) const -> EGAMV<DIM,  decltype( sumv( a, A() ) ) >  {
 	   // printf("sumv\n");
 		return sumv(a, *this); 
+	}   
+	
+	static EGAMV x, y, z, xy, xz, yz;  
+	
+	auto dual() const -> EGAMV< DIM, typename EProd< A, typename EGA<DIM>::Pss>::Type > { 
+		return egp( *this , typename EGA<DIM>::Pss( -1 ) );
+	}        
+	
+	auto undual() const -> EGAMV< DIM, typename EProd< A, typename EGA<DIM>::Pss>::Type> {  
+		return egp( *this , typename EGA<DIM>::Pss ( 1 ) );
 	}
 	
-	// template<class B>
-	// friend auto operator + (const B& b, const EGAMV& a) -> EGAMV<decltype( sum( b, a ) ) >;  
-	// 
-	// template<class B>
-	// friend auto operator + (const EGAMV& a, const B& b) -> EGAMV<decltype( sum( a, b ) ) >;
-	//                                                                                            
+	
+	// template<typename T>
+	// EGAMV trs( const T& ); 
+	// EGAMV trs( VT x, VT y, VT z );
+	template<typename T>
+	EGAMV rot( const T& );
+	// template<typename T>
+	// EGAMV rot( VT a, const T& );  
+                                                                                        
 };   
 
 
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::x = A().template set<1>(1);
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::y =  A().template set<2>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::z =  A().template set<4>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xy = A().template set<3>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xz = A().template set<5>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().template set<6>(1);
+         
 
 //EUCLIDEAN CANDIDATES
-template<TT N> using NESca = EGAMV<typename EGA<N>::Sca>;   
-template<TT N> using NEVec = EGAMV<typename EGA<N>::Vec>; 
-template<TT N> using NEBiv = EGAMV<typename EGA<N>::Biv>; 
-template<TT N> using NETri = EGAMV<typename EGA<N>::Tri>; 
-template<TT N> using NERot = EGAMV<typename EGA<N>::Rot>; 
-template<TT N, TT ... NN> using NEe   = EGAMV<typename EGA<N>::template e<NN...> >;   
+template<TT N> using NESca = EGAMV<N, typename EGA<N>::Sca>;   
+template<TT N> using NEVec = EGAMV<N, typename EGA<N>::Vec>; 
+template<TT N> using NEBiv = EGAMV<N, typename EGA<N>::Biv>; 
+template<TT N> using NETri = EGAMV<N, typename EGA<N>::Tri>; 
+template<TT N> using NEPss = EGAMV<N, typename EGA<N>::Pss>; 
+template<TT N> using NERot = EGAMV<N, typename EGA<N>::Rot>; 
+template<TT N, TT ... NN> using NEe   = EGAMV<N, typename EGA<N>::template e<NN...> >;   
 
 //N-Dimensional Conformal Candidates                        
 template<TT N, TT E> using Ne  =  CGAMV<N,typename CGA<N>::template e<E> >; 
