@@ -10,7 +10,8 @@ IN PROGRESS!!!
 
 */
 
-#include "vsr_products.h" 
+#include "vsr_products.h"
+#include "vsr_constants.h" 
 // #include "vsr_versions.h"
 
 namespace vsr {           
@@ -164,7 +165,7 @@ namespace Op{
 			
 	        VT s = ( a <= b )[0];  
 			//180 degree check
-			if ( a == b.conjugation() ) return Rot(1); //mind the ordering of blades
+			if ( a == b.conjugation() ) return Gen::rot( a ^ A::y * PIOVERTWO); //mind the ordering of blades
 					
 	        VT ss = 2 * (s+1);
 	        VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );

@@ -198,7 +198,9 @@
 				}
 			}
 
-			s->colors().text.set(0,1,0);
+			s->colors().text.set(0,1,0); 
+			s->colors().fore.set(0,1,0);  
+			//s->colors().set(0,1,0);
 			s->name( _name );
 			add((Widget*)s, _name);
 		}
@@ -290,7 +292,9 @@ struct App : public View3D{
 	virtual void init(Window * win){
 		stretch(1,1);
 		colors().back.set(.1,.1,.1);
-	    *this << gui; 
+	    *this << gui;  
+	
+		//gui.colors().back.set(0,1,0);
 
 	    set(win); 
 
