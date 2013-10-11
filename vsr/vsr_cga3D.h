@@ -46,7 +46,7 @@ namespace vsr{
 	Dlp Plane( VT a, VT b, VT c, VT d=0.0){
 		return Dlp(a,b,c,d);
 	} 
-	///Dual Plane from vec and distance from center
+	///Dual Plane from` vec and distance from center
 	Dlp Plane( const Vec& v, VT d=0.0){
 		return v + Inf(d);
 	} 
