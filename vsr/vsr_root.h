@@ -11,6 +11,11 @@ using namespace std;
 
 namespace vsr{
              
+template<class V>
+bool compare(const V& a, const V& b, VT amt =.00005){   
+	//( a <= b ).vprint();
+	return ( ( a - b ).wt() ) < amt;
+}            
 	
 template<int DIM, class ... R >
 vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){   
@@ -34,7 +39,7 @@ vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){
 			 
 			bool exists = 0;
 			for ( int k = 0; k < results.size(); ++k){
-				exists = ( nr == results[k] ); 
+				exists = ( compare(nr,results[k]) ); 
 				// nr.vprint(); results[k].vprint(); std::cout << exists << endl;     
 				if (exists) break;
 			}   
@@ -59,8 +64,8 @@ vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){
                 bool exists = 0; 
 				for ( int k = 0; k < cs; ++k){ 
 					// std::cout << k << endl;
-					// nr.vprint();  
-					exists = ( nr == results[k] );
+					//nr.vprint();  
+					exists = ( compare(nr,results[k]) );
 					//nr.vprint(); results[k].vprint(); std::cout << exists << endl;
 					if (exists) {  
 					   break;
@@ -96,7 +101,7 @@ vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){
 				for ( int k = 0; k < ns; ++k){ 
 					// std::cout << k << endl;
 					// nr.vprint();  
-					exists = ( nr == results[k] );
+					exists = ( compare(nr,results[k]) );
 					//nr.vprint(); results[k].vprint(); std::cout << exists << endl;
 					if (exists) {  
 					   break;

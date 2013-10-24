@@ -25,7 +25,7 @@ struct MyApp : App {
 	         
 	
 	bool bOrtho;
-	static const int DIM = 4; 
+	static const int DIM = 6; 
 
 	NCube<DIM> tetra;
    	

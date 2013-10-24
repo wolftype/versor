@@ -590,7 +590,12 @@ struct Ro {
     static Par par(const Pnt& pnt, const Vec& flat, double r){
         //return Ro::dls_pnt(pnt,r) * ( (pnt * -1.0) <= (Inf(1)*flat));
         return par( Ro::dls_pnt(pnt,r), flat);// ^ ( (pnt <= (flat.involute() * Inf(1))) * -1.0 );
-    }
+    }                
+
+    template<class F>
+	static auto round( const Pnt& dls, const F& flat) RETURNS (
+	    dls ^ ( ( dls <= ( flat.inv() * Inf(1) ) )  * -1.0 )
+	)
 
     /*! Curvature of Round 
         @param Round Element
@@ -669,13 +674,13 @@ template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t){
 	return this -> trs(t);  
 } 
-template<TT DIM, typename A> 
-CGAMV<DIM,A> CGAMV<DIM,A>::trs( VT x, VT y, VT z){
-	return this -> sp ( Gen::trs(x,y,z) );  
+template<TT DIM, typename A> template<class ... T>
+CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v){
+	return this -> sp ( Gen::trs(v...) );  
 }
-template<TT DIM, typename A>
-CGAMV<DIM,A> CGAMV<DIM,A>::translate( VT x, VT y, VT z){
-	return this -> sp ( Gen::trs(x,y,z) );  
+template<TT DIM, typename A> template<class ... T>
+CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v){
+	return this -> sp ( Gen::trs(v...) );  
 }
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t){

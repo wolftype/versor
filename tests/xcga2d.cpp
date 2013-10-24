@@ -29,7 +29,7 @@ int main(){
  
 	printf("line (grade 3)\n");
 	Lin::bprint();  
-	printf("dualLine (grade 2)\n");
+	printf("dualLine (grade 1)\n");
 	Dll::bprint();
     printf("circle (3-blade)\n");
 	Cir::bprint();  	
@@ -44,7 +44,7 @@ int main(){
 	printf("translator (s + drv)\n");
 	auto t = Gen::trs( Drv(1,1) ); t.bprint();    
 	
-	printf("motor (s + dll + pss)\n");
+	printf("motor (s + biv + drv )\n");
 	( t * r).bprint();
 		
 	printf("transversor (s + tnv)\n");

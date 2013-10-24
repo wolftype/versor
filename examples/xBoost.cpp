@@ -1,7 +1,4 @@
 #include "vsr_cga3D.h"  
-#include "vsr_cga3D_draw.h" 
-#include "vsr_cga3D_interface.h"  
-
 #include "vsr_GLVimpl.h"
 
 #include "vsr_field.h"
@@ -23,9 +20,8 @@ struct MyApp : App {
 			
 			Par par = Par( Tnv( 1,0,0) * t).trs( cos(time), 0, 0); 
 
-			
-			auto c = Circle(0,0,0).bst( par );  
-			
+			auto c = Circle(0,0,0).bst( par ); 
+
 			Draw ( c, 1, t, 1-t );
 	    }
 	

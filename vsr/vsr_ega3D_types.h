@@ -31,57 +31,57 @@ namespace vsr{
         @param Rotor r
     */     
           
-    namespace Gen{  
+	    namespace Gen{  
 	
 	/*! Get Bivector Generator from a Rotor 
-        @param Rotor r
-    */
-    static Biv log(const Rot& r){
-    	
-        VT t = r.get<0>();                           //<--- Scalar Value from Rotor
-        
-        Biv b = r.cast<Biv>();
-        
-        VT n = b.rnorm();
-        
-        if (n <= 0) {
-            if (t < 0) {
-                printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
-                return Biv(PI,0,0);
-            } else {
-                return Biv(0,0,0); 
-            }
-        }
-        
-        VT s = atan2( n, t );
-        return b * ( s / n);
-    }
-
-		static Biv pl( const Rot& r) {
-	        Biv b = r.cast<Biv>();
-	        VT t = b.rnorm(); // use rnorm or norm here?
-	        if (t == 0 ) return Biv(1,0,0);
-	        return b / t;
-	    }                     
-
-	    /*! Angle of Rotation from Rotor 
 	        @param Rotor r
 	    */
-	    static VT iphi( const Rot& r) {
-	        return Biv ( log(r) * -2 ).norm();
-	    }
-
-	    /*! Axis Angle from Rotor (useful for calling glRotate . . . )
-	        @param Rotor input
-	    */
-		static Rot aa (const Rot& r) {
-
-	        Vec v = Gen::pl( r ).dual();		
-	        VT deg = iphi(r) * ( -180 / PI );
-        			
-	        return Rot(deg, v[0], v[1], v[2]);
-	    }   
-	}
+	    // static Biv log(const Rot& r){
+	    // 	
+	    //     VT t = r.get<0>();                           //<--- Scalar Value from Rotor
+	    //     
+	    //     Biv b = r.cast<Biv>();
+	    //     
+	    //     VT n = b.rnorm();
+	    //     
+	    //     if (n <= 0) {
+	    //         if (t < 0) {
+	    //             printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
+	    //             return Biv(PI,0,0);
+	    //         } else {
+	    //             return Biv(0,0,0); 
+	    //         }
+	    //     }
+	    //     
+	    //     VT s = atan2( n, t );
+	    //     return b * ( s / n);
+	    // }  
+	// 
+	// 	static Biv pl( const Rot& r) {
+	//         Biv b = r.cast<Biv>();
+	//         VT t = b.rnorm(); // use rnorm or norm here?
+	//         if (t == 0 ) return Biv(1,0,0);
+	//         return b / t;
+	//     }                     
+	// 
+	//     /*! Angle of Rotation from Rotor 
+	//         @param Rotor r
+	//     */
+	//     static VT iphi( const Rot& r) {
+	//         return Biv ( log(r) * -2 ).norm();
+	//     }
+	// 
+	//     /*! Axis Angle from Rotor (useful for calling glRotate . . . )
+	//         @param Rotor input
+	//     */
+	// 	static Rot aa (const Rot& r) {
+	// 
+	//         Vec v = Gen::pl( r ).dual();		
+	//         VT deg = iphi(r) * ( -180 / PI );
+	//         			
+	//         return Rot(deg, v[0], v[1], v[2]);
+	//     }   
+	}   
 }
 
 #endif  

@@ -15,7 +15,8 @@
 
 #include <vector>
 
-#include "vsr_products.h"
+#include "vsr_generic_op.h" 
+
 #include "vsr_interp.h"  
 
 #include "gfx/gfx_data.h"
@@ -59,10 +60,12 @@ namespace vsr {
     class Lattice {
     
         public:
-        
+            
+			using LPnt = NPnt<5>;  //Lattice Point
+
             Lattice (int n ) : mNum(n) {
         
-                mPoint = new Pnt[mNum];
+                mPoint = new LPnt[mNum];
 
             }
 
@@ -74,19 +77,19 @@ namespace vsr {
             void resize(int n){
                 if(mPoint) delete[] mPoint;
                 mNum = n;
-                mPoint = new Pnt[mNum];
+                mPoint = new LPnt[mNum];
             }
             
-            Pnt& pnt( int ix ) { return mPoint[ix]; }    
-            Pnt pnt( int ix ) const { return mPoint[ix]; }    
+            LPnt& pnt( int ix ) { return mPoint[ix]; }    
+            LPnt pnt( int ix ) const { return mPoint[ix]; }    
 
-            Pnt* pnt() { return mPoint; }
+            LPnt* pnt() { return mPoint; }
                         
         protected:
         
             int mNum;
 
-            Pnt * mPoint;
+            LPnt * mPoint;
         
     };
     
@@ -94,6 +97,8 @@ namespace vsr {
     class CubicLattice  {
     
         public:
+         
+		using LPnt = NPnt<5>;  //Lattice Point
 
         CubicLattice(int _w = 1, int _h = 1, int _d = 1, double _s = 1.0)
         : mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
@@ -182,7 +187,7 @@ namespace vsr {
         double pz(int k) const { return  od() - (mSpacing * k); }
 
         void alloc(){
-            mPoint = new Pnt[mNum];
+            mPoint = new LPnt[mNum];
 
             mNbr = new Nbr[mNum];
 
@@ -269,9 +274,10 @@ namespace vsr {
             
             return vxl;
 	}
-    
-     Vec bound ( const Vec& p) const {
-		Vec v = p;        
+     
+	 template<class V> 
+     V bound ( const V& p) const {
+		V v = p;        
         
 		if ( v[0] < px(0) ) v[0] = px(0);// + f.spacing()/2.0;
         else if  ( v[0] > px( w()-1) ) v[0] = px( w()-1);// - f.spacing()/2.0;
@@ -285,9 +291,10 @@ namespace vsr {
 		return v;
     }	
 
-    //bound and modify to range [0,1]
-    Vec2D range( const Vec2D& v) const{
-        Vec2D t = v;
+    //bound and modify to range [0,1]  
+	template<class V>
+    V range2D( const V& v) const{
+        V t = v;
 
         double minx = px(0);
         double maxx = px(mWidth-1);
@@ -302,12 +309,13 @@ namespace vsr {
         double dx = (t[0] - minx)/tw();
         double dy = (t[1] - miny)/th();
         
-        return Vec2D(dx,dy);
+        return V(dx,dy);
     }
 
-    //bound and modify to range [0,1]
-    Vec range( const Vec& v) const{
-        Vec t = v;
+    //bound and modify to range [0,1]  
+	template<class V>
+    V range( const V& v) const{
+        V t = v;
 
         double minx = px(0);
         double maxx = px(mWidth-1);
@@ -327,7 +335,7 @@ namespace vsr {
         double dy = (t[1] - miny)/th();
         double dz = -(t[2] - maxz)/td();
         
-        return Vec(dx,dy,dz);
+        return V(dx,dy,dz);
     }
         
         
@@ -479,28 +487,28 @@ namespace vsr {
         //backwards compatibilty
         
         /*! Set grid data by Coordinate */
-        Pnt&  gridAt(int w = 0, int h = 0, int d = 0) { return mPoint[ idx(w, h, d)  ]; }   
+        LPnt&  gridAt(int w = 0, int h = 0, int d = 0) { return mPoint[ idx(w, h, d)  ]; }   
         /*! Get grid data by Coordinate */
-        Pnt	gridAt(int w = 0, int h = 0, int d = 0) const { return mPoint[ idx(w, h, d)  ]; }     
+        LPnt	gridAt(int w = 0, int h = 0, int d = 0) const { return mPoint[ idx(w, h, d)  ]; }     
         /*! Set Grid (position) Data*/ 
-        Pnt& grid(int i) { return mPoint[i]; }  
+        LPnt& grid(int i) { return mPoint[i]; }  
         /*! Get Grid (position)  Data */      
-        Pnt grid(int i) const { return mPoint[i]; }     
+        LPnt grid(int i) const { return mPoint[i]; }     
         
-        Pnt surf(double u, double v){
+        LPnt surf(double u, double v){
             
             Patch p =  surfIdx(u,v);
             
-            Pnt a = mPoint[ p.a ];//gridAt ( iw, ih, 0 );
-            Pnt b = mPoint[ p.b ];//gridAt ( iw + 1, ih, 0 );
-            Pnt c = mPoint[ p.c ];//gridAt ( iw + 1, ih + 1, 0 );
-            Pnt d = mPoint[ p.d ];//gridAt ( iw, ih + 1, 0 );
+            LPnt a = mPoint[ p.a ];//gridAt ( iw, ih, 0 );
+            LPnt b = mPoint[ p.b ];//gridAt ( iw + 1, ih, 0 );
+            LPnt c = mPoint[ p.c ];//gridAt ( iw + 1, ih + 1, 0 );
+            LPnt d = mPoint[ p.d ];//gridAt ( iw, ih + 1, 0 );
             
-            return Ro::null( Interp::surface<Pnt>( a,b,c,d, p.rw, p.rh) ) ;       
+            return Ro::null( Interp::surface<LPnt>( a,b,c,d, p.rw, p.rh) ) ;       
         }   
 
-        Pnt surfGrid(double u, double v) { return surfpnt(u,v); }
-        Pnt surfpnt(double u, double v){
+        LPnt surfGrid(double u, double v) { return surfPnt(u,v); }
+        LPnt surfPnt(double u, double v){
              
             double pw = 1.0 / ( mWidth-1);
             double ph = 1.0/ ( mHeight-1);
@@ -520,12 +528,12 @@ namespace vsr {
             //double rd = fd - id;
            // cout << rw << " " << rh << endl; 
             
-            Pnt a = grid( idx ( iw, ih, 0 ) );
-            Pnt d =grid( idx ( iw, ih + 1, 0 ));
-            Pnt b = grid( idx (  iw + 1, ih, 0 ));
-            Pnt c = grid( idx (  iw + 1, ih + 1, 0 ));
+            LPnt a = grid( idx ( iw, ih, 0 ) );
+            LPnt d =grid( idx ( iw, ih + 1, 0 ));
+            LPnt b = grid( idx (  iw + 1, ih, 0 ));
+            LPnt c = grid( idx (  iw + 1, ih + 1, 0 ));
             
-            return Ro::null( Interp::surface<Pnt> (a,b,c,d, rw, rh) );       
+            return Ro::null( Interp::surface<LPnt> (a,b,c,d, rw, rh) );       
         }
 
         vector<int>& face() { return mFace; }
@@ -544,7 +552,7 @@ namespace vsr {
         double mSpacing;
         
         //Points in Space
-        Pnt * mPoint;
+        LPnt * mPoint;
         
         //vxl access
         Vxl *mVxl;

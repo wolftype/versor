@@ -6,13 +6,13 @@
  *  Copyright 2010 wolftype. All rights reserved.
  *
  
- KINEMATIC CHAIN can be closed or open (robot arm)
+3D KINEMATIC CHAIN can be closed or open (robot arm)
  
- if one end is fixed, it is a MECHANISM
+ > if one end is fixed, it is a MECHANISM
  
- if a MECHANISM transmits power it is a MACHINE
+ > if a MECHANISM transmits power it is a MACHINE
  
- */
+*/
 
 #ifndef VSR_CHAIN_H_INCLUDED
 #define VSR_CHAIN_H_INCLUDED
@@ -23,17 +23,19 @@ namespace vsr {
 
 	class Chain : public Frame {
         
-		Frame * mJoint;			///< In Socket Transformation (RDHC, etc) SET THIS directly (all others follow after calling fk() method)
-		Frame * mLink;			///< Relative Link to next joint
+		MFrame * mJoint;			///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
+								///  (all others follow after calling fk() method)  
+								
+		MFrame * mLink;			///< Relative Link to NEXT joint
 		
-		Frame * mFrame;			///< Absolute frames of Joints = joint * prevLink * prevFrame
+		MFrame * mFrame;			///< Absolute frames of Joints = prevFrame  * prevLink *  joint
 
 		int mNum;
 		
 		void _init(){
 			for (int i = 0; i < mNum; ++i){
 				Vec v(0,1.0,0);
-				mLink[i].pos() == Ro::null(v);//trs( Gen::trs(v) );
+				mLink[i].pos() = Ro::null(v);//trs( Gen::trs(v) );
 				mFrame[i].scale(.2);
 				
 				//cout << mLink[i].pos() << endl;
@@ -44,14 +46,14 @@ namespace vsr {
 		
 		public:
 		
-			Chain(int n = 3) : mNum(n) {
-                if (mNum > 0){
-				mFrame = new Frame[n];
-				mLink  = new Frame[n];
-				mJoint = new Frame[n];
-				_init();		
-                }	
-			}
+			Chain(int n = 3) : mNum(n), mFrame(NULL), mJoint(NULL), mLink(NULL) {
+                
+					alloc(n);
+					_init();		
+                  
+			}       
+		    
+			
         ~Chain(){
             if (mFrame) delete[] mFrame;
             if (mLink) delete[] mLink;
@@ -59,14 +61,16 @@ namespace vsr {
         }
         
             void alloc(int n){
-                mNum = n;
-                if (mFrame) delete[] mFrame;
-                if (mLink) delete[] mLink;
-                if (mJoint) delete[] mJoint;   
-            	mFrame = new Frame[n];
-				mLink  = new Frame[n];
-				mJoint = new Frame[n];
-				_init();	        
+                mNum = n; 
+				if (mNum>0){
+                if (mFrame ) delete[] mFrame;
+                if (mLink ) delete[] mLink;
+                if (mJoint ) delete[] mJoint;   
+            	mFrame = new MFrame[n];
+				mLink  = new MFrame[n];
+				mJoint = new MFrame[n];
+				_init(); 
+				}           
             }
             
             void frameSet(){
@@ -75,17 +79,17 @@ namespace vsr {
         
 			/* GETTERS AND SETTERS */
 			int num() const { return mNum; }
-			Frame& link(int k) { return mLink[k]; }						///< set k's Link To Next Joint
-			Frame& joint(int k) { return mJoint[k]; }					///< set kth joint's In Socket Transformation
-			Frame& frame(int k) { return mFrame[k]; }					///< set Absolute Displacement Motor
+			MFrame& link(int k) { return mLink[k]; }						///< set k's Link To Next Joint
+			MFrame& joint(int k) { return mJoint[k]; }					///< set kth joint's In Socket Transformation
+			MFrame& frame(int k) { return mFrame[k]; }					///< set Absolute Displacement Motor
 
-			Frame link(int k) const { return mLink[k]; }				///< Get k's Link To Next joint 
-			Frame joint(int k) const { return mJoint[k]; }				///< Get kth Joint's In Socket Transformation
-			Frame frame(int k) const { return mFrame[k]; }				///< Get Absolute Displacement Motor
+			MFrame link(int k) const { return mLink[k]; }				///< Get k's Link To Next joint 
+			MFrame joint(int k) const { return mJoint[k]; }				///< Get kth Joint's In Socket Transformation
+			MFrame frame(int k) const { return mFrame[k]; }				///< Get Absolute Displacement Motor
 
 			
-			Frame& operator [] (int k) { return mFrame[k]; }				///< Set kth Absolute Frame
-			Frame operator [] (int k) const { return mFrame[k]; }		///< Get kth Absolute Frame
+			MFrame& operator [] (int k) { return mFrame[k]; }				///< Set kth Absolute Frame
+			MFrame operator [] (int k) const { return mFrame[k]; }		///< Get kth Absolute Frame
 			
 			/* SURROUNDS */
 			/// Sphere Centered at Joint K Going Through Joint K+1 
@@ -112,9 +116,9 @@ namespace vsr {
                 return Ro::null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
             }
             
-            Frame& base() { return mFrame[0]; }
-            Frame& first() { return mFrame[0]; }        
-            Frame& last() { return mFrame[mNum -1]; }
+            MFrame& base() { return mFrame[0]; }
+            MFrame& first() { return mFrame[0]; }        
+            MFrame& last() { return mFrame[mNum -1]; }
 			
 			/// Vert xy Plane Containing Root Target Point v ( NORMALIZED )
 			Dlp xy(const Pnt& p) {
@@ -124,7 +128,9 @@ namespace vsr {
 			Dlp xz(const Pnt& p)  {
 				return Dlp(0,1,0,p[1]);
 			}
-			
+
+			/// Dual Line Forward: Line from kth frame to kth Link
+			Dll linkf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }			
 			/// Dual Line Forward: Line from kth frame to kth+1 joint
 			Dll linf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
 			/// Dual Line Backward: Line from kth frame to kth-1 joint
@@ -137,8 +143,8 @@ namespace vsr {
                 Mot mot = mJoint[0].mot();
                 mFrame[0].mot( mot );
                 for (int i = 1; i < mNum; ++i){		
-                    Mot rel = mLink[i-1].mot() * mJoint[i].mot();
-                    mFrame[i].mot(  mFrame[i-1].mot() * rel ) ;
+					Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
+					mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
                 }
             }	      
         
@@ -272,10 +278,10 @@ namespace vsr {
                 for (int i = start; i < mNum-1; ++i){
                     //DRV of LINK
                     Vec b = Op::dle( Biv( linf(i) ) );                    
-                    Rot nr = Gen::ratio(t, b*-1); //What it takes to turn the current integration there
+                    Rot nr = Gen::ratio( t, b ); //What it takes to turn the current integration there
                     R = nr * R;
                     mFrame[i].rot( R );
-                    t = Op::sp(t, nr ); //angle is integrated
+                    t = t.sp( nr ); //angle is integrated
                 }
                 
                 //Set Base Joint

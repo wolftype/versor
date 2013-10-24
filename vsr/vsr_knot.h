@@ -15,9 +15,7 @@
 #ifndef Versor_vsr_knot_h
 #define Versor_vsr_knot_h
 
-// #include "vsr_frame.h" 
 #include "vsr_fiber.h"
-//#include "vsr_set.h"
 
 namespace vsr {
 

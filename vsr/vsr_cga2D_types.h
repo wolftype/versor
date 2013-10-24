@@ -49,12 +49,20 @@ typedef NMot<4> Mot;	 //Motor
 typedef NTrv<4> Trv;	 //Transversor 
 typedef NBst<4> Bst;	 //Boost 
 typedef NDil<4> Dil;	 //Dilator 
-typedef NTsd<4> Tsd;	 //Translated Dilator   
+typedef NTsd<4> Tsd;	 //Translated Dilator  
+
+      
+
+#define PAO vsr::Pnt(0,0,1,0)   // Point At Origin  
 
 //ADDITIONAL NON-GENERIC OPS  
-
+                        
+template<class V>
+Pnt Point(const V& v){
+	return Ro::null( v[0], v[1]  );
+}
 Pnt Point(VT x, VT y){
-	return Ro::null( Vec(x,y) );
+	return Ro::null( x, y );
 }
 Par Pair( const Pnt& a, const Pnt& b){
 	return a ^ b;
@@ -64,6 +72,14 @@ Cir Circle(const Pnt& a, const Pnt& b, const Pnt& c){
 }
 Pnt Circle(VT x, VT y, VT rad){
 	return Ro::dls( Vec(x,y), rad ); 
+}
+
+Lin Line( const Pnt& a, const Pnt & b ){
+	return a ^ b ^ Inf(1);
+}  
+
+Par Meet( const Lin& lin, const Cir& cir){
+	return ( lin.dual() ^ cir.dual() ).dual();
 }
 
 

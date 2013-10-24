@@ -87,7 +87,8 @@ struct CIP{
 template<class B, class Metric,  int idxA, int idxB>  
 struct CIP<MV<>,B, Metric, idxA,idxB> {
 	typedef XList<> Type; 
-};
+}; 
+
  
 /////////////////////////////
 // DIAGONAL METRIC USED   ///   
@@ -485,6 +486,7 @@ struct CGA{
 	template<TT N> using e = MV< (1<<(N-1)) >;   
    // template<TT M, TT N> using ee = MV< (1<<(M-1)) (1<<(N-1)) >; 
 	typedef MV< pss(DIM) > Pss;  
+	typedef MV< pss(DIM-2) > EucPss;					 //Euclidean Pseudoscaler 
 		
 	typedef typename Blade1<DIM-2>::VEC 	Vec;         //Euclidean Vector
 	typedef typename Blade1<2>::VEC 	Vec2D;  
@@ -501,13 +503,7 @@ struct CGA{
 	typedef typename OProd<Biv, Inf, M, true>::Type Drb;  
 	typedef typename OProd<Tri, Ori, M, true>::Type Tnt;
 	typedef typename OProd<Tri, Inf, M, true>::Type Drt; 
-
-	 	 
-	//typedef decltype( sum( Vec(), Inf() ) ) Dlp;
-	//typedef decltype( sum( Biv(), Drv() ) ) Dll;    
-	//typedef decltype( sum( sum( Dll(), Mnk() ), Tnv() ) ) Par;  
-	
-	   
+     
 	typedef typename Blade1<DIM>::VEC Pnt; 
 	typedef typename OProd< Pnt, Pnt, M, true>::Type Par;
 	typedef typename OProd<Pnt, Inf, M, true>::Type Flp;
@@ -515,7 +511,7 @@ struct CGA{
     typedef typename OProd< Par, Inf, M, true>::Type Lin;    
 	typedef typename OProd< Par, Pnt, M, true>::Type Cir;
 	typedef typename OProd< Cir, Pnt, M, true>::Type Sph; 
-	typedef typename OProd< Cir, Inf,M, true>::Type Pln;  
+	typedef typename OProd< Cir, Inf,M, true>::Type  Pln;  
 	
 	typedef typename Prod< Lin, Pss, M, true>::Type Dll;
 	typedef typename Prod< Pln, Pss, M, true>::Type Dlp;
@@ -525,13 +521,51 @@ struct CGA{
 	typedef decltype( sumv(1.,  Mnk() ) ) Dil; 
 	typedef typename Prod<Rot,Trs,M,true>::Type Mot;    
 	typedef decltype( sumv(1.,  Par() ) ) Bst; 
-	typedef decltype( sumv(1.,  Flp() ) ) Tsd;   
+	typedef decltype( sumv(1.,  Flp() ) ) Tsd;  
 	
+	// static Sca SSca;
+	// static Pss SPss;
+	// static EucPss SEucPss;
+	// static Vec SVec;
+	// static Vec2D SVec2D;
+	// static Biv SBiv;
+	// static Tri STri;
+	// static Rot SRot;
+	// static Inf SInf; 
+	// static MV< origin<DIM>() > SOri;
+	// static MV< eplane<DIM>() > SMnk;
+	// static Tnv STnv;
+	// static Tnb STnb;
+	// static Drv SDrv;
+	// static Drb SDrb;
+	// static Tnt STnt;
+	// static Drt SDrt;
+	// static Pnt SPnt;
+	// static Par SPar;
+	// static Flp SFlp;
+	// static Lin SLin;
+	// static Cir SCir;
+	// static Sph SSph;
+	// static Pln SPln;
+	// static Dll SDll;
+	// static Dlp SDlp;
+	// static Trs STrs;
+	// static Trv STrv;
+	// static Dil SDil;
+	// static Mot SMot;
+	// static Bst SBst;
+	// static Tsd STsd; 
+  
 };  
 
 template<TT DIM, class A>
-struct CGAMV : public A {  
- 
+struct CGAMV : public A {                 
+	
+	//template< class B> using AType = CGAMV  
+	template< class B > using AType = CGAMV<DIM, B >;
+	typedef CGA<DIM> MODE;
+	
+	
     typedef A Type;
     
 	typedef typename RMetric<DIM-1,1>::Type M;
@@ -543,24 +577,41 @@ struct CGAMV : public A {
 	
 	template<class B>
 	constexpr CGAMV(const CGAMV<DIM,B>& b) : A( b.template cast<A>() ) {}   
-	 
+	
+	//other 
 	template< class B >
 	CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,B>::Type, M, true>::Type> 
 	operator * (const CGAMV<DIM, B>& b) const {
 		return CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,  B>::Type, M, true>::Type>( cgp<M>( *this, b ) );
-	} 
-	
+	}      
+	// //self 
+	// CGAMV<DIM, typename Prod<A, A, M, true>::Type> 
+	// operator * (const CGAMV& b) const {
+	// 	return CGAMV<DIM, typename Prod<A, A, M, true>::Type>( cgp<M>( *this, b ) );
+	// } 
+	//other
 	template<class B>
 	CGAMV<DIM, typename OProd<A, typename B::Type, M, true>::Type> 
 	operator ^ (const B& b) const {
 		return CGAMV<DIM, typename OProd<A, typename B::Type, M, true>::Type>( cop<M>( *this, b ) );
 	}
- 
+	// //self 
+	// CGAMV<DIM, typename OProd<A, A, M, true>::Type> 
+	// operator ^ (const CGAMV& b) const {
+	// 	return CGAMV<DIM, typename OProd<A, A, M, true>::Type>( cop<M>( *this, b ) );
+	// } 
+    //other
 	template<class B>
 	CGAMV<DIM, typename IProd<A, typename B::Type, M, true>::Type> 
 	operator <= (const B& b) const {
 		return CGAMV<DIM, typename IProd<A, typename B::Type, M, true>::Type>( cip<M>( *this, b ) );
-	}  
+	} 
+	// //self 
+	// CGAMV<DIM, typename IProd<A, A, M, true>::Type> 
+	// operator <= (const CGAMV& b) const {
+	// 	return CGAMV<DIM, typename IProd<A, A, M, true>::Type>( cip<M>( *this, b ) );
+	// }   
+	
 	 
 	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > 
 	dual() const{
@@ -569,19 +620,23 @@ struct CGAMV : public A {
 	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > 
 	undual() const{
 		return  CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type >( cgp<M>( *this,  typename CGA<DIM>::Pss(1) )  );
-	}    
+	}  
+	
+	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::EucPss, M, true>::Type > 
+	duale() const{
+		return  CGAMV<DIM, typename Prod<A, typename CGA<DIM>::EucPss, M, true>::Type >( cgp<M>( *this,  typename CGA<DIM>::EucPss(-1) )  );
+	} 
+	CGAMV<DIM, typename Prod<A, typename CGA<DIM>::EucPss, M, true>::Type > 
+	unduale() const{
+		return  CGAMV<DIM, typename Prod<A, typename CGA<DIM>::EucPss, M, true>::Type >( cgp<M>( *this,  typename CGA<DIM>::EucPss(1) )  );
+	}  
 	 
 	
 	CGAMV operator ~() const{
 		return Reverse< A >::Type::template Make(*this) ;
 	}
 	
-	CGAMV operator !() const {    
-
-		CGAMV tmp = ~(*this); 
-		VT v = ((*this) * tmp)[0];    
-		return (v==0) ? tmp : tmp / v;
-	}
+	CGAMV operator !() const;
 	
 	template<class B>
 	auto operator / (const CGAMV<DIM,B>& b) const RETURNS(
@@ -603,14 +658,16 @@ struct CGAMV : public A {
 	template<typename B>
 	CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 
 	template<typename B>
+	CGAMV spin( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }
+	
+	//test reduced instruction 
+	template<typename B>
 	CGAMV sptest( const B& b) const { return csp<M>(*this, b); } 
 	template<typename B>
-	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }   
+	CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
+	template<typename B>
+	CGAMV reflect( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
 	                                                                                  
-	// template<typename B>
-	// CGAMV sp2( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }  
-	// template<typename B>
-	// CGAMV re2( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
 	
 	CGAMV operator + (const CGAMV& a) const {  
 	   // printf("sum same\n");
@@ -661,16 +718,12 @@ struct CGAMV : public A {
 		return *this;
 	}  
 	
-	//template<class B>
-	//friend auto operator + (VT b, const CGAMV& a) -> CGAMV< DIM, decltype( sumv( b, A() ) ) >;  
 	 
 	auto operator + (VT a) const -> CGAMV< DIM, decltype( sumv( a, A() ) ) >  {
 	   // printf("sumv\n");
 		return sumv(a, *this); 
 	}
-	// template<class B>
-	// friend auto operator + (const CGAMV& a, const B& b) -> CGAMV< DIM, decltype( sum( a, b ) ) >;  
-	
+   
 	template<class B>
 	auto operator + (const CGAMV<DIM, B>& b) const -> CGAMV< DIM, decltype( sum( *this, B() ) ) >  {
 	   // printf("sum\n");
@@ -682,8 +735,10 @@ struct CGAMV : public A {
 	CGAMV<DIM, typename CGA<DIM>::Pnt > null();
               
 	template<typename T>
-	CGAMV trs( const T& ); 
-	CGAMV trs( VT x, VT y, VT z );
+	CGAMV trs( const T& );   	
+	template<class ... T>   
+	CGAMV trs( T ... v);   
+	
 	template<typename T>
 	CGAMV rot( const T& );
 	template<typename T>
@@ -698,8 +753,9 @@ struct CGAMV : public A {
 	CGAMV bst( const T& );   
 
 	template<typename T>  
-	CGAMV translate( const T& );   
-	CGAMV translate( VT x, VT y, VT z);
+	CGAMV translate( const T& );
+	template<class ... T>   
+	CGAMV translate( T ... v);
 	
 	template<typename T>
 	CGAMV rotate( const T& );
@@ -722,19 +778,16 @@ template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::y =  A().template set<2>(1)
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::z =  A().template set<4>(1);  
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xy = A().template set<3>(1);  
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xz = A().template set<5>(1);  
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::yz = A().template set<6>(1);    
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::yz = A().template set<6>(1);  
+
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::operator !() const {    
+	CGAMV tmp = ~(*this); 
+	VT v = ((*this) * tmp)[0];    
+	return (v==0) ? tmp : tmp / v;
+}  
 
 
-// template<TT DIM, class A> 
-// auto operator + ( VT b, const CGAMV<DIM,A>& a) -> CGAMV< DIM, decltype( sumv( b, A() ) ) >{
-// 	printf("sum!!!!\n");
-// 	return sumv(b, a );
-// }    
-// template<class B, TT DIM, class A> 
-// auto operator + (const CGAMV<DIM,A>& a, const B& b) -> CGAMV< DIM, decltype( sum( a, b ) ) >{
-// 	return sum(a,b);
-// }
-
+//to be developed...
 template<class M, class A>
 struct MGAMV : public A {  
  
@@ -769,8 +822,11 @@ struct MGAMV : public A {
 }; 
 
 template<TT DIM, class A>
-struct EGAMV : public A {  
- 
+struct EGAMV : public A {
+	
+	//template< class B> using AType = CGAMV  
+	template< class B > using AType = EGAMV<DIM, B >;
+    typedef EGA<DIM>  MODE;
     typedef A Type;
 
 	template< class ... Args >
@@ -926,39 +982,42 @@ template<TT N> using NEPss = EGAMV<N, typename EGA<N>::Pss>;
 template<TT N> using NERot = EGAMV<N, typename EGA<N>::Rot>; 
 template<TT N, TT ... NN> using NEe   = EGAMV<N, typename EGA<N>::template e<NN...> >;   
 
-//N-Dimensional Conformal Candidates                        
+//N-Dimensional Conformal Candidates  
+//e.g. Ne<5,3> = e3 in 3D conformal                      
 template<TT N, TT E> using Ne  =  CGAMV<N,typename CGA<N>::template e<E> >; 
-template<TT N> using NSca = CGAMV<N, typename CGA<N>::Sca>;   
-template<TT N> using NVec = CGAMV<N, typename CGA<N>::Vec>; 
-template<TT N> using NVec2D = CGAMV<N, typename CGA<N>::Vec2D>;  
-template<TT N> using NBiv = CGAMV<N, typename CGA<N>::Biv>; 
-template<TT N> using NTri = CGAMV<N, typename CGA<N>::Tri>; 
-template<TT N> using NRot = CGAMV<N, typename CGA<N>::Rot>;
-template<TT N> using NOri = CGAMV<N, typename CGA<N>::Ori>;  
-template<TT N> using NInf = CGAMV<N, typename CGA<N>::Inf>;  
-template<TT N> using NMnk = CGAMV<N, typename CGA<N>::Mnk>;  
-template<TT N> using NPss = CGAMV<N, typename CGA<N>::Pss>;
-template<TT N> using NPnt = CGAMV<N, typename CGA<N>::Pnt>;  
-template<TT N> using NPar = CGAMV<N, typename CGA<N>::Par>;  
-template<TT N> using NCir = CGAMV<N, typename CGA<N>::Cir>;  
-template<TT N> using NSph = CGAMV<N, typename CGA<N>::Sph>;  
-template<TT N> using NDrv = CGAMV<N, typename CGA<N>::Drv>;  
-template<TT N> using NTnv = CGAMV<N, typename CGA<N>::Tnv>;  
-template<TT N> using NDrb = CGAMV<N, typename CGA<N>::Drb>;  
-template<TT N> using NTnb = CGAMV<N, typename CGA<N>::Tnb>;  
-template<TT N> using NDrt = CGAMV<N, typename CGA<N>::Drt>;  
-template<TT N> using NTnt = CGAMV<N, typename CGA<N>::Tnt>; 
-template<TT N> using NDll = CGAMV<N, typename CGA<N>::Dll>;  
-template<TT N> using NLin = CGAMV<N, typename CGA<N>::Lin>;  
-template<TT N> using NFlp = CGAMV<N, typename CGA<N>::Flp>;  
-template<TT N> using NPln = CGAMV<N, typename CGA<N>::Pln>; 
-template<TT N> using NDlp = CGAMV<N, typename CGA<N>::Dlp>;   
-template<TT N> using NTrs = CGAMV<N, typename CGA<N>::Trs>;  
-template<TT N> using NMot = CGAMV<N, typename CGA<N>::Mot>;  
-template<TT N> using NTrv = CGAMV<N, typename CGA<N>::Trv>;  
-template<TT N> using NBst = CGAMV<N, typename CGA<N>::Bst>; 
-template<TT N> using NDil = CGAMV<N, typename CGA<N>::Dil>;
-template<TT N> using NTsd = CGAMV<N, typename CGA<N>::Tsd>;
+template<TT N> using NSca 		= CGAMV<N, typename CGA<N>::Sca>;   
+template<TT N> using NVec 		= CGAMV<N, typename CGA<N>::Vec>; 
+template<TT N> using NVec2D 	= CGAMV<N, typename CGA<N>::Vec2D>;  
+template<TT N> using NBiv 		= CGAMV<N, typename CGA<N>::Biv>; 
+template<TT N> using NTri 		= CGAMV<N, typename CGA<N>::Tri>; 
+template<TT N> using NRot 		= CGAMV<N, typename CGA<N>::Rot>;
+template<TT N> using NOri 		= CGAMV<N, typename CGA<N>::Ori>;  
+template<TT N> using NInf 		= CGAMV<N, typename CGA<N>::Inf>;  
+template<TT N> using NMnk 		= CGAMV<N, typename CGA<N>::Mnk>;  
+template<TT N> using NPss 		= CGAMV<N, typename CGA<N>::Pss>;
+template<TT N> using NEucPss 	= CGAMV<N, typename CGA<N>::EucPss>; 
+template<TT N> using NPnt	    = CGAMV<N, typename CGA<N>::Pnt>;  
+template<TT N> using NDls	    = CGAMV<N, typename CGA<N>::Pnt>; 
+template<TT N> using NPar	    = CGAMV<N, typename CGA<N>::Par>;  
+template<TT N> using NCir	    = CGAMV<N, typename CGA<N>::Cir>;  
+template<TT N> using NSph	    = CGAMV<N, typename CGA<N>::Sph>;  
+template<TT N> using NDrv	    = CGAMV<N, typename CGA<N>::Drv>;  
+template<TT N> using NTnv	    = CGAMV<N, typename CGA<N>::Tnv>;  
+template<TT N> using NDrb	    = CGAMV<N, typename CGA<N>::Drb>;  
+template<TT N> using NTnb	    = CGAMV<N, typename CGA<N>::Tnb>;  
+template<TT N> using NDrt	    = CGAMV<N, typename CGA<N>::Drt>;  
+template<TT N> using NTnt	    = CGAMV<N, typename CGA<N>::Tnt>; 
+template<TT N> using NDll	    = CGAMV<N, typename CGA<N>::Dll>;  
+template<TT N> using NLin	    = CGAMV<N, typename CGA<N>::Lin>;  
+template<TT N> using NFlp	    = CGAMV<N, typename CGA<N>::Flp>;  
+template<TT N> using NPln	    = CGAMV<N, typename CGA<N>::Pln>; 
+template<TT N> using NDlp	    = CGAMV<N, typename CGA<N>::Dlp>;   
+template<TT N> using NTrs	    = CGAMV<N, typename CGA<N>::Trs>;  
+template<TT N> using NMot	    = CGAMV<N, typename CGA<N>::Mot>;  
+template<TT N> using NTrv	    = CGAMV<N, typename CGA<N>::Trv>;  
+template<TT N> using NBst	    = CGAMV<N, typename CGA<N>::Bst>; 
+template<TT N> using NDil	    = CGAMV<N, typename CGA<N>::Dil>;
+template<TT N> using NTsd	    = CGAMV<N, typename CGA<N>::Tsd>;
 
  
 } //vsr::

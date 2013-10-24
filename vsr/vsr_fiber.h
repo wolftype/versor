@@ -11,7 +11,7 @@
 #ifndef Versor_vsr_fiber_h
 #define Versor_vsr_fiber_h
 
-#include "vsr_op.h"
+#include "vsr_cga3D_op.h"
 #include "vsr_coord.h"
 
 

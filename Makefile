@@ -26,19 +26,20 @@ else
 ifneq ($(CLANG),0) 
 	CXX = $(CLANG)/clang++ -std=c++11  
 else 
-	CXX = clang++ -std=c++11 -v  
+	CXX = clang++ -std=c++11  
 endif 
 	CXX += -arch x86_64
 endif
-CXX += -O3 -fpeel-loops  -ftemplate-depth-1200 
+CXX += -O3 -fpeel-loops  -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast
 AR 	= ar crs 
 
 IPATH = -Ivsr/ 
-LDFLAGS =
+LDFLAGS =  
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
 IPATH += -I/usr/include/ 
-LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ 
+LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr 
+#-lvsr
 LDFLAGS += -lm  
 else
 IPATH += -I$(PIROOT)usr/include
@@ -76,9 +77,11 @@ INCLUDE_DIR = vsr/
 VPATH = $(SRC_DIR):\
 		$(INCLUDE_DIR) 
 
-EXEC = tests/%.cpp 
+EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D.o 
+OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
+#vsr_cga3D_interface.o 
+#vsr_cga3D_draw.o
 
 OBJ_DIR = build/obj/
 LIB_DIR = build/lib/
@@ -106,9 +109,10 @@ glv:
 	@echo "building external GUI library GLV . . . if there are errors, make sure you have entered:\n\n"
 	@echo "git submodule init"
 	@echo "git submodule update\n\n"
-	$(MAKE) --no-print-directory -C ext/glv install DESTDIR=../../$(BUILD_DIR)
+	$(MAKE) --no-print-directory -C ext/glv install DESTDIR=../../$(BUILD_DIR)    
 
-$(EXEC): dir glv FORCE 
+
+$(EXEC): dir glv vsr FORCE 
 	@echo Building $@
 	$(CXX) -o $(BIN_DIR)$(*F) $@ $(IPATH) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)

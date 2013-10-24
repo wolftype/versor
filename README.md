@@ -4,7 +4,7 @@ CSS: style0.css
   src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
-Versor (vsr)
+Versor (vsr) Version 2.0
 ===
 A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.  
 ---
@@ -12,9 +12,8 @@ A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.
 
 [Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu)       
 
-Versor is a C++ Library that generates optimized geometric algebra code at compile-time
-through template metaprogramming.  The current version (2.0) now supports arbitrary dimensions and 
-metrics (limited by your compiler...).  
+Versor is a C++ Library for Geometric Algebra. Version 2.0 generates optimized geometric algebra code at compile-time
+through template meta-programming, and supports arbitrary dimensions and metrics (limited by your compiler...).  
 
 Developer: Pablo Colapinto  
 `gmail: wolftype`
@@ -73,7 +72,7 @@ INTRODUCTION
 
 This package provides operations and draw routines for conformal geometric algebra, 
 a relatively new spatial computing model used by physicists, engineers, and artists. _Versor_ is designed to make graphical 
-experimentation of conformal geometric algebra within a C++ environment easier. 
+experimentation of geometric algebra within a C++ environment easier. 
 You can use this library to draw geometrical things, explore spherical and hyperbolic spaces, transformations, design robots, etc. 
 I am using it for my PhD on bio-inspired engineering.
 
@@ -81,9 +80,9 @@ I first developed _Versor_ while reading "Geometric Algebra for Computer Science
 It's a fantastic book and if you're reading this you should also consider reading that.  
 
 Built to aid in my modelling of organic forms, the initial development was funded in large part by the Olivia Long Converse Fellowship for Botanic research, 
-courtesy of the Graduate Division at the University of California in Santa Barbara.  So this software is under a UC Regents General Public License.
-
-
+courtesy of the Graduate Division at the University of California in Santa Barbara.  Currently supported by the Deutsch Foundation,
+this software is under a UC Regents General Public License.  Feel free to use and distribute as long as copyrights and credits
+are maintained. 
 
 Homepage at versor.mat.ucsb.edu
                                                                       
@@ -126,7 +125,7 @@ How does it work?
 ---
 
 If you like mind-numbing functional template metaprogramming, take a look at the code
-and let me know what you think.  If you don't, then I wouldn't . . .  But if you have ideas or questions please do not hesitate
+and please let me know what you think.  If you don't, then I wouldn't . . .  But if you have ideas or questions please do not hesitate
 to contact me.
 
 METHODS
@@ -139,7 +138,6 @@ METHODS
 * `Fl::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
 * `Ta::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
 
-You notice I've been throwing around the `null()` method a lot, 
 
 GENERATORS 
 ---
@@ -159,7 +157,8 @@ BUILD
 - Alternatively Versor 1.0 is available at github.com/wolftype/vsr.git
 
 For C++11 you'll want clang 3.2 (mac) or above or gcc 4.6 or above (linux).  
-NOT tested on windows. 
+NOT tested on windows.
+ 
 If you don't want to or can't compile C++11 code try an [older flavor of vsr](github.com/wolftype/vsr.git). 
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
 

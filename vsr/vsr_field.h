@@ -10,11 +10,8 @@
 #ifndef Versor_vsr_field_h
 #define Versor_vsr_field_h
 
-#include "vsr_products.h"
-#include "vsr_op.h"
-#include "vsr_frame.h"
+//#include "vsr_frame.h"
 #include "vsr_lattice.h"
-
 #include "gfx/gfx_data.h"
 
 namespace vsr{
@@ -66,8 +63,7 @@ namespace vsr{
     
     template < class T>
     class Field : public CubicLattice {
-        
-        
+               
         protected:
         
         T * mData;
@@ -148,29 +144,6 @@ namespace vsr{
 //            return Vec( px(Rand::Int(mWidth)) , py(Rand::Int(mHeight)), pz(Rand::Int(mDepth))  );         
 //        }
 //
-
-            //MOVED TO vsr_draw
-//        void draw(float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
-//            for (int i = 0; i < mNum; ++i){
-//                GL::Draw::Render( mData[i], r, g, b, a );
-//            }
-//        }
-//
-//        void drawGrid(float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
-//            for (int i = 0; i < mNum; ++i){
-//                GL::Draw::Render( grid(i), r, g, b, a );
-//            }
-//        }
-//
-//
-//        void drawPush(float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
-//            for (int i = 0; i < mNum; ++i){
-//                GL::push();
-//                GL::translate( mPoint[i].w() );
-//                GL::Draw::Render( mData[i],r,g,b,a );
-//                GL::pop();
-//            }
-//        }
         
         //data at bottom front corner of vxl at p
         template<class B>
@@ -178,28 +151,24 @@ namespace vsr{
             int idx = vxlAt(p).a;
             return mData[idx];
         }
-
+                                   
         //2d Euler (bounded)
-        T euler2d( const Vec2D& v){
-            Vec2D t = range(v);   //bind to range of field         
+		template<class V>
+        T euler2d( const V& v){
+            V t = range(v);   //bind to range of field         
             return surf(t[0], t[1]);
         }
         
-        //2d Euler (bounded)
-        T euler2d( const Vec& v){
-            Vec t = range(v);   //bind to range of field         
-            return surf(t[0], t[1]);
-        }
-        
-        //3d Euler (bounded) v an arbitrary point in space
-        T euler3d( const Vec& v) const{
-            Vec t= range(v);
+        //3d Euler (bounded) v an arbitrary point in space  
+		template<class V>  
+        T euler3d( const V& v) const{
+            V t= range(v);
             return vol(t[0], t[1], t[2]);
         }
 
 
         /*! Get BILINEAR Interpolated Data at eval u,v [0-1.0] */
-        T surf(double u, double v){
+        T surf(VT u, VT v){
             
             Patch p = surfIdx(u,v);
             
@@ -211,7 +180,7 @@ namespace vsr{
             return Interp::surface<T> (a,b,c,d, p.rw, p.rh);
         }
         
-        T vol(double u, double v, double w) const {
+        T vol(VT u, VT v, VT w) const {
             VPatch p = vidx(u,v,w);
             
             T a = mData[ p.a ]; T b = mData[ p.b ]; T c = mData[ p.c ]; T d = mData[ p.d ];
@@ -219,10 +188,11 @@ namespace vsr{
             return Interp::volume<T> (a,b,c,d,e,f,g,h, p.rw, p.rh, p.rd );
         }
         
-        //Contour Integral
-        vector<Vec> contour(const Vec& v, int num, double force){
+        //Contour Integral 
+		template<class V>
+        vector<V> contour(const V& v, int num, double force){
             vector<Vec> vp;
-            Vec tv = v;
+            V tv = v;
             for (int i = 0; i < num; ++i){
                 vp.push_back(tv);
                 tv += euler3d(tv) * force;
@@ -380,7 +350,7 @@ namespace vsr{
             double dt0 = dt;// * mWidth;
             BOUNDITER
                 int tidx = idx(i,j,k);
-                Pnt p = mPoint[ tidx ].trs( f.euler3d( mPoint[tidx] ) * -dt0 );//f[tidx] * -dt0 ); //Lattice Point 
+                LPnt p = mPoint[ tidx ].trs( f.euler3d( mPoint[tidx] ) * -dt0 );//f[tidx] * -dt0 ); //Lattice Point 
                 mData[tidx] = prev.euler3d( p );
             BOUNDEND
             
@@ -395,7 +365,7 @@ namespace vsr{
         //Sum Differences of each Vxl Face (= DIVERGENCE TENSOR)
 		BOUNDITER
             int ix = idx(i,j,k);
-			mData[ix] = Sca( f.tensNbrsWt(ix) * ( -.5 ) );			
+			mData[ix] = f.tensNbrsWt(ix) * ( -.5 ); //sca			
 		BOUNDEND   
         boundaryConditions(0);
         return *this;
@@ -444,44 +414,44 @@ namespace vsr{
 
 
     };
-    
-    template<> void Field<Vec>::boundaryConditions(bool ref){  
-	
-        for (int i = 0; i < mFace.size(); ++i){
-            int ix = mFace[i];
-            static Nbr n;
-            n = mNbr[ ix ];
-            int type = n.type;
-            
-            //negation for now treat as vectors
-            if (type & LEFT) mData[ix][0] = ref ? -mData[n.xr][0] : mData[n.xr][0]; 
-            if (type & RIGHT) mData[ix][0] = ref ? -mData[n.xl][0] : mData[n.xl][0]; 
-            if (type & TOP) mData[ix][1] = ref ? -mData[n.yb][1] : mData[n.yb][1]; 
-            if (type & BOTTOM) mData[ix][1] = ref ? -mData[n.yt][1] : mData[n.yt][1]; 
-            if (type & BACK) mData[ix][2] = ref ? -mData[n.zf][2] : mData[n.zf][2]; 
-            if (type & FRONT) mData[ix][2] = ref ? -mData[n.zb][2] : mData[n.zb][2];            
-        }    
-    }
-    
 
-//    //SPECIALIZATIONS
-
-    template<> void Field< Vec > :: init() {
-        ITER  mData[tidx] = Vec(mPoint[tidx]).unit(); ITEND
-    }
+//    //SPECIALIZATIONS  
     
-    template<> void Field< Sca > :: init() {
-        ITN  mData[i] = Sca(0); END
-    }
-
-    template<> void Field< Dll > :: init(){
-        ITN mData[i] = Frame( mPoint[i] ).dll(); END
-    }
-    
-    template<> void Field< Frame > :: init(){  
-		//printf("FRAME FIELD INIT\n");
-		ITN mData[i].pos() = mPoint[i]; END
-    }
+		//     template<> void Field<Vec>::boundaryConditions(bool ref){  
+		// 	
+		//         for (int i = 0; i < mFace.size(); ++i){
+		//             int ix = mFace[i];
+		//             static Nbr n;
+		//             n = mNbr[ ix ];
+		//             int type = n.type;
+		//             
+		//             //negation for now treat as vectors
+		//             if (type & LEFT) mData[ix][0] = ref ? -mData[n.xr][0] : mData[n.xr][0]; 
+		//             if (type & RIGHT) mData[ix][0] = ref ? -mData[n.xl][0] : mData[n.xl][0]; 
+		//             if (type & TOP) mData[ix][1] = ref ? -mData[n.yb][1] : mData[n.yb][1]; 
+		//             if (type & BOTTOM) mData[ix][1] = ref ? -mData[n.yt][1] : mData[n.yt][1]; 
+		//             if (type & BACK) mData[ix][2] = ref ? -mData[n.zf][2] : mData[n.zf][2]; 
+		//             if (type & FRONT) mData[ix][2] = ref ? -mData[n.zb][2] : mData[n.zb][2];            
+		//         }    
+		//     }
+		// 
+		// 
+		//     template<> void Field< Vec > :: init() {
+		//         ITER  mData[tidx] = Vec(mPoint[tidx]).unit(); ITEND
+		//     }
+		//     
+		//     template<> void Field< Sca > :: init() {
+		//         ITN  mData[i] = Sca(0); END
+		//     }
+		// 
+		//     template<> void Field< Dll > :: init(){
+		//         ITN mData[i] = Frame( mPoint[i] ).dll(); END
+		//     }
+		//     
+		//     template<> void Field< Frame > :: init(){  
+		// //printf("FRAME FIELD INIT\n");
+		// ITN mData[i].pos() = mPoint[i]; END
+		//     }   
 
 
 //    template<> void Field< Vec > :: draw(float r, float g, float b, float a) {
@@ -633,136 +603,4 @@ namespace vsr{
 
 #endif
 
-//deprecated
-
-//   //Work on this and clean it up . . .
-//	void boundaryConditions(bool ref){
-//		int i,j, ix, ix2, ixo, ixo2;
-//
-//		//WALLS repeat inner settings OR reflect them back
-//		//z component
-//		for ( i = 1; i < mWidth-1; ++i){
-//			for ( j = 1; j < mHeight-1; ++j ){
-//				ix = idx(i,j,0);  ix2 = idx(i,j,mDepth-1);
-//				
-//				mData[ix] =  (ref) ?  Op::re( mData[ix+1], Dlp(0,0,1,0) ) : mData[ix+1];
-//				mData[ix2] = (ref) ?  Op::re( mData[ix2-1], Dlp(0,0,1,0) ) : mData[ix2-1];
-//
-//			}
-//		}
-//		//x component
-//		for ( i = 1; i < mWidth-1; ++i){
-//			for ( j = 1; j < mDepth-1; ++j ){
-//				 ix = idx(i,0,j);  ixo = idx(i,1,j); 
-//				 ix2 = idx(i,mHeight-1,j);  ixo2 = idx(i,mHeight-2,j);
-//				mData[ix] = ref ? Op::re( mData[ixo], Dlp(0,1,0,0) ): mData[ixo];//pdata[ixo] * -1 : pdata[ixo]; //
-//				mData[ix2] = ref ?  Op::re( mData[ixo2], Dlp(0,1,0,0) ): mData[ixo2];//pdata[ixo2] * -1 : pdata[ixo2];//			//RIGHT
-//			}
-//		}
-//		//y component
-//		for ( i = 1; i < mHeight-1; ++i){
-//			for ( j = 1; j < mDepth-1; ++j ){
-//				 ix = idx(0,i,j);  ixo = idx(1,i,j); 
-//				 ix2 = idx(mWidth-1,i,j);  ixo2 = idx(mWidth-2,i,j);		
-//				mData[ix] = ref ?  Op::re( mData[ixo], Dlp(1,0,0,0) ) : mData[ixo];	//pdata[ixo] * -1 : pdata[ixo];//			//TOP
-//				mData[ix2] = ref ? Op::re( mData[ixo2], Dlp(1,0,0,0) ) : mData[ixo2];//pdata[ixo2] * -1 : pdata[ixo2];//			//BOTTOM
-//			}
-//		}
-//
-//		
-//		// EDGES Average Neighbors
-//		for ( i = 1; i < mWidth-1; ++i){
-//			 ix = idx(i,0,0);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yt ] +  mData[ mNbr[ ix ].zb ] ) / 2.0;	//BOTTOM		
-//
-//			 ix = idx(i,mHeight-1,0);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yb ] +  mData[ mNbr[ ix ].zb ]  ) / 2.0;   //TOP
-//
-//			 ix = idx(i, mHeight-1, mDepth -1);
-//			mData[ ix ] =  ( mData[ mNbr[ ix ].yb ] +  mData[ mNbr[ ix ].zf ] ) / 2.0;   //
-//
-//			 ix = idx(i,0,mDepth-1);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yt ] +  mData[ mNbr[ ix ].zf ] ) / 2.0;
-//		}
-//		
-//		for ( i = 1; i < mHeight-1; ++i){
-//			 ix = idx(0,i,0);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].xr ] +  mData[ mNbr[ ix ].zb ] ) / 2.0;
-//
-//			 ix = idx(mWidth-1,i,0);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].xl ] +  mData[ mNbr[ ix ].zb ] ) / 2.0;
-//
-//			 ix = idx(mWidth-1,i,mDepth-1);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].xl] +  mData[ mNbr[ ix ].zf ] ) / 2.0;
-//
-//			 ix = idx(0,i,mDepth-1);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].xr ] +  mData[ mNbr[ ix ].zf ] ) / 2.0;
-//		}
-//
-//		for ( i = 1; i < mDepth-1; ++i){
-//			 ix = idx(0,0,i);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yt ] +  mData[ mNbr[ ix ].xr ] ) / 2.0;
-//
-//			 ix = idx(mWidth-1,0,i);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yt ] +  mData[ mNbr[ ix ].xl ] ) / 2.0;
-//
-//			 ix = idx(mWidth-1,mHeight-1,i);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yb ] +  mData[ mNbr[ ix ].xl ] ) / 2.0;
-//
-//			 ix = idx(0,mHeight-1,i);
-//			mData[ ix ] = ( mData[ mNbr[ ix ].yb ] +  mData[ mNbr[ ix ].xr ] ) / 2.0;
-//		}
-//
-//		//corners average neighbors		
-//		for ( i = 0; i < 8; ++i){
-//			mData [ mCorner[i] ] =  (ref) ? sumNbrs( mCorner[i] ) / -1.0 : sumNbrs( mCorner[i] ) / 3.0;
-//		}
-//
-//		
-//	}
-
-//alt bound
-//        Vec range( const Vec& v){
-//            Vec t = v;
-//
-//            double minx = px(0);
-//            double maxx = px(mWidth-1);
-//            double miny = py(0);
-//            double maxy = py(mHeight-1);
-//            double maxz = pz(0);
-//            double minz = pz(mDepth-1);
-//            
-//            if (t[0] < minx) t[0] = minx;
-//            if (t[0] > maxx) t[0] = maxx;
-//            if (t[1] < miny) t[1] = miny;
-//            if (t[1] > maxy) t[1] = maxy;
-//            if (t[2] < minz) t[2] = minz;
-//            if (t[2] > maxz) t[2] = maxz;
-//            
-//            double dx = (t[0] - minx)/tw();
-//            double dy = (t[1] - miny)/th();
-//            double dz = -(t[2] - maxz)/td();
-//            
-//            return Vec(dx,dy,dz);
-            
-            
-//        /* Totals and Offsets From Center */
-//        /*! Total Width */
-//        double tw() const { return (mWidth-1) * mSpacing; }
-//        /*! Offset Width */
-//        double ow() const { return tw() / 2.0 ; }
-//        /*! Total Height */
-//        double th() const { return (mHeight-1) * mSpacing; }
-//        /*! Offset Height */
-//        double oh() const { return th() / 2.0 ; }
-//        /*! Total Depth */
-//        double td() const { return (mDepth-1) * mSpacing; }
-//        /*! Offset Depth */
-//        double od() const { return td() / 2.0 ; }//0;}//
-//        /*! Spatial Positions of ith element in x direction  */
-//        double px(int i) const { return -ow() + (mSpacing * i); }
-//        /*! Spatial Positions of jth element in y direction  */
-//        double py(int j) const { return -oh() + (mSpacing * j); }
-//        /*! Spatial Positions of kth element in z direction  */
-//        double pz(int k) const { return  od() - (mSpacing * k); }
 

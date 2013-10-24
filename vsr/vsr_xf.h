@@ -9,8 +9,8 @@
 #ifndef Versor_vsr_xf_h
 #define Versor_vsr_xf_h
 
-#include "vsr_op.h"      
 #include "gfx/gfx_matrix.h"
+#include "vsr_cga3D_op.h" 
 
 using namespace gfx;
 namespace vsr {
@@ -127,7 +127,7 @@ namespace vsr {
 			Transformation matrix from dual plane
 		*/                                       
 		inline Mat4f mat(const Dlp& dlp){  		
-			Dls v = Fl::locd( dlp , PAO);// true );
+			Dls v = Fl::loc( dlp , PAO, true );
 		    Rot r = Gen::ratio( Vec::z, Vec( dlp ).unit() );
 			return mat(r, Vec(v));
 		}

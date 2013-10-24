@@ -7,17 +7,6 @@
 
 namespace vsr{
 
-//3D Euclidean
-// typedef NESca<3> Sca; 
-// typedef NEVec<3> Vec; 
-// typedef NEBiv<3> Biv; 
-// typedef NETri<3> Tri; 
-// typedef NERot<3> Rot;
-// typedef NEe<1> e1; 
-// typedef NEe<2> e2; 
-// typedef NEe<3> e3;
-
-
 
 //3D CONFORMAL 
 typedef Ne<5,1> e1; 
@@ -62,7 +51,6 @@ typedef NTrv<5> Trv;	 //Transversor
 typedef NBst<5> Bst;	 //Boost 
 typedef NDil<5> Dil;	 //Dilator 
 typedef NTsd<5> Tsd;	 //Translated Dilator      
-
 
 
 

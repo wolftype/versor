@@ -2,7 +2,8 @@
 #define VSR_CGA2D_DRAW_H_INCLUDED  
 
 #include "gfx/gfx_glyphs.h"
-#include "vsr_cga2D_types.h" 
+#include "vsr_cga2D_types.h"   
+
 
 namespace vsr{
 	
@@ -35,13 +36,49 @@ namespace vsr{
 	        Pnt p = Ro::cen( s );
 	        VT t = sqrt ( fabs ( ta ) );
 
-	        gfx::GL::translate ( p.begin() );
+	        gfx::GL::translate ( p[0], p[1], 0 );
 	        (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );	
 	    } else {  
 
-	        gfx::Glyph::Point(s);
+	        gfx::Glyph::Point2D(s);
 	    }
-	} 
+	}  
+	
+	 void Immediate (const Par& s){
+	        //Is Imaginary?
+	        VT size = Ro::size( s, false );
+		  //  printf("size: %fn", size);
+	        std::vector<Pnt> pp = Ro::split( s );
+
+	        VT ta = Ro::size( pp[0], true );   
+	                                     
+	        if ( fabs(ta) >  FPERROR ) {    
+	            Pnt p1 = Ro::cen( pp[0] );
+	            Pnt p2 = Ro::cen( pp[1] );
+	            double t = sqrt ( fabs ( ta ) );
+	            bool real = size > 0 ? 1 : 0;	
+
+	            glPushMatrix();
+	            gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]);
+	            (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
+	            glPopMatrix();
+
+	            gfx::GL::translate ( p2.begin() );
+	            (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
+
+	        } else {
+			   // pp[0].vprint(); pp[1].vprint();
+	            gfx::Glyph::Point2D(pp[0]);
+	            gfx::Glyph::Point2D(pp[1]);
+	        }
+	}
+	
+	void Immediate (const Lin& s){
+	    Drv d = Fl::dir( s );
+	    Dls v = Fl::loc( s , PAO, false);
+	    gfx::GL::translate (v[0], v[1],0);
+	    gfx::Glyph::Line2D(d * 10, d * -10);	
+	}
 	
 }
 

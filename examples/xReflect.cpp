@@ -11,10 +11,12 @@ struct MyApp : App {
 	
 	float theta, phi;
 	float time;
+	bool bRef;
 	
 	virtual void initGui(){
 		gui(theta,"theta",-TWOPI,TWOPI); 
-		gui(phi,"phi",-PIOVERTWO,PIOVERTWO);  
+		gui(phi,"phi",-PIOVERTWO,PIOVERTWO);
+		gui(bRef,"reflections");  
 	}
 
 	void onDraw(){
@@ -29,7 +31,7 @@ struct MyApp : App {
 		Draw(z,0,0,1);
 		  	    
         //BIVECTORS
-		Biv xy = x^y;    
+		Biv xy = y^x;    
 		Biv xz = x^z;    
 	    Biv yz = y^z;    
 
@@ -40,10 +42,22 @@ struct MyApp : App {
 		//ROTATIONS 
 		Rot tr =  Gen::rot( xz * theta / 2.0 ); 
 		Rot pr = Gen::rot( xy.sp(tr) * phi /2.0); 
-		Draw( x.sp( pr * tr ) ); 
+		Vec nv = x.sp( pr * tr ); 
+		
+		Draw(xy.sp(tr));
+		Draw( nv ); 
 		
 		//REFLECTIONS
+		if (bRef) {
+			Draw( nv.re( x ),1,.5,.5 );  
+			Draw( nv.re( y ),.5,1,.5 ); 
+			Draw( nv.re( z ),.5,.5,1 ); 
+		} 
 		
+		//Join
+		// Biv nvy =  nv ^ nv.re( y ); 
+		// Draw(nvy, .7, 1, .7);
+		// Draw( nvy.dual(), .2, 1, .2); 
 		
 	}
 

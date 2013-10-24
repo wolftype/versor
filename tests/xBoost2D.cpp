@@ -6,19 +6,76 @@ using namespace vsr;
      
 
 struct MyApp : App {
-
+                   
+	float time;   
+	
+	Pnt * field;
+	int width;
+	int height;  
+	
+	float amt;
+	
+	void initVariables(){  
+		
+		gui(amt, "amt", -10,10);
+		width = 10; height = 10;
+		field = new Pnt[width * height];
+		
+		for (int i = 0; i < width; ++i){   
+			float u = 1.0 * i/width;
+		  	for (int j = 0; j < height; ++j){ 
+				float v = 1.0 * j/height; 
+				
+				int idx = i * width + j;
+				field[idx] = Ro::null( Vec(-2.0 + u*4, -2.0 + v*4) );
+			}
+		}
+	}
+	
 	void onDraw(){
-	      
-		Dls a = Ro::dls( Vec(1,0),  1.0);
-	
-		Draw(a);  
-	
-		for (int i = 0; i < 10; ++i){          
-			float t = 1.0 * i/10; 
-			auto tmp = a.sp( Gen::trv( Tnv(1,0) * t ) ); 
-		   
-			Draw(  tmp );		
-		}           
+	                                                        
+		time +=.1;
+		Dls cir = Ro::dls( Vec(0,0),  1.0);//.trs( Drv(sin(time),0) );  
+
+		Draw(cir);  
+
+		
+		Pnt a = Point(1,0);
+		Pnt b = Point(-1,0);   
+		
+		Lin lina = a ^ Vec(0,.5) ^ Inf(1);//Line(a,b);
+		Lin linb = a ^ b ^ Inf(1);//Line(a,b);   
+		
+		auto m = linb/lina;
+		
+		m.bprint();
+		Dll().bprint();
+		
+		 Draw(linb);  
+		
+		auto pp =  (linb.dual() ^ cir ).dual();//.bprint(); 
+	   
+
+		Draw( pp,1,0,0 );  
+		
+		
+		
+		
+		Bst bst = Gen::bst( Par( Tnv(0,1) ) * amt );//.trs(  Drv(sin(time),0) ) * amt );
+		bst.vprint();
+		for (int i = 0; i < width; ++i){   
+			float u = 1.0 * i/width;
+		  	for (int j = 0; j < height; ++j){ 
+				float v = 1.0 * j/height;
+				int idx = i * width + j;
+				Pnt np = Ro::loc( field[idx].sp(bst) );//Ro::loc(  );
+				//field[idx] = np;
+				np.vprint();
+				Draw(np);
+		  }
+			
+		}
+		 
 	
 	}  
 
@@ -33,12 +90,11 @@ int main(){
 	Window * win = new Window(500,500,"CGA2D",&glv);    
 	app = new MyApp;   
 	
-	app -> init(win); 
+	app -> init(win);
+	app -> initVariables(); 
 	       
 	glv << *app;
 	Application::run();
-	
-	return 0;
-	
-}
 
+	return 0;
+}

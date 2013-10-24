@@ -11,7 +11,7 @@
 #define VSR_TWIST_H_INCLUDED
 
 #include "vsr_products.h"
-#include "vsr_op.h"
+#include "vsr_cga3D_op.h"
 #include "vsr_interp.h"
 
 namespace vsr {

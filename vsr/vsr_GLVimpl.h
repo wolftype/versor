@@ -13,7 +13,8 @@
 #include "GLV/glv_binding.h"
 #include "GLV/glv_color_controls.h"  
 
-#include "gfx/gfx_gl.h"  
+#include "gfx/gfx_gl.h" 
+#include "gfx/gfx_glsl.h"  
 #include "gfx/gfx_scene.h" 
 #include "gfx/gfx_pipe.h" 
 #include "gfx/gfx_interface.h"  
@@ -440,22 +441,28 @@ struct App : public View3D{
              break;
          case Event::MouseDrag:
              interface.onMouseDrag();
+			 interface.mouseNavigate();
              break;
          case Event::MouseUp:
              interface.onMouseUp();
+			 interface.mouseNavigateStop();
              break;
          case Event::KeyDown:
-             onKeyDown(glv);
+             App::onKeyDown(glv);
              interface.onKeyDown();
+			 interface.keyboardNavigate(); 
              break;
          case Event::KeyUp:
-             interface.onKeyUp();
+             interface.onKeyUp(); 
+			  interface.keyboardNavigateStop(); 
              break;
              
      }
      
      return false;
  }   
+
+ 
 
   virtual bool onKeyDown(GLV& glv){ 
 	

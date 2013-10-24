@@ -1,8 +1,5 @@
 #include "vsr_cga3D.h"
 #include "vsr_GLVimpl.h" 
-#include "vsr_cga3D_draw.h" 
-#include "vsr_cga3D_interface.h"  
-
 #include "vsr_knot.h"
 
 
@@ -16,7 +13,7 @@ struct MyApp : App {
 	virtual void initGui(){
 		gui(amt,"amt",0,10);
 		
-		amt = .001; 
+		amt = .003; 
 	}
 
 	void onDraw(){
@@ -24,10 +21,10 @@ struct MyApp : App {
 
 		TorusKnot tk(3,2,amt); 
 	
-		static auto a = Point(2,0,0);     
+		static auto a = Ro::null(2,0,0);     
 
 		Touch(interface, a);   
-		Draw( Sphere(a,.2), 1, 1, 0 );
+		Draw( Ro::dls(a,.2), 1, 1, 0 );
 
 		tk.calc( a );
 	

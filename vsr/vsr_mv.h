@@ -65,6 +65,9 @@ struct MV<X, XS...>{
 	template<class A> A cast() const;   
 	template<class A> A copy() const; 
 	
+	// template<TT N> 
+	// A sub() const; 
+	
 	template<typename A>
 	MV& operator = ( const A& a) {
 		*this = a.template cast< MV<X,XS...> >(); 

@@ -2,7 +2,7 @@
 #define FRAME_H_INCLUDED
 
  
-#include "vsr_cga3D.h"
+#include "vsr_cga3D_op.h"
 #include "vsr_xf.h" 
  
 namespace vsr {
@@ -45,18 +45,37 @@ namespace vsr {
 
 		Pnt pos() const { return mPos; }  
 	    Pnt& pos() { return mPos; }  
-		Vec vec() const { return mPos; } 
+		Vec vec() const { return mPos; }   
+		
 		Vec x()  const { return Vec::x.sp( mRot ); }
 		Vec y()  const { return Vec::y.sp( mRot ); }
-		Vec z()  const { return Vec::z.sp( mRot ); }  
+		Vec z()  const { return Vec::z.sp( mRot ); }   
 		
-		Biv xy()  const { return x() ^ y(); }
-		Biv xz()  const { return x() ^ z(); }
-		Biv yz()  const { return y() ^ z(); }   
+		Biv xy()  const { return x() ^ y(); }    ///< xz euclidean bivector
+		Biv xz()  const { return x() ^ z(); }    ///< xy euclidean bivector
+		Biv yz()  const { return y() ^ z(); }    ///< yz euclidean bivector
 		
-		Cir cxy() const { return Ro::cir( bound(), xy() ); }
-		Cir cxz() const { return Ro::cir( bound(), xz() ); }
-		Cir cyz() const { return Ro::cir( bound(), yz() ); } 
+		Lin lx() const { return mPos ^ x() ^ Inf(1); }  ///< x direction direct line
+		Lin ly() const { return mPos ^ y() ^ Inf(1); }  ///< y direction direct line
+		Lin lz() const { return mPos ^ z() ^ Inf(1); }  ///< z direction direct line      
+		
+		Dll dlx() const { return lx().dual(); }		///< x direction dual line
+		Dll dly() const { return ly().dual(); }		///< y direction dual line
+		Dll dlz() const { return lz().dual(); }		///< z direction dual line
+  	
+		/* Homogenous Planes in Conformal Space */
+		Dlp dxz() const	{ return -z() <= dlx(); }		///< xz dual plane
+		Dlp dxy() const { return y() <= dlx(); }			///< xy dual plane
+		Dlp dyz() const	{ return y() <= dlz(); }			///< yz dual plane  
+		
+		/* Local XY Pair */
+		Par pxy() const { return dxy() ^ bound(); }			///< xy point pair
+		Par pxz() const { return dxz() ^ bound(); }			///< xz point pair
+		Par pyz() const { return dyz() ^ bound(); }			///< yz point pair   
+		
+		Cir cxy() const { return Ro::round( bound(), xy() ); }
+		Cir cxz() const { return Ro::round( bound(), xz() ); }
+		Cir cyz() const { return Ro::round( bound(), yz() ); } 
 	   
 		
 		Vec right() const { return x(); }
@@ -94,10 +113,16 @@ namespace vsr {
 	struct MFrame : public Frame {
 		VT aBiv; Biv dBiv;  
 		VT aVec; Vec dVec;
-		
-		MFrame() : Frame() { init(); }
+		                               
+	   // MFrame( const Frame& f ) : Frame() { init(); } 
+		MFrame() : Frame() { init(); } 
+		MFrame(const Pnt& p, const Rot& r = Rot(1,0,0,0)) : Frame(p,r){ init(); }
 		MFrame(VT _x, VT _y, VT _z) : Frame(_x,_y,_z) { init(); } 
-		MFrame(const Mot& m ) : Frame(m){ init(); }
+		MFrame(const Mot& m ) : Frame(m){ init(); }  
+		
+		// MFrame& operator = ( const Frame& f ){
+		// 	return MFrame(f);
+		// }  
 		
 		void init(){
 			aBiv = aVec = .9;
