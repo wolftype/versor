@@ -19,7 +19,7 @@ struct MyApp : App {
 		auto tv = interface.vd().ray; 
 		Vec z (tv[0], tv[1], tv[2] );
 		ray = Point( interface.mouse.projectMid ) ^ z ^ Inf(1); 
-    	mouse = Point( ray,  Ori(1) );  
+    		mouse = Point( ray,  Ori(1) );  
   }
 
   	virtual void onDraw(){ 
@@ -27,6 +27,25 @@ struct MyApp : App {
 		getMouse();
 		
 		Draw(mouse,0,1,0);
+		         
+		Cir cir = Circle( mouse, Point(0,0,0), Point(1,0,0));
+		Draw( cir );
+		
+		Draw( Point(1,0,0), 1,0,0 );
+		
+		static auto lin = Line( Point(0,1,0), Point(-1,0,0) );
+		Touch(interface,lin);
+		
+		Draw(lin,0,1,0);
+		                                 
+		for (int i = 0; i < 100; ++ i ){
+			float t = PI * i/100;
+			Mot mot = Gen::mot( lin.dual() * t );
+			Draw( cir.spin( mot ) );
+		}
+		 
+		
+		
 		
 	}
    

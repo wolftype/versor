@@ -28,7 +28,7 @@ inline string bitString( int b ){
 }
 
 inline void bsprint(int x){
-	printf("%s\n", bitString<5>(x).c_str() );
+	printf("%s\n", bitString<6>(x).c_str() );
 }
 	
 constexpr TT grade (TT a, TT c = 0){

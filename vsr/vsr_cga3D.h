@@ -4,6 +4,8 @@
 #include "vsr_cga3D_op.h"
 #include "vsr_cga3D_draw.h"
 #include "vsr_cga3D_interface.h"
+ 
+//VT is a float or double should be named NUM 
 
 namespace vsr{
 

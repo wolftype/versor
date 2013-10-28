@@ -721,7 +721,17 @@ namespace Op{
 	template<TT DIM, typename A> template< class ... T> 
 	CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v){
 		return this -> sp ( Gen::trs(v...) );  
+	}  
+	
+	//TRANSVERSIONS
+	template<TT DIM, typename A> template<typename T>
+	CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t){
+		return this -> sp ( Gen::trv(t) );  
 	} 
+	template<TT DIM, typename A> template< class ... T> 
+	CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v){
+		return this -> sp ( Gen::trv(v...) );  
+	}
 	
 	//ROTATIONS
 	template<TT DIM, typename A> template<typename T>
@@ -745,7 +755,7 @@ namespace Op{
    //DILATIONS 
 	template<TT DIM, typename A> template<typename T>
 	CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t){
-		  	return this -> sp ( Gen::dil(t) );  
+		  	return this -> sp ( Gen::dil<DIM>(t) );  
 	} 
 	template<TT DIM, typename A> template<typename T>
 	CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t){

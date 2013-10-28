@@ -109,7 +109,8 @@ glv:
 	@echo "building external GUI library GLV . . . if there are errors, make sure you have entered:\n\n"
 	@echo "git submodule init"
 	@echo "git submodule update\n\n"
-	$(MAKE) --no-print-directory -C ext/glv install DESTDIR=../../$(BUILD_DIR)    
+	$(MAKE) --no-print-directory -C ext/glv
+	#install DESTDIR=../../$(BUILD_DIR)    
 
 
 $(EXEC): dir glv vsr FORCE 

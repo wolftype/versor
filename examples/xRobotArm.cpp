@@ -77,7 +77,7 @@ struct MyApp : App {
 		 MFrame middleFrame( Ro::split(fpair,true) );
 
 
-		 //We can store the frame positions in a chain class which will sort out relative orientations for us
+		 //We can store the `positions in a chain class which will sort out relative orientations for us
 		 k[0] = baseFrame;
 		 k[1] = secondFrame;
 		 k[2] = middleFrame;

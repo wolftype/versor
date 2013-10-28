@@ -1,6 +1,6 @@
 #include "vsr_cga3D.h" 
 #include "vsr_GLVimpl.h" 
-#include "vsr_twist.h"
+
 
 using namespace vsr;
 using namespace glv;  

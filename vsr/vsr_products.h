@@ -466,13 +466,14 @@ struct EGA{
 
 //Metric GA (e.g. SpaceTime Algebra)
 template<class M>
-struct MGA{   
+struct MGA{                
+	typedef M Metric;
 	static const int DIM = M::Num;
 	typedef MV<0> Sca; 
 	template<TT N> using e = MV< 1<<(N-1) >;
 	typedef typename Blade1<DIM>::VEC Vec; 
     typedef typename Prod<Vec,Vec, M, false>::Type Biv;
-	typedef decltype( 1 + Biv() ) Rot;  
+	typedef decltype( sumv(1, Biv()) ) Rot;  
 	typedef MV< pss(DIM) > Pss;    
 };
 
@@ -737,7 +738,12 @@ struct CGAMV : public A {
 	template<typename T>
 	CGAMV trs( const T& );   	
 	template<class ... T>   
-	CGAMV trs( T ... v);   
+	CGAMV trs( T ... v);  
+	
+	template<typename T>
+	CGAMV trv( const T& );   	
+	template<class ... T>   
+	CGAMV trv( T ... v); 
 	
 	template<typename T>
 	CGAMV rot( const T& );
@@ -770,7 +776,11 @@ struct CGAMV : public A {
 	template<typename P, typename T>
 	CGAMV dilate( const P&, const T& ); 
 	template<typename T>
-	CGAMV boost( const T& );   
+	CGAMV boost( const T& );
+	
+	// void bbprint(){
+	// 	for (auto i : A::begin() ) printf("%s\n", bitString<DIM>(i).c_str() );
+	// }   
 };
 
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().template set<1>(1);
@@ -795,7 +805,9 @@ struct MGAMV : public A {
 	//static const int DIM = M::Num;
 	
 	template< class ... Args >
-	constexpr MGAMV(Args...v) : A(v...) {}
+	constexpr MGAMV(Args...v) : A(v...) {} 
+	
+	constexpr MGAMV(const A& a) : A(a) {}    
 	 
 	template<class B>
 	MGAMV<M, typename Prod<A, typename B::Type, M, false>::Type> operator * (const B& b) {
@@ -814,17 +826,115 @@ struct MGAMV : public A {
 	 
 	MGAMV<M, typename Prod<A, typename MGA<M>::Pss, M, false>::Type > dual(){
 		return  MGAMV<M, typename Prod<A, typename MGA<M>::Pss, M, false>::Type >( mgp<M>( *this,  typename MGA<M>::Pss(-1) )  );
-	} 
+	}  
+	
 	MGAMV<M, typename Prod<A, typename MGA<M>::Pss, M, false>::Type > undual(){
 		return  MGAMV<M, typename Prod<A, typename MGA<M>::Pss, M, false>::Type >( mgp<M>( *this,  typename MGA<M>::Pss(1) )  );
-	} 
+	}  
+	
+	MGAMV operator ~() const{
+		return Reverse< A >::Type::template Make(*this) ;
+	}
+	
+	MGAMV operator !() const;
+	
+	template<class B>
+	auto operator / (const MGAMV<M,B>& b) const RETURNS(
+		(  *this * !b )
+	)   
+	
+	MGAMV conj() const { return this -> conjugation(); }
+	MGAMV inv() const { return this -> involution(); } 
+	
+	VT wt() const{ return (*this <= *this)[0]; }
+	VT rwt() const{ return (*this <= ~(*this))[0]; }
+	VT norm() const { VT a = rwt(); if(a<0) return 0; return sqrt( a ); } 
+	VT rnorm() const{ VT a = rwt(); if(a<0) return -sqrt( -a ); return sqrt( a );  }  
+	
+	MGAMV unit() const { VT t = sqrt( fabs( (*this <= *this)[0] ) ); if (t == 0) return A(); return *this / t; }
+	MGAMV runit() const { VT t = rnorm(); if (t == 0) return  A(); return *this / t; }
+    MGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }  
+
+	template<typename B>
+	MGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 
+	template<typename B>
+	MGAMV spin( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }
+	
+	//test reduced instruction 
+	template<typename B>
+	MGAMV sptest( const B& b) const { return csp<M>(*this, b); } 
+	template<typename B>
+	MGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
+	template<typename B>
+	MGAMV reflect( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
+	                                                                                  
+	
+	MGAMV operator + (const MGAMV& a) const {  
+	   // printf("sum same\n");
+		MGAMV tmp;
+		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] + a[i];
+		return tmp;
+	}  
+	
+	MGAMV operator - (const MGAMV& a) const {
+		MGAMV tmp;
+		for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i] - a[i];
+		return tmp;
+	}
+	 
+	MGAMV operator -() const{
+		MGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] = -tmp[i]; }
+		return tmp;
+	}  
+	
+	MGAMV& operator -=(const MGAMV& b){ 
+		for (int i = 0; i < A::Num; ++i) (*this)[i] -= b[i];
+		return *this;
+	}   
+	MGAMV& operator +=(const MGAMV& b){ 
+		for (int i = 0; i < A::Num; ++i) (*this)[i] += b[i];
+		return *this;
+	}  
+	
+	MGAMV operator / (VT f) const{   
+		MGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] /= f; }
+		return tmp;
+	}
+	
+	MGAMV& operator /= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] /= f; }
+		return *this;
+	}
+    
+	MGAMV operator * (VT f) const {
+		MGAMV tmp = *this;
+		for (int i = 0; i < A::Num; ++i){ tmp[i] *= f; }
+		return tmp;
+	}
+	MGAMV& operator *= (VT f){
+		for (int i = 0; i < A::Num; ++i){ (*this)[i] *= f; }
+		return *this;
+	}  
+	
+	 
+	auto operator + (VT a) const -> MGAMV< M, decltype( sumv( a, A() ) ) >  {
+	   // printf("sumv\n");
+		return sumv(a, *this); 
+	}
+   
+	template<class B>
+	auto operator + (const MGAMV<M, B>& b) const -> MGAMV< M, decltype( sum( *this, B() ) ) >  {
+	   // printf("sum\n");
+		return sum(*this, b); 
+	}
 	
 }; 
 
 template<TT DIM, class A>
 struct EGAMV : public A {
-	
-	//template< class B> using AType = CGAMV  
+
 	template< class B > using AType = EGAMV<DIM, B >;
     typedef EGA<DIM>  MODE;
     typedef A Type;
