@@ -40,7 +40,8 @@ typedef NTnt<4> Tnt;	 //Tangent Trivector
                     	
 typedef NDll<4> Dll;	 //Dual Line        
 typedef NLin<4> Lin;	 //Dual Line    
-typedef NFlp<4> Flp;	 //Flat Plane
+typedef NFlp<4> Flp;	 //Flat Point 
+typedef decltype( Flp().dual() ) Dfp; //Dual Flat Point
 typedef NPln<4> Pln;	 //Plane 
 typedef NDlp<4> Dlp;	 //Plane   
                     	
@@ -51,39 +52,64 @@ typedef NBst<4> Bst;	 //Boost
 typedef NDil<4> Dil;	 //Dilator 
 typedef NTsd<4> Tsd;	 //Translated Dilator  
 
-      
+  namespace cga2D{
+
+    //FULL NAMES
+    typedef  Sca Scalar;
+    typedef  Biv Bivector;
+    typedef  Tri Trivector ;
+    typedef  Rot Rotor;
+    typedef  Ori Origin;
+    typedef  Inf Infinity;
+    typedef  Mnk Minkowski;
+    typedef  Pss Pseudoscalar;
+    typedef  Pnt Point;
+    typedef  Par Pair;
+    typedef  Cir Circle;
+    typedef  Sph Sphere;
+    typedef  Pnt DualSphere;
+    typedef  Drv DirectionVector;
+    typedef  Drb DirectionBivector;
+    typedef  Drt DirectionTrivector;
+    typedef  Tnv TangentVector;
+    typedef  Tnb TangentBivector;
+    typedef  Tnt TangentTrivector;
+    typedef  Dll DualLine;
+    typedef  Lin Line;
+    typedef  Flp FlatPoint;
+    typedef  Dfp DualFlatPoint;
+    typedef  Pln Plane;
+    typedef  Dlp DualPlane;
+    typedef  Trs Translator;
+    typedef  Mot Motor;
+    typedef  Trv Transversor;
+    typedef  Bst Boost;
+    typedef  Dil Dilator;
+    typedef  Tsd TranslatedDilator;
+
+  }//cga2D::      
 
 #define PAO vsr::Pnt(0,0,1,0)   // Point At Origin  
 
 //ADDITIONAL NON-GENERIC OPS  
-                        
-template<class V>
-Pnt Point(const V& v){
+namespace Ro {                        
+  template<class V>
+  inline Pnt point(const V& v){
 	return Ro::null( v[0], v[1]  );
 }
-Pnt Point(VT x, VT y){
-	return Ro::null( x, y );
-}
-Par Pair( const Pnt& a, const Pnt& b){
-	return a ^ b;
-}
-Cir Circle(const Pnt& a, const Pnt& b, const Pnt& c){
-	return a ^ b ^ c; 
-}
-Pnt Circle(VT x, VT y, VT rad){
+  Pnt circle(VT x, VT y, VT rad){
 	return Ro::dls( Vec(x,y), rad ); 
 }
+} // Ro::
 
-Lin Line( const Pnt& a, const Pnt & b ){
-	return a ^ b ^ Inf(1);
-}  
+namespace Fl {
 
 Par Meet( const Lin& lin, const Cir& cir){
 	return ( lin.dual() ^ cir.dual() ).dual();
 }
 
+} // Fl::  
 
-} //  
-
+} // vsr::
 
 #endif

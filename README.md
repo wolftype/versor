@@ -1,5 +1,4 @@
 CSS: style0.css
-	 
 <script type="text/javascript"
   src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
@@ -10,7 +9,7 @@ A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.
 ---
 ### Currently tested on Linux and Mac OS X ###
 
-[Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu)       
+[Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu) 
 
 Versor is a C++ Library for Geometric Algebra. Version 2.0 generates optimized geometric algebra code at compile-time
 through template meta-programming, and supports arbitrary dimensions and metrics (limited by your compiler...).  
@@ -38,21 +37,23 @@ Developer: Pablo Colapinto
 
 Quickstart
 ---
-              
-	git clone git://github.com/wolftype/vsr2.0.git
-	cd vsr2.0
-	git submodule init
-	git submodule update
+
+You need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
+
+  git clone git://github.com/wolftype/vsr2.0.git
+  cd vsr2.0
+  git submodule init
+  git submodule update
 
 To test a graphics example
 
-	make tests/xBasics.cpp 
-		 
-This builds and runs the file.  
+  make tests/xBasics.cpp 
+     
+which both builds and runs the file.  
 
 
 [**BUILT-IN INTERFACE**]
-| 	                            	| 	                                          | 
+|                                 |                                             | 
 Key                                 | Response  
 ------------------------------      | ------------------------------------------  
 `~`                                 | Toggle full screen.  
@@ -88,20 +89,20 @@ Homepage at versor.mat.ucsb.edu
                                                                       
 To build with the 5D Conformal Model
 
-	#include "vsr_cga3D.h"
+  #include "vsr_cga3D.h"
 
 To bind with glut, GLV interface, and draw to screen
                              
-	#include "vsr_cga3D_draw.h"
+  #include "vsr_cga3D_draw.h"
 
 To bind with Glut, GLV interface
 
-	#include "vsr_GLVimpl.h"                           
+  #include "vsr_GLVimpl.h"                           
 
 To inferface with elements using "G", "R", "S" keys to Grab, Rotate, or Scale:
 
-	#include "vsr_cga3D_interface.h"
-	
+  #include "vsr_cga3D_interface.h"
+  
    
 What's new?
 --- 
@@ -114,13 +115,13 @@ the xRoots.cpp example calculates all the Euclidean 4D reflections of a couple o
 As for CGA, all the Pnt, Vec, Dll notation remains as before, but i've started adding utility functions
 since it helps people out. 
 
-	auto pa = Point( 1,0,0 ); 
-	auto pb = Point( 0,1,0 ); 
-	auto pc = Point(-1,0,0 ); 
-	auto c = Circle(pa, pb, pc);
-	
-	Draw(c); 
-	
+  auto pa = Point( 1,0,0 ); 
+  auto pb = Point( 0,1,0 ); 
+  auto pc = Point(-1,0,0 ); 
+  auto c = Circle(pa, pb, pc);
+  
+  Draw(c); 
+  
 How does it work?
 ---
 
@@ -142,13 +143,13 @@ METHODS
 GENERATORS 
 ---
 
-	Rot Gen::rot( const Biv& b ); 					//<-- Generate a Rotor from a Bivector
-	Trs Gen::trs( const Drv& v);					//<-- Generate a Translator from a Direction Vector
-	Mot Gen::mot( const Dll& d);					//<-- Generate a Motor from a Dual Line
-	Dil Gen::dil( const Pnt& p, double amt );		//<-- Generate a Dilator from a Point and an amount
-	Trv Gen::trv( cont Tnv& v);						//<-- Generate a Transveror from a Tangent Vector
-	Bst Gen::bst( const Par& p); 			   		 //<-- Generate a Booster from a Point Pair
-	 
+  Rot Gen::rot( const Biv& b );           //<-- Generate a Rotor from a Bivector
+  Trs Gen::trs( const Drv& v);          //<-- Generate a Translator from a Direction Vector
+  Mot Gen::mot( const Dll& d);          //<-- Generate a Motor from a Dual Line
+  Dil Gen::dil( const Pnt& p, double amt );    //<-- Generate a Dilator from a Point and an amount
+  Trv Gen::trv( cont Tnv& v);            //<-- Generate a Transveror from a Tangent Vector
+  Bst Gen::bst( const Par& p);               //<-- Generate a Booster from a Point Pair
+   
 
 BUILD
 ---                 
@@ -165,15 +166,15 @@ This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) 
 IMPORTANT NOTE ON MAKEFILE FLAGS
 
 1. CLANG=path/to/clang/ (default usr/local/bin)
-		The makefile assumes clang is at usr/local/bin/ -- if you want to change that set this flag  
+    The makefile assumes clang is at usr/local/bin/ -- if you want to change that set this flag  
 
 2. GCC=1  (default 0)
-		If you want to build with GCC set GCC=1.
+    If you want to build with GCC set GCC=1.
 
 3. RPI=1 (default 0)
         vsr also builds on the Raspberry Pi with a cross-compiler (GCC=1 RPI=1)
-		(note you cannot build from the pi itself, you must use a cross-compiler)
+    (note you cannot build from the pi itself, you must use a cross-compiler)
 
 3. GFX=0 (default 1) 
-		if you want to build without graphics support you can set GFX=0
+    if you want to build without graphics support you can set GFX=0
                                                                        

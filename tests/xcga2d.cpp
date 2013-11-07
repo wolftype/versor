@@ -6,15 +6,15 @@ using namespace vsr;
 int main(){
 	
 	
-	auto a = Point(1,0);
+	auto a = Ro::point(1,0);
 	         
-	auto b = Point(0,1);
+	auto b = Ro::point(0,1);
 	         
-	auto c = Point(-1,0);  
+	auto c = Ro::point(-1,0);  
 
 
 	(a ^ b ^ c).vprint();
-	auto cir = Circle(a,b,c);
+	auto cir = a^b^c;
 	
 	 cir.vprint();  
    
@@ -56,6 +56,9 @@ int main(){
 	( Lin() * Sph() ).bprint();  
 	
 	Par( Tnv()).sp( Gen::trs( Drv(1,0) ) ).bprint();
+
+  printf("dual pair\n");
+  (Op::dual( Par() ).bprint() );
 	
 	// ( Pnt() * Sph() ).bprint();
 	// 

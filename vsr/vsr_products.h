@@ -523,39 +523,6 @@ struct CGA{
 	typedef typename Prod<Rot,Trs,M,true>::Type Mot;    
 	typedef decltype( sumv(1.,  Par() ) ) Bst; 
 	typedef decltype( sumv(1.,  Flp() ) ) Tsd;  
-	
-	// static Sca SSca;
-	// static Pss SPss;
-	// static EucPss SEucPss;
-	// static Vec SVec;
-	// static Vec2D SVec2D;
-	// static Biv SBiv;
-	// static Tri STri;
-	// static Rot SRot;
-	// static Inf SInf; 
-	// static MV< origin<DIM>() > SOri;
-	// static MV< eplane<DIM>() > SMnk;
-	// static Tnv STnv;
-	// static Tnb STnb;
-	// static Drv SDrv;
-	// static Drb SDrb;
-	// static Tnt STnt;
-	// static Drt SDrt;
-	// static Pnt SPnt;
-	// static Par SPar;
-	// static Flp SFlp;
-	// static Lin SLin;
-	// static Cir SCir;
-	// static Sph SSph;
-	// static Pln SPln;
-	// static Dll SDll;
-	// static Dlp SDlp;
-	// static Trs STrs;
-	// static Trv STrv;
-	// static Dil SDil;
-	// static Mot SMot;
-	// static Bst SBst;
-	// static Tsd STsd; 
   
 };  
 
@@ -563,8 +530,8 @@ template<TT DIM, class A>
 struct CGAMV : public A {                 
 	
 	//template< class B> using AType = CGAMV  
-	template< class B > using AType = CGAMV<DIM, B >;
-	typedef CGA<DIM> MODE;
+	template< class B > using BType = CGAMV<DIM, B >;
+	typedef CGA<DIM> Mode;
 	
 	
     typedef A Type;
@@ -577,7 +544,11 @@ struct CGAMV : public A {
 	constexpr CGAMV(const A& a) : A(a) {}   
 	
 	template<class B>
-	constexpr CGAMV(const CGAMV<DIM,B>& b) : A( b.template cast<A>() ) {}   
+	constexpr CGAMV(const CGAMV<DIM,B>& b) : A( b.template cast<A>() ) {} 
+	                                
+	//import from a different metric . . .
+	template<TT DIMB, class B>
+	constexpr CGAMV(const CGAMV<DIMB,B>& b) : A( b.template cast<A>() ) {}  
 	
 	//other 
 	template< class B >
@@ -733,7 +704,7 @@ struct CGAMV : public A {
 	
    static CGAMV x, y, z, xy, xz, yz;   
 
-	CGAMV<DIM, typename CGA<DIM>::Pnt > null();
+	CGAMV<DIM, typename CGA<DIM>::Pnt > null() const;
               
 	template<typename T>
 	CGAMV trs( const T& );   	
@@ -744,6 +715,11 @@ struct CGAMV : public A {
 	CGAMV trv( const T& );   	
 	template<class ... T>   
 	CGAMV trv( T ... v); 
+
+	template<typename T>
+	CGAMV transverse( const T& );   	
+	template<class ... T>   
+	CGAMV transverse( T ... v); 
 	
 	template<typename T>
 	CGAMV rot( const T& );

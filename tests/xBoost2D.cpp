@@ -35,20 +35,20 @@ struct MyApp : App {
 	void onDraw(){
 	                                                        
 		time +=.1;
-		Dls cir = Ro::dls( Vec(0,0),  1.0);//.trs( Drv(sin(time),0) );  
+		Dls cir = Ro::dls( Vec(0,0),  1.0).trs( Drv(sin(time),0) );  
 
 		Draw(cir);  
 
 		
-		Pnt a = Point(1,0);
-		Pnt b = Point(-1,0);   
+		Pnt a = Ro::point(1,0);
+		Pnt b = Ro::point(-1,0);   
 		
 		Lin lina = a ^ Vec(0,.5) ^ Inf(1);//Line(a,b);
-		Lin linb = a ^ b ^ Inf(1);//Line(a,b);   
+		Lin linb = (a ^ b ^ Inf(1)).rot( Biv(time) );//Line(a,b);   
 		
 		auto m = linb/lina;
 		
-		m.bprint();
+	//	m.bprint();
 		Dll().bprint();
 		
 		 Draw(linb);  

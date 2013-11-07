@@ -18,8 +18,9 @@ struct MyApp : App {
   	void getMouse(){
 		auto tv = interface.vd().ray; 
 		Vec z (tv[0], tv[1], tv[2] );
-		ray = Point( interface.mouse.projectMid ) ^ z ^ Inf(1); 
-    		mouse = Point( ray,  Ori(1) );  
+    auto tm = interface.mouse.projectMid;
+		ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
+    		mouse = Round::point( ray,  Ori(1) );  
   }
 
   	virtual void onDraw(){ 

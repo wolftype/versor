@@ -10,6 +10,9 @@
 using namespace std;
 
 namespace vsr{
+      
+
+struct Root{
              
 template<class V>
 bool compare(const V& a, const V& b, VT amt =.00005){   
@@ -18,7 +21,7 @@ bool compare(const V& a, const V& b, VT amt =.00005){
 }            
 	
 template<int DIM, class ... R >
-vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){   
+vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > System ( R ... v )  {   
 	
 	typedef EGAMV<DIM, typename Blade1<DIM>::VEC > V;
 	 
@@ -121,6 +124,8 @@ vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > rootSystem( R ... v ){
    }
 
  	return results;
-}              
+}  
+};
+            
 } //vsr::
 #endif

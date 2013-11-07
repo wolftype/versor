@@ -11,7 +11,8 @@
 #define Versor_vsr_field_h
 
 //#include "vsr_frame.h"
-#include "vsr_lattice.h"
+#include "vsr_lattice.h" 
+#include "vsr_math.h" 
 #include "gfx/gfx_data.h"
 
 namespace vsr{
@@ -79,7 +80,7 @@ namespace vsr{
         /// Zero Out All Data
         void zero() { ITER mData[tidx] = T(0); ITEND }
         
-        Field( int w, int h, int d, double spacing = 1.0) :
+        Field( int w=1, int h=1, int d=1, double spacing = 1.0) :
         CubicLattice(w,h,d,spacing), mData( NULL )
 
         {
@@ -89,9 +90,9 @@ namespace vsr{
         
         Field& resize( int w, int h, int d, double spacing = 1.0){
             
-            resize(w,h,d,spacing);
-            alloc(); init();
-            
+            CubicLattice::resize(w,h,d,spacing);     
+
+            alloc(); init();  
             return *this;
         }
         
@@ -105,15 +106,9 @@ namespace vsr{
             if (mData) delete[] mData;
         }
 
-
-        
         /*! Allocate Memory */
         void alloc(){
-            
-            if (mData) delete[] mData;
-
-            mNum = mWidth * mHeight * mDepth;
-            
+         	if (mData) delete[] mData;       
             mData = new T[mNum]; 
         }
         
@@ -191,7 +186,7 @@ namespace vsr{
         //Contour Integral 
 		template<class V>
         vector<V> contour(const V& v, int num, double force){
-            vector<Vec> vp;
+            vector<V> vp;
             V tv = v;
             for (int i = 0; i < num; ++i){
                 vp.push_back(tv);

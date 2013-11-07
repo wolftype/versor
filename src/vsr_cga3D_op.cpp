@@ -224,7 +224,7 @@ namespace Gen{
 	        VT  den2 = ac * ac * den;
 
 
-	        b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );			//negative necessary . dll? . . 
+	        b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );			//bivector part - negative necessary . dll? . . 
 	        tq = (b * q);  //Make motor and extract Grade 2 part
 
 	        if (den2 == 0 ) {

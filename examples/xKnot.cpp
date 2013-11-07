@@ -9,17 +9,22 @@ using namespace glv;
 struct MyApp : App {
 	
 	float amt;
+	float P, Q;
 	
 	virtual void initGui(){
-		gui(amt,"amt",0,10);
+		gui(P,"Q",0,10)(Q,"Q",0,10)(amt,"amt",0,10);
 		
 		amt = .003; 
+		P = 3; 
+		Q = 2;
 	}
 
 	void onDraw(){
      
 
-		TorusKnot tk(3,2,amt); 
+		TorusKnot tk(P,Q,amt);  
+		
+		cout << tk.iter() << endl;
 	
 		static auto a = Ro::null(2,0,0);     
 

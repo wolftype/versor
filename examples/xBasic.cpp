@@ -3,6 +3,7 @@
 
 
 using namespace vsr;
+using namespace vsr::cga3D;
 using namespace glv;  
 
 
@@ -13,19 +14,19 @@ struct MyApp : public App {
 	void onDraw(){
 	                                                                          
 		//Circle through 3 Points
-		static Cir circle = Point(1,0,0) ^ Point(0,1,0) ^ Point(-1,0,0); ///< i.e. CXY(1)
+		static Circle circle = point(1,0,0) ^ point(0,1,0) ^ point(-1,0,0); ///< i.e. CXY(1)
          
-		//Dual Plane with Normal in Y direction
-		static Dlp dualPlane = Plane(0,1,0);
+		//Dual plane with Normal in Y direction
+		static DualPlane dualplane = plane(0,1,0);
          
 		//Calculate their Intersection (which is the dual of the outer product of duals . . . )
-		auto pointPair = Meet(circle,dualPlane);  //<---- i.e. (circle.dual() ^ dualPlane).dual();
+		auto pair = meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual();
 
 
 		//Draw 'em with colors
 		Draw(circle,0,1,0);   	//<-- Green
-		Draw(dualPlane,0,0,1);  //<-- Blue
-		Draw(pointPair,1,0,0);  //<-- Red
+		Draw(dualplane,0,0,1);  //<-- Blue
+		Draw(pair,1,0,0);  //<-- Red
 
 		//Enable Mouse Control with 'G' 'R' and 'S' keys
 		Touch( interface, circle );

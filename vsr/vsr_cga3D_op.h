@@ -15,47 +15,50 @@
 namespace vsr{
                      
 
+using namespace cga3D;
+
+
 namespace Gen{               
-	
-	/*! Generate a Rotor (i.e quaternion) from spherical coordinates
+  
+  /*! Generate a Rotor (i.e quaternion) from spherical coordinates
         @param[in] theta in xz plane from (1,0,0) in range [0,PI]
         @param[in] phi in rotated xy plane in range []
     */
-    	Rot rot(double theta, double phi);                
-	    
+      Rot rot(double theta, double phi);                
+      
 
    /*! Generate a Motor from a Dual Line Axis
        @param Dual Line Generator (the axis of rotation, including pitch and period)
    */  
-		Mot mot( const Dll& dll);
+    Mot mot( const Dll& dll);
 
     /*! Dual Line Generator from a Motor 
         @param Motor m (a concatenation of rotation and translation)
     */  
-	    Dll log( const Mot& m);
+      Dll log( const Mot& m);
 
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-	   Dll log(const Dll& a, const Dll& b, VT t = 1.0);
+     Dll log(const Dll& a, const Dll& b, VT t = 1.0);
 
-	    /*! Generate Motor That Twists Dual Line a to Dual Line b;
+      /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
-	    */
-		Mot ratio( const Dll& a, const Dll& b, VT t = 1.0);
+      */
+    Mot ratio( const Dll& a, const Dll& b, VT t = 1.0);
 
 
-	    /*! Generate a Translated Transversion 
-	        @param Tangent Direction
-	        @param Position in space
-	        @param scalar amt (typically 0 or 1)
-	    */
-	    template <class A, class T>
-	    Bst bst(const A& tnv, const Vec& drv, T t){
-	        Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
-		   // s.vprint();
-	        return Gen::bst(s * t);
-	    }
+      /*! Generate a Translated Transversion 
+          @param Tangent Direction
+          @param Position in space
+          @param scalar amt (typically 0 or 1)
+      */
+      template <class A, class T>
+      Bst bst(const A& tnv, const Vec& drv, T t){
+          Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
+       // s.vprint();
+          return Gen::bst(s * t);
+      }
    
 }; 
     
@@ -84,8 +87,8 @@ extern template class CGAMV<5,   CGA<5>::Bst   >;
 extern template class CGAMV<5,   CGA<5>::Dil   >; 
 extern template class CGAMV<5,   CGA<5>::Tsd   >;
 
-extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                       	
-extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                       	
+extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                         
+extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                         
 extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Mot& )const;                       
 extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Bst& )const;
 extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Tsd& )const;
@@ -112,8 +115,8 @@ extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Bst& )const;
 extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Tsd& )const;
 extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Dil& )const; 
 
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const;                       	
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const;                       	
+extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const;                         
+extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const;                         
 extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Mot& )const;                       
 extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Bst& )const;
 extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Tsd& )const;
@@ -142,7 +145,7 @@ extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;
                                                            
 
                                                            
-extern template Rot Gen::rot( const Biv& );				                 
+extern template Rot Gen::rot( const Biv& );                         
 extern template Rot Gen::rot( VT, const Biv& ); 
 extern template Biv Gen::log( const Rot& );
 extern template Par Gen::log( const Bst& ); 
@@ -217,15 +220,15 @@ extern template Drb Fl::dir( const Pln&);
  
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t){
-	 	return this -> sp ( Gen::mot(t) );  
+     return this -> sp ( Gen::mot(t) );  
 } 
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t){
-	 	return this -> mot(t);  
+     return this -> mot(t);  
 }
 template<TT DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t){
-	 	return this -> mot(t);  
+     return this -> mot(t);  
 }
 
 
@@ -251,9 +254,9 @@ CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t){
 #define S2F(f) f/1000.0
 #define LN(x,y,z) ( vsr::Pnt(0,0,0,1,.5)^PT(x,y,z)^vsr::Inf(1) )
 #define DLN(x,y,z) ( vsr::Op::dl(LN(x,y,z)) )
-#define PAO vsr::Pnt(0,0,0,1,0)   // Point At Origin
-#define EP vsr::Dls(0,0,0,1,-.5) // dual unit sphere at origin: hyperbolic space
-#define EM vsr::Dls(0,0,0,1,.5)  // dual imaginary unit sphere at origin: spherical space
+#define PAO vsr::Pnt(0,0,0,1,0)   /// Point At Origin
+#define EP vsr::Dls(0,0,0,1,-.5)  ///  Dual unit sphere at origin: swap with infinity for hyperbolic space
+#define EM vsr::Dls(0,0,0,1,.5)   ///  Dual imaginary unit sphere at origin: swap with infinity for spherical space
 #define INFTY vsr::Inf(1)
 #define HYPERBOLIC EP
 #define SPHERICAL EM

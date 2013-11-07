@@ -23,6 +23,7 @@
 
 
 using namespace std;
+using namespace gfx;   
 
 namespace vsr {
 
@@ -103,7 +104,8 @@ namespace vsr {
         CubicLattice(int _w = 1, int _h = 1, int _d = 1, double _s = 1.0)
         : mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
          mNum( mWidth * mHeight * mDepth),
-         mNumVxl( (mWidth-1) * (mHeight-1) * (mDepth-1) )
+         mNumVxl( (mWidth-1) * (mHeight-1) * (mDepth-1) ),
+		 mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
          {
             alloc(); init();
         }
@@ -112,7 +114,8 @@ namespace vsr {
             onDestroy();
         }
         
-        void onDestroy(){
+        void onDestroy(){   
+			if (mPoint) delete[] mPoint;
             if (mVxl) delete[] mVxl;
             if (mNbr) delete[] mNbr;
             if (mNbrVxl) delete[] mNbrVxl;
@@ -130,6 +133,8 @@ namespace vsr {
         CubicLattice& resize( int _w, int _h, int _d, int _s = 1.0){
             onDestroy();
             mWidth = _w; mHeight = _h; mDepth = _d; mSpacing = _s;
+			mNum = _w * _h * _d; 
+			mNumVxl = (_w-1) * (_h-1) * (_d -1);
             alloc(); init();
             return *this;
         }
@@ -188,9 +193,7 @@ namespace vsr {
 
         void alloc(){
             mPoint = new LPnt[mNum];
-
-            mNbr = new Nbr[mNum];
-
+            mNbr = new Nbr[mNum];   
             mVxl = new Vxl[mNumVxl];
             mNbrVxl = new Nbr[mNumVxl];
         }
@@ -218,7 +221,7 @@ namespace vsr {
             BOUNDITER0
             
                 int ix = i * (mHeight-1) * (mDepth-1) + j * (mDepth-1) + k;
-                Vec v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
+                Vec3f v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
                
                  mVxl[ix] = vxlAt(v);
                 
@@ -246,12 +249,13 @@ namespace vsr {
             
         }
         			
-        /*! Voxel of Vector v */						
-        Vxl vxlAt( const Vec& tv ) const { 
+        /*! Voxel of Vector v */ 
+   		template<class V>
+        Vxl vxlAt( const V& tv ) const { 
 		
             Vxl vxl;
             
-            Vec v = bound(tv);
+            V v = bound(tv);
             
             //Bottom - Left corner Voxel	
             int lw = floor( ( v[0] + ow() ) / spacing() );
