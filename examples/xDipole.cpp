@@ -21,7 +21,7 @@ struct MyApp : App {
     
 	int numDipoles;
     Par * par;
-	Pnt * pos;  
+  	Pnt * pos;  
 	
 	int numPotentials;
 	Mesh * potentialsA;  
@@ -80,7 +80,7 @@ struct MyApp : App {
 	void initDipoles(){
 		for (int i = 0; i < numDipoles; ++i){  
 		  float t= TWOPI * i/numDipoles;   
-		  pos[i] = Point( Vec( .5 * cos(t) * f.tw(), sin(t) * f.th()/2.0, 0)); 
+		  pos[i] = Ro::point( Vec( .5 * cos(t) * f.tw(), sin(t) * f.th()/2.0, 0)); 
 		  par[i] = Par(Tnv(0,1,0)).trs( pos[i] ); 
 		}
 	}           
@@ -114,7 +114,7 @@ struct MyApp : App {
 	if (bReset) {
 	 for (int i = 0; i < numDipoles; ++i){
 		float t= TWOPI * i/numDipoles;                         
-		pos[i] = Point( Vec( .5 * cos(time + t) * f.tw(), sin(time+t) * f.th()/2.0, 0));
+		pos[i] = Ro::point( Vec( .5 * cos(time + t) * f.tw(), sin(time+t) * f.th()/2.0, 0));
 		pos[i] = pos[i].mot(  dll * t * time * PI  ); 	                                                       
 		par[i] = Par(Tnv(0,1,0)).trs( pos[i] );  
 	}   
@@ -177,9 +177,8 @@ struct MyApp : App {
 		 
 		Vec nva(0, tb, 0);  //starting points
 		Vec nvb(0, tb, 0);   
-		// auto nva = Point(ta,tb,0); 
-		// auto nvb = Point(ta,tb,0);  
-		for (int j = 0; j < pRes; ++j){
+		
+    for (int j = 0; j < pRes; ++j){
 			potentialsA[i][j].Pos.set ( nva[0], nva[1], nva[2] );
 			potentialsB[i][j].Pos.set ( nvb[0], nvb[1], nvb[2] );
             

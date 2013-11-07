@@ -16,37 +16,16 @@ struct MyApp : App {
 	}
   
   	void getMouse(){
-		auto tv = interface.vd().ray; 
-		Vec z (tv[0], tv[1], tv[2] );
-    auto tm = interface.mouse.projectMid;
-		ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-    		mouse = Round::point( ray,  Ori(1) );  
+  		auto tv = interface.vd().ray; 
+	  	Vec z (tv[0], tv[1], tv[2] );
+      auto tm = interface.mouse.projectMid;
+		  ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
+    	mouse = Round::point( ray,  Ori(1) );  
   }
 
   	virtual void onDraw(){ 
         
-		getMouse();
-		
-		Draw(mouse,0,1,0);
-		         
-		Cir cir = Circle( mouse, Point(0,0,0), Point(1,0,0));
-		Draw( cir );
-		
-		Draw( Point(1,0,0), 1,0,0 );
-		
-		static auto lin = Line( Point(0,1,0), Point(-1,0,0) );
-		Touch(interface,lin);
-		
-		Draw(lin,0,1,0);
-		                                 
-		for (int i = 0; i < 100; ++ i ){
-			float t = PI * i/100;
-			Mot mot = Gen::mot( lin.dual() * t );
-			Draw( cir.spin( mot ) );
-		}
-		 
-		
-		
+	  	getMouse();
 		
 	}
    

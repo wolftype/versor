@@ -497,7 +497,8 @@ namespace Op{
     auto 
   dls( const CGAMV<DIM,S>& v, VT r = 1.0 ) -> CGAMV<DIM, typename CGA<DIM>::Pnt > {
         CGAMV<DIM, typename CGA<DIM>::Pnt > s = null(v);
-        ( r > 0) ? s.template get< infinity<DIM>() >() -= .5 * (r * r) 
+        ( r > 0) ? s.template get< infinity<DIM>() >() -= .5 * (r * r)
+
      : s.template get< infinity<DIM>() >() += .5 * (r*r);
     return s;     
     }
