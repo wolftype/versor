@@ -5,6 +5,7 @@
 
 using namespace vsr;
 using namespace glv;  
+using namespace vsr::cga3D;
 
 struct MyApp : App {
 	
@@ -30,7 +31,8 @@ struct MyApp : App {
 		
   		//Target: Mouse Position 
 		
-		targetPos = Point( Line( interface.mouse.projectNear, interface.vd().ray ),  Ori(1) );  
+    auto line =  Fl::line( interface.mouse.projectNear, interface.vd().ray );
+		targetPos = Ro::point( line, Ori(1) );  
 		
 		MFrame targetFrame ( targetPos ); 
 
@@ -39,8 +41,8 @@ struct MyApp : App {
 		
          MFrame secondFrame( 0, distA, 0 );
 
-		 auto firstSphere = Sphere( secondFrame.pos(), distA ); 	// Make a sphere from a point and a radius, calls Ro::dls( Pnt, float )
-         auto targetSphere = Sphere( targetPos, distA ); 
+		 auto firstSphere = Ro::sphere( secondFrame.pos(), distA ); 	// Make a sphere from a point and a radius, calls Ro::dls( Pnt, float )
+         auto targetSphere = Ro::sphere( targetPos, distA ); 
         
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
@@ -56,21 +58,21 @@ struct MyApp : App {
 		 Draw(tline,1,1,0);
  
 		 //Point Pairs of Final joint
-		 Par fjoint = ( tline ^ targetSphere ).dual();
+		 Pair fjoint = ( tline ^ targetSphere ).dual();
 		 Draw(fjoint);  
 		
  	   	 //Pick the one closest to the base frame
 		 MFrame finalFrame ( Ro::split(fjoint,false), Rot(1,0,0,0) );
 
 		 //Sphere around fframe
-		 auto ffsphere = Sphere( finalFrame.pos(), distA);
+		 auto ffsphere = Ro::sphere( finalFrame.pos(), distA);
 
 		 //Circle of Possibilities
-		 Cir cir = ( ffsphere ^ firstSphere).dual();
+		 Circle cir = ( ffsphere ^ firstSphere).dual();
 		 Draw(cir,.5,1,1);
 
 		 //TWo points where the middle joint could be
-		 Par fpair = ( rotationPlane.dual() ^ cir.dual() ).dual();
+		 Pair fpair = ( rotationPlane.dual() ^ cir.dual() ).dual();
 		 Draw(fpair, 1,.5,.5);
 
 		 //Pick One and put the middle frame there

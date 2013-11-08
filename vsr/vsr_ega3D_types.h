@@ -57,6 +57,7 @@ namespace vsr{
 	    //     return b * ( s / n);
 	    // }  
 	// 
+  
 	// 	static Biv pl( const Rot& r) {
 	//         Biv b = r.cast<Biv>();
 	//         VT t = b.rnorm(); // use rnorm or norm here?
@@ -74,13 +75,14 @@ namespace vsr{
 	//     /*! Axis Angle from Rotor (useful for calling glRotate . . . )
 	//         @param Rotor input
 	//     */
-	// 	static Rot aa (const Rot& r) {
-	// 
-	//         Vec v = Gen::pl( r ).dual();		
-	//         VT deg = iphi(r) * ( -180 / PI );
-	//         			
-	//         return Rot(deg, v[0], v[1], v[2]);
-	//     }   
+
+		/* static Rot aa (const Rot& r) { */
+	
+	        /* Vec v = Gen::pl( r ).dual(); */		
+	        /* VT deg = iphi(r) * ( -180 / PI ); */
+	        			
+	        /* return Rot(deg, v[0], v[1], v[2]); */
+	    /* } */   
 	}   
 }
 

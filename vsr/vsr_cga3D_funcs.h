@@ -18,7 +18,11 @@ namespace vsr{
      inline Point point( const Lin& lin, const V& v){
        return Ro::null( Fl::loc( lin, v, false) );
      }          
-     
+
+     template<class V>
+     inline Point point( const V& v){
+       return Ro::null( v );
+     }        
       
       inline Point pointA(const Pair& p){
        return Ro::split(p, true);
@@ -79,7 +83,7 @@ namespace vsr{
      ///Direct line 
      template<class V>
      inline Line line( const V& a, const V& b){
-        return point(a) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
+        return Ro::point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
      }
      ///Direct line 
      inline Line line( VT x, VT y, VT z ){

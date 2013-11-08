@@ -911,8 +911,8 @@ struct MGAMV : public A {
 template<TT DIM, class A>
 struct EGAMV : public A {
 
-	template< class B > using AType = EGAMV<DIM, B >;
-    typedef EGA<DIM>  MODE;
+	template< class B > using BType = EGAMV<DIM, B >;
+    typedef EGA<DIM>  Mode;
     typedef A Type;
 
 	template< class ... Args >
