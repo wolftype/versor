@@ -1,22 +1,30 @@
---Lua Geometric Algebra generator
+--Lua Geometric Algebra generator [arbitrary metrics]
 --Author: Pablo Colapinto
---Email:  wolftype@gmail.com
+--Email:  wolftype@gmail.com  
+--free to use and distribute
 
 --[[
 
 Builds Euclidean and Conformal Basis 
-Operations In Arbitrary Metric
+Operations In Arbitrary Metric  
+
+**SEE R3.lua for sample usage**
 
 Space time Algebra, for instance,
 is possible by setting metric to
-{-1,-1,-1,1} and calling buildEuclidean. 
+{-1,-1,-1,1} and calling buildEuclidean (probably not the right name . . .)
+
+local sta = GA:new(-1,-1,-1,1)
+sta.buildEuclidean()
 
 
-3D Conformal is build by 
+3D Conformal is built by 
+
+local cga = GA:new(1,1,1,1,-1)  
+cga.buildConformal()
 
 ]]
 
-package.path = "util/?.lua;"..package.path
 require "routines" 
 
 local bit = require("bit")
@@ -30,10 +38,10 @@ local rshift = bit.rshift
 
 module("versor", package.seeall)
  
---BASIS UTILITY FUNCTIONS 
+
 local symidx = {gp=1, op=2, ip=3}  
 
-
+--BASIS UTILITY FUNCTIONS  
 blade = function(b, wt)
 	return {id = b, w = wt}
 end 
@@ -287,7 +295,7 @@ end
 GA = {
 
   		--Store Basis Combinatorics (a Cayley Graph) 
-		new = function(self,...)  
+		new = function(super,...)  
 			
 		   gax = 	{
 
@@ -310,9 +318,9 @@ GA = {
 			MV = { 
 				-- desc = "base",
 				-- idx = 0,
-				__mul = function(a,b) return self:mvProduct(a, b, "gp") end, -- *  (geometric product)
-				__pow = function(a,b) return self:mvProduct(a, b, "op") end, -- ^  (outer product)
-				__concat  = function(a,b) return self:mvProduct(a, b, "ip") end,  -- .. (inner product)
+				__mul = function(a,b) return super.mvProduct(super,a, b, "gp") end, -- *  (geometric product)
+				__pow = function(a,b) return super.mvProduct(super,a, b, "op") end, -- ^  (outer product)
+				__concat  = function(a,b) return super.mvProduct(super,a, b, "ip") end,  -- .. (inner product)
 				__call = function(table,...) return table:new(...) end, 
 				
 			     print = function(self) for i, iv in ipairs(self) do print(iv) end end
@@ -320,7 +328,7 @@ GA = {
 
 		  } 
 		
-	       setmetatable(gax, self)
+	       setmetatable(gax, super)
 		
 		   gax.MV.__index = gax.MV --looks into inherited type for members   
  
@@ -351,7 +359,7 @@ GA = {
 			end 
 		
 		
-
+           gax:buildBasis()
 		   return gax 
 		end, 
 		
@@ -878,7 +886,36 @@ GA = {
 GA.__index = GA -- metamethod looks into GA for members . . .   
 
 
--- GA.__call = function(...)       
+--[[
+THIS IS HOW TO USE IT:
+
+
+local B = require "versor"
+   
+local t = B.GA:new(1,1,1)
+t:buildEuclidean() 
+
+
+local vec = { id = "Vec", desc = "Vector", bases = {"e1","e2","e3"} }    
+local rot = { id = "Rot", desc = "Rotor", bases = {"s", "e12","e13","e23"} }  
+
+vec.blades = B.toBasisList( vec.bases )   
+t:makeType( vec.blades, vec.id, false )   
+
+rot.blades = B.toBasisList( rot.bases ) 
+t:makeType( rot.blades, rot.id, false )  
+
+for i,iv in ipairs( t.types["Vec"](0,0,1) ) do
+   print(iv)
+end      
+
+local v = t.types["Vec"](1,0,0) 
+local r = t.types["Rot"](1,1,1,1)
+
+local test = v * v
+
+
+]]  
 
    	  
 

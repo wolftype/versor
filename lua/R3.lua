@@ -16,19 +16,19 @@ local rot = { id = "Rot", desc = "Rotor", bases = {"s", "e12","e13","e23"} }
 
 --more types etc...
 
---Convert strings to ints and register type
-vec.blades = B.toBasisList( vec.bases )   
-t:makeType( vec.blades, vec.id, false )   
+--Convert strings to ints and register type (could make this a method of GA)
+vec.blades = V.toBasisList( vec.bases )   --Convert
+t:makeType( vec.blades, vec.id, false )   --Register
 
-rot.blades = B.toBasisList( rot.bases ) 
-t:makeType( rot.blades, rot.id, false )  
+rot.blades = V.toBasisList( rot.bases )   --Convert
+t:makeType( rot.blades, rot.id, false )   --Register
    
 --ACTUAL INSTANCES  
 local v = t.types["Vec"](1,0,0) 
 local r = t.types["Rot"](1,1,1,1)     
 
 
---Operate!  the Metatable should call into the GA mvProduct, but having trouble accessing it correctly
+--Operate!  the Metatable should call into the GA mvProduct, but having trouble accessing members correctly    
 local c = r * v * r 			--note, r.inverse() etc still needs to be defined
 
 
