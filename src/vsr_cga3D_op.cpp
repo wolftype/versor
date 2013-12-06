@@ -90,7 +90,7 @@ template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;
 
 template Rot Gen::ratio( const Vec&, const Vec& );                                                     
 template Rot Gen::rot( const Biv& );				                 
-template Rot Gen::rot( VT, const Biv& ); 
+//template Rot Gen::rot( VT, const Biv& ); 
 template Biv Gen::log( const Rot& );
 template Par Gen::log( const Bst& ); 
 template Trv Gen::trv( const Vec& );
