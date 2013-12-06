@@ -1,4 +1,14 @@
 /*
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+
+/*
 
 CONFORMAL SPLIT METRIC 
 

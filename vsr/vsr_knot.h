@@ -65,81 +65,81 @@ struct TorusKnot  {
     
     TorusKnot(double p = 3, double q = 2, double a = .01) : P(p), Q(q), amt(a) {}   
                      
-	//calculate full orbit from point p
-	void calc( const Pnt& p){
-		Pnt np = p; 
-		Bst tbst = bst();
-		for (int i = 0; i < iter(); ++ i ){
-			np = Ro::loc( np.sp( tbst ) );  
-			add(np);
-		}                   
-		//Tube Neighborhood  
-		int tnum = iter();
-		for (int i = 0; i < tnum; ++i ){ 
-			double t = -1 + 2.0 * i/ tnum;
-	        double tt = 1 + t * t;
-	        int idx = i < tnum -1 ? i + 1 : 0;  
-			Par tpar = pnt[i] ^ pnt[idx];
-			Cir c = tpar.dual();//.dil(tk.pnt[i], );
-			add ( c );
-		}
-	}
+  //calculate full orbit from point p
+  void calc( const Pnt& p){
+    Pnt np = p; 
+    Bst tbst = bst();
+    for (int i = 0; i < iter(); ++ i ){
+      np = Ro::loc( np.sp( tbst ) );  
+      add(np);
+    }                   
+    //Tube Neighborhood  
+    int tnum = iter();
+    for (int i = 0; i < tnum; ++i ){ 
+      double t = -1 + 2.0 * i/ tnum;
+          double tt = 1 + t * t;
+          int idx = i < tnum -1 ? i + 1 : 0;  
+      Par tpar = pnt[i] ^ pnt[idx];
+      Cir c = tpar.dual();//.dil(tk.pnt[i], );
+      add ( c );
+    }
+  }
 
-	double energy(int idx, int num){
+  double energy(int idx, int num){
 
-	    double totalEnergy = 0;     ///< Running sum TOTAL ENERGY OF KNOT 
-		energies.clear();           ///< energies relative to idx
-	    energies.push_back(0);      ///< Initial
-	
-		//forward and reverse arc measurements
-	    vector<double> globalA; //Distance
-	    //vector<double> globalB;
-	    vector<double> local; //Distance
-	
-	    double totalA = 0;
+      double totalEnergy = 0;     ///< Running sum TOTAL ENERGY OF KNOT 
+    energies.clear();           ///< energies relative to idx
+      energies.push_back(0);      ///< Initial
+  
+    //forward and reverse arc measurements
+      vector<double> globalA; //Distance
+      //vector<double> globalB;
+      vector<double> local; //Distance
+  
+      double totalA = 0;
 
-	    //integrated sums
-	    for (int i = 0; i < num; ++i){
+      //integrated sums
+      for (int i = 0; i < num; ++i){
 
-	        //Idx of Neighbor
-	        int idxA = i < num - 1 ? i + 1 : 0;
+          //Idx of Neighbor
+          int idxA = i < num - 1 ? i + 1 : 0;
 
-	        double ta = Ro::dist( pnt[i], pnt[idxA]);
-	        local.push_back(ta);
+          double ta = Ro::dist( pnt[i], pnt[idxA]);
+          local.push_back(ta);
 
-	        totalA += ta;
+          totalA += ta;
 
-	        globalA.push_back( totalA );
-	    }
+          globalA.push_back( totalA );
+      }
         
-	    for (int i = 0; i < num; ++i){    
+      for (int i = 0; i < num; ++i){    
 
-	        double ta = 0;
+          double ta = 0;
 
-	        for (int j = 0; j < num; ++j){
+          for (int j = 0; j < num; ++j){
 
-	            if ( i != j ) {
-	                double chord = Ro::sqd( pnt[i], pnt[j] );
+              if ( i != j ) {
+                  double chord = Ro::sqd( pnt[i], pnt[j] );
 
-	                double diffA = fabs( globalA[j] - globalA[i] );
-	                double diffB = fabs( (totalA - globalA[j] ) + globalA[i] );//fabs( globalB[j] - globalA[i] );
+                  double diffA = fabs( globalA[j] - globalA[i] );
+                  double diffB = fabs( (totalA - globalA[j] ) + globalA[i] );//fabs( globalB[j] - globalA[i] );
 
-	                double diff = diffA < diffB ? diffA : diffB;
+                  double diff = diffA < diffB ? diffA : diffB;
 
-	                double tener = ( ( 1.0 / chord ) - (1.0 / (diff * diff) ) ) * local[j]; //weighted by distance
-	                //push back for i = 0
-	                if (i == idx ) energies.push_back(tener);
-	                ta += tener;
-	            }
-	        }
+                  double tener = ( ( 1.0 / chord ) - (1.0 / (diff * diff) ) ) * local[j]; //weighted by distance
+                  //push back for i = 0
+                  if (i == idx ) energies.push_back(tener);
+                  ta += tener;
+              }
+          }
 
-	        totalEnergy += ta * local[i];
-	   }     
+          totalEnergy += ta * local[i];
+     }     
         
         return totalEnergy; 
     } 
-	
-	     
+  
+       
         
 };
 

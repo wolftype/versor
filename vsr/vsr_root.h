@@ -1,131 +1,152 @@
+//Versor
+//Author: pablo colapinto
+//
+// this file was written with the help of Pierre Dechant
+//
+// given a simple root, find all the others through reflections
+//
+// used e.g. in vsr_groups.h to create reflection groups
+//
+//
+
+
 #ifndef ROOT_SYSTEM_INCLUDED
 #define ROOT_SYSTEM_INCLUDED
                       
 #include <vector>
-//#include <iostream>
 #include "vsr_products.h"   
 #include "vsr_generic_op.h"
-
 
 using namespace std;
 
 namespace vsr{
-      
 
 struct Root{
-             
-template<class V>
-bool compare(const V& a, const V& b, VT amt =.00005){   
-	//( a <= b ).vprint();
-	return ( ( a - b ).wt() ) < amt;
-}            
-	
-template<int DIM, class ... R >
-vector< EGAMV<DIM, typename Blade1<DIM>::VEC >  > System ( R ... v )  {   
-	
-	typedef EGAMV<DIM, typename Blade1<DIM>::VEC > V;
-	 
-	int n = sizeof...(R);
-	
-	V root[] = { v... };
-	
-	vector< V > results;
-	
-	for ( int i = 0; i < n; ++i ){
-		results.push_back( root[i] );
-	}
-	
-	for (int i = 0; i < n; ++i){
-	   	for (int j = 0; j < n; ++j){
+  
+  
+  ///Utility function to compare two vectors (looks at norm of the difference)           
+  template<class V>
+  static bool Compare(const V& a, const V& b, VT amt =.00005){   
+    return ( ( a - b ).wt() ) < amt; 
+  }            
+    
+    //Build a Root System from Simple Root Generators (ANY Dimension!)
+   template<class V, class ... R>
+   static vector<V> System( const V& x, const R&... v ){
+    
+      int n = sizeof...(R) + 1;
+ 
+      V root[] = {x, v... };
 
-			V nr = root[i].re(root[j]);//ref(root[i],root[j]);//-!root[j] * root[i] * root[j];
-			 
-			bool exists = 0;
-			for ( int k = 0; k < results.size(); ++k){
-				exists = ( compare(nr,results[k]) ); 
-				// nr.vprint(); results[k].vprint(); std::cout << exists << endl;     
-				if (exists) break;
-			}   
-			
-			if (!exists) results.push_back( nr ); 
-			 
-		} 
-	}   
-	
-	bool keepGoing = true; 
-//	
+      vector< V > initial; //<-- Initial Simple Roots
+    
+      for ( int i = 0; i < n; ++i ){
+         initial.push_back( root[i] );    
+      } 
+
+      return System( initial );
+   }
+    
+  // Build a Root System from A vector of Simple Roots
+   template<class V>
+   static vector<V> System( const vector<V>& root){
+
+    int n = root.size();                        //<-- Number of Simple Roots
+
+    //Copy simple roots into results first
+    vector< V > results = root;
+
+    //FIRST PASS: reflect all roots around each other, and save if new 
+    /* for (int i = 0; i < n; ++i){ */
+    /*     for (int j = 0; j < n; ++j){ */
+
+    /*     V nr = root[i].re(root[j]);             //<-- Reflection */
+       
+    /*     bool exists = 0; */
+    /*     for ( int k = 0; k < results.size(); ++k){ */
+    /*       exists = ( Compare(nr,results[k]) );  //<-- Use the Compare function */
+    /*       if (exists) break; */
+    /*     } */   
+        
+    /*     if (!exists) results.push_back( nr ); */ 
+         
+    /*   } */ 
+    /* } */   
+    
+    //Okay, now repeat reflections until no new ones are created
+    /* bool keepGoing = true; */ 
+      
+    /*   while (keepGoing){ */   
+    /*     //For EACH simple root */
+    /*     for (int i = 0; i < n; ++i){ */
+    
+    /*         //How big is results so far? (this will change every loop) */
+    /*         int cs = results.size(); */
+            
+    /*         for (int j = 0; j < cs; ++j ){ */
+       
+    /*             bool done = true; //expect to be finished unless . . . */
+    /*             V nr = results[j].re( root[i] ); */
+                                  
+    /*             bool exists = 0; */ 
+    /*             for ( int k = 0; k < cs; ++k){ */ 
+    /*               exists = ( Compare(nr,results[k]) ); */
+    /*               if (exists) { */  
+    /*                   break; //<-- break out of this mini search loop */
+    /*               } */
+    /*             } */
+        
+    /*             if (!exists)  { */ 
+    /*               results.push_back( nr ); */
+    /*               done = false; //... we reset here and do it again */
+    /*             } */   
+      
+    /*             if (done) { keepGoing = false; } */
+
+    /*           } */
+    /*         } */  
+    /*     } */   
+
+
+    bool keepGoing = true; 
     while (keepGoing){   
-  //  for ( int ii = 0; ii < 3; ++ii){
-		for (int i = 0; i < n; ++i){
-		
-            int cs = results.size();
-			for (int j = 0; j < cs; ++j ){
-			 
-				bool done = 1;
-			    V nr = results[j].re( root[i] );//ref(results[j],root[i]);; 
-	                
-                bool exists = 0; 
-				for ( int k = 0; k < cs; ++k){ 
-					// std::cout << k << endl;
-					//nr.vprint();  
-					exists = ( compare(nr,results[k]) );
-					//nr.vprint(); results[k].vprint(); std::cout << exists << endl;
-					if (exists) {  
-					   break;
-					}
-				}
-				
-				if (!exists)  { 
-					//std::cout <<"! exists" << endl;
-					//nr.vprint();  
-					results.push_back( nr );
-					done = 0; 
-				}   
-			
-				if (done) keepGoing = false; 
-			}
-		}  
-   }   
 
-
-    keepGoing = true; 
-//	
-    while (keepGoing){   
-  //  for ( int ii = 0; ii < 3; ++ii){
+        bool done = true;
+        
         int cs = results.size(); 
-		for (int i = 0; i < cs; ++i){  
-			int ns = results.size();
-			for (int j = 0; j < ns; ++j ){
 
-				bool done = 1;
-			    V nr = results[j].re( results[i] ); //ref(results[j],results[i]);; 
+        for (int i = 0; i < cs; ++i){  
+        
+          int ns = results.size();
+        
+          for (int j = 0; j < ns; ++j ){
 
-                bool exists = 0; 
-				for ( int k = 0; k < ns; ++k){ 
-					// std::cout << k << endl;
-					// nr.vprint();  
-					exists = ( compare(nr,results[k]) );
-					//nr.vprint(); results[k].vprint(); std::cout << exists << endl;
-					if (exists) {  
-					   break;
-					}
-				}
+              V nr = results[j].re( results[i] ); 
 
-				if (!exists)  { 
-					//std::cout <<"! exists" << endl;
-					//nr.vprint();  
-					results.push_back( nr );
-					done = 0; 
-				}   
+              bool exists = 0; 
+              for ( int k = 0; k < ns; ++k){ 
+                exists = ( Compare(nr,results[k]) );
+                if (exists) {  
+                  break;
+                }
+              }
 
-				if (done) keepGoing = false; 
-			}
-		}  
+              if (!exists)  { 
+                results.push_back( nr );
+                done = false;  //if even one is new, try them all again
+              }   
+
+            }
+        } 
+        
+        if (done) { keepGoing = false; } // if not, then stop
+ 
    }
 
- 	return results;
+   return results;
 }  
 };
+
             
 } //vsr::
 #endif

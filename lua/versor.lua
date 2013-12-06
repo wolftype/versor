@@ -1,5 +1,5 @@
 --Lua Geometric Algebra generator [arbitrary metrics]
---Author: Pablo Colapinto
+--Author: Pablo Colapinto and Wesley Smith
 --Email:  wolftype@gmail.com  
 --free to use and distribute
 

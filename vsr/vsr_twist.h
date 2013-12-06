@@ -1,6 +1,6 @@
 /*
- *  MotorCouple.h
- *  CONGA_07
+ *  HELPFUL FOR TWISTING THINGS
+ *  
  *
  *  Created by x on 1/20/11.
  *  Copyright 2011 x. All rights reserved.

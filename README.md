@@ -142,13 +142,13 @@ METHODS
 
 GENERATORS 
 ---
-
-  Rot Gen::rot( const Biv& b );           //<-- Generate a Rotor from a Bivector
-  Trs Gen::trs( const Drv& v);          //<-- Generate a Translator from a Direction Vector
-  Mot Gen::mot( const Dll& d);          //<-- Generate a Motor from a Dual Line
-  Dil Gen::dil( const Pnt& p, double amt );    //<-- Generate a Dilator from a Point and an amount
-  Trv Gen::trv( cont Tnv& v);            //<-- Generate a Transveror from a Tangent Vector
-  Bst Gen::bst( const Par& p);               //<-- Generate a Booster from a Point Pair
+          
+  Rot Gen::rot( const Biv& b );                 //<-- Generate a Rotor from a Bivector
+  Trs Gen::trs( const Drv& v);                  //<-- Generate a Translator from a Direction Vector
+  Mot Gen::mot( const Dll& d);                  //<-- Generate a Motor from a Dual Line
+  Dil Gen::dil( const Pnt& p, double amt );     //<-- Generate a Dilator from a Point and an amount
+  Trv Gen::trv( cont Tnv& v);                   //<-- Generate a Transveror from a Tangent Vector
+  Bst Gen::bst( const Par& p);                  //<-- Generate a Booster from a Point Pair
    
 
 BUILD
@@ -157,8 +157,11 @@ BUILD
 - For Versor 2.0 You'll need C++11 support (See important makefile notes below). 
 - Alternatively Versor 1.0 is available at github.com/wolftype/vsr.git
 
-For C++11 you'll want clang 3.2 (mac) or above or gcc 4.6 or above (linux).  
+For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).  
 NOT tested on windows.
+
+	brew tap home-brew/versions
+	brew install --HEAD llvm34 --rtti, --disable-assertions, --with-libcxx, --with-clang
  
 If you don't want to or can't compile C++11 code try an [older flavor of vsr](github.com/wolftype/vsr.git). 
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.

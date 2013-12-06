@@ -124,18 +124,45 @@ namespace vsr{
         return (s ^ d.dual()).dual();
       }
       //circle intersection of direct sphere and dual plane
-       inline Circle meet( const Sph& s, const Dlp& d){
+       inline Circle meet( const Sphere& s, const DualPlane& d){
         return (s.dual() ^ d).dual();
       }
       //circle intersection of direct sphere and direct plane
-       inline Circle meet( const Sph& s, const Pln& d){
+       inline Circle meet( const Sphere& s, const Plane& d){
         return (s.dual() ^ d.dual()).dual();
       } 
-      //flat point intersection of line and dual plane
-       inline FlatPoint meet( const Lin& lin, const Dlp& dlp){ 
-        return ( (lin).dual()^ dlp).dual();
+      //normalized and nulled point intersection of line and dual plane
+       inline FlatPoint meet( const Line& lin, const DualPlane& dlp){ 
+        Flp flp = ( (lin).dual()^ dlp).dual();
+        return (flp / flp[3]).null();
       } 
-      
+      //normalized and nulled point intersection of dualline and dual plane
+       inline Point meet( const Dll& dll, const DualPlane& dlp){ 
+        auto flp = ( dll ^ dlp).dual();
+        return flp.null();
+      } 
+
+    
+      //flat point intersection of two lines
+       inline Point meet( const Line& la, const Line& lb){
+          Line r = la.reflect(lb);// Draw(r,1,1,0);
+          Line r2 = (la - r.runit()).runit();//  Draw(r2,0,1,1);
+          Point pori = Fl::loc(r2, Ori(1), false);
+          Point tp = pori.re( lb ); 
+          return ( ( (tp / tp[3]) + pori)/2.0 ).null(); 
+        }
+         /* //test for origin */
+        /* auto t = Ori(1) ^ la; Sca(t.wt()).vprint(); */
+        /* (t.dual() ^ lb.dual() ).dual().vprint(); */
+        /* if (t.wt() != 0 ) { */
+         /*  return ( t.dual() ^ lb.dual() ).dual(); */
+        /* } else { */
+         /*  auto t2 = (Ori(1) ^ lb ); */
+         /*  if ( t2.wt() != 0 ) return ( la.dual() ^ t2.dual() ).dual(); */
+         /*  else return Flp(); */
+         /* } */
+       //}  
+
       //point pair intersection of circle and Dual plane
        inline Par meet( const Cir& cir, const Dlp& dlp){ 
         return ( (cir).dual() ^ dlp).dual();

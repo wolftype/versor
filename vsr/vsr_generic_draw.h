@@ -11,10 +11,11 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "vsr_generic_op.h"
+#include "vsr_field.h"
 
 namespace vsr{ 
 	
-	
+//  using namespace gfx;	
    
 	template<class A>
 	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
@@ -24,20 +25,90 @@ namespace vsr{
 			Immediate(s);
 		glPopMatrix();
 	}
+
+	template<class A>
+	void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix(); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			ImmediateB(s);
+		glPopMatrix();
+	}
+
+  /*! Draw Some Type A at 3D Position B */
+  template<class A, class B>
+	void DrawAt( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix();
+    glTranslatef( p[0], p[1], p[2] ); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			Immediate(s);
+		glPopMatrix();
+	}
+
+  //Alt
+  template<class A, class B>
+	void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix();
+    glTranslatef( p[0], p[1], p[2] ); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			ImmediateB(s);
+		glPopMatrix();
+	}
+
 	               
 	template<TT DIM>
 	NRot<DIM> AA( const NVec<DIM>& s){
-		//Biv b = Ro::dir( s ).copy<Biv>();               
         NRot<DIM> r = Gen::ratio( NVec<DIM>::z, s.unit() ); 
         return Gen::aa(r);
     }                                  
 
-	// template<TT DIM>
-	// Rot AA( const NPnt<TT>& s){
-	// 	//Biv b = Ro::dir( s ).copy<Biv>();               
-	//         Rot r = Gen::ratio( NVec<TT>::z, s.unit() ); 
-	//         return Gen::aa(r);
-	//     } 
+  	template<TT DIM>
+	  NERot<DIM> AA( const NEVec<DIM>& s){
+        NERot<DIM> r = Gen::ratio( NEVec<DIM>::z, s.unit() ); 
+        return Gen::aa(r);
+    }                                  
+
+  template<TT DIM>
+   NERot<DIM> AA( const NEBiv<DIM>& s){   
+		return Gen::aa( Gen::ratio( NEVec<DIM>::z, s.dual().unit() ) ); 
+	}
+
+  //GENERIC EUCLIDEAN ORTHOGONAL PROJECTION
+  template<TT DIM>
+  void Immediate (const NEVec<DIM>& ts){  
+      NEVec<3> s = ts;
+      gfx::Glyph::Line(s);
+      glPushMatrix();  
+      gfx::GL::translate( s.begin() );
+      gfx::GL::rotate( AA(s).begin() );  
+      gfx::Glyph::Cone();
+      glPopMatrix();
+  }
+
+  template<TT DIM>
+  void ImmediateB (const NEVec<DIM>& ts){  
+      NEVec<3> s = ts;
+      gfx::Glyph::Line(s);
+      glPushMatrix();  
+      gfx::GL::translate( s.begin() );
+      gfx::Glyph::SolidSphere(.05);
+      glPopMatrix();
+  }
+
+    template<TT DIM>
+  void Immediate (const NEBiv<DIM>& s){  
+		double ta = s.norm(); 
+	    bool sn = Op::sn( s , NEBiv<DIM>::xy * (-1));
+	
+		glPushMatrix();	
+			gfx::GL::rotate( AA(s).begin() );  
+			gfx::Glyph::DirCircle( ta, sn );
+		glPopMatrix();
+  }
+
+
 	
 	template<TT DIM> 
 	NRot<DIM> AA( const NCir<DIM>& s){
@@ -116,6 +187,13 @@ namespace vsr{
 	            gfx::Glyph::Point(pp[1]);
 	        }
 	}
+
+  template<class T>
+  void Immediate( const Field<T>& f){
+      for (int i = 0; i < f.num(); ++i){
+        Draw(f[i]);
+      }
+  }
  
 } //vsr::
 

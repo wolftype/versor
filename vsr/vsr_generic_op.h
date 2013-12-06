@@ -1,3 +1,14 @@
+/*
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+
+
 #ifndef VSR_GENERIC_OP_H_INCLUDED
 #define VSR_GENERIC_OP_H_INCLUDED   
 
@@ -131,7 +142,7 @@ namespace Op{
 
  namespace Gen{  
 
-    /* Rotor from Bivector b*/  
+    /* ND Rotor from Bivector b*/  
     template<class A>
     auto rot ( const A& b ) -> decltype( b + 1 ) {  
       //  printf("me");
@@ -147,12 +158,12 @@ namespace Op{
           Generate Rotaion at origin from angle and axis or angle and plane
           @param a vector or bivector
       */
-    template< class A> 
-    auto rot( VT angle, const A& v) RETURNS(
-        rot( v * angle )
-    ) 
+    /* template< class A> */ 
+    /* auto rot( VT angle, const A& v) RETURNS( */
+    /*     rot( v * angle ) */
+    /* ) */ 
     
-    /*! Get Bivector Generator from a Rotor  (3d Conformal)
+    /*! Get Bivector Generator from a Rotor  (3d Conformal...)
           @param Rotor r
       */
      template<TT DIM>
@@ -196,9 +207,9 @@ namespace Op{
           if (n <= 0) {
               if (t < 0) {
                   printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
-                  return TBIV(PI,0,0);
+                  return TBIV(PI);
               } else {
-                  return TBIV(0,0,0); 
+                  return TBIV(); 
               }
           }
 
@@ -254,7 +265,7 @@ namespace Op{
       */
      template< class A > 
       VT iphi( const A& r) { 
-      using TBIV = typename A::template BType< typename A::Mode::Biv >;  
+          using TBIV = typename A::template BType< typename A::Mode::Biv >;  
           return TBIV ( log(r) * -2 ).norm();
       }
 
@@ -520,8 +531,9 @@ namespace Op{
         @param Point
         @param Radius (enter a negative radius for an imaginary sphere)
     */   
-  template< TT DIM >
-    NDls<DIM> dls_pnt( const NPnt<DIM>& p, VT r = 1.0 ) {
+    template< TT DIM >
+    NDls<DIM> 
+    dls_pnt( const NPnt<DIM>& p, VT r = 1.0 ) {
         NPnt<DIM> s = p;
         (r > 0) ? s.template get< infinity<DIM>() >() -= .5 * (r * r) 
     : s.template get< infinity<DIM>() >() += .5 * (r*r);
@@ -534,7 +546,7 @@ namespace Op{
 
     template<TT DIM, class T>
     constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > 
-   cen( const CGAMV<DIM, T>& s) {
+    cen( const CGAMV<DIM, T>& s) {
         return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >();
     }
     template< class T > constexpr auto center ( const T& t ) RETURNS (cen(t))
@@ -543,7 +555,8 @@ namespace Op{
     Location of A Round Element (normalized)
   */
   template<TT DIM, class T>
-  constexpr NPnt<DIM> loc(const CGAMV<DIM, T>& s){
+  constexpr NPnt<DIM> 
+  loc(const CGAMV<DIM, T>& s){
     return null ( cen ( s ) ); 
   }   
   template< class T> constexpr auto location( const T& t) RETURNS (loc(t))
@@ -554,21 +567,25 @@ namespace Op{
         @param duality flag 
     */
     template<TT DIM, class T> 
-    VT size( const CGAMV<DIM, T>& r, bool dual){
+    VT 
+    size( const CGAMV<DIM, T>& r, bool dual){
         auto s = NInf<DIM>(1) <= r;
         return ( ( r * r.inv() ) / ( s * s ) * ( (dual) ? -1.0 : 1.0 )  )[0];
     } 
     /*! Radius of Round */
   template<class T> 
-    VT rad( const T& s ){
+    VT 
+    rad( const T& s ){
         return sqrt ( fabs ( size(s, false) ) );
     } 
     template<class T> VT radius( const T& t) { return rad(t); }
+   
     /*! Curvature of Round 
         @param Round Element
     */
     template<class A>
-    VT cur(const A& s){
+    VT 
+    cur(const A& s){
         VT r = rad( s );     
         return (r==0) ? 10000 : 1.0 / rad(s);
     }
@@ -577,63 +594,78 @@ namespace Op{
         @param Round Element
     */ 
 
-    template<class T> VT curvature( const T& t) { return cur(t); }
+    template<class T> 
+    VT 
+    curvature( const T& t) { return cur(t); }
 
 
     /*! Squared Size of Normalized Dual Sphere (faster than general case)
         @param Normalized Dual Sphere
     */
-  template<TT DIM>
-   VT dsize( const NPnt<DIM>& dls ){
+    template<TT DIM>
+    VT 
+    dsize( const NPnt<DIM>& dls ){
         return (dls * dls)[0];
     }
-    
+   
+   /*! Squared distance between two points */ 
   template<TT DIM>
-    VT sqd(const NPnt<DIM>& a, const NPnt<DIM>& b){
+    VT 
+    sqd(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return ( (a <= b)[0] ) * -2.0;
     }
     
     /*! Distance between points a and b */  
-  template<TT DIM> 
-    VT dist(const NPnt<DIM>& a, const NPnt<DIM>& b){
+   template<TT DIM> 
+    VT 
+    dist(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return sqrt( fabs(sqd(a,b) ) );
     }
 
     /*! Split Points from Point Pair 
         @param PointPair input
+        returns a vector<Pnt>
     */  
-  template<TT DIM>
-    std::vector< NPnt<DIM> > split(const NPar<DIM>& pp){
+    template<TT DIM>
+    std::vector< NPnt<DIM> > 
+    split(const NPar<DIM>& pp){
         
-    std::vector< NPnt<DIM> > pair;
-        
-        VT r = sqrt( fabs( ( pp <= pp )[0] ) );
-        
-    //dual line in 2d, dual plane in 3d
-    auto d = NInf<DIM>(-1) <= pp;
+      std::vector< NPnt<DIM> > pair;
+          
+      VT r = sqrt( fabs( ( pp <= pp )[0] ) );
+          
+      //dual line in 2d, dual plane in 3d
+      auto d = NInf<DIM>(-1) <= pp;
 
-    NBst<DIM> bstA; bstA = pp;        
-    NBst<DIM> bstB; bstB = pp;        
-        bstA += NSca<DIM>(r);
-        bstB -= NSca<DIM>(r);
-                
-    NPnt<DIM> pA;
-    pA = ( bstA ) / d;
-    NPnt<DIM> pB;
-    pB = ( bstB ) / d;
-                
-        pair.push_back(pA);
-        pair.push_back(pB);
+      NBst<DIM> bstA; bstA = pp;        
+      NBst<DIM> bstB; bstB = pp;        
+          
+      bstA += NSca<DIM>(r);
+      bstB -= NSca<DIM>(r);
+                  
+      NPnt<DIM> pA;
+      pA = ( bstA ) / d;
+      NPnt<DIM> pB;
+      pB = ( bstB ) / d;
+                  
+      pair.push_back(pA);
+      pair.push_back(pB);
 
-        return pair;
+      return pair;
     }
    
-  template<TT DIM> 
-    NPnt<DIM> split(const NPar<DIM>& pp, bool bFirst){
+    /*!
+     * Split a point pair
+     * @param Point Pair
+     * @param bool which one
+     * */
+    template<TT DIM> 
+    NPnt<DIM> 
+    split(const NPar<DIM>& pp, bool bFirst){
         
         VT r = sqrt( fabs( ( pp <= pp )[0] ) );
         
-    auto d = NInf<DIM>(-1) <= pp;
+         auto d = NInf<DIM>(-1) <= pp;
         
         NBst<DIM> bst = pp + ( bFirst ? r : -r ); 
         
@@ -644,19 +676,22 @@ namespace Op{
    /*! Direction of Round Element 
         @param Direct Round
     */    
-  template<TT DIM, class A>
-    auto dir( const CGAMV<DIM, A>& s ) RETURNS(
+    template<TT DIM, class A>
+    auto 
+    dir( const CGAMV<DIM, A>& s ) RETURNS(
         ( ( NInf<DIM>(-1) <= s ) ^ NInf<DIM>(1) )
     ) 
 
     /*! Carrier Flat of Round Element */
     template<TT DIM, class A>
-    auto car(const CGAMV<DIM, A>& s) RETURNS(
+    auto 
+    car(const CGAMV<DIM, A>& s) RETURNS(
         s ^ NInf<DIM>(1)
     )  
     /*! Dual Surround of a Round Element */
     template<TT DIM, class A>
-    NDls<DIM> sur( const CGAMV<DIM, A>& s) {
+    NDls<DIM> 
+    sur( const CGAMV<DIM, A>& s) {
         return NDls<DIM>( s / ( s ^ NInf<DIM>(1) ));
     } 
 
@@ -665,15 +700,31 @@ namespace Op{
      Note: round will be imaginary if dual sphere is real . . .
      */  
      template<TT DIM, class A>
-     auto round(const NDls<DIM>& dls, const A& flat) RETURNS (
+     auto 
+     round(const NDls<DIM>& dls, const A& flat) RETURNS (
          dls ^ ( ( dls <= ( flat.inv() * NInf<DIM>(1) ) )  * -1.0 ) 
+     )
+
+      /*!
+        Creates a real / imaginary round from an imaginary / real round
+       */
+     template<class A>
+     auto
+     real(const A& s) RETURNS (
+      
+         round( 
+                Ro::dls( Ro::loc( s ), -Ro::rad( Ro::sur( s ) ) ), 
+                typename A::template BType < typename A::Mode::Ori > (-1) <= Ro::dir( s ) 
+              )
+
      )
 
      /*!
       * Dual Round from Center and Point on Surface
       * */
      template<TT DIM>
-      NDls<DIM> at( const NDls<DIM>& c, const NDls<DIM>& p) {
+      NDls<DIM> 
+      at( const NDls<DIM>& c, const NDls<DIM>& p) {
         return NDls<DIM>( p <= (c^NInf<DIM>(1) ) );
      }
     
@@ -800,7 +851,7 @@ namespace Op{
         return ( s / NInf<DIM>(-1) <= s );
     }
 
-    /*! Tangent Element of Round r at Point p
+    /*! Tangent Element of Direct Round r at Point p
         @param Direct Round Element r
         @param Point p
     */

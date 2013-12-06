@@ -7,6 +7,10 @@
  
 namespace vsr {
   struct Frame{
+
+    //these typedefs help Frame play nice with Field class . . .
+    template< class B > using BType = CGAMV<5, B >;
+    typedef CGA<5> Mode;
                          
     Pnt mPos;                                            
     Rot mRot;
@@ -68,14 +72,32 @@ namespace vsr {
     Dlp dxy() const { return y() <= dlx(); }      ///< xy dual plane
     Dlp dyz() const  { return y() <= dlz(); }      ///< yz dual plane  
     
-    /* Local XY Pair */
-    Par pxy() const { return dxy() ^ bound(); }      ///< xy point pair
-    Par pxz() const { return dxz() ^ bound(); }      ///< xz point pair
-    Par pyz() const { return dyz() ^ bound(); }      ///< yz point pair   
-    
-    Cir cxy() const { return Ro::round( bound(), xy() ); }
-    Cir cxz() const { return Ro::round( bound(), xz() ); }
-    Cir cyz() const { return Ro::round( bound(), yz() ); } 
+
+    /*! Real Pair */
+    Par px() const { return  Ro::round( ibound(), x() ); }//dxy() ^ bound(); }      ///< y point pair
+    Par py() const { return  Ro::round( ibound(), y() );  }      ///< y point pair
+    Par pz() const { return Ro::round( ibound(),  z() );  }      ///< z point pair   
+
+    /*! Imaginary Pair */
+    Par ipx() const { return  Ro::round( bound(), x() ); }//dxy() ^ bound(); }      ///< y point pair
+    Par ipy() const { return  Ro::round( bound(), y() );  }      ///< y point pair
+    Par ipz() const { return Ro::round( bound(),  z() );  }      ///< z point pair   
+   
+    /*! Global Tangent as Null Point Pair*/
+    Par tx() const { return Par( x().copy<Tnv>() * mScale ).trs(mPos); }
+    Par ty() const { return Par( y().copy<Tnv>() * mScale ).trs(mPos); }
+    Par tz() const { return Par( z().copy<Tnv>() * mScale ).trs(mPos); }
+
+    /*! Real Circles */
+    Cir cxy() const { return Ro::round( ibound(), xy() ); }
+    Cir cxz() const { return Ro::round( ibound(), xz() ); }
+    Cir cyz() const { return Ro::round( ibound(), yz() ); } 
+
+    /*! Imaginary Circles */
+    Cir icxy() const { return Ro::round( bound(), xy() ); }
+    Cir icxz() const { return Ro::round( bound(), xz() ); }
+    Cir icyz() const { return Ro::round( bound(), yz() ); } 
+
      
     
     Vec right() const { return x(); }
@@ -97,6 +119,10 @@ namespace vsr {
     
     Dls bound() const{
       return Ro::dls( mPos, mScale );
+    }
+
+    Dls ibound() const{
+      return Ro::dls( mPos, -mScale );
     }
     
     Dll dll() const { return Gen::log( mot() ); }       ///< get dll log of motor (for interpolating)  

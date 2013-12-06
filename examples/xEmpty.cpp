@@ -4,33 +4,42 @@
 #include "vsr_GLVimpl.h"
 
 using namespace vsr;
+using namespace vsr::cga3D;
 
 
 struct MyApp : App {    
    
-	Pnt mouse;
-	Lin ray;
+  Pnt mouse;
+  Lin ray;
 
-	MyApp(Window * win ) : App(win){
-		scene.camera.pos( 0,0,10 ); 
-	}
-  
-  	void getMouse(){
-  		auto tv = interface.vd().ray; 
-	  	Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-		  ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-    	mouse = Round::point( ray,  Ori(1) );  
+  float time;
+  float amt;
+
+  MyApp(Window * win ) : App(win){
+    scene.camera.pos( 0,0,10 ); 
+    time = 0;
   }
 
-  	virtual void onDraw(){ 
+  void initGui(){
+      gui(amt,"amt",-100,100);
+  }
+  
+    void getMouse(){
+      auto tv = interface.vd().ray; 
+      Vec z (tv[0], tv[1], tv[2] );
+      auto tm = interface.mouse.projectMid;
+      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
+      mouse = Round::point( ray,  Ori(1) );  
+  }
+
+    virtual void onDraw(){ 
         
-	  	getMouse();
-		
-	}
+      getMouse();
+    
+  }
    
 
-	
+  
 };
 
 
@@ -39,16 +48,17 @@ MyApp * app;
 
 int main(){
                              
-	GLV glv(0,0);	
+  GLV glv(0,0);  
 
-	Window * win = new Window(500,500,"Versor",&glv);    
-	app = new MyApp( win ); 
+  Window * win = new Window(500,500,"Versor",&glv);    
+  app = new MyApp( win ); 
+  app -> initGui();
   
-	
-	glv << *app;
+  
+  glv << *app;
 
-	Application::run();
+  Application::run();
 
-	return 0;
+  return 0;
 
 }

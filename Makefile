@@ -12,6 +12,8 @@ endif
 
 PIROOT = $(HOME)/code/pi/root/
 
+
+#PASS IN CLANG=path/to/clang++ if default is not working
 CLANG = 0
 
 #COMPILER VERSION  
@@ -24,13 +26,13 @@ else
 endif
 else  
 ifneq ($(CLANG),0) 
-	CXX = $(CLANG)/clang++ -std=c++11  
+	CXX = $(CLANG) -std=c++11  
 else 
 	CXX = clang++ -std=c++11  
 endif 
 	CXX += -arch x86_64
 endif
-CXX += -O3 -fpeel-loops  -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast
+CXX += -O3 -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast
 AR 	= ar crs 
 
 IPATH = -Ivsr/ 
@@ -79,7 +81,7 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
+OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o vsr_cga3D_cubicLattice.o
 #vsr_cga3D_interface.o 
 #vsr_cga3D_draw.o
 

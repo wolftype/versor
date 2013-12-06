@@ -92,14 +92,14 @@ namespace vsr{
             //Vector of Circle
             Vec v = Ro::vec( mCir, ptheta ) / Ro::rad(mCir);
             
-		   // v.vprint();
+       // v.vprint();
 //            Vector v = Vec::x.rot( Biv::xz * ptheta ) / Ro::rad(mCir);
             
             Vec c = Ro::loc(mCir);
-			
+      
             Bst bst = Gen::bst( v, c , 1 );
-		   // bst.vprint();
-			
+       // bst.vprint();
+      
             Lin lim = mCir.sp( bst );                                      //<-- Circle to a Line (Limit)
             Mot mot = Gen::ratio( lim.dual().runit(), dll(), pphi);
             

@@ -146,7 +146,7 @@ extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;
 
                                                            
 extern template Rot Gen::rot( const Biv& );                         
-extern template Rot Gen::rot( VT, const Biv& ); 
+//extern template Rot Gen::rot( VT, const Biv& ); 
 extern template Biv Gen::log( const Rot& );
 extern template Par Gen::log( const Bst& ); 
 extern template Trv Gen::trv( const Vec& );
@@ -219,11 +219,11 @@ extern template Drb Fl::dir( const Pln&);
 
  
 template<TT DIM, typename A> template<typename T>
-CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t){
+CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t) const{
      return this -> sp ( Gen::mot(t) );  
 } 
 template<TT DIM, typename A> template<typename T>
-CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t){
+CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t) const{
      return this -> mot(t);  
 }
 template<TT DIM, typename A> template<typename T>

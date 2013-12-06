@@ -26,7 +26,7 @@ namespace vsr{
 
   Rot AA( const Dlp& s){
     //Biv b = Ro::dir( s ).copy<Biv>();               
-        Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
+  Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
         return Gen::aa(r);
     }  
   Vec Pos( const Dlp& s){ 
@@ -45,14 +45,24 @@ namespace vsr{
   
   
   void Immediate (const Vec& s){
+    //cout << "vec" << endl; 
       gfx::Glyph::Line(s);
     glPushMatrix();  
       gfx::GL::translate( s.begin() );
       gfx::GL::rotate( AA(s).begin() );  
       Glyph::Cone();
     glPopMatrix();
-  }                         
-                       
+  }  
+  
+    void ImmediateB (const Vec& s){
+      //cout << "ehl" << endl;
+      gfx::Glyph::Line(s);
+      glPushMatrix();  
+      gfx::GL::translate( s.begin() );
+      gfx::Glyph::SolidSphere(.05,5,5);
+      glPopMatrix();                       
+  }
+                   
    void Immediate (const Drv& s){ 
     Immediate( s.copy<Vec>() );
   }
@@ -172,6 +182,51 @@ namespace vsr{
   }  
   
   
+  /* void Immediate( const Field<Frame>& f){ */
+  /*   for (int i = 0; i < f.num(); ++i){ */  
+  /*     glPushMatrix(); */ 
+  /*     Immediate( f[i] ); */ 
+  /*     glPopMatrix(); */ 
+  /*   } */
+  /* } */  
+  
+  /* void Immediate( const Field<Vec>& f){ */ 
+  /*    // printf("draw vec field\n"); */
+  /*   for (int i = 0; i < f.num(); ++i){ */  
+  /*     glPushMatrix(); */
+  /*       gfx::GL::translate( f.grid(i).begin() ); */ 
+  /*        //glPushMatrix(); */ 
+  /*         Immediate( f[i] ); */ 
+  /*       //glPopMatrix(); */ 
+  /*     glPopMatrix(); */   
+      
+  /*   } */
+  /* } */ 
+  
+  template<>
+  void Immediate( const Field<Sca>& f){
+    Pnt p = Pnt();
+    for (int i = 0; i < f.num(); ++i){  
+      DrawAt(p, f.grid(i), f[i][0], 1, 1 - f[i][0] ); 
+    }
+  }
+
+  template<>
+  void Immediate( const Field<Vec>& f){
+//    cout << "field vec" << endl; 
+    for (int i = 0; i < f.num(); ++i){  
+      DrawAt( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
+    }
+  }
+
+  template<>
+  void ImmediateB( const Field<Vec>& f){
+    for (int i = 0; i < f.num(); ++i){  
+      DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
+    }
+  }
+
+  template<>
   void Immediate( const Field<Frame>& f){
     for (int i = 0; i < f.num(); ++i){  
       glPushMatrix(); 
@@ -179,23 +234,10 @@ namespace vsr{
       glPopMatrix(); 
     }
   }  
-  
-  void Immediate( const Field<Vec>& f){ 
-     // printf("draw vec field\n");
-    for (int i = 0; i < f.num(); ++i){  
-      glPushMatrix();
-        gfx::GL::translate( f.grid(i).begin() ); 
-         //glPushMatrix(); 
-          Immediate( f[i] ); 
-        //glPopMatrix(); 
-      glPopMatrix();   
-      
-    }
-  } 
-  
 
     
   template void Draw(const Vec&, float, float, float ,float);
+  template void DrawB(const Vec&, float, float, float ,float);
   template void Draw(const Dlp&, float, float, float ,float);
   template void Draw(const Pln&, float, float, float ,float);  
   template void Draw(const Pnt&, float, float, float ,float);
@@ -206,7 +248,9 @@ namespace vsr{
   template void Draw(const Dll&, float, float, float ,float);
   template void Draw(const Lin&, float, float, float ,float);
   template void Draw(const Frame&, float, float, float ,float);
-  template void Draw(const MFrame&, float, float, float ,float); 
+  template void Draw(const MFrame&, float, float, float ,float);
+  template void Draw(const Field<Vec>&, float, float ,float,float); 
+  template void DrawB(const Field<Vec>&, float, float ,float,float); 
   //template<class T> void Draw( const Field<T>&, float, float, float);
   // template void Draw(const Vec&, float, float, float ,float);
   // template void Draw(const Vec&, float, float, float ,float);

@@ -1,3 +1,13 @@
+/*
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+
 #ifndef VERSIONS_H_INCLUDED
 #define VERSIONS_H_INCLUDED
 
