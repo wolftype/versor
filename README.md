@@ -321,10 +321,9 @@ line into its dual representation, we just call the dual() method:
 For those who are interested, this dual representation is isomorphic to the Plücker coordinates, which are used in screw theory to twist things around.  Here, too, we can use
 dual lines to generate transformations which twist things around them.
 
-  
 
-GUI
----   
+Gui
+---
 
 The examples/*.cpp files include bindings to the GLV framework for windowing and user interface controls.  
 A GLVApp class and GLVInterface class provide the necessary glue to get started quickly.
