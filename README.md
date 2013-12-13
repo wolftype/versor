@@ -78,14 +78,14 @@ QUICKSTART
 
 Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For version 2.0 you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
 
-  git clone git://github.com/wolftype/vsr2.0.git
-  cd vsr2.0
-  git submodule init
-  git submodule update
+	git clone git://github.com/wolftype/vsr2.0.git
+	cd vsr2.0
+	git submodule init
+	git submodule update
 
 To test a graphics example
 
-  make tests/xBasics.cpp 
+	make tests/xBasics.cpp 
      
 which both builds and runs the file.  
 
@@ -524,6 +524,27 @@ In addition to the above "even" spinors, we can also reflect.  Reflections (in a
 	r = r / r[3]; 			//Renormalization of a point
 
 The re() method calculates `v.re(C)` as `C*v.inv()*~C`.  With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the 
-weight of the element (for at Point at x, it will change it by x^2)
+weight of the element (for at Point at x, it will change it by x^2)        
+
+
+LINKS
+---
+
+* [Some Video Demos of Versor](http://vimeo.com/wolftype)
+* [The Good Book: _Geometric Algebra for Computer Science_](http://www.geometricalgebra.net/)
+* [GA Bookmarks on Delicious](http://www.delicious.com/tag/geometricalgebra)
+* [GA Google Group](https://groups.google.com/forum/?fromgroups#!forum/geometric_algebra)
+* [David Hestenes' Geometric Calculus Page](http://geocalc.clas.asu.edu/)
+* [University of Amsterdam Intelligent Systems Lab](http://www.science.uva.nl/research/isla/)
+* [Eduardo Bayro-Corrochano's Robotics Lab](http://www.gdl.cinvestav.mx/~edb/)
+* [Cambridge University Geometric Algebra Research Group](http://www.mrao.cam.ac.uk/~clifford/)
+* [Cognitive Systems at Christian-Albrechts-Universität zu Kiel](http://www.mrao.cam.ac.uk/~clifford/)
+
+PAPERS
+---
+
+* 2011 [Versor: Spatial Computing With Conformal Geometric Algebra](http://wolftype.com/versor/colapinto_masters_final_02.pdf)
+* 2012 [Boosted Surfaces: Synthesis of Meshes using Point Pair Generators in the Conformal Model](http://versor.mat.ucsb.edu/Boosted_Surfaces_submission_0113.pdf)
+
 
                                                                        
