@@ -14,7 +14,8 @@
 
 #include <stdio.h>  
 #include <bitset>  
-#include <string> 
+#include <string>
+#include <sstream> 
 
 namespace vsr{   
   
@@ -38,9 +39,28 @@ inline string bitString( int b ){
   return tmp.template to_string<char,char_traits<char>,allocator<char> >();  
 }
 
+inline string estring(int x){
+  if ( x == 0 ){  return "s"; }
+
+  stringstream s; s << "e";
+  int i = 1;
+  while ( x != 0){
+      if (x&1) s << i;
+      x = x >> 1;
+      i++;
+  }
+
+  return s.str();
+
+}
+
 inline void bsprint(int x){
   printf("%s\n", bitString<6>(x).c_str() );
 }
+
+inline void beprint(int x){
+ printf("%s\t", estring(x).c_str() ); 
+ }
   
 constexpr TT grade (TT a, TT c = 0){
   return a > 0 ? ( a & 1 ? grade( a >> 1, c + 1) :  grade( a >> 1, c ) ) : c;

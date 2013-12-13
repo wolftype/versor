@@ -102,7 +102,7 @@ struct MV<X, XS...>{
     }  
   
   void print() { printf("blades\n"); bprint(); vprint(); } 
-  static void bprint() { printf("%d\t",X); bsprint(X);  TAIL::bprint(); }  
+  static void bprint() { printf("%s\t%s\t%d\n", estring(X).c_str(), bitString<6>(X).c_str(), X);  TAIL::bprint(); } 
   void vprint() const { for ( float i : val ) printf("%f\t", i); printf("\n\n"); }   
         
 

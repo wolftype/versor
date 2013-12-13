@@ -19,7 +19,7 @@ struct Inst{
   } 
   
   static void print(){
-    printf("%d =  a[%d] * b[%d]\t", Res, idxA, idxB);
+    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, estring(Res).c_str() );
   }  
 };   
 
@@ -37,7 +37,7 @@ struct Inst<true, A,B,IDXA,IDXB>{
   } 
   
   static void print(){
-    printf("%d =  -a[%d] * b[%d]\t", Res, idxA, idxB);
+    printf("-a[%d] * b[%d] /*%s*/\t",idxA, idxB,  estring(Res).c_str());
   }  
 }; 
 
@@ -52,7 +52,7 @@ struct Instruct{
     return a[idxA] * b[idxB];
   } 
   static void print(){
-    printf("%d =  a[%d] * b[%d]\t", Res, idxA, idxB);
+    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, estring(Res).c_str());
   }
 }; 
 template< TT R, int IDXA, int IDXB>
@@ -65,7 +65,7 @@ struct Instruct<true, R, IDXA, IDXB>{
     return -a[idxA] * b[idxB];
   } 
   static void print(){
-    printf("%d =  -a[%d] * b[%d]\t", Res, idxA, idxB);
+    printf("-a[%d] * b[%d] /*%s*/\t", idxA, idxB,  estring(Res).c_str());
   }
 };
 

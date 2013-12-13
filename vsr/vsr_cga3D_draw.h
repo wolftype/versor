@@ -156,8 +156,8 @@ void DrawEvery( const A& a, const B& b){
 
   //triangle and normal
   template<class T>
-  void TriNormal( const T& a, const T& b, const T& c){
-    gfx::GL::normal( Ro::dir( a^b^c ).template copy<Biv>().duale().unit() );
+  void TriNormal( const T& a, const T& b, const T& c, bool cc = false ){
+    gfx::GL::normal( Ro::dir( a^ ( !cc ? ( b^c ) : (c^b) ) ).template copy<Biv>().duale().unit() );
     gfx::GL::Tri( a, b, c );
    // glColor3f(0,0,0);
     //gfx::GL::TriLine(a,b,c);
