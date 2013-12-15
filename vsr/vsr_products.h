@@ -447,6 +447,12 @@ template<class M, class A, class B>
 constexpr A csp(const A& a, const B& b) {
   return RProd< typename Prod<B,A,M,true>::Type, B, A, M, true>().gp( cgp<M>(b, a),   Reverse< B >::Type::template Make(b) );
 }
+
+//reflect a by b, return a
+template<class M, class A, class B>
+constexpr A cre(const A& a, const B& b) {
+  return RProd< typename Prod<B,A,M,true>::Type, B, A, M, true>().gp( cgp<M>(b, a.involution()),   Reverse< B >::Type::template Make(b) );
+}
                      
                 
 template<class A, class B>
@@ -639,21 +645,28 @@ struct CGAMV : public A {
     CGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }  
 
   template<typename B>
-  CGAMV sp( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 
+  CGAMV sp0( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 
+
+
+  //test reduced instruction more efficient
   template<typename B>
-  CGAMV spin( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }
+  CGAMV sp( const B& b) const { return csp<M>(*this, b); } 
+
+  template<typename B>
+  CGAMV spin( const B& b) const { return sp(b); }// (b * (*this) * ~b).template cast<A>(); }
   
-  //test reduced instruction 
-  template<typename B>
-  CGAMV sptest( const B& b) const { return csp<M>(*this, b); } 
   
   //reflection over a VERSOR
   template<typename B>
-  CGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
+  CGAMV re0( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
+  
   template<typename B>
-  CGAMV reflect( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); } 
+  CGAMV re( const B& b) const { return cre<M>(*this, b); } 
 
-  //refelction over a SUBSPACE NO involution
+  template<typename B>
+  CGAMV reflect( const B& b) const { return re(b); }// (b * (*this).inv() * !b).template cast<A>(); } 
+
+  //refelction over an ODD SUBSPACE = NO involution
   template<typename B>
   CGAMV sre(const B& b) const { return ( b * (*this) * !b).template cast<A>(); }
                                                                                     
@@ -856,9 +869,10 @@ struct MGAMV : public A {
   template<typename B>
   MGAMV spin( const B& b) const { return (b * (*this) * ~b).template cast<A>(); }
   
-  //test reduced instruction 
+  //test reduced instruction (more efficent) 
   template<typename B>
-  MGAMV sptest( const B& b) const { return csp<M>(*this, b); } 
+  MGAMV sptest( const B& b) const { return csp<M>(*this, b); }
+   
   template<typename B>
   MGAMV re( const B& b) const { return (b * (*this).inv() * !b).template cast<A>(); }  
   template<typename B>
