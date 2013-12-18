@@ -85,7 +85,7 @@ Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  F
 
 To test a graphics example
 
-	make tests/xBasics.cpp 
+	make examples/xBasic.cpp 
      
 which both builds and runs the file.  
 
