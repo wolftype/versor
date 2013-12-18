@@ -63,7 +63,7 @@ Developer: Pablo Colapinto
 	-Heinz von Foerster 
 
 ## OTHER NICE SOFTWARE: ##
-
+zo
 * [Cinderella](http://www.cinderella.de/tiki-index.php) Standalone GA interface
 * [GAViewer](http://www.science.uva.nl/ga/viewer/content_viewer.html) Standalone GA interface
 * [Gaigen](http://staff.science.uva.nl/~fontijne/g25.html) An Implementation Generator
@@ -85,7 +85,7 @@ Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  F
 
 To test a graphics example
 
-	make tests/xBasics.cpp 
+	make examples/xBasics.cpp 
      
 which both builds and runs the file.  
 
