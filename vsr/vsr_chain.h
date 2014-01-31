@@ -18,17 +18,60 @@
 #define VSR_CHAIN_H_INCLUDED
 
 #include "vsr_frame.h"
+#include "vsr_twist.h"
 
-namespace vsr {
+namespace vsr{
+
+struct Prismatic {
+  Prismatic() : mFrame() {}
+  Frame operator() (VT amt) { return mFrame.moveZ(amt); }//pos() = frame.pos().trs ( frame.z() * amt ) ; }
+  Frame mFrame;
+};
+
+struct Revolute : public Frame {
+  Revolute( const Frame& f = Frame() ) : Frame(f) {}
+  Frame operator() (VT amt) { mAmt = amt; return rotXY( amt ); }
+  Frame operator()() const { return rotXY( mAmt ); }
+  //Frame mFrame;
+  VT mAmt;
+};
+
+struct Cylindrical {
+  Cylindrical() : mFrame() {}
+  Frame operator() (VT slide, VT rotate) { return mFrame.moveZ(slide).rotXY( rotate ); }
+  Frame mFrame;
+};
+
+struct Helical {
+  Helical( VT period = PI, VT pitch = 1.0 ) : mFrame(), mPeriod( period), mPitch(pitch) {}
+  Frame operator() (VT amt) { return Frame( Gen::mot( Twist::Along( mFrame.dlz(), mPeriod, mPitch ) * amt ) * mFrame.mot() ); }
+  Frame mFrame;
+  VT mPeriod, mPitch;
+};
+
+struct Planar {
+  Planar() : mFrame() {}
+  Frame operator() (VT dx, VT dy, VT rotate) { return mFrame.move(dx,dy).rotXY( rotate ); }
+  Frame mFrame;
+};
+ 
+struct  Spherical {
+  Spherical() : mFrame() {}
+  Frame operator() (VT rx, VT ry) { return Frame( mFrame.pos(), Gen::rot(rx,ry)  * mFrame.rot() ); }
+  Frame mFrame;
+};
+//spherical (sph coords)
+//planar
+
 
 	class Chain : public Frame {
         
-		MFrame * mJoint;			///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
+		Frame * mJoint;			///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
 								///  (all others follow after calling fk() method)  
 								
-		MFrame * mLink;			///< Relative Link to NEXT joint
+		Frame * mLink;			///< Relative Link to NEXT joint
 		
-		MFrame * mFrame;			///< Absolute frames of Joints = prevFrame  * prevLink *  joint
+		Frame * mFrame;			///< Absolute frames of Joints = prevFrame  * prevLink *  joint
 
 		int mNum;
 		
@@ -60,36 +103,36 @@ namespace vsr {
             if (mJoint) delete[] mJoint;
         }
         
-            void alloc(int n){
-                mNum = n; 
-				if (mNum>0){
-                if (mFrame ) delete[] mFrame;
-                if (mLink ) delete[] mLink;
-                if (mJoint ) delete[] mJoint;   
-            	mFrame = new MFrame[n];
-				mLink  = new MFrame[n];
-				mJoint = new MFrame[n];
-				_init(); 
-				}           
-            }
+        void alloc(int n){
+            mNum = n; 
+            if (mNum>0){
+              if (mFrame ) delete[] mFrame;
+              if (mLink ) delete[] mLink;
+              if (mJoint ) delete[] mJoint;   
+              mFrame = new Frame[n];
+              mLink  = new Frame[n];
+              mJoint = new Frame[n];
+              _init(); 
+            }           
+        }
             
-            void frameSet(){
-                mJoint[0].set( mPos, mRot ); fk();
-            }
+        void frameSet(){
+            mJoint[0].set( mPos, mRot ); fk();
+        }
         
 			/* GETTERS AND SETTERS */
 			int num() const { return mNum; }
-			MFrame& link(int k) { return mLink[k]; }						///< set k's Link To Next Joint
-			MFrame& joint(int k) { return mJoint[k]; }					///< set kth joint's In Socket Transformation
-			MFrame& frame(int k) { return mFrame[k]; }					///< set Absolute Displacement Motor
+			Frame& link(int k) { return mLink[k]; }						///< set k's Link To Next Joint
+			Frame& joint(int k) { return mJoint[k]; }					///< set kth joint's In Socket Transformation
+			Frame& frame(int k) { return mFrame[k]; }					///< set Absolute Displacement Motor
 
-			MFrame link(int k) const { return mLink[k]; }				///< Get k's Link To Next joint 
-			MFrame joint(int k) const { return mJoint[k]; }				///< Get kth Joint's In Socket Transformation
-			MFrame frame(int k) const { return mFrame[k]; }				///< Get Absolute Displacement Motor
+			Frame link(int k) const { return mLink[k]; }				///< Get k's Link To Next joint 
+			Frame joint(int k) const { return mJoint[k]; }				///< Get kth Joint's In Socket Transformation
+			Frame frame(int k) const { return mFrame[k]; }				///< Get Absolute Displacement Motor
 
 			
-			MFrame& operator [] (int k) { return mFrame[k]; }				///< Set kth Absolute Frame
-			MFrame operator [] (int k) const { return mFrame[k]; }		///< Get kth Absolute Frame
+			Frame& operator [] (int k) { return mFrame[k]; }				///< Set kth Absolute Frame
+			Frame operator [] (int k) const { return mFrame[k]; }		///< Get kth Absolute Frame
 			
 			/* SURROUNDS */
 			/// Sphere Centered at Joint K Going Through Joint K+1 
@@ -116,9 +159,9 @@ namespace vsr {
                 return Ro::null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
             }
             
-            MFrame& base() { return mFrame[0]; }
-            MFrame& first() { return mFrame[0]; }        
-            MFrame& last() { return mFrame[mNum -1]; }
+            Frame& base() { return mFrame[0]; }
+            Frame& first() { return mFrame[0]; }        
+            Frame& last() { return mFrame[mNum -1]; }
 			
 			/// Vert xy Plane Containing Root Target Point v ( NORMALIZED )
 			Dlp xy(const Pnt& p) {
@@ -137,14 +180,21 @@ namespace vsr {
 			Dll linb(int k ) { return Op::dl( mFrame[k].pos() ^ mFrame[k-1].pos() ^ Inf(1) ).runit() ; }
 			/// Dual Line From Kth Joint to Input Target (Default is From Last joint)
 			Dll lin(const Pnt& p ) { return Op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
+
+      /// relative (lagrangian) at kth joint
+      Mot rel(int idx){
+         if (idx==0) return mJoint[0].mot();
+
+         return mLink[idx-1].mot() * mJoint[idx].mot();
+      }
 			
 			/// Forward Kinematics: Absolute Concatenations of previous frame, previous link, and current joint
             void fk() {	
-                Mot mot = mJoint[0].mot();
+                Motor mot = mJoint[0].mot();
                 mFrame[0].mot( mot );
                 for (int i = 1; i < mNum; ++i){		
-					Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
-					mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
+					        Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
+					        mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
                 }
             }	      
         
@@ -207,7 +257,7 @@ namespace vsr {
                 }
                 
                 //calculate joint angles
-                joints();               
+                calcJoints();               
             }
             /// "FABRIK" Iterative Solver [see paper "Inverse Kinematic Solutions using Conformal Geometric Algebra", by Aristodou and Lasenby] feed target point, end frame and beginning frame,
             void fabrik(const Pnt& p, int end, int begin, double err = .01){
@@ -255,14 +305,14 @@ namespace vsr {
                 }
 
                 //calculate joint angles
-                joints();
+                calcJoints();
 
             }
         
 
         
             /// Derive Joint Rotations from Current Positions
-            void joints(int start = 0){
+            void calcJoints(int start = 0){
 
 
                 Vec t = Vec::y;
@@ -318,34 +368,16 @@ namespace vsr {
     
 			
 			/// Derive New Relative Link Frames from current Positions
-			void links(){
+			void calcLinks(){
 				for (int i = 0; i < mNum-1; ++i){
 					mLink[i].pos() = Ro::null( mFrame[i+1].vec() - mFrame[i].vec() ); 
                     //mLink[i].mot( mFrame[i+1].mot() / mFrame[i].mot() ); 
 				}
 			} 
         
-			//         virtual void drawLinkages(bool dashed = true){
-			//             for (int i = 0; i < mNum-1; ++i){
-			//                 (dashed) ? Glyph::DashedLine(mFrame[i].pos(), mFrame[i+1].pos() ) : Glyph::Line(mFrame[i].pos(), mFrame[i+1].pos() );
-			//             }            
-			//         }
-			//         
-			//         virtual void drawJoints(){
-			//             for (int i = 0; i < mNum; ++i){
-			//                 DRAW( mFrame[i] );
-			//                 DRAW( mFrame[i].cxy() );
-			//             }           
-			//         }
-			//         
-			// virtual void draw(){
-			// 	drawLinkages(); 
-			//                 drawJoints();
-			// 
-			// }
 	
 	};
 
-} //con::
+} //vsr::
 
 #endif

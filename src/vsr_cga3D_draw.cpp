@@ -181,7 +181,13 @@ namespace vsr{
      gfx::Glyph::Axes( Vec::x, Vec::y, Vec::z );
   }  
   
-  
+   /* void Immediate( const MFrame& f){ */
+   /*   gfx::GL::translate ( f.pos().begin() ); */
+   /*   gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); */ 
+   /*   gfx::GL::scale( f.scale() ); */  
+   /*   gfx::Glyph::Axes( Vec::x, Vec::y, Vec::z ); */
+  /* } */   
+
   /* void Immediate( const Field<Frame>& f){ */
   /*   for (int i = 0; i < f.num(); ++i){ */  
   /*     glPushMatrix(); */ 
@@ -248,7 +254,7 @@ namespace vsr{
   template void Draw(const Dll&, float, float, float ,float);
   template void Draw(const Lin&, float, float, float ,float);
   template void Draw(const Frame&, float, float, float ,float);
-  template void Draw(const MFrame&, float, float, float ,float);
+//  template void Draw(const MFrame&, float, float, float ,float);
   template void Draw(const Field<Vec>&, float, float ,float,float); 
   template void DrawB(const Field<Vec>&, float, float ,float,float); 
   //template<class T> void Draw( const Field<T>&, float, float, float);

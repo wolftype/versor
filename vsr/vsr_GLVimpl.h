@@ -19,193 +19,18 @@
 #include "gfx/gfx_pipe.h" 
 #include "gfx/gfx_interface.h"  
 
-#include "vsr_std_types.h"
+//GL2PS
+#include "gl2ps/gl2ps.h"
+
+//GUI
+#include "vsr_gui.h"
 
 
-  using namespace std;
-  using namespace glv;
-  using namespace gfx;
+using namespace std;
+using namespace glv;
+using namespace gfx;
 
-  using namespace gfx::GLSL; 
-  
-  enum {
-    SLIDER,
-    SLIDERS,
-    SLIDER2D,
-    BUTTON,
-    BUTTONS,
-    DIALER,
-    COLORSLIDER
-  };
-
-
-
-  //typedef Widget Widget;
-  typedef map<string, Widget*> WidgetMap;
-  typedef map<string, Widget*>::iterator WidgetPtr; 
-
-    class Gui : public Table {
-
-        /* Map of Widgets (index by name) */
-        WidgetMap mWidget;
-
-        /* Placement Defaults */
-        Placer * mPlacer;
-
-        bool bDesc;        //show descriptor?
-        bool bVisible;    //draw to screen?
-
-              void _init(){
-
-                  enable ( Controllable |  DrawBorder | DrawBack | FocusHighlight );
-
-                  int spacing    = 10;
-                  mPlacer = new Placer(*this, Direction::S, Place::TL, spacing, spacing);
-
-                  Label :: Spec spec(Place::CL, width() + 20, 0);
-                  Label * tmp = new Label ( name(), spec);
-
-                  *mPlacer << *tmp;
-
-                  addHandler(Event::MouseDrag, Behavior::mouseMove);
-              }
-
-        public:
-
-                  Gui() : Table("<"), bVisible(true) {
-                      _init();
-                  }
-
-                  Gui(int _w , int _h ) : Table("<"), bVisible(true) {
-                      this -> w = _w;
-                      this -> h = _h;
-                      _init();
-                  }
-
-
-                  Gui(string _name): Table("<"), bVisible(true) {
-                      name(_name);
-                      _init();
-                  }
-
-          void add ( Widget* v) {
-            mWidget[ v->name() ] = v;
-
-            Label :: Spec spec(Place::CL, v -> width() + 20, 0);
-            Label * tmp = new Label (v->name(), spec);
-
-            //cout << "adding and placing pointer " << (v->name()) << "to gui." << endl;
-            *mPlacer << ( ( *mWidget[ v->name() ] ) << *tmp );
-
-          }
-
-                  /*!  add widget and automatically determine type of widget */
-                  template<class T>
-                  Gui& operator () (T& val, string nm = "", float min = 0, float max = 1){
-
-                      using namespace vsr;
-                      static int it = 0;
-                      stringstream name;
-
-                      if (nm == "" ) 
-                          name << typeid(T).name() << "_" << it; 
-                      else name << nm;
-
-
-                      switch ( vsr::Types[ typeid(T).name() ] ){
-                          case vsr::BOOLEAN:
-                              add(BUTTON, name.str(), val);
-                              break;
-                          case FLOAT:
-                          case DOUBLE:
-                          case INT:
-                              add(DIALER, name.str(), val, min, max);
-                              break;
-                          default:
-                              break;
-                      }
-
-                      it++;
-                      return *this;
-                  }
-                  /*!  add widget and automatically determine type of widget */
-                  template<class T>
-                  Gui& operator () (T& val, float max){
-                      return (*this)(val, "", 0, max);
-                  }
-          /*! add widget: enum type, name, min, max, attach, num */
-          template <class V>
-          void add (int, string, V& val, float min = 0., float max = 1. );
-
-                  void add ( Widget* v, const std::string& _name){
-
-                      mWidget[ _name ] = v;  
-                      Label * tmp = new Label (_name );
-
-                      Box * box = new Box();
-                      *this << ( *box << *mWidget[ _name]  << *tmp );  
-
-                      arrange();    
-                  }
-
-          Widget& widget(string name) { return *mWidget[name]; }      ///< Get Widget
-          WidgetMap& widget() { return mWidget; }              ///< Get Widget Map
-
-          void updateValues();
-
-          /* Render on Screen */
-          virtual void onDraw(){
-            glTranslated(5,h-10,0);
-            glColor3f(1,1,1);
-            draw::text( name().c_str() );
-          }
-
-
-    };
-
-
-    template <class V>
-    void Gui :: add (int _type, string _name, V& val, float min , float max ){
-
-      Widget * s;
-      switch (_type){
-        case SLIDER:
-        {
-          Slider * ns = new Slider(glv::Rect(100,20));
-          ns -> attachVariable(val, 0 );
-          s = (Widget*)ns;
-          break;
-        }
-        case SLIDER2D:
-        {
-          Slider2D * ns = new Slider2D();
-          s = (Widget*)ns;
-          break;
-        }
-        case BUTTON:
-        {
-                  cout << " adding Button to gui " << endl; 
-          Button *ns = new Button(glv::Rect(20,20));
-          ns -> attachVariable(val, 0);
-          s = (Widget*)ns;
-          break;
-        }
-        case DIALER:
-        {
-          NumberDialer * ns = new NumberDialer(4,3,max,min);
-          ns -> attachVariable(val, 0);
-          s = (Widget*)ns;
-          break;
-        }
-      }
-
-      s->colors().text.set(0,1,0); 
-      s->colors().fore.set(0,1,0);  
-      //s->colors().set(0,1,0);
-      s->name( _name );
-      add((Widget*)s, _name);
-    }
-                          
+using namespace gfx::GLSL; 
 
 struct GLVImpl : public Interface::Impl {    
 
@@ -282,9 +107,11 @@ struct App : public View3D{
     Pipe pipe; 
 
     Mat4f mvm;
+
+    bool bPrintPS;
     
   App(Window * win = NULL ) : View3D(), 
-    renderMode(0)
+    renderMode(0), bPrintPS(false)
  {   
 
   init(win);
@@ -381,6 +208,11 @@ struct App : public View3D{
       onDraw();
      
       scene.pop();
+
+       if (bPrintPS){
+          ps();
+          bPrintPS = false;
+       }
   }  
   
   //vbo render (opengl es 2.0)
@@ -472,7 +304,10 @@ struct App : public View3D{
             interface.impl -> fullScreenToggle();
       break; 
     case 'v':
-    gui.toggle(Visible);
+        gui.toggle(Visible);
+        break;
+    case 'p':
+        bPrintPS = true;
         break;
     
   }
@@ -480,6 +315,58 @@ struct App : public View3D{
   return true;    
   
  }                                                                                             
+ 
+        void ps(){
+//            interface.view().fit();
+            GL::enablePreset();
+            scene.push();
+                gl2ps();
+            scene.pop();
+            GL::disablePreset();
+        }
+        
+                
+        virtual void gl2ps(){
+            static int id = 0;
+            stringstream os; os << "output_" << id << ".eps";
+            id++;
+            
+            FILE *fp;
+            int state = GL2PS_OVERFLOW, buffsize = 0;
+            
+            string name = os.str();
+            fp = fopen(name.c_str(), "wb");
+            
+            printf("writing %s to %s\n", os.str().c_str(), name.c_str() );
+            GLint tv[4];
+            glGetIntegerv(GL_VIEWPORT, tv);
+//            glPointSize(15);
+            
+            //| GL2PS_NO_BLENDING 
+            //| GL2PS_SIMPLE_LINE_OFFSET
+            //
+            
+            
+            //gl2psEnable( GL2PS_POLYGON_OFFSET_FILL );
+            while(state == GL2PS_OVERFLOW){
+                buffsize += 1024*1024;
+                gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_EPS, GL2PS_SIMPLE_SORT,//GL2PS_NO_SORT,//, //GL2PS_SIMPLE_SORT, 
+                               GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | GL2PS_SIMPLE_LINE_OFFSET | GL2PS_TIGHT_BOUNDING_BOX ,// | GL2PS_OCCLUSION_CULL,// | GL2PS_TIGHT_BOUNDING_BOX,// | GL2PS_BEST_ROOT, GL2PS_NO_PS3_SHADING | //| 
+                               GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
+                
+                gl2psEnable(GL2PS_BLEND);
+                gl2psBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                gl2psPointSize(10);
+                gl2psLineWidth(1);
+                 onDraw();
+                
+                state = gl2psEndPage();
+            }
+            
+            fclose(fp);
+            printf("Done!\n");
+        }
+ 
   
 };
 

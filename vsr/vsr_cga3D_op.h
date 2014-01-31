@@ -227,7 +227,7 @@ CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t) const{
      return this -> mot(t);  
 }
 template<TT DIM, typename A> template<typename T>
-CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t){
+CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t) const{
      return this -> mot(t);  
 }
 

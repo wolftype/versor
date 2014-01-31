@@ -17,7 +17,17 @@ namespace vsr{
 		glPopMatrix();
 	} 
 	
-           
+   /*! Draw Some Type A at 2D Position B */
+  typedef void (*GFunc)();
+  template<class B>
+	void DrawAt( GFunc glyph, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix();
+    glTranslatef( p[0], p[1], 0 ); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			glyph();//Immediate(s);
+		glPopMatrix();
+	}          
 	// FEATURE ExTRAcTION (ROTATION AND POSITION)
 
 	Rot AA( const Vec& s){            

@@ -21,10 +21,15 @@ namespace vsr  {
 
         unsigned long& activeId() { return mActiveId; }
         unsigned long activeId() const { return mActiveId; }
+
         
         Set& insert(T s) { mData.insert( mData.begin(), s); }
         Set& pop() { mData.pop_back(); } 
         Set& add(T s) { mData.push_back(s); mActiveId = mData.size(); return *this; }
+        
+        /* template<typename ... S> */
+        /* Set ( S ... s ) { S ts[] = {s...}; mData = vector<T>{ts, ts + sizeof(ts) / sizeof(S) */
+
         Set& add(const Set& s) { for(int i = 0; i < s.size(); ++i) add(s[i]); }
         Set& erase(int idx) { mData.erase( mData.begin() + idx ); }
         Set& erase(int b, int e) { mData.erase( mData.begin() + b, mData.begin() + e ); }
@@ -40,8 +45,10 @@ namespace vsr  {
         unsigned long num() const { return mData.size(); }    
         
         typename vector<T>::iterator begin() { return mData.begin(); }
+        typename vector<T>::iterator end() { return mData.end(); }
          
-		vector<T>& data(){ return mData; }
+		      vector<T>& data(){ return mData; }
+          vector<T> data() const { return mData; }
  
     };
      

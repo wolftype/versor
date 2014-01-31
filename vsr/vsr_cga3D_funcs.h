@@ -19,10 +19,10 @@ namespace vsr{
        return Ro::null( Fl::loc( lin, v, false) );
      }          
 
-     template<class V>
-     inline Point point( const V& v){
-       return Ro::null( v );
-     }        
+     /* template<class V> */
+     /* inline Point point( const V& v){ */
+     /*   return Ro::null( v ); */
+     /* } */        
       
       inline Point pointA(const Pair& p){
        return Ro::split(p, true);
@@ -146,7 +146,7 @@ namespace vsr{
       //flat point intersection of two lines
        inline Point meet( const Line& la, const Line& lb){
           Line r = la.reflect(lb);// Draw(r,1,1,0);
-          Line r2 = (la - r.runit()).runit();//  Draw(r2,0,1,1);
+          Line r2 = (la - r.unit()).unit();//  Draw(r2,0,1,1);
           Point pori = Fl::loc(r2, Ori(1), false);
           Point tp = pori.re( lb ); 
           return ( ( (tp / tp[3]) + pori)/2.0 ).null(); 

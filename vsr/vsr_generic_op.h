@@ -516,7 +516,7 @@ namespace Op{
     template< class T > auto dualSphere( const T& t, VT r = 1.0 ) RETURNS ( dls(t, r) )
 
 
-        /*! Dual Sphere from Element and Radius
+    /*! Dual Sphere from Element and Radius
         @param Any input MV v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
@@ -673,6 +673,15 @@ namespace Op{
 
     }  
 
+    /*!
+     * Split A Circle into its dual point pair poles
+    */
+    template<TT DIM>
+    std::vector< NPnt<DIM> >
+    split( const NCir<DIM>& nc ){
+      return split( nc.dual() );
+    }
+
    /*! Direction of Round Element 
         @param Direct Round
     */    
@@ -682,13 +691,13 @@ namespace Op{
         ( ( NInf<DIM>(-1) <= s ) ^ NInf<DIM>(1) )
     ) 
 
-    /*! Carrier Flat of Round Element */
+    /*! Carrier Flat of Direct? Round Element */
     template<TT DIM, class A>
     auto 
     car(const CGAMV<DIM, A>& s) RETURNS(
         s ^ NInf<DIM>(1)
     )  
-    /*! Dual Surround of a Round Element */
+    /*! Dual Surround of a Direct or Dual Round Element */
     template<TT DIM, class A>
     NDls<DIM> 
     sur( const CGAMV<DIM, A>& s) {
@@ -779,6 +788,9 @@ namespace Op{
   NPnt<DIM> pnt_cir(const NCir<DIM>& c, VT t){
       return null( split( par_cir(c,t), true) );
   }
+
+  /* template<TT DIM> */
+  /* NPnt<DIM> pnt_dls( */
 
 
  } // RO::
@@ -874,94 +886,103 @@ namespace Op{
   
               
   template<TT DIM, class A> template< class T>
-  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t){
+  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{
     return this->sp( Gen::rot(t) );
   }   
   
   
   //TRANSLATIONS
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{
     return this -> sp ( Gen::trs(t) );  
   } 
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{
     return this -> trs(t);  
   }
   template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v){
+  CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{
     return this -> sp ( Gen::trs(v...) );  
   }
   template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v){
+  CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{
     return this -> sp ( Gen::trs(v...) );  
   }  
   
   //TRANSVERSIONS
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{
     return this -> sp ( Gen::trv(t) );  
   }
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{
     return this -> sp ( Gen::trv(t) );  
   } 
  
   template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v){
+  CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{
     return this -> sp ( Gen::trv(v...) );  
   }
   template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v){
+  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{
     return this -> sp ( Gen::trv(v...) );  
   }
 
   
   //ROTATIONS
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{
       return this -> sp ( Gen::rot(t) );  
   }
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{
       return this -> rot(t);  
   } 
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rot( VT a, const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::rot( VT a, const T& t) const{
       return this -> sp ( Gen::rot(a,t) );  
   }
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VT a, const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VT a, const T& t) const{
       return this -> rot(a, t);  
   } 
 
 
    //DILATIONS 
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{
         return this -> sp ( Gen::dil<DIM>(t) );  
   } 
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{
         return this -> dilate(t);  
   }
   template<TT DIM, typename A> template<typename P, typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{
         return this -> sp ( Gen::dil(a, t) );  
   }
   template<TT DIM, typename A> template<typename P, typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{
         return this -> sp ( Gen::dil(a, t) );  
   }
+    template<TT DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{
+        return this -> dilate(t);  
+  }
+  template<TT DIM, typename A> template<typename P, typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{
+        return this -> sp ( Gen::dil(a, t) );  
+  }
+
   
 
   //BOOSTS
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{
         return this -> sp ( Gen::bst(t) );  
   }
   template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t){
+  CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{
         return this -> bst(t);  
   }
 
@@ -970,7 +991,6 @@ namespace Op{
   CGAMV<DIM, typename CGA<DIM>::Pnt > CGAMV<DIM,A>::null() const{
         return Ro::null(*this);  
   }            
-  
   
 }   //vsr::
 

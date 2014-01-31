@@ -20,13 +20,13 @@ namespace vsr {
 		/*!
          4x4 Transformation Matrix From Rotor
         */
-        inline Mat4f mat( const Rot& r) {
+        inline gfx::Mat4f mat( const Rot& r) {
           
             Vec xi = Vec::x.sp(r);
             Vec yi = Vec::y.sp(r);
             Vec zi = Vec::z.sp(r);
             
-            return Mat4f(xi[0], xi[1], xi[2], 0, 
+            return gfx::Mat4f(xi[0], xi[1], xi[2], 0, 
                           yi[0], yi[1], yi[2], 0,
                           zi[0], zi[1], zi[2], 0,
                           0   ,   0 ,   0 ,    1 );
@@ -50,7 +50,7 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Rotor, Translation Vector, and Scale
         */
-        inline Mat4f mat( const Rot& r, const Vec& v, double s) {
+        inline gfx::Mat4f mat( const Rot& r, const Vec& v, double s) {
           
             Vec xi = Vec::x.sp(r);
             Vec yi = Vec::y.sp(r);
@@ -58,7 +58,7 @@ namespace vsr {
             
             double x = v[0]; double y = v[1]; double z = v[2];
             
-            return Mat4f( xi[0] * s, xi[1] * s, xi[2] * s, 0, 
+            return gfx::Mat4f( xi[0] * s, xi[1] * s, xi[2] * s, 0, 
                           yi[0] * s, yi[1] * s, yi[2] * s, 0,
                           zi[0] * s, zi[1] * s, zi[2] * s, 0,
                           x  ,   y ,   z ,    1 );
@@ -67,11 +67,11 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Translation Vector, and Scale
         */
-        inline Mat4f mat( const Vec& v, VT s) {
+        inline gfx::Mat4f mat( const Vec& v, VT s) {
                     
             double x = v[0]; double y = v[1]; double z = v[2];
   
-            return Mat4f( s , 0 , 0 , 0, 
+            return gfx::Mat4f( s , 0 , 0 , 0, 
                           0 , s , 0 , 0,
                           0 , 0 , s , 0,
                           x  ,   y ,   z ,    1 );
@@ -80,7 +80,7 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Rotor, Translation Vector
         */
-        inline Mat4f mat( const Rot& r, const Vec& v) {
+        inline gfx::Mat4f mat( const Rot& r, const Vec& v) {
           
             Vec xi = Vec::x.sp(r);
             Vec yi = Vec::y.sp(r);
@@ -88,7 +88,7 @@ namespace vsr {
             
             double x = v[0]; double y = v[1]; double z = v[2];
             
-            return Mat4f( xi[0] , xi[1] , xi[2] , 0, 
+            return gfx::Mat4f( xi[0] , xi[1] , xi[2] , 0, 
                           yi[0] , yi[1] , yi[2] , 0,
                           zi[0] , zi[1] , zi[2] , 0,
                           x  ,   y ,   z ,    1 );
@@ -97,12 +97,12 @@ namespace vsr {
         /*
         4x4 Transformation matrix from Vector
         */
-        inline Mat4f mat(const Vec& v){
+        inline gfx::Mat4f mat(const Vec& v){
             Rot r = Gen::ratio( Vec::z, v.unit() );	
 			return mat( r, v );
         }    
 
-		inline Mat4f mat(const Biv& b){
+		inline gfx::Mat4f mat(const Biv& b){
 			Rot r = Gen::ratio( Vec::z, Op::dle( b ).unit() );
 
 		    double ta = b.norm();  
@@ -114,7 +114,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from Circle
         */
-        inline Mat4f mat(const Cir& s){
+        inline gfx::Mat4f mat(const Cir& s){
             Biv b = Ro::dir( s ).copy<Biv>(); // Get Direction 
             Rot r = Gen::ratio( Vec::z, Op::dle(b).unit() );
             Vec v = Ro::loc(s);
@@ -126,7 +126,7 @@ namespace vsr {
 		/*
 			Transformation matrix from dual plane
 		*/                                       
-		inline Mat4f mat(const Dlp& dlp){  		
+		inline gfx::Mat4f mat(const Dlp& dlp){  		
 			Dls v = Fl::loc( dlp , PAO, true );
 		    Rot r = Gen::ratio( Vec::z, Vec( dlp ).unit() );
 			return mat(r, Vec(v));
@@ -135,7 +135,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from dual sphere with known size
         */
-        inline Mat4f mat(const Dls& v, VT s){
+        inline gfx::Mat4f mat(const Dls& v, VT s){
 
 			Pnt p = Ro::cen( v );
 			return mat( Vec(p), s );     
@@ -144,7 +144,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from dual sphere 
         */
-        inline Mat4f mat(const Dls& v ){
+        inline gfx::Mat4f mat(const Dls& v ){
 		
 			VT ta = Ro::size( v, true );		
 			Pnt p = Ro::cen( v );
@@ -154,7 +154,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from dual line 
         */
-        inline Mat4f mat(const Dll& v ){
+        inline gfx::Mat4f mat(const Dll& v ){
 	  		Biv d = v.unit();
 			Rot r = Gen::ratio( Vec::z, Op::dle(d) );
 		    Dls s = Fl::loc( v , PAO, true); 
@@ -164,7 +164,7 @@ namespace vsr {
 		/*
         4x4 Transformation matrix from direct line 
         */
-        inline Mat4f mat(const Lin& v ){
+        inline gfx::Mat4f mat(const Lin& v ){
 	  		Drv d = Fl::dir(v);
 			Rot r = Gen::ratio( Vec::z, d.copy<Vec>().unit() );
 		    Dls s = Fl::loc( v , PAO, false); 

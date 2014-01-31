@@ -63,7 +63,7 @@ LDFLAGS += -lvcos
 endif
 
 ifeq ($(GFX),1) 
-IPATH += -Iext/glv/ -Iext/gfx/ 
+IPATH += -Iext/glv/ -Iext/gfx/ -Iext/ 
 ifeq ($(PLATFORM),Linux)
 	LDFLAGS += -lGLV -lGLEW -lGLU -lGL -lglut 
 else
@@ -75,13 +75,15 @@ LDFLAGS := $(LDFLAGS)
 
 SRC_DIR = src/
 INCLUDE_DIR = vsr/
+EXT_DIR = ext/
  
 VPATH = $(SRC_DIR):\
-		$(INCLUDE_DIR) 
+		$(INCLUDE_DIR):\
+		$(EXT_DIR)gl2ps 
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o vsr_cga3D_cubicLattice.o
+OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o vsr_cga3D_cubicLattice.o gl2ps.o
 #vsr_cga3D_interface.o 
 #vsr_cga3D_draw.o
 
@@ -95,8 +97,13 @@ LIB_FILE = libvsr.a
 #LDFLAGS += -l$(LIB_NAME)  
 
 $(OBJ_DIR)%.o: %.cpp 
-	@echo hey compiling $@ using $< 
+	@echo Building libvsr: compiling $@ using $< 
 	$(CXX) $(IPATH) -c $< -o $@ 
+
+$(OBJ_DIR)%.o: %.c
+	@echo Building libvsr: compiling $@ using $< 
+	$(CXX) $(IPATH) -c $< -o $@ 
+
 
 $(LIB_NAME): dir $(addprefix $(OBJ_DIR),$(OBJ)) 
 	@echo archiving $@

@@ -13,17 +13,19 @@ namespace gfx{
    
   using namespace vsr; 
   
-
  
+  //gfx interface (should be its own lib) templates implementation on X<A,B>
+  //
+
+  //FOR ALL MULTIVECTOR TYPES:
   template<class A, class B> 
-  void Interface :: 
-  X <A,B> :: f ( A * s, const B& pos, float t ){
+  void Interface :: X <A,B> :: f ( A * s, const B& pos, float t ){
      
       //Address of State
       A& ts = *s;
 
       //Center of Defining Sphere   
-    Pnt pnt = Ro::loc(pos);
+      Pnt pnt = Ro::loc(pos);
   
       Vec tv = pnt;   
               
@@ -52,7 +54,7 @@ namespace gfx{
               }
               case 'g': //TRANSLATE
               {    
-          Vec3f mdc = i->mouse.dragCat * t;
+                  Vec3f mdc = i->mouse.dragCat * t;
                   ts = ts.trs(  mdc[0], mdc[1], mdc[2] ); 
                   break;
               }
@@ -73,17 +75,20 @@ namespace gfx{
   
   }  
 
+    //FOR FRAMES
     template< class B >
     struct Interface :: X< Frame, B> {
-    Interface * i;
-    X( Interface * _i ) : i(_i) {}
-    void  f( Frame * s, const B& pos, float t ){
+      
+      Interface * i;
+      X( Interface * _i ) : i(_i) {}
+    
+      void  f( Frame * s, const B& pos, float t ){
 
        //Address of State
         Frame& ts = *s;
 
         //Center of Defining Sphere   
-      Pnt pnt = Ro::loc(pos);
+        Pnt pnt = Ro::loc(pos);
 
         Vec tv = pnt;   
 
@@ -100,24 +105,23 @@ namespace gfx{
 
                   //Drag towards or away from element . . . 
                   int neg = (tm1.len() > tm2.len()) ? 1 : -1;                  
-          ts.dilate( i->mouse.drag.len() * t * neg  );
+                  ts.dilate( i->mouse.drag.len() * t * neg  );
 
                   break;
               }
               case 'g': //TRANSLATE
               {   
-          Vec3f mdc = i->mouse.dragCat * t;
+                  Vec3f mdc = i->mouse.dragCat * t;
                   ts.pos() = ts.pos().trs( mdc[0], mdc[1], mdc[2] );
                   break;
               }
               case 'r': //ROTATE local line
               {    
-           // cout << vd().z << mouse.dragCat << mouse.dragBivCat << endl; 
-                  //Dll td = pos <= ( Drv( i->mouse.dragBivCat[0], i->mouse.dragBivCat[1], i->mouse.dragBivCat[2] ).undual()  * t );
-                  //ts.rot() = Rot( Gen::mot(td) ) * ts.rot();
-          Rot tr = Gen::rot( Vec( i->mouse.dragBivCat[0],i->mouse.dragBivCat[1],i->mouse.dragBivCat[2] ).duale() );//( Vec::z ^ Vec( i->mouse.drag[0], i->mouse.drag[1], 0 ) ) );
-            ts.rot() = tr * ts.rot();
-          break;
+                  Biv tbiv = Vec( i->mouse.dragBivCat[0],i->mouse.dragBivCat[1],i->mouse.dragBivCat[2] ).duale();
+                  Rot tr = Gen::rot( tbiv );//( Vec::z ^ Vec( i->mouse.drag[0], i->mouse.drag[1], 0 ) ) );
+                  ts.rot() = tr * ts.rot();
+                  //ts.db() = tbiv; 
+                  break;
               }
 
               default://case 'q': //DESELECT

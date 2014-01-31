@@ -47,8 +47,8 @@ struct MyApp : App {
       
       for (int i = 0; i < chain[j].num(); ++i ){
         Draw( chain[j][i] );
-        Draw( chain[j][i].bound(), 1,0,0,.2);  
-        Touch( interface, chain[j].joint(i), chain[j][i] );  
+        Draw( chain[j][i].bound(), 1,0,0,.8);  
+        Touch( interface, chain[j].joint(i), chain[j][i] ); //manipulate joint based on position of final computed frame 
          
          chain[j].joint(i).step();
       }   

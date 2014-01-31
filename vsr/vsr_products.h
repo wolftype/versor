@@ -496,7 +496,7 @@ struct MGA{
 
 template<TT DIM>
 struct CGA{ 
-  static const int ND = DIM;
+  static const int Dim = DIM;
              
   typedef typename RMetric<DIM-1,1>::Type M;   
   
@@ -551,7 +551,7 @@ struct CGAMV : public A {
   typedef CGA<DIM> Mode;
   
   
-    typedef A Type;
+  typedef A Type;
     
   typedef typename RMetric<DIM-1,1>::Type M;
 
@@ -740,52 +740,55 @@ struct CGAMV : public A {
   CGAMV<DIM, typename CGA<DIM>::Pnt > null() const;
               
   template<typename T>
-  CGAMV trs( const T& );     
+  CGAMV trs( const T& ) const;     
   template<class ... T>   
-  CGAMV trs( T ... v);  
+  CGAMV trs( T ... v) const;  
   
   template<typename T>
-  CGAMV trv( const T& );     
+  CGAMV trv( const T& ) const;     
   template<class ... T>   
-  CGAMV trv( T ... v); 
-
-  template<typename T>
-  CGAMV transverse( const T& );     
-  template<class ... T>   
-  CGAMV transverse( T ... v); 
+  CGAMV trv( T ... v) const; 
   
   template<typename T>
-  CGAMV rot( const T& );
+  CGAMV rot( const T& ) const;
   template<typename T>
-  CGAMV rot( VT a, const T& );
+  CGAMV rot( VT a, const T& ) const;
   template<typename T>
   CGAMV mot( const T& ) const; 
   template<typename T>
-  CGAMV dil( const T& );
+  CGAMV dil( const T& ) const;
   template<typename P, typename T>
-  CGAMV dil( const P&, const T& ); 
+  CGAMV dil( const P&, const T& ) const; 
   template<typename T>
-  CGAMV bst( const T& );   
+  CGAMV bst( const T& ) const;   
 
   template<typename T>  
-  CGAMV translate( const T& );
+  CGAMV translate( const T& ) const;
   template<class ... T>   
-  CGAMV translate( T ... v);
-  
+  CGAMV translate( T ... v) const;
   template<typename T>
-  CGAMV rotate( const T& );
+  CGAMV transverse( const T& ) const;     
+  template<class ... T>   
+  CGAMV transverse( T ... v) const; 
   template<typename T>
-  CGAMV rotate( VT a, const T& );
+  CGAMV rotate( const T& ) const;
+  template<typename T>
+  CGAMV rotate( VT a, const T& ) const;
   template<typename T>
   CGAMV motor( const T& ) const; 
   template<typename T>
-  CGAMV twist( const T& ); //same as motor
+  CGAMV twist( const T& ) const; //same as motor
   template<typename T>
-  CGAMV dilate( const T& );
+  CGAMV dilate( const T& ) const;
   template<typename P, typename T>
-  CGAMV dilate( const P&, const T& ); 
+  CGAMV dilate( const P&, const T& ) const; 
   template<typename T>
-  CGAMV boost( const T& );
+  CGAMV scale( const T& ) const; //same as dilate
+  template<typename P, typename T>
+  CGAMV scale( const P&, const T& ) const; 
+  
+  template<typename T>
+  CGAMV boost( const T& ) const;
   
   // void bbprint(){
   //   for (auto i : A::begin() ) printf("%s\n", bitString<DIM>(i).c_str() );
@@ -1084,7 +1087,7 @@ struct EGAMV : public A {
   // EGAMV trs( const T& ); 
   // EGAMV trs( VT x, VT y, VT z );
   template<typename T>
-  EGAMV rot( const T& );
+  EGAMV rot( const T& ) const;
   // template<typename T>
   // EGAMV rot( VT a, const T& );  
                                                                                         

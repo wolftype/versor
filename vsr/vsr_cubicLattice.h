@@ -16,11 +16,8 @@
 #include <vector>
 
 #include "vsr_generic_op.h" 
-
 #include "vsr_interp.h"  
-
 #include "gfx/gfx_data.h"
-
 
 using namespace std;
 using namespace gfx;   
@@ -58,7 +55,7 @@ namespace vsr {
         }}}
 
     
-        /*! Discretized Volume Indexing (Isometric Cubic Lattice w/o data) */
+    /*! Discretized Volume Indexing (Isometric Cubic Lattice w/o data) */
     template<class LPnt>
     class CubicLattice  {
     
@@ -70,7 +67,7 @@ namespace vsr {
         : mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
          mNum( mWidth * mHeight * mDepth),
          mNumVxl( (mWidth-1) * (mHeight-1) * (mDepth-1) ),
-     mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
+          mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
          {
             alloc(); init();
         }
@@ -193,7 +190,7 @@ namespace vsr {
             BOUNDITER0
             
                 int ix = i * (mHeight-1) * (mDepth-1) + j * (mDepth-1) + k;
-                Vec3f v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
+                gfx::Vec3f v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
                
                  mVxl[ix] = vxlAt(v);
                 
