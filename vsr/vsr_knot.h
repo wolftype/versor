@@ -58,21 +58,23 @@ struct TorusKnot  {
     }
         
     Bst bst() {
-        return Gen::bst( par() * amt / 2.0 );
+        return Gen::bst( par() * amt  );
     }
     
     Bst bst(double t) { amt = t; return bst(); }
     
     TorusKnot(double p = 3, double q = 2, double a = .01) : P(p), Q(q), amt(a) {}   
                      
-  //calculate full orbit from point p
+  //Calculate full orbit from point p
   void calc( const Pnt& p){
     Pnt np = p; 
     Bst tbst = bst();
     for (int i = 0; i < iter(); ++ i ){
       np = Ro::loc( np.sp( tbst ) );  
       add(np);
-    }                   
+    }
+    
+              
     //Tube Neighborhood  
     int tnum = iter();
     for (int i = 0; i < tnum; ++i ){ 
@@ -83,6 +85,16 @@ struct TorusKnot  {
       Cir c = tpar.dual();//.dil(tk.pnt[i], );
       add ( c );
     }
+  }
+
+  //calculate full orbit from point p without normalizing each step
+  void calc0( const Pnt& p){
+    Pnt np = p; 
+    Bst tbst = bst();
+    for (int i = 0; i < iter(); ++ i ){
+      np = np.sp( tbst ) ;  
+      add( Ro::loc( np) );
+    }       
   }
 
   double energy(int idx, int num){

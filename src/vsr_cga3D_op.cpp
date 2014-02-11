@@ -174,6 +174,16 @@ namespace Gen{
         return rp * rt;
     }                   
 
+    /*! Generate a rotor from euler angles */
+    Rot rot( double y, double p, double r){
+      Rot yaw = Gen::rot( Biv::xz * y/2.0 );
+      Rot pitch = Gen::rot( Biv::yz.spin(yaw) * p/2.0);
+      Rot tmp = pitch * yaw;
+      Rot roll = Gen::rot( Biv::xy.spin(tmp) * r/2.0);
+
+      return roll * tmp;
+    }
+
 
    /*! Generate a Motor from a Dual Line Axis
        @param Dual Line Generator (the axis of rotation, including pitch and period)
@@ -214,15 +224,14 @@ namespace Gen{
      Dll log( const Mot& m){
 	    	       								//tmp dll
 	        Drv cperp, cpara;
-			Dll rq,q,tq;
-			Biv b;
+			    Dll rq,q,tq;
+			    Biv b;
 
-			q = m;				//extract grade 2 part
+			    q = m;				//extract grade 2 part
 
 	        VT  ac = acos( m[0] );			//angle of rotor	
 	        VT  den = Math::sinc(ac);
 	        VT  den2 = ac * ac * den;
-
 
 	        b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );			//bivector part - negative necessary . dll? . . 
 	        tq = (b * q);  //Make motor and extract Grade 2 part

@@ -108,7 +108,8 @@ Par Meet( const Lin& lin, const Cir& cir){
 	return ( lin.dual() ^ cir.dual() ).dual();
 }
 
-} // Fl::  
+} // Fl:: 
+ 
 
 } // vsr::
 

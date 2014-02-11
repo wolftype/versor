@@ -248,6 +248,10 @@ namespace Op{
     //           if (t == 0 ) return TBIV(1);
     //           return b / t;
     //       }  
+
+      /*! Normalized plane of rotation from Rotor 
+          @param Rotor r
+      */
     template< class A >
     auto pl( const A& r) -> typename A::template BType< typename A::Mode::Biv > { 
       using TBIV = typename A::template BType< typename A::Mode::Biv >;  
@@ -282,6 +286,9 @@ namespace Op{
 
           return TRot(deg, v[0], v[1], v[2]);
       }
+      /*! Axis Angle from Rotor (WARNING NOT GENERIC)
+          @param Rotor input
+      */ 
       template< class A >
       auto axisAngle( const A& r) RETURNS ( aa(r) )
   
@@ -293,6 +300,10 @@ namespace Op{
     auto trv ( const CGAMV<DIM,A>& a ) RETURNS (
        a.template copy< NTnv<DIM> >() + 1
     )
+    /*!
+          Generate Local Boost at origin as exponential of a Point Pair
+          @param a tangent vector
+     */
     template< class A > auto transversor( const A& a ) RETURNS ( trv(a) ) 
     /*!
           Generate translation  as exponential of a direction vector
@@ -302,6 +313,10 @@ namespace Op{
     auto trv ( T ... v ) ->  NTrv<sizeof...(T)+2> {      
       return ( NTnv<sizeof...(T)+2>(v...) ) + 1;
     } 
+    /*!
+          Generate translation  as exponential of a direction vector
+          @param a tangent vector
+      */
     template< typename ... T> auto transversor( T ... v ) RETURNS ( trv(v...) )
     
     /*!
@@ -312,6 +327,10 @@ namespace Op{
     auto trs ( const CGAMV<DIM,A>& a ) RETURNS (
        ( a.template copy< NDrv<DIM> >() * -.5 ) + 1
     ) 
+    /*!
+          Generate translation  as exponential of a direction vector
+          @param a tangent vector
+      */
     template<class A> auto translator (const A& a) RETURNS ( trs(a) ) 
     
     /*!
@@ -322,6 +341,10 @@ namespace Op{
     auto trs ( T ... v ) ->  NTrs<sizeof...(T)+2> {      
       return ( NDrv<sizeof...(T)+2>(v...) * -.5 ) + 1;
     } 
+    /*!
+          Generate translation  as exponential of a direction vector
+          @param a tangent vector
+      */
     template<typename ... T> auto translator(T ... v) RETURNS ( trs( v...) )
     
     /*! Generate a Dilation from Origin [[[ pass in ( log(t) * .5 ) ]]]
@@ -331,6 +354,9 @@ namespace Op{
       constexpr auto dil( T t) -> NDil<DIM> {
           return NDil<DIM>( cosh( t *.5 ), sinh( t * .5 ) );
       } 
+    /*! Generate a Dilation from Origin [[[ pass in ( log(t) * .5 ) ]]]
+          @param Amt t
+      */
       template<class T> constexpr auto dilator( T t ) RETURNS ( dil(t) )
 
       /*! Generate a Dilation from a point p by amt t 
@@ -341,6 +367,10 @@ namespace Op{
       auto dil(const NPnt<DIM>& p, T t) -> NTsd<DIM>  {
           return NTsd<DIM>( NDil<DIM>( cosh( t*.5 ), sinh( t*.5 ) ) ).trs( p );
       }
+      /*! Generate a Dilation from a point p by amt t 
+          @param Point p (or Vec)
+          @param Amt t -- to pass in a relative amt (i.e. t=.5 for half size or t=2 for VT), pass in std::log(t)
+      */
       template< class A, class T > constexpr auto dilator ( const A& p, T t) RETURNS ( dil(p,t) ) 
     
     /*!
@@ -361,6 +391,11 @@ namespace Op{
 
           return (tp * sn) + cn;
     }
+    /*!
+          Generate Boost as exponential of a Point Pair
+          Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
+          @param Point Pair generator
+      */ 
     template<class A> auto boost( const A& a ) RETURNS ( bst(a) )
     
     // /*!
@@ -385,7 +420,7 @@ namespace Op{
 
     
      //feed in vectors!  
-    /*! Rotor Ratio of two vectors */
+    /*! Rotor Ratio of two Conformal vectors */
      template<TT DIM> 
      auto ratio( 
       const CGAMV<DIM, typename CGA<DIM>::Vec >& a, 
@@ -408,7 +443,8 @@ namespace Op{
           if (r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n");
           return r;    
       } 
-  
+
+    /*! Rotor Ratio of two Euclidean vectors */  
      template<TT DIM> 
      auto ratio( 
       const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 
@@ -500,7 +536,7 @@ namespace Op{
     } 
     template< class ... T > auto dualSphere( VT r, T ... v ) RETURNS ( dls(r, v...) )
 
-    /*! Dual Sphere from Element and Radius
+    /*! Dual Sphere from Element FIRST and Radius
         @param Any input MV v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
@@ -516,7 +552,7 @@ namespace Op{
     template< class T > auto dualSphere( const T& t, VT r = 1.0 ) RETURNS ( dls(t, r) )
 
 
-    /*! Dual Sphere from Element and Radius
+    /*! Dual Sphere from Element FIRST and Radius
         @param Any input MV v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
@@ -527,7 +563,7 @@ namespace Op{
 
 
 
-    /*! Dual Sphere from Point and Radius
+    /*! Dual Sphere from Point and Radius (faster)
         @param Point
         @param Radius (enter a negative radius for an imaginary sphere)
     */   
@@ -546,20 +582,24 @@ namespace Op{
 
     template<TT DIM, class T>
     constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > 
-    cen( const CGAMV<DIM, T>& s) {
+    center( const CGAMV<DIM, T>& s) {
         return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >();
     }
-    template< class T > constexpr auto center ( const T& t ) RETURNS (cen(t))
+    template< class T > constexpr auto cen ( const T& t ) RETURNS (center(t))
 
   /*!
     Location of A Round Element (normalized)
   */
   template<TT DIM, class T>
   constexpr NPnt<DIM> 
-  loc(const CGAMV<DIM, T>& s){
+  location(const CGAMV<DIM, T>& s){
     return null ( cen ( s ) ); 
   }   
-  template< class T> constexpr auto location( const T& t) RETURNS (loc(t))
+  /*!
+    Location of A Round Element (normalized) (Shorthand)
+  */
+
+  template< class T> constexpr auto loc( const T& t) RETURNS (location(t))
   
 
     /*! Squared Size of a General Round Element
@@ -575,17 +615,17 @@ namespace Op{
     /*! Radius of Round */
   template<class T> 
     VT 
-    rad( const T& s ){
+    radius( const T& s ){
         return sqrt ( fabs ( size(s, false) ) );
     } 
-    template<class T> VT radius( const T& t) { return rad(t); }
+    template<class T> VT rad( const T& t) { return radius(t); }
    
     /*! Curvature of Round 
         @param Round Element
     */
     template<class A>
     VT 
-    cur(const A& s){
+    curvature(const A& s){
         VT r = rad( s );     
         return (r==0) ? 10000 : 1.0 / rad(s);
     }
@@ -596,7 +636,7 @@ namespace Op{
 
     template<class T> 
     VT 
-    curvature( const T& t) { return cur(t); }
+    cur( const T& t) { return curvature(t); }
 
 
     /*! Squared Size of Normalized Dual Sphere (faster than general case)
@@ -611,16 +651,19 @@ namespace Op{
    /*! Squared distance between two points */ 
   template<TT DIM>
     VT 
-    sqd(const NPnt<DIM>& a, const NPnt<DIM>& b){
+    squaredDistance(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return ( (a <= b)[0] ) * -2.0;
     }
+    template< class A> VT sqd( const A& a, const A& b) { return squaredDistance(a,b); }
+
     
     /*! Distance between points a and b */  
    template<TT DIM> 
     VT 
-    dist(const NPnt<DIM>& a, const NPnt<DIM>& b){
+    distance(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return sqrt( fabs(sqd(a,b) ) );
     }
+    template< class A> VT dist( const A& a, const A& b) { return distance(a,b); }
 
     /*! Split Points from Point Pair 
         @param PointPair input
@@ -687,22 +730,34 @@ namespace Op{
     */    
     template<TT DIM, class A>
     auto 
-    dir( const CGAMV<DIM, A>& s ) RETURNS(
+    direction( const CGAMV<DIM, A>& s ) RETURNS(
         ( ( NInf<DIM>(-1) <= s ) ^ NInf<DIM>(1) )
     ) 
+    /*! Direction of Round Element (shorthand)
+        @param Direct Round
+    */    
+    template<class A> auto dir( const A&s ) RETURNS( direction(s) ) 
 
-    /*! Carrier Flat of Direct? Round Element */
+
+    /*! Carrier Flat of Direct? Round Element 
+         @param Direct Round
+     * */
     template<TT DIM, class A>
     auto 
-    car(const CGAMV<DIM, A>& s) RETURNS(
+    carrier(const CGAMV<DIM, A>& s) RETURNS(
         s ^ NInf<DIM>(1)
-    )  
+    ) 
+    /*! Carrier Flat of Direct? Round Element (Shorthand) */
+    template<class A> auto car( const A&s ) RETURNS( carrier(s) ) 
     /*! Dual Surround of a Direct or Dual Round Element */
     template<TT DIM, class A>
     NDls<DIM> 
-    sur( const CGAMV<DIM, A>& s) {
+    surround( const CGAMV<DIM, A>& s) {
         return NDls<DIM>( s / ( s ^ NInf<DIM>(1) ));
     } 
+    /*! Dual Surround of a Direct or Dual Round Element (Shorthand) */
+    template<class A> auto sur( const A& s) RETURNS ( surround(s) )
+
 
     /*!
      Direct Round From Dual Sphere and Euclidean Bivector
@@ -729,7 +784,9 @@ namespace Op{
      )
 
      /*!
-      * Dual Round from Center and Point on Surface
+       Dual Round from Center and Point on Surface
+        @param Center
+        @param point on surface
       * */
      template<TT DIM>
       NDls<DIM> 
@@ -756,6 +813,10 @@ namespace Op{
       NPnt<DIM> pnt(const NDls<DIM>& dls, const NVec<DIM>& flat){
         return split( round(dls, flat), true ); // cout << "y" << endl; 
      }
+    /*!
+     Direct Point From Dual Sphere and Euclidean Carrier Flat
+     */  
+   // template<class A
 
 
 
@@ -955,7 +1016,7 @@ namespace Op{
   } 
   template<TT DIM, typename A> template<typename T>
   CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{
-        return this -> dilate(t);  
+        return this -> sp ( Gen::dil<DIM>(t) );  
   }
   template<TT DIM, typename A> template<typename P, typename T>
   CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{

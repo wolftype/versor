@@ -63,7 +63,6 @@ Developer: Pablo Colapinto
 	-Heinz von Foerster 
 
 ## OTHER NICE SOFTWARE: ##
-zo
 * [Cinderella](http://www.cinderella.de/tiki-index.php) Standalone GA interface
 * [GAViewer](http://www.science.uva.nl/ga/viewer/content_viewer.html) Standalone GA interface
 * [Gaigen](http://staff.science.uva.nl/~fontijne/g25.html) An Implementation Generator
@@ -93,7 +92,7 @@ Not Working?
 ---                 
 
 - For Versor 2.0 You'll need C++11 support (See makefile notes below). 
-- Alternatively Versor 1.0 is available at [github.com/wolftype/vsr.git](github.com/wolftype/vsr.git)
+- Alternatively Versor 1.0 is available at [github.com/wolftype/versor_1.0.git](www://github.com/wolftype/vsr.git)
 
 For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).  
 NOT CURRENTLY TESTED ON WINDOWS.   
@@ -103,7 +102,7 @@ For clang on a snow leopard (with thanks to Karl Yerkes for this tidbit)
 	brew tap home-brew/versions
 	brew install --HEAD llvm34 --rtti, --disable-assertions, --with-libcxx, --with-clang
  
-If you don't want to or can't compile C++11 code try an [older flavor of vsr](github.com/wolftype/vsr.git). 
+If you don't want to or can't compile C++11 code try an [older flavor of vsr](www://github.com/wolftype/versor_1.0.git). 
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
 
 ####MAKEFILE FLAGS

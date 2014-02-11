@@ -25,6 +25,14 @@ namespace Gen{
         @param[in] phi in rotated xy plane in range []
     */
       Rot rot(double theta, double phi);                
+
+  /*! Generate a Rotor (i.e. quaternion) from Euler angles
+      @param[in] yaw in xz plane
+      @param[in] pitch in (transformed) yz plane
+      @param[in] roll in (transformed) xy plane
+   */
+
+      Rot rot( double yaw, double pitch, double roll);
       
 
    /*! Generate a Motor from a Dual Line Axis
@@ -247,9 +255,9 @@ CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t) const{
 #define PZ(f) vsr::Ro::null(vsr::Vec(0,0,f))
 #define PAIR(x,y,z) (PT(x,y,z)^PT(-x,-y,-z))
 //#define IPAIR(x,y,z) (IPT(x,y,z)^IPT(-x,-y,-z))
-#define CXY(f) (PX(f)^PX(-f)^PY(f))
-#define CXZ(f) (PX(f)^PX(-f)^PZ(f))
-#define CYZ(f) (PY(f)^PY(-f)^PZ(f))
+#define CXY(f) (PX(f)^PY(f)^PX(-f)).unit()
+#define CXZ(f) (PX(f)^PZ(f)^PX(-f)).unit()
+#define CYZ(f) (PY(f)^PY(-f)^PZ(f)).unit()
 #define F2S(f) f*1000.0
 #define S2F(f) f/1000.0
 #define LN(x,y,z) ( vsr::Pnt(0,0,0,1,.5)^PT(x,y,z)^vsr::Inf(1) )
@@ -258,9 +266,9 @@ CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t) const{
 #define EP vsr::Dls(0,0,0,1,-.5)  ///  Dual unit sphere at origin: swap with infinity for hyperbolic space
 #define EM vsr::Dls(0,0,0,1,.5)   ///  Dual imaginary unit sphere at origin: swap with infinity for spherical space
 #define INFTY vsr::Inf(1)
-#define HYPERBOLIC EP
-#define SPHERICAL EM
-#define EUCLIDEAN INFTY
+#define HYPERBOLIC_INF EP
+#define SPHERICAL_INF EM
+#define EUCLIDEAN_INF INFTY
 #define HLN(x,y,z) (vsr::Ori(1)^PT(x,y,z)^EP) //hyperbolic line (circle)
 #define HDLN(x,y,z) (vsr::Op::dl(HLN(x,y,z)))
 
