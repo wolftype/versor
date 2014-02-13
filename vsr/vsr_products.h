@@ -795,12 +795,12 @@ struct CGAMV : public A {
   // }   
 };
 
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().template set<1>(1);
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::y =  A().template set<2>(1);  
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::z =  A().template set<4>(1);  
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xy = A().template set<3>(1);  
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xz = A().template set<5>(1);  
-template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::yz = A().template set<6>(1);  
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::x = A().A::template set<1>(1);
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::y =  A().A::template set<2>(1);  
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::z =  A().A::template set<4>(1);  
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xy = A().A::template set<3>(1);  
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::xz = A().A::template set<5>(1);  
+template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::yz = A().A::template set<6>(1);  
 
 template<TT DIM, class A> CGAMV<DIM,A> CGAMV<DIM,A>::operator !() const {    
   CGAMV tmp = ~(*this); 
@@ -1094,12 +1094,12 @@ struct EGAMV : public A {
 };   
 
 
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::x = A().template set<1>(1);
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::y =  A().template set<2>(1);  
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::z =  A().template set<4>(1);  
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xy = A().template set<3>(1);  
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xz = A().template set<5>(1);  
-template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().template set<6>(1);
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::x = A(). A::template set<1>(1);
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::y =  A().A::template set<2>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::z =  A().A::template set<4>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xy = A().A::template set<3>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xz = A().A::template set<5>(1);  
+template<TT DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().A::template set<6>(1);
          
 
 //EUCLIDEAN CANDIDATES
