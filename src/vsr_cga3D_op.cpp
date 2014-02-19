@@ -1,7 +1,7 @@
 #include "vsr_cga3D_op.h"
 
 namespace vsr{  
-	
+  
 
                          
 template class CGAMV<5,   CGA<5>::Sca   >;  
@@ -29,9 +29,9 @@ template class CGAMV<5,   CGA<5>::Dil   >;
 template class CGAMV<5,   CGA<5>::Tsd   >;
 
 
-                                         	     
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                      	
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                      	
+                                                
+template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                        
+template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                        
 template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Mot& )const;                      
 template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Bst& )const;
 template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Tsd& )const;
@@ -89,7 +89,7 @@ template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;
 
 
 template Rot Gen::ratio( const Vec&, const Vec& );                                                     
-template Rot Gen::rot( const Biv& );				                 
+template Rot Gen::rot( const Biv& );                         
 //template Rot Gen::rot( VT, const Biv& ); 
 template Biv Gen::log( const Rot& );
 template Par Gen::log( const Bst& ); 
@@ -159,7 +159,7 @@ template Drb Fl::dir( const Pln&);
 // template VT Fl::wt( const Pln&, bool);  
 namespace Gen{               
 
-	/*! Generate a Rotor (i.e quaternion) from spherical coordinates
+  /*! Generate a Rotor (i.e quaternion) from spherical coordinates
         @param[in] theta in xz plane from (1,0,0) in range [0,PI]
         @param[in] phi in rotated xy plane in range []
     */
@@ -190,97 +190,97 @@ namespace Gen{
    */  
    Mot mot( const Dll& dll){
 
-	        Dll b = dll;
-	        Biv B(b[0],b[1],b[2]); //Biv B(dll);  
+          Dll b = dll;
+          Biv B(b[0],b[1],b[2]); //Biv B(dll);  
 
-			VT w = B.wt();
+      VT w = B.wt();
 
-	    	VT  c = ( sqrt( fabs ( w ) ) );
-	        VT sc = sin(c);
-	        VT cc = cos(c);
+        VT  c = ( sqrt( fabs ( w ) ) );
+          VT sc = sin(c);
+          VT cc = cos(c);
 
-	        if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
+          if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
 
-	        B = B.unit();
-	        Vec t(b[3],b[4],b[5]);
+          B = B.unit();
+          Vec t(b[3],b[4],b[5]);
 
-			Vec tv;
-			tv = Op::pj(t,B) ;
-			Vec tw;
-			tw = Op::rj(t,B) ;
+      Vec tv;
+      tv = Op::pj(t,B) ;
+      Vec tw;
+      tw = Op::rj(t,B) ;
 
-	        tv *= Math::sinc(c);
+          tv *= Math::sinc(c);
 
-	        Vec tt = tw * cc + tv;
+          Vec tt = tw * cc + tv;
 
-	        auto ts = B*tw;	      //Vec_Biv
+          auto ts = B*tw;        //Vec_Biv
 
-	        return Mot(cc, B[0] * sc, B[1] * sc, B[2] * sc, tt[0], tt[1], tt[2], ts[3] * sc);
-	}
+          return Mot(cc, B[0] * sc, B[1] * sc, B[2] * sc, tt[0], tt[1], tt[2], ts[3] * sc);
+  }
 
     /*! Dual Line Generator from a Motor 
         @param Motor m (a concatenation of rotation and translation)
     */  
      Dll log( const Mot& m){
-	    	       								//tmp dll
-	        Drv cperp, cpara;
-			    Dll rq,q,tq;
-			    Biv b;
+                               //tmp dll
+          Drv cperp, cpara;
+          Dll rq,q,tq;
+          Biv b;
 
-			    q = m;				//extract grade 2 part
+          q = m;        //extract grade 2 part
 
-	        VT  ac = acos( m[0] );			//angle of rotor	
-	        VT  den = Math::sinc(ac);
-	        VT  den2 = ac * ac * den;
+          VT  ac = acos( m[0] );      //angle of rotor  
+          VT  den = Math::sinc(ac);
+          VT  den2 = ac * ac * den;
 
-	        b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );			//bivector part - negative necessary . dll? . . 
-	        tq = (b * q);  //Make motor and extract Grade 2 part
+          b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );      //bivector part - negative necessary . dll? . . 
+          tq = (b * q);  //Make motor and extract Grade 2 part
 
-	        if (den2 == 0 ) {
-	            //cperp = b * -1.0;
-	            cpara = q;// * -1.0;
-	        } else {
-	            cperp = ( b * Drt(m[7]) ) / ( ( den2 )  * -1.0 );	//perpendicular (along line of axis)
-	            cpara = ( b * tq ) / ( ( den2 )  * -1.0 );			//parallel      (in plane of rotation)
-	        }
+          if (den2 == 0 ) {
+              //cperp = b * -1.0;
+              cpara = q;// * -1.0;
+          } else {
+              cperp = ( b * Drt(m[7]) ) / ( ( den2 )  * -1.0 );  //perpendicular (along line of axis)
+              cpara = ( b * tq ) / ( ( den2 )  * -1.0 );      //parallel      (in plane of rotation)
+          }
 
-	        Drv c = cperp + cpara; 
+          Drv c = cperp + cpara; 
 
-	        rq += b;
-	        rq += c;          
+          rq += b;
+          rq += c;          
 
-	        return rq;
-	    }
+          return rq;
+      }
 
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-	  Dll log(const Dll& a, const Dll& b, VT t ){
-	        Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n;
-	        return Gen::log( m ) * (t/2.0) ;
-	    }
+    Dll log(const Dll& a, const Dll& b, VT t ){
+          Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n;
+          return Gen::log( m ) * (t/2.0) ;
+      }
 
-	    /*! Generate Motor That Twists Dual Line a to Dual Line b;
+      /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
-	    */
+      */
      Mot ratio( const Dll& a, const Dll& b, VT t){
-	        //Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
-	        return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
-	    }
+          //Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
+          return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
+      }
 
 
 
-	    // /*! Generate a Translated Transversion 
-	    //     @param Tangent Direction
-	    //     @param Position in space
-	    //     @param scalar amt (typically 0 or 1)
-	    // */
-	    // template <class A, class T>
-	    // Bst bst(const A& tnv, const Vec& drv, T t){
-	    //     Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
-	    // 			   // s.vprint();
-	    //     return Gen::bst(s * t);
-	    // }   
+      // /*! Generate a Translated Transversion 
+      //     @param Tangent Direction
+      //     @param Position in space
+      //     @param scalar amt (typically 0 or 1)
+      // */
+      // template <class A, class T>
+      // Bst bst(const A& tnv, const Vec& drv, T t){
+      //     Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
+      //          // s.vprint();
+      //     return Gen::bst(s * t);
+      // }   
 
 }
 

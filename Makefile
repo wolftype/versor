@@ -44,6 +44,7 @@ LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr
 #-lvsr
 LDFLAGS += -lm  
 else
+IPATH += -I../gfx/
 IPATH += -I$(PIROOT)usr/include
 IPATH += -I$(PIROOT)usr/local/include
 IPATH += -I$(PIROOT)opt/vc/include
@@ -83,9 +84,10 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o vsr_cga3D_draw.o vsr_cga3D_interface.o vsr_cga3D_cubicLattice.o gl2ps.o
-#vsr_cga3D_interface.o 
-#vsr_cga3D_draw.o
+OBJ = vsr_cga3D_op.o vsr_cga3D_cubicLattice.o
+ifneq ($(RPI),1)
+OBJ += vsr_cga3D_draw.o vsr_cga3D_interface.o gl2ps.o
+endif
 
 OBJ_DIR = build/obj/
 LIB_DIR = build/lib/

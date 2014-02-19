@@ -264,7 +264,7 @@ namespace vsr {
     return v;
     }  
 
-    //bound and modify to range [0,1]  
+  //bound and modify to range [0,1]  
   template<class V>
     V range2D( const V& v) const{
         V t = v;

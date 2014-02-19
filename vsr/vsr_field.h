@@ -154,14 +154,14 @@ namespace vsr{
         //2d Euler (bounded)
     template<class V>
         T euler2d( const V& v){
-            V t = range(v);   //bind to range of field         
+            V t = this->range2D(v);   //bind to range of field         
             return surf(t[0], t[1]);
         }
         
         //3d Euler (bounded) v an arbitrary point in space  
     template<class V>  
         T euler3d( const V& v) const{
-            V t= range(v);
+            V t= this->range(v);
             return vol(t[0], t[1], t[2]);
         }
 

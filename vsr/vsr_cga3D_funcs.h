@@ -7,12 +7,9 @@
 namespace vsr{   
   
 
-
     using namespace cga3D;
     
     namespace Ro {
-
-    
 
      template<class V>
      inline Point point( const Lin& lin, const V& v){

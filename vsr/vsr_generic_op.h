@@ -580,26 +580,34 @@ namespace Op{
     Simple Center of A Round Element (not normalized -- use loc or location method)
   */
 
+    /* template<TT DIM, class T> */
+    /* constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > */ 
+    /* center( const CGAMV<DIM, T>& s) { */
+    /*     return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >(); */
+    /* } */
     template<TT DIM, class T>
     constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > 
-    center( const CGAMV<DIM, T>& s) {
+    cen( const CGAMV<DIM, T>& s) {
         return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >();
     }
-    template< class T > constexpr auto cen ( const T& t ) RETURNS (center(t))
 
   /*!
     Location of A Round Element (normalized)
   */
-  template<TT DIM, class T>
-  constexpr NPnt<DIM> 
-  location(const CGAMV<DIM, T>& s){
-    return null ( cen ( s ) ); 
-  }   
+  /* template<TT DIM, class T> */
+  /* constexpr NPnt<DIM> */ 
+  /* location(const CGAMV<DIM, T>& s){ */
+  /*   return null ( cen ( s ) ); */ 
+  /* } */   
   /*!
     Location of A Round Element (normalized) (Shorthand)
   */
 
-  template< class T> constexpr auto loc( const T& t) RETURNS (location(t))
+  template<TT DIM, class T>
+  constexpr NPnt<DIM> 
+  loc(const CGAMV<DIM, T>& s){
+    return null ( cen ( s ) ); 
+  }   
   
 
     /*! Squared Size of a General Round Element
