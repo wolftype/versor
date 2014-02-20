@@ -17,7 +17,7 @@ namespace vsr {
 
     namespace Xf {
         
-		/*!
+    /*!
          4x4 Transformation Matrix From Rotor
         */
         inline gfx::Mat4f mat( const Rot& r) {
@@ -32,20 +32,20 @@ namespace vsr {
                           0   ,   0 ,   0 ,    1 );
         }
         
-		// /*!
-		//          4x4 Transformation Matrix From Rotor and scale
-		//         */
-		//         inline Mat4f mat( const Rot& r, double s) {
-		//           
-		//             Vec xi = Vec::x.sp(r);
-		//             Vec yi = Vec::y.sp(r);
-		//             Vec zi = Vec::z.sp(r);
-		//             
-		//             return Mat4f(xi[0], xi[1], xi[2], 0, 
-		//                           yi[0], yi[1], yi[2], 0,
-		//                           zi[0], zi[1], zi[2], 0,
-		//                           0   ,   0 ,   0 ,    1 );
-		//         }  
+    // /*!
+    //          4x4 Transformation Matrix From Rotor and scale
+    //         */
+    //         inline Mat4f mat( const Rot& r, double s) {
+    //           
+    //             Vec xi = Vec::x.sp(r);
+    //             Vec yi = Vec::y.sp(r);
+    //             Vec zi = Vec::z.sp(r);
+    //             
+    //             return Mat4f(xi[0], xi[1], xi[2], 0, 
+    //                           yi[0], yi[1], yi[2], 0,
+    //                           zi[0], zi[1], zi[2], 0,
+    //                           0   ,   0 ,   0 ,    1 );
+    //         }  
 
         /*!
          4x4 Transformation Matrix From Rotor, Translation Vector, and Scale
@@ -98,18 +98,18 @@ namespace vsr {
         4x4 Transformation matrix from Vector
         */
         inline gfx::Mat4f mat(const Vec& v){
-            Rot r = Gen::ratio( Vec::z, v.unit() );	
-			return mat( r, v );
+            Rot r = Gen::ratio( Vec::z, v.unit() );  
+      return mat( r, v );
         }    
 
-		inline gfx::Mat4f mat(const Biv& b){
-			Rot r = Gen::ratio( Vec::z, Op::dle( b ).unit() );
+    inline gfx::Mat4f mat(const Biv& b){
+      Rot r = Gen::ratio( Vec::z, Op::dle( b ).unit() );
 
-		    double ta = b.norm();  
-		   // bool sn = Op::sn( s , Biv::xy * (-1));
-		
-			return mat( r, Vec(0,0,0), ta );
-		}
+        double ta = b.norm();  
+       // bool sn = Op::sn( s , Biv::xy * (-1));
+    
+      return mat( r, Vec(0,0,0), ta );
+    }
             
         /*
         4x4 Transformation matrix from Circle
@@ -119,57 +119,57 @@ namespace vsr {
             Rot r = Gen::ratio( Vec::z, Op::dle(b).unit() );
             Vec v = Ro::loc(s);
             VT scale = Ro::rad( s ); 
-		   // printf("rad: %f\n", scale);
+       // printf("rad: %f\n", scale);
             return mat(r,v,scale);//,scale
         }    
 
-		/*
-			Transformation matrix from dual plane
-		*/                                       
-		inline gfx::Mat4f mat(const Dlp& dlp){  		
-			Dls v = Fl::loc( dlp , PAO, true );
-		    Rot r = Gen::ratio( Vec::z, Vec( dlp ).unit() );
-			return mat(r, Vec(v));
-		}
-			
+    /*
+      Transformation matrix from dual plane
+    */                                       
+    inline gfx::Mat4f mat(const Dlp& dlp){      
+      Dls v = Fl::loc( dlp , PAO, true );
+        Rot r = Gen::ratio( Vec::z, Vec( dlp ).unit() );
+      return mat(r, Vec(v));
+    }
+      
         /*
         4x4 Transformation matrix from dual sphere with known size
         */
         inline gfx::Mat4f mat(const Dls& v, VT s){
 
-			Pnt p = Ro::cen( v );
-			return mat( Vec(p), s );     
+      Pnt p = Ro::cen( v );
+      return mat( Vec(p), s );     
         }
 
         /*
         4x4 Transformation matrix from dual sphere 
         */
         inline gfx::Mat4f mat(const Dls& v ){
-		
-			VT ta = Ro::size( v, true );		
-			Pnt p = Ro::cen( v );
-			return mat( Vec(p), sqrt( fabs(ta) ) ); 
+    
+      VT ta = Ro::size( v, true );    
+      Pnt p = Ro::cen( v );
+      return mat( Vec(p), sqrt( fabs(ta) ) ); 
         }   
         
         /*
         4x4 Transformation matrix from dual line 
         */
         inline gfx::Mat4f mat(const Dll& v ){
-	  		Biv d = v.unit();
-			Rot r = Gen::ratio( Vec::z, Op::dle(d) );
-		    Dls s = Fl::loc( v , PAO, true); 
-			return mat( r, Vec(s) );
-		}  
-		
-		/*
+        Biv d = v.unit();
+      Rot r = Gen::ratio( Vec::z, Op::dle(d) );
+        Dls s = Fl::loc( v , PAO, true); 
+      return mat( r, Vec(s) );
+    }  
+    
+    /*
         4x4 Transformation matrix from direct line 
         */
         inline gfx::Mat4f mat(const Lin& v ){
-	  		Drv d = Fl::dir(v);
-			Rot r = Gen::ratio( Vec::z, d.copy<Vec>().unit() );
-		    Dls s = Fl::loc( v , PAO, false); 
-			return mat( r, Vec(s) );
-		}
+        Drv d = Fl::dir(v);
+      Rot r = Gen::ratio( Vec::z, d.copy<Vec>().unit() );
+        Dls s = Fl::loc( v , PAO, false); 
+      return mat( r, Vec(s) );
+    }
 
     } // XF
 } //vsr::

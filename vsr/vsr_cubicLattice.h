@@ -517,7 +517,8 @@ namespace vsr {
      vector<int>& faceVxl() { return mFaceVxl; } 
      Vxl faceVxl(int ix) { return mVxl[ mFaceVxl[ix] ]; }    
     
-     
+     LPnt * gridPtr() { return mPoint; }
+     void gridPtr(LPnt * lp) { mPoint = lp; } 
 
      protected:
         
