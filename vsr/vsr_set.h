@@ -2,10 +2,12 @@
 #ifndef VSR_SET_H_INCLUDED
 #define VSR_SET_H_INCLUDED
 
-
+#include <vector>
 
 namespace vsr  {
-    
+   
+    using std::vector;
+
 	//vector of data
     template<typename T>
     class Set {
@@ -33,7 +35,8 @@ namespace vsr  {
         Set& add(const Set& s) { for(int i = 0; i < s.size(); ++i) add(s[i]); }
         Set& erase(int idx) { mData.erase( mData.begin() + idx ); }
         Set& erase(int b, int e) { mData.erase( mData.begin() + b, mData.begin() + e ); }
-        
+       
+        Set& clear() { vector<T>().swap(mData); return *this; } 
         
         T& active() { return mData[mActiveId-1]; }
         T active() const { return mData[mActiveId-1]; }
@@ -43,61 +46,86 @@ namespace vsr  {
         
         unsigned long size() const { return mData.size(); }
         unsigned long num() const { return mData.size(); }    
-        
+       
+        T * ptr() { return &(mData[0]); } 
+        T& last() { return mData[mActiveId-1]; } 
+
         typename vector<T>::iterator begin() { return mData.begin(); }
         typename vector<T>::iterator end() { return mData.end(); }
          
-		      vector<T>& data(){ return mData; }
-          vector<T> data() const { return mData; }
+		    vector<T>& data(){ return mData; }
+        vector<T> data() const { return mData; }
+
+
  
     };
      
-	//pointer of data
-    template<typename T>
+	//pointer to data T in container
+  template<typename T>
 	class Data {
 		
 	protected:
 		
 		T * mData;              
 		int mNum;
+    size_t mOffset; // data's memory spacing
+    size_t mStride; // data's memory length
 	
 	public:                       
 		
-		//T * ptr() { return mData; }
-		T& data(int idx) { return mData[idx]; }
-		T data(int idx) const { return mData[idx]; }
+		T& data(int idx) { return mData[idx ]; }
+		T data(int idx) const { return mData[idx ]; }
     
     T * ptr() { return mData; }
+    void ptr( T * d ) { mData = d; }
+
+    template<typename S>
+    void setOffset() { mOffset = sizeof(S) - mStride; }
 		
-		Data(int N=1) : mNum(N), mData(NULL){ alloc(); }
-		void resize(int N) { mNum = N; alloc(); }
-		void alloc(){
+		Data(int N=0) : mNum(N), mData(NULL) {
+      mStride = sizeof(T);
+      setOffset<T>();
+    }
+
+    void num(int N) { mNum = N; }
+    int num() const { return mNum; }  
+
+		void alloc( int N){
+      mNum = N;
 			if (mData) delete[] mData;
 			mData = new T[mNum];
 		}
 		
-		int num() { return mNum; }  
+
 	};
-     template<typename T>
+
+
+   template<typename T>
 	 class DoubleData : public Data<T> { 
-		protected:
-		T * mPrev;  
-		public:
-		void swap(){
+	
+  	protected:
+	
+  	T * mPrev;  
+	
+  	public:
+	
+  	void swap(){
 			T * tmp = mPrev; mPrev = this->mData; this->mData = tmp;
 		}
+
 		T& prev(int idx) { return mPrev[idx]; }
 		T prev(int idx) const { return mPrev[idx]; }
-		//T& prev() { return *mPrev; }                               
 		
-		DoubleData(int N=1) : Data<T>(N) { alloc(); }
-		void resize(int N) { this->mNum = N; alloc(); }  
-		void alloc(){              
-			Data<T>::alloc(); 
+		DoubleData(int N=0) : Data<T>(N) {}
+	
+		void alloc(int N){             
+			Data<T>::alloc(N); 
 			if (mPrev) delete[] mPrev;
 			mPrev = new T[this->mNum];
 		} 
+
 		void copy(){
+      if (!mPrev) mPrev = new T[this->mNum];
 			std::copy( this->mData, this->mData+this->mNum, mPrev);
 		}
 	};

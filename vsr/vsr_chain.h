@@ -101,25 +101,28 @@ struct  Spherical : public Joint {
 
 
   class Chain : public Frame {
-      
-     vector<Joint*> mJoint;   
-    //Joint * mJoint;      ///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
-                         ///  (all others follow after calling fk() method)  
-                         //
+     
+     protected:
+       
+     Frame mBaseFrame;        ///< default zero, to tie chains together, set this to another chain's frame.  
+       
+     vector<Frame> mJoint;    ///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
+                              ///  (all others follow after calling fk() method)  
+                              //
 
-     vector<Frame> mLink;           
-    //Frame * mLink;      ///< Relative Link to NEXT joint
+     vector<Frame> mLink;      ///< Relative Link to NEXT joint         
+    //Frame * mLink;     
     
-      vector<Frame> mFrame;
-   // Frame * mFrame;      ///< Absolute frames of Joints = prevFrame  * prevLink *  joint
+      vector<Frame> mFrame;    ///< Absolute frames of Joints = prevFrame  * prevLink *  joint
 
+   // Frame * mFrame;      
     int mNum;
     
     void _init(){
       for (int i = 0; i < mNum; ++i){
         Vec v(0,1.0,0);
         mLink[i].pos() = Ro::null(v);//trs( Gen::trs(v) );
-        mFrame[i].scale(.5);
+//        mFrame[i].scale(.3);
         
         //cout << mLink[i].pos() << endl;
       }
@@ -128,6 +131,9 @@ struct  Spherical : public Joint {
     }
     
     public:
+
+      Frame& baseFrame() { return mBaseFrame; }
+      Frame baseFrame() const { return mBaseFrame; }
     
       Chain(const string& s) {//: mFrame(NULL), mJoint(NULL), mLink(NULL) {
         
@@ -161,14 +167,15 @@ struct  Spherical : public Joint {
                mLink.clear();
                mJoint.clear();  
 
-               mFrame = vector<Frame>(mNum);//new Frame[n];
+               mJoint  = vector<Frame>(mNum);
                mLink  = vector<Frame>(mNum);///new Frame[n];
+               mFrame = vector<Frame>(mNum);//new Frame[n];
 
 
                for (int i = 0; i < mNum; ++i){
                   
-                  if( strncmp( &s[i], "R", 1 ) == 0) mJoint.push_back( new Revolute() );
-                  else if (strncmp( &s[i], "S", 1 ) == 0 ) mJoint.push_back( new Spherical() );
+                  if( strncmp( &s[i], "R", 1 ) == 0) mJoint.push_back( Revolute() );
+                  else if (strncmp( &s[i], "S", 1 ) == 0 ) mJoint.push_back( Spherical() );
 
                       /* case "R":  mJoint.push_back( new Revolute() ); */
                       /* break; */
@@ -205,27 +212,29 @@ struct  Spherical : public Joint {
 
               mFrame = vector<Frame>(n);//new Frame[n];
               mLink  = vector<Frame>(n);///new Frame[n];
-              for (int i = 0; i < mNum; ++i){
-                Spherical * s = new Spherical();
-                mJoint.push_back(s);
-              }
+              mJoint = vector<Frame>(n);//new Frame[n];
+
+              /* for (int i = 0; i < mNum; ++i){ */
+              /*   Spherical * s = new Spherical(); */
+              /*   mJoint.push_back(s); */
+              /* } */
              // mJoint = vector<Joint*>(n, new Spherical());///new Frame[n];
               _init(); 
             }           
         }
             
         void frameSet(){
-            mJoint[0] -> set( mPos, mRot ); fk();
+            mJoint[0].set( mPos, mRot ); fk();
         }
         
       /* GETTERS AND SETTERS */
       int num() const { return mNum; }
       Frame& link(int k) { return mLink[k]; }            ///< set k's Link To Next Joint
-      Frame& joint(int k) { return *mJoint[k]; }          ///< set kth joint's In Socket Transformation
+      Frame& joint(int k) { return mJoint[k]; }          ///< set kth joint's In Socket Transformation
       Frame& frame(int k) { return mFrame[k]; }          ///< set Absolute Displacement Motor
 
       Frame link(int k) const { return mLink[k]; }        ///< Get k's Link To Next joint 
-      Frame joint(int k) const { return *mJoint[k]; }        ///< Get kth Joint's In Socket Transformation
+      Frame joint(int k) const { return mJoint[k]; }        ///< Get kth Joint's In Socket Transformation
       Frame frame(int k) const { return mFrame[k]; }        ///< Get Absolute Displacement Motor
 
       
@@ -281,28 +290,42 @@ struct  Spherical : public Joint {
 
       /// relative (lagrangian) at kth joint
       Mot rel(int idx){
-         if (idx==0) return mJoint[0] -> mot();
+         if (idx==0) return mJoint[0].mot();
 
-         return mLink[idx-1].mot() * mJoint[idx] -> mot();
+         return mLink[idx-1].mot() * mJoint[idx].mot();
       }
       
       /// Forward Kinematics: Absolute Concatenations of previous frame, previous link, and current joint
             void fk() {  
-                Motor mot = mJoint[0] -> mot();
-                mFrame[0].mot( mot );
+                Motor mot = mJoint[0].mot();
+                mFrame[0].mot( mBaseFrame.mot() * mot );
                 for (int i = 1; i < mNum; ++i){    
-                  Mot rel =  mLink[i-1].mot() * mJoint[i] -> mot();//mLink[i-1].mot() * mJoint[i].mot();
+                  Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
                   mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
                 }
             }        
         
-            /// Forward Kinematics: Selective From begin joint to end joint
-      void fk(int begin, int end){
-//                Mot mot = mJoint[0].mot();
-        for (int i = begin; i < end; ++i){
-          Mot m =  mFrame[i-1].mot()  * mLink[i-1].mot() * mJoint[i]->mot();
+      /// Forward Kinematics: calculate forward to "end" joint
+      void fk(int end){
+       
+        Mot mot = mJoint[0].mot();
+        mFrame[0].mot( mBaseFrame.mot() * mot  );
+       
+        for (int i = 1; i <= end; ++i){
+          Mot m =  mFrame[i-1].mot()  * mLink[i-1].mot() * mJoint[i].mot();
           mFrame[i].mot( m );        
         }
+      
+      }
+
+      /// Forward Kinematics: calculate forward from "begin" to "end" joint
+      void fk(int begin, int end){
+              
+        for (int i = begin; i < end; ++i){
+          Mot m =  mFrame[i-1].mot()  * mLink[i-1].mot() * mJoint[i].mot();
+          mFrame[i].mot( m );        
+        }
+      
       }
 
             void ik(int end, int begin){
@@ -435,12 +458,12 @@ struct  Spherical : public Joint {
                 }
                 
                 //Set Base Joint
-                mJoint[0] -> rot( mFrame[0].rot() );
+                mJoint[0].rot( mFrame[0].rot() );
                 
                 for (int i = 1; i < mNum; ++i){                    
                     //reverse engineer
                     Rot Rt = (!mFrame[i-1].rot()) * mFrame[i].rot();
-                    mJoint[i] -> rot( Rt ); 
+                    mJoint[i].rot( Rt ); 
                 }
 
             }
@@ -448,7 +471,7 @@ struct  Spherical : public Joint {
             ///Satisfy Specific Angle Constraint at frame k
             void angle(int k, double theta){
                 
-                Rot R =  mJoint[k] -> rot();
+                Rot R =  mJoint[k].rot();
                 //double t = Gen::iphi ( R );
                                 
                 Biv b = Biv( R ) * -1;// * ( (t > 1) ? ); // note: check Op:lg and Gen::log_rot (maybe mult by -1 there as well)
@@ -459,10 +482,10 @@ struct  Spherical : public Joint {
                 
                 Rot nr = Gen::rot( b.unit() * theta );
                 
-                mJoint[k] -> rot( nr );
+                mJoint[k].rot( nr );
                 
-                //forward kinematics
-                fk(k,mNum);
+                //forward kinematics to k
+                fk(k, mNum);
                 
             }
     

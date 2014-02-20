@@ -3,7 +3,13 @@
  *
  *  Author: Pablo Colapinto
  *  Gmail:  wolftype
- *
+ 
+  GENERIC OPERATIONS THAT ARE TOTALLY TEMPLATED
+
+  AVOIDS PICKING ANY SPECIFIC DIMENSION . . .  
+
+  (pretty awesome)
+ 
  *  homepage: versor.mat.ucsb.edu
  *
  * */
@@ -12,15 +18,6 @@
 #ifndef VSR_GENERIC_OP_H_INCLUDED
 #define VSR_GENERIC_OP_H_INCLUDED   
 
-/*
- 
-GENERIC OPERATIONS THAT ARE TOTALLY TEMPLATED
-
-AVOIDS PICKING ANY SPECIFIC DIMENSION . . .  
-
-(pretty awesome)
-
-*/
 
 #define Generator Gen
 #define Round Ro
@@ -154,10 +151,6 @@ namespace Op{
     template<class A> auto rotor( const A& b ) RETURNS ( rot(b) )
     
      
-    /*!
-          Generate Rotaion at origin from angle and axis or angle and plane
-          @param a vector or bivector
-      */
     /* template< class A> */ 
     /* auto rot( VT angle, const A& v) RETURNS( */
     /*     rot( v * angle ) */
@@ -844,10 +837,10 @@ namespace Op{
   NPar<DIM> par_cir(const NCir<DIM>& c, VT t){  
     using TBIV = NBiv<DIM>;
     
-      NDll<DIM> axis = (NInf<DIM>(1) <= c).runit();      
+      NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
         
         NRot<DIM> rot = Gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() );
-        NVec<DIM> vec = NVec<DIM>::x.sp( rot * Gen::rot(TBIV::xz * t));
+        NVec<DIM> vec = NVec<DIM>::x.sp( rot * Gen::rot(TBIV::xz * t/2.0)); //BIG CHANGE . . .
         
         return round( sur( c ), vec );
    }       
@@ -857,6 +850,14 @@ namespace Op{
   NPnt<DIM> pnt_cir(const NCir<DIM>& c, VT t){
       return null( split( par_cir(c,t), true) );
   }
+
+    /*! Point on Circle at angle t*/
+    template<TT DIM>
+    NPnt<DIM> pointOnCircle(const NCir<DIM>& c, VT t){
+      return null( split( par_cir(c,t), true) );
+   }
+
+
 
   /* template<TT DIM> */
   /* NPnt<DIM> pnt_dls( */

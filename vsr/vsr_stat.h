@@ -5,11 +5,8 @@
 //  Created by Pablo Colapinto on 5/2/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
-/*!
- 
- Probability Density Functions
- 
- */
+//
+
 #ifndef vsr_Prob_h
 #define vsr_Prob_h
 
@@ -24,7 +21,11 @@ namespace vsr{
 
     //mersenne twister
     //mt19937 gen( time(NULL) );
-    
+
+
+/*! 
+ Probability Density Functions
+ */
     struct Rand {
         
 

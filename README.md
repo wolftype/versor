@@ -92,7 +92,7 @@ Not Working?
 ---                 
 
 - For Versor 2.0 You'll need C++11 support (See makefile notes below). 
-- Alternatively Versor 1.0 is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/vsr.git)
+- Alternatively Versor 1.0 is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
 
 For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).  
 NOT CURRENTLY TESTED ON WINDOWS.   
