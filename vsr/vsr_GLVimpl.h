@@ -139,9 +139,8 @@ struct App : public View3D{
   virtual ~App();
 
   virtual void initGL(){
-      string Vert = AVertex + VaryingN + UMatrix  + NTransform + VLighting + VCalc + MVertN; 
-     // string Vert = SimpleVertex;//SimpleVertex;//AVertex + VaryingN + MVertN; 
-    string Frag = MFrag;//TFragMix; //mFrag   //SimpleFragment;//
+    string Vert = DefaultVert; 
+    string Frag = DefaultFrag; 
          
                                
     printf("%s\n", "initGL");
