@@ -46,10 +46,11 @@ namespace vsr {
             static T linear( T * s, int num, double t);
 			
 			/// arbitrary number of points to pass through
-            template<typename T>
+      template<typename T>
 			static T quadric(T * s, int num, double t, bool closed =0);
-            /// arbitrary number of points to pass through
-            template<typename T>
+      
+      /// arbitrary number of points to pass through
+      template<typename T>
 			static T cubic(T * s, int num, double t);
         
             /*! bilinear eulerian surface interpolation assumes four points 
@@ -155,16 +156,17 @@ namespace vsr {
     template<typename T>
     inline T Interp :: quadric( T * cp, int num, double t, bool closed ) {
         
+        // Make legal
         if (t < 0 ) t = 0;
         
-        
+        // 
         double n = closed ? num / 2.0 : (num-1)/2.0; 
         
         int fn = floor(n);		// number of 3 group sections
-        double rem = n - fn;	//remainder ( 0 or .5 )
+        double rem = n - fn;	// remainder ( 0 or .5 )
         
         double td = ( t * n ); //fn?	
-        int it = floor(td); //current group
+        int it = floor(td);    //current group
         
         double ct = td - it;   //current position in group (0-1)
         

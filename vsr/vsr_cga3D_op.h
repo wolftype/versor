@@ -31,7 +31,6 @@ namespace Gen{
       @param[in] pitch in (transformed) yz plane
       @param[in] roll in (transformed) xy plane
    */
-
       Rot rot( double yaw, double pitch, double roll);
       
 
@@ -71,29 +70,29 @@ namespace Gen{
 }; 
     
 
-extern template class CGAMV<5,   CGA<5>::Sca   >;  
-extern template class CGAMV<5,   CGA<5>::Vec   >;  
-extern template class CGAMV<5,   CGA<5>::Vec2D >;  
-extern template class CGAMV<5,   CGA<5>::Biv   >;  
-extern template class CGAMV<5,   CGA<5>::Tri   >;  
-extern template class CGAMV<5,   CGA<5>::Rot   >;  
-extern template class CGAMV<5,   CGA<5>::Mnk   >;  
-extern template class CGAMV<5,   CGA<5>::Pss   >;     
-extern template class CGAMV<5,   CGA<5>::Pnt   >;  
-extern template class CGAMV<5,   CGA<5>::Par   >; 
-extern template class CGAMV<5,   CGA<5>::Cir   >; 
-extern template class CGAMV<5,   CGA<5>::Sph   >;  
-extern template class CGAMV<5,   CGA<5>::Dll   >; 
-extern template class CGAMV<5,   CGA<5>::Lin   >; 
-extern template class CGAMV<5,   CGA<5>::Flp   >; 
-extern template class CGAMV<5,   CGA<5>::Pln   >; 
-extern template class CGAMV<5,   CGA<5>::Dlp   >; 
-extern template class CGAMV<5,   CGA<5>::Trs   >;   
-extern template class CGAMV<5,   CGA<5>::Mot   >; 
-extern template class CGAMV<5,   CGA<5>::Trv   >; 
-extern template class CGAMV<5,   CGA<5>::Bst   >; 
-extern template class CGAMV<5,   CGA<5>::Dil   >; 
-extern template class CGAMV<5,   CGA<5>::Tsd   >;
+//extern template class CGAMV<5,   CGA<5>::Sca   >;  
+//extern template class CGAMV<5,   CGA<5>::Vec   >;  
+//extern template class CGAMV<5,   CGA<5>::Vec2D >;  
+//extern template class CGAMV<5,   CGA<5>::Biv   >;  
+//extern template class CGAMV<5,   CGA<5>::Tri   >;  
+//extern template class CGAMV<5,   CGA<5>::Rot   >;  
+//extern template class CGAMV<5,   CGA<5>::Mnk   >;  
+//extern template class CGAMV<5,   CGA<5>::Pss   >;     
+//extern template class CGAMV<5,   CGA<5>::Pnt   >;  
+//extern template class CGAMV<5,   CGA<5>::Par   >; 
+//extern template class CGAMV<5,   CGA<5>::Cir   >; 
+//extern template class CGAMV<5,   CGA<5>::Sph   >;  
+//extern template class CGAMV<5,   CGA<5>::Dll   >; 
+//extern template class CGAMV<5,   CGA<5>::Lin   >; 
+//extern template class CGAMV<5,   CGA<5>::Flp   >; 
+//extern template class CGAMV<5,   CGA<5>::Pln   >; 
+//extern template class CGAMV<5,   CGA<5>::Dlp   >; 
+//extern template class CGAMV<5,   CGA<5>::Trs   >;   
+//extern template class CGAMV<5,   CGA<5>::Mot   >; 
+//extern template class CGAMV<5,   CGA<5>::Trv   >; 
+//extern template class CGAMV<5,   CGA<5>::Bst   >; 
+//extern template class CGAMV<5,   CGA<5>::Dil   >; 
+//extern template class CGAMV<5,   CGA<5>::Tsd   >;
 
 extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                         
 extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                         
@@ -154,7 +153,7 @@ extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;
 
                                                            
 extern template Rot Gen::rot( const Biv& );                         
-//extern template Rot Gen::rot( VT, const Biv& ); 
+
 extern template Biv Gen::log( const Rot& );
 extern template Par Gen::log( const Bst& ); 
 extern template Trv Gen::trv( const Vec& );

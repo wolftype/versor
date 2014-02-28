@@ -142,17 +142,13 @@ struct App : public View3D{
     string Vert = DefaultVert; 
     string Frag = DefaultFrag; 
          
-                               
     printf("%s\n", "initGL");
     
-    //cout << Vert << Frag << endl; 
-
     pipe.program = new ShaderProgram(Vert,Frag,0);
     pipe.bind();
     pipe.bindAll();
     pipe.unbind();
     
-    //pipe.bindAll(); 
   } 
   
     void initView(){

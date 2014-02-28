@@ -4,29 +4,29 @@ namespace vsr{
   
 
                          
-template class CGAMV<5,   CGA<5>::Sca   >;  
-template class CGAMV<5,   CGA<5>::Vec   >;  
-template class CGAMV<5,   CGA<5>::Vec2D >;  
-template class CGAMV<5,   CGA<5>::Biv   >;  
-template class CGAMV<5,   CGA<5>::Tri   >;  
-template class CGAMV<5,   CGA<5>::Rot   >;  
-template class CGAMV<5,   CGA<5>::Mnk   >;  
-template class CGAMV<5,   CGA<5>::Pss   >;     
-template class CGAMV<5,   CGA<5>::Pnt   >;  
-template class CGAMV<5,   CGA<5>::Par   >; 
-template class CGAMV<5,   CGA<5>::Cir   >; 
-template class CGAMV<5,   CGA<5>::Sph   >;  
-template class CGAMV<5,   CGA<5>::Dll   >; 
-template class CGAMV<5,   CGA<5>::Lin   >; 
-template class CGAMV<5,   CGA<5>::Flp   >; 
-template class CGAMV<5,   CGA<5>::Pln   >; 
-template class CGAMV<5,   CGA<5>::Dlp   >; 
-template class CGAMV<5,   CGA<5>::Trs   >;   
-template class CGAMV<5,   CGA<5>::Mot   >; 
-template class CGAMV<5,   CGA<5>::Trv   >; 
-template class CGAMV<5,   CGA<5>::Bst   >; 
-template class CGAMV<5,   CGA<5>::Dil   >; 
-template class CGAMV<5,   CGA<5>::Tsd   >;
+//template class CGAMV<5,   CGA<5>::Sca   >;  
+//template class CGAMV<5,   CGA<5>::Vec   >;  
+//template class CGAMV<5,   CGA<5>::Vec2D >;  
+//template class CGAMV<5,   CGA<5>::Biv   >;  
+//template class CGAMV<5,   CGA<5>::Tri   >;  
+//template class CGAMV<5,   CGA<5>::Rot   >;  
+//template class CGAMV<5,   CGA<5>::Mnk   >;  
+//template class CGAMV<5,   CGA<5>::Pss   >;     
+//template class CGAMV<5,   CGA<5>::Pnt   >;  
+//template class CGAMV<5,   CGA<5>::Par   >; 
+//template class CGAMV<5,   CGA<5>::Cir   >; 
+//template class CGAMV<5,   CGA<5>::Sph   >;  
+//template class CGAMV<5,   CGA<5>::Dll   >; 
+//template class CGAMV<5,   CGA<5>::Lin   >; 
+//template class CGAMV<5,   CGA<5>::Flp   >; 
+//template class CGAMV<5,   CGA<5>::Pln   >; 
+//template class CGAMV<5,   CGA<5>::Dlp   >; 
+//template class CGAMV<5,   CGA<5>::Trs   >;   
+//template class CGAMV<5,   CGA<5>::Mot   >; 
+//template class CGAMV<5,   CGA<5>::Trv   >; 
+//template class CGAMV<5,   CGA<5>::Bst   >; 
+//template class CGAMV<5,   CGA<5>::Dil   >; 
+//template class CGAMV<5,   CGA<5>::Tsd   >;
 
 
                                                 
@@ -190,58 +190,60 @@ namespace Gen{
    */  
    Mot mot( const Dll& dll){
 
-          Dll b = dll;
-          Biv B(b[0],b[1],b[2]); //Biv B(dll);  
+      Dll b = dll;
+      Biv B(b[0],b[1],b[2]); //Biv B(dll);  
 
       VT w = B.wt();
 
-        VT  c = ( sqrt( fabs ( w ) ) );
-          VT sc = sin(c);
-          VT cc = cos(c);
+      VT  c = ( sqrt( fabs ( w ) ) );
+      VT sc = sin(c);
+      VT cc = cos(c);
 
-          if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
+      if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
 
-          B = B.unit();
-          Vec t(b[3],b[4],b[5]);
+      B = B.unit();
+      Vec t(b[3],b[4],b[5]);
 
       Vec tv;
       tv = Op::pj(t,B) ;
       Vec tw;
       tw = Op::rj(t,B) ;
 
-          tv *= Math::sinc(c);
+      tv *= Math::sinc(c);
 
-          Vec tt = tw * cc + tv;
+      Vec tt = tw * cc + tv;
 
-          auto ts = B*tw;        //Vec_Biv
+      auto ts = B*tw;        //Vec_Biv
 
-          return Mot(cc, B[0] * sc, B[1] * sc, B[2] * sc, tt[0], tt[1], tt[2], ts[3] * sc);
+      return Mot(cc, B[0] * sc, B[1] * sc, B[2] * sc, tt[0], tt[1], tt[2], ts[3] * sc);
   }
 
     /*! Dual Line Generator from a Motor 
         @param Motor m (a concatenation of rotation and translation)
     */  
      Dll log( const Mot& m){
-                               //tmp dll
+
           Drv cperp, cpara;
-          Dll rq,q,tq;
+          Dll rq, q, tq;
           Biv b;
 
-          q = m;        //extract grade 2 part
+          q = m;                                                  //extract grade 2 part
 
-          VT  ac = acos( m[0] );      //angle of rotor  
+          VT  ac = acos( m[0] );                                  //angle of rotor  
           VT  den = Math::sinc(ac);
           VT  den2 = ac * ac * den;
 
-          b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );      //bivector part - negative necessary . dll? . . 
-          tq = (b * q);  //Make motor and extract Grade 2 part
+          b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );     //bivector part - negative necessary . dll? . . 
+          tq = (b * q);                                           //Make motor and extract Grade 2 part
 
-          if (den2 == 0 ) {
+          if (den2 == 0 ) {                                       // Pure Rotation (no slide along screw)
+               printf("%f, %f, %f\n", ac, den, den2 );
+               printf("den2 = 0 in motor log\n"); 
               //cperp = b * -1.0;
-              cpara = q;// * -1.0;
+              cpara = b * tq * -1.0;// * -1.0; or q
           } else {
-              cperp = ( b * Drt(m[7]) ) / ( ( den2 )  * -1.0 );  //perpendicular (along line of axis)
-              cpara = ( b * tq ) / ( ( den2 )  * -1.0 );      //parallel      (in plane of rotation)
+              cperp = ( b * Drt(m[7]) ) / ( ( den2 )  * -1.0 );   //perpendicular (along line of axis)
+              cpara = ( b * tq ) / ( ( den2 )  * -1.0 );          //parallel      (in plane of rotation)
           }
 
           Drv c = cperp + cpara; 
