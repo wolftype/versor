@@ -14,7 +14,7 @@ namespace vsr{
     }
 
     glColor3f(0,1,0);
-    glBegin(GL_LINE_LOOP);
+    glBegin(GL_LINE_STRIP);
     for (int i = 0; i<c.num(); ++i){
         gfx::GL::vertex( c[i].pos().begin() );
     }
@@ -32,7 +32,7 @@ namespace vsr{
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );// - 2 * f.scale() );
       gfx::GL::rotate( Gen::aa( rot * Gen::rot( Biv::yz * PIOVERFOUR ) ).begin() );
       gfx::GL::scale( f.scale() ); 
-      ma.drawElementsColor(r,g,b,a);
+      ma.drawElements(r,g,b,a);
     glPopMatrix();
 
     glPushMatrix();
@@ -41,7 +41,7 @@ namespace vsr{
       gfx::GL::rotate( Gen::aa( rot ).begin() );
       gfx::GL::translate( 0, f.scale() * .5, 0 );
       gfx::GL::scale( f.scale() * .5 );    
-      ma.drawElementsColor(g,r,b,a); 
+      ma.drawElements(g,r,b,a); 
             
     glPopMatrix();
   }

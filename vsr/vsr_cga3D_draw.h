@@ -10,7 +10,7 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "vsr_cga3D_op.h"
-#include "vsr_frame.h" 
+#include "vsr_cga3D_frame.h" 
 #include "vsr_field.h"
 
 namespace vsr{
@@ -30,13 +30,13 @@ namespace vsr{
   
   //Alternative Draw routine
   template<class A>
-	void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix(); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			ImmediateB(s);
-		glPopMatrix();
-	}
+  void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
+    glPushMatrix(); 
+    glNormal3f(0,0,1);
+    glColor4f(r,g,b,a);
+      ImmediateB(s);
+    glPopMatrix();
+  }
 
 
   ///Draw glyph of A at location of B
@@ -52,14 +52,14 @@ namespace vsr{
 
  ///Draw alternative glyph of A at location of B
    template<class A, class B>
-	void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix();
+  void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+    glPushMatrix();
     glTranslatef( p[0], p[1], p[2] ); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			ImmediateB(s);
-		glPopMatrix();
-	} 	
+    glNormal3f(0,0,1);
+    glColor4f(r,g,b,a);
+      ImmediateB(s);
+    glPopMatrix();
+  }   
     
 
 

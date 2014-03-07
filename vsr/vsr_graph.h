@@ -8,50 +8,49 @@
 
 namespace vsr{
  
- /*! Templated half edge structure (of vecs etc)
-  * Navigates references to data only (DOES NOT STORE!)
- */ 
-
+ /*! Templated half edge structure (pointers to any type)
+  *  Navigates references to surface topology of data only (DOES NOT STORE DATA)
+  */ 
  template<class T>
  struct HEGraph {
 
-   struct HalfEdge;
+   struct HalfEdge;                     
    struct Face;
    struct Node;
-  // struct Edge;
-  //
-
-//     typedef SmartObj<TS, Node> T;
    
    struct Node {
 
      Node() : ptr(NULL), edge(NULL) {}
-     T * ptr;              // Pointer to type T
-     HalfEdge * edge;      // An emanating half-edge
+     T * ptr;                           ///< Pointer to type T
+     HalfEdge * edge;                   ///< An emanating half-edge
 
+     /// Get reference to data;
      T& data() { return *ptr; }    
      T data() const { return *ptr; }
 
      Node& data( T& v ) { ptr = &v; return *this; }
 
-    //find all outgoing Edges
+     /// Find all outgoing Edges
      vector<HalfEdge*> valence();
 
-    //is vertex closed (no null Edges)?
-    bool closed();
+     /// Test for node closure (no null Edges in loop)
+     bool closed();
 
-    //find any null edge of a vertex
-    HalfEdge& null();
+     /// Find any null edge of a node 
+     HalfEdge& null();
 
-    //find both null edges around a vertex
-    vector<HalfEdge*> nulls();
+     /// Find both null edges around a node
+     vector<HalfEdge*> nulls();
 
         
    };
 
 
-   
-   //HALF EDGE
+
+      
+   /*!-----------------------------------------------------------------------------
+    * HALF EDGE Data structure 
+    *-----------------------------------------------------------------------------*/
    struct HalfEdge{ 
 
      //int id;
@@ -61,11 +60,11 @@ namespace vsr{
          
      bool bVisited;    
           
-     Node    * node;      // Incident vertex
-     Face    * face;      // Face membership
+     Node    * node;       // Incident vertex
+     Face    * face;       // Face membership
 
-     HalfEdge  * opp;       // Opposite half-edge
-     HalfEdge  * next;      // Next half-edge counterclockwise
+     HalfEdge  * opp;      // Opposite half-edge
+     HalfEdge  * next;     // Next half-edge counterclockwise
 
      HalfEdge& prev() { return *(next -> next); }
 
@@ -81,18 +80,65 @@ namespace vsr{
         next = &(*e.next);
      }
 
-    //find next null edge (assumes this edge is null)
-     HalfEdge& nextNull(){
-        HalfEdge * e = next -> opp;
-        HalfEdge * t = next;
-       // cout << this << " " << t << " " <<  e << endl; 
-        while (e !=NULL){
-            t = e -> next;
-            e = e -> next -> opp;   
-         //   cout << "nextNull " << t << " " << e << endl;        
+    /// Find next null edge 
+    /// (assumes this edge is null)
+    /// Could be on same face . . . 
+     HalfEdge& nextNull(bool clockwise){
+        
+        if (clockwise){
+          HalfEdge * e = next -> opp;
+          HalfEdge * t = next;
+          while (e !=NULL){
+              t = e -> next;
+              e = e -> next -> opp;   
+          }
+          return *t;
+        } else {
+          HalfEdge * e = next -> next -> opp;
+          HalfEdge * t = next -> next;
+          while (e !=NULL){
+              t = e -> next -> next;
+              e = e -> next -> next -> opp;   
+          }
+          return *t;
+
         }
-        return *t;
      }
+
+     /// Check for shared Node with another HalfEdge
+     bool ccwFrom( HalfEdge& eb ){
+       if ( node == eb.prev().node ) return true;
+       return false;
+     }
+     bool cwFrom( HalfEdge& eb){
+       if ( prev().node == eb.node  ) return true;
+       return false;
+     }
+
+    /// Test for partnership
+     bool isOpp( HalfEdge& eb ){
+       if ( ( node == eb.prev().node ) && ( prev().node == eb.node ) ) return true;
+       return false;
+     }
+
+    /// Seal together two halfedges
+     void seal( HalfEdge& eb) {
+       opp = &eb; eb.opp = this;
+     }
+
+     /* vector< HalfEdge* > edgeLoop(){ */
+
+     /* } */
+
+     /// Check for simple Loop (triangle)
+     bool triangle(){
+        auto& eb = nextNull(false);
+        if ( &nextNull(true) == &(eb.nextNull(false)) ) return true;
+        else return false;
+     }
+     
+
+
 
    };
 
@@ -334,6 +380,63 @@ namespace vsr{
       mFace.push_back( f );
    }
 
+   void close( HalfEdge& e, Node& n){
+
+      //a new face
+      Face * f = new Face;
+      
+      //3 new halfEdges
+      HalfEdge *ea, *eb, *ec;
+      ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
+      
+      //make facet
+      facet( ea,eb,ec,f);
+
+      ea -> node = e.node;
+      eb -> node = e.prev().node;
+      ec -> node = &n;
+
+      e.opp = eb; eb -> opp = &e;
+
+      mHalfEdge.push_back( ea );
+      mHalfEdge.push_back( eb );
+      mHalfEdge.push_back( ec );
+
+      mFace.push_back( f );
+
+
+   }
+
+   //Close Simple Triangle Hole
+   void close( HalfEdge& e ){
+      //add edges and a face
+      Face * f = new Face;
+      
+      HalfEdge *ea, *eb, *ec;
+      ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
+      
+      //make facet
+      facet( ea,eb,ec,f);
+
+      auto& tb = e.nextNull(false);
+      auto& tc = e.nextNull(true);
+
+      ea -> node = tb.node;
+      eb -> node = tc.node;
+      ec -> node = e.node;
+
+      ea -> opp = &e; e.opp = ea;
+      eb -> opp = &tb; tb.opp = eb;
+      ec -> opp = &tc; tc.opp = ec;
+
+      mHalfEdge.push_back( ea );
+      mHalfEdge.push_back( eb );
+      mHalfEdge.push_back( ec );
+
+      mFace.push_back( f );
+
+   }
+
     //removes a face
     void removeFacet( int idx ) {
 
@@ -351,22 +454,49 @@ namespace vsr{
         for (auto i : edgeLoop(a) ) tmp.push_back( i -> node );
     }
 
+    /// Get null edges of graph
+    vector<HalfEdge*> nullEdges(){
+      vector<HalfEdge*> tmp;
+      for (auto& i : mHalfEdge){
+        if ( i -> isBorder() ) tmp.push_back(i);
+      }
+      return tmp;
+    }
 
-    //null edges (boundary)
+    /// Any Null Edges?
+    bool hasBorder(){
+       for (auto& i : mHalfEdge){
+          if ( i -> isBorder() ) return true;
+       }
+       return false;
+    }
+
+    /// Find first null edge
+    HalfEdge& firstNull(){
+       for (auto& i : mHalfEdge){
+           if ( i -> isBorder() ) return *i;
+       }
+    }
+
+    /// Get null edge path (boundary) of graph
     vector<HalfEdge*> nullEdgeLoop(){
+
       vector<HalfEdge*> tmp;
       int it = -1;
       
-     for (int it = 0; it < mHalfEdge.size(); ++it){
-         // cout << it << endl;                         
+      for (int it = 0; it < mHalfEdge.size(); ++it){
+          
           if ( mHalfEdge[it] -> opp != NULL ) continue;
+          
           else {
+             
              HalfEdge * he = mHalfEdge[it];
+             
              do{          
                 tmp.push_back( he );
                 he = &(he -> nextNull() ); 
-               // cout << (he) << " " << mHalfEdge[it] << endl; 
              } while ( he != mHalfEdge[it] ); 
+             
              return tmp;  
          }
       }

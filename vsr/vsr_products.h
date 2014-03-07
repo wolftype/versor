@@ -789,7 +789,23 @@ struct CGAMV : public A {
   
   template<typename T>
   CGAMV boost( const T& ) const;
+ 
+  template<typename T>
+  static void PrintGP(){
+    Prod< A, T, typename Mode::M, true>::DO::print(); 
+  }
+
+  template<typename T>
+  static void PrintOP(){
+    OProd< A, T, typename Mode::M, true>::DO::print(); 
+  }
   
+  template<typename T>
+  static void PrintIP(){
+    IProd< A, T, typename Mode::M, true>::DO::print(); 
+  }
+
+
   // void bbprint(){
   //   for (auto i : A::begin() ) printf("%s\n", bitString<DIM>(i).c_str() );
   // }   

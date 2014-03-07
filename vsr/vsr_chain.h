@@ -109,24 +109,17 @@ struct  Spherical : public Joint {
      vector<Frame> mJoint;    ///< In Socket Transformation (RDHC, etc) SET THIS directly using joint(i) 
                               ///  (all others follow after calling fk() method)  
                               //
-
      vector<Frame> mLink;      ///< Relative Link to NEXT joint         
-    //Frame * mLink;     
     
-      vector<Frame> mFrame;    ///< Absolute frames of Joints = prevFrame  * prevLink *  joint
+     vector<Frame> mFrame;    ///< Absolute frames of Joints = prevFrame  * prevLink *  joint
 
-   // Frame * mFrame;      
     int mNum;
     
     void _init(){
       for (int i = 0; i < mNum; ++i){
         Vec v(0,1.0,0);
-        mLink[i].pos() = Ro::null(v);//trs( Gen::trs(v) );
-//        mFrame[i].scale(.3);
-        
-        //cout << mLink[i].pos() << endl;
+        mLink[i].pos() = Ro::null(v);
       }
-            
        fk();
     }
     
@@ -134,15 +127,22 @@ struct  Spherical : public Joint {
 
       Frame& baseFrame() { return mBaseFrame; }
       Frame baseFrame() const { return mBaseFrame; }
+
+      void reset(){
+        for (auto& i : mJoint) i.reset();
+        for (auto& i : mLink) i.reset();
+        mBaseFrame.reset();
+        _init();
+      }
     
-      Chain(const string& s) {//: mFrame(NULL), mJoint(NULL), mLink(NULL) {
+      Chain(const string& s) {
         
         //mNum = s.length();
         alloc(s);
         _init();
       }
 
-      Chain(int n = 3) : mNum(n) {//, mFrame(NULL), mJoint(NULL), mLink(NULL) {
+      Chain(int n = 3) : mNum(n) {
                 
           alloc(n);
           _init();    
@@ -151,12 +151,9 @@ struct  Spherical : public Joint {
         
       
         ~Chain(){
-            //if (mFrame) delete[] mFrame;
-            //if (mLink) delete[] mLink;
-            //if (mJoint) delete[] mJoint;
-              mFrame.clear();
-              mLink.clear();
-              mJoint.clear(); 
+           mFrame.clear();
+           mLink.clear();
+           mJoint.clear(); 
         }
 
         void alloc(const string& s){
@@ -168,14 +165,14 @@ struct  Spherical : public Joint {
                mJoint.clear();  
 
                mJoint  = vector<Frame>(mNum);
-               mLink  = vector<Frame>(mNum);///new Frame[n];
-               mFrame = vector<Frame>(mNum);//new Frame[n];
+               mLink  = vector<Frame>(mNum);
+               mFrame = vector<Frame>(mNum);
 
 
                for (int i = 0; i < mNum; ++i){
                   
-                  if( strncmp( &s[i], "R", 1 ) == 0) mJoint.push_back( Revolute() );
-                  else if (strncmp( &s[i], "S", 1 ) == 0 ) mJoint.push_back( Spherical() );
+               if( strncmp( &s[i], "R", 1 ) == 0) mJoint.push_back( Revolute() );
+               else if (strncmp( &s[i], "S", 1 ) == 0 ) mJoint.push_back( Spherical() );
 
                       /* case "R":  mJoint.push_back( new Revolute() ); */
                       /* break; */
@@ -202,17 +199,14 @@ struct  Spherical : public Joint {
         void alloc(int n){
             mNum = n; 
             if (mNum>0){
-              //if (mFrame ) delete[] mFrame;
-              //if (mLink ) delete[] mLink;
-              //if (mJoint ) delete[] mJoint; 
-              
+ 
               mFrame.clear();
               mLink.clear();
               mJoint.clear();  
 
-              mFrame = vector<Frame>(n);//new Frame[n];
-              mLink  = vector<Frame>(n);///new Frame[n];
-              mJoint = vector<Frame>(n);//new Frame[n];
+              mFrame = vector<Frame>(n);
+              mLink  = vector<Frame>(n);
+              mJoint = vector<Frame>(n);
 
               /* for (int i = 0; i < mNum; ++i){ */
               /*   Spherical * s = new Spherical(); */
@@ -293,6 +287,11 @@ struct  Spherical : public Joint {
          if (idx==0) return mJoint[0].mot();
 
          return mLink[idx-1].mot() * mJoint[idx].mot();
+      }
+
+      void calcBase(){
+         Mot mot = mJoint[0].mot();
+         mFrame[0].mot( mBaseFrame.mot() * mot  );
       }
       
       /// Forward Kinematics: Absolute Concatenations of previous frame, previous link, and current joint
@@ -438,34 +437,33 @@ struct  Spherical : public Joint {
             void calcJoints(int start = 0){
 
 
-                Vec t = Vec::y;
-                Rot R(1,0,0,0);
+                Vec t = mBaseFrame.y(); // Vec::y;
+                Rot R = mBaseFrame.rot(); // (1,0,0,0);
                 
                 //Where we are in current rotation scheme
                 for (int i = 0; i < start; ++i){
-                    //cout << "update" << endl; 
                     t = t.sp( mFrame[i].rot() );
                 }
 
                 //From Here forward, what we need to get where we want to go
                 for (int i = start; i < mNum-1; ++i){
-                    //DRV of LINK
-                    Vec b = Op::dle( Biv( linf(i) ) );                    
-                    Rot nr = Gen::ratio( t, b ); //What it takes to turn the current integration there
-                    R = nr * R;
-                    mFrame[i].rot( R );
-                    t = t.sp( nr ); //angle is integrated
+                    Vec b = Op::dle( Biv( linf(i) ) );  //1. Goal (Direction of Line to next joint)                  
+                    Rot nr = Gen::ratio( t, b );        //2. What it takes to turn the current integration there
+                    R = nr * R;                         //3. Compound into R
+                    mFrame[i].rot( R );                 //4. Apply Rotation to Frame
+                    t = t.sp( nr );                     //5. Save new integrated angle
                 }
                 
                 //Set Base Joint
-                mJoint[0].rot( mFrame[0].rot() );
+                mJoint[0].rot( !mBaseFrame.rot() * mFrame[0].rot() );
                 
+                //Reverse engineer by getting relative transformations
                 for (int i = 1; i < mNum; ++i){                    
-                    //reverse engineer
                     Rot Rt = (!mFrame[i-1].rot()) * mFrame[i].rot();
                     mJoint[i].rot( Rt ); 
                 }
 
+                //Next step is to apply fk() and see if it all worked . . .
             }
         
             ///Satisfy Specific Angle Constraint at frame k
@@ -474,12 +472,9 @@ struct  Spherical : public Joint {
                 Rot R =  mJoint[k].rot();
                 //double t = Gen::iphi ( R );
                                 
-                Biv b = Biv( R ) * -1;// * ( (t > 1) ? ); // note: check Op:lg and Gen::log_rot (maybe mult by -1 there as well)
+                Biv b = Biv( R ) * -1;
+                // * ( (t > 1) ? ); // note: check Op:lg and Gen::log_rot (maybe mult by -1 there as well)
 
-//                cout << b << endl; 
-//                cout << Op::lg( R ) << endl; 
-//                cout << Op :: pl( R ) << endl; 
-                
                 Rot nr = Gen::rot( b.unit() * theta );
                 
                 mJoint[k].rot( nr );

@@ -1,27 +1,28 @@
 --Lua Geometric Algebra generator [arbitrary metrics]
---Author: Pablo Colapinto and Wesley Smith
+--Authors: Pablo Colapinto and Wesley Smith
 --Email:  wolftype@gmail.com  
---free to use and distribute
-
 --[[
 
 Builds Euclidean and Conformal Basis 
 Operations In Arbitrary Metric  
 
-**SEE R3.lua for sample usage**
+**SEE R#.lua for sample usage**
+**SEE C2.lua for sample usage**
 
-Space time Algebra, for instance,
+Space Time Algebra, for instance,
 is possible by setting metric to
-{-1,-1,-1,1} and calling buildEuclidean (probably not the right name . . .)
+{-1,-1,-1,1} 
 
-local sta = GA:new(-1,-1,-1,1)
-sta.buildEuclidean()
+EXAMPLE:
 
-
-3D Conformal is built by 
-
-local cga = GA:new(1,1,1,1,-1)  
-cga.buildConformal()
+local V = require"versor"
+local STA = V{
+  metric={-1,-1,-1,1},
+  types = {
+    { name = "typename", bases={"e1","e2" ... }},
+    {},
+  }
+}
 
 ]]
 
@@ -238,17 +239,21 @@ setmetatable(M, {
 })
 
 function M:generate(t)
-	local binopCode = self:generateBinops(t.binops)
+	
+  local binopCode = self:generateBinops(t.binops)
 	local typeCode = self:generateRegisteredTypes()
 	local typeCodeAliases = {}
-	for name in pairs(typeCode) do
+	
+  for name in pairs(typeCode) do
 		local ty = self.types[name]
 		if(ty.alias and name == ty.alias) then
 			typeCodeAliases[name] = typeCode[name]
 		end
 	end
+
 	local functionBody = {"api = { classes={}, constructors={} }"}
-	for name in pairs(typeCode) do
+	
+  for name in pairs(typeCode) do
 		if(not typeCodeAliases[name]) then
 			local code = typeCode[name]
 			
@@ -274,7 +279,7 @@ function M:generate(t)
 	end
 	--print(table.concat(functionBody, "\n\n"))
 	local f, err = loadstring(table.concat(functionBody, "\n\n"))
-	print(f, err)
+	--print(f, err)
 	local env = {
 		space = self,
 		setmetatable = setmetatable,
@@ -284,6 +289,7 @@ function M:generate(t)
 	setfenv(f, env)
 	f()
 	return env.api
+  
 end
 
 function M:metricProduct(a, b)
@@ -592,10 +598,10 @@ function M:productList(bases1, bases2, opname)
 	local tally = {}
 	
 	-- fetch table pairs of values in types
-	local idx = 0
+	local idx = 1 --bug fix (was 0)
 	for i=1, #bases1 do
 		local iv = bases1[i]
-		for j=1, #bases1 do
+		for j=1, #bases2 do
 			local jv = bases2[j]
 
 			local prod = self.products[iv][opname][jv]

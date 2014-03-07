@@ -137,6 +137,21 @@ namespace Op{
 } // Op::  
 
 
+
+/*!-----------------------------------------------------------------------------
+ * Operations on Euclidean Types 
+ *-----------------------------------------------------------------------------*/
+namespace Euc{
+  /*!
+   *  Homegenize an ND Euclidean Vector (add a dimension with weight of 1.0)
+   */
+    template< TT N >
+    NEVec<N+1> hom(const NEVec<N>& v){
+      return NEVec<N+1>(v) + NEe<N+1,N+1>(1.0);
+    }
+}
+
+
  namespace Gen{  
 
     /* ND Rotor from Bivector b*/  
@@ -475,6 +490,11 @@ namespace Op{
 
  } //Gen::  
 
+
+
+/*!-----------------------------------------------------------------------------
+ * Operations on Round types (Points, Point Pairs, Circles, Spheres, N-Spheres) 
+ *-----------------------------------------------------------------------------*/
  namespace Ro {                          
      
     /*! Null Point from Arbirtary Multivector */   
@@ -603,7 +623,7 @@ namespace Op{
   }   
   
 
-    /*! Squared Size of a General Round Element
+    /*! Squared Size of a General Round Element (could be negative)
         @param input normalized round (dual sphere, point pair, circle, or direct sphere)
         @param duality flag 
     */
@@ -867,6 +887,10 @@ namespace Op{
        
   
 
+
+ /*!-----------------------------------------------------------------------------
+  * Operations On Flat Types (Lines, Dual Lines, Planes, Dual Planes, Flat Points, etc) 
+  *-----------------------------------------------------------------------------*/
   namespace Fl {          
 
     /*! Direction of Direct Flat 
@@ -917,6 +941,11 @@ namespace Op{
   }   // Fl :: 
    
 
+
+
+  /*!-----------------------------------------------------------------------------
+   * Operations on Tangent Types ( tangent vector, bivectors, trivectors, etc) 
+   *-----------------------------------------------------------------------------*/
    namespace Ta {
 
     /*! Direction of Tangent Element (similar formulation to Rounds) 
@@ -952,7 +981,7 @@ namespace Op{
   
   //------------------------------------------
   
-  //METHODS
+  //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
   
               
   template<TT DIM, class A> template< class T>
