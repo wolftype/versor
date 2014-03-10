@@ -89,9 +89,11 @@ struct GLVImpl : public Interface::Impl {
 
 
 struct GLVInterface : public gfx::Interface {
+  
   GLVInterface() : gfx::Interface() { init(); }
   GLVImpl& glv(){ return *(GLVImpl*)impl; }
-    virtual void init(){
+    
+  virtual void init(){
     impl = new GLVImpl(this);
   } 
 };
@@ -158,7 +160,7 @@ struct App : public View3D{
       float tw =  width();
       float th = height();     
 
-        float aspect = 1.0 * tw / th;   
+      float aspect = 1.0 * tw / th;   
           
       scene.fit(tw,th);
 
@@ -268,20 +270,20 @@ struct App : public View3D{
              break;
          case Event::MouseDrag:
              interface.onMouseDrag();
-       interface.mouseNavigate();
+             interface.mouseNavigate();
              break;
          case Event::MouseUp:
              interface.onMouseUp();
-       interface.mouseNavigateStop();
+             interface.mouseNavigateStop();
              break;
          case Event::KeyDown:
              App::onKeyDown(glv);
              interface.onKeyDown();
-       interface.keyboardNavigate(); 
+             interface.keyboardNavigate(); 
              break;
          case Event::KeyUp:
              interface.onKeyUp(); 
-        interface.keyboardNavigateStop(); 
+             interface.keyboardNavigateStop(); 
              break;
              
      }

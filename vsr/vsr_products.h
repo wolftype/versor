@@ -507,7 +507,7 @@ struct CGA{
   typedef MV< pss(DIM-2) > EucPss;           //Euclidean Pseudoscaler 
     
   typedef typename Blade1<DIM-2>::VEC   Vec;         //Euclidean Vector
-  typedef typename Blade1<2>::VEC   Vec2D;  
+  //typedef typename Blade1<2>::VEC   Vec2D;  
   typedef typename EOProd<Vec,Vec>::Type   Biv;        //Euclidean Bivector
   typedef typename EOProd<Biv,Vec>::Type   Tri;       //Euclidean Trivector
   typedef typename EProd<Vec,Vec>::Type   Rot;        //Euclidean Rotor (Complex number in 2d, Quaternion in 3d)
