@@ -25,8 +25,8 @@ namespace vsr{
 using namespace std;
   
 
-typedef double VT; 
-typedef short TT;  
+//typedef double VT; 
+typedef short TT;  /// BLADE BIT REPRESENTATION TYPE
 
 constexpr TT blade(){ return 0; }
 
@@ -34,7 +34,6 @@ template<class X, class...XS>
 constexpr TT blade( X x, XS ... xs){
   return x | blade(xs...);  
 }
-
 
 template<int N>
 inline string bitString( int b ){
@@ -90,6 +89,11 @@ constexpr int cpow(int x, int N)
     return (N>0) ? (x*cpow(x, N-1)) : (1.0);
 }
 
+
+
+/*-----------------------------------------------------------------------------
+ *  SIGN FLIP BOOLEANS
+ *-----------------------------------------------------------------------------*/
 constexpr bool reverse(TT a){
   return cpow( -1, (grade(a) * (grade(a)-1) / 2.0) ) == -1;
 }
@@ -100,13 +104,16 @@ constexpr bool conjugate(TT a){
   return cpow( -1,(grade(a) * (grade(a)+1) / 2.0) ) == -1;   
 }
 
+
+/*-----------------------------------------------------------------------------
+ *  COMPARISON FOR SORTING ALGORITHMS
+ *-----------------------------------------------------------------------------*/
 template <TT A, TT B>
 constexpr bool compare(){
     return ( grade(A) == grade(B) ) ?  A < B: grade(A) < grade(B); //return A < B::HEAD;
 }
 
-//pss
-// template< TT dim >   
+
 constexpr TT pss(TT dim){
   return ( dim == 0 ) ? 0 : (1 << (dim-1)) | pss( dim-1 ); 
 }

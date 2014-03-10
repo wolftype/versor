@@ -1,7 +1,22 @@
-//REMOVAL OF SET<N>
-//TYPEDEF OF BLADE IDS  
-//Metric Product
-//Conformal Split
+/*
+ * =====================================================================================
+ *
+ *       Filename:  vsr_xlists.h
+ *
+ *    Description:  execution lists
+ *
+ *        Version:  1.0
+ *        Created:  03/10/2014 12:16:51
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Pablo Colapinto (), gmail -> wolftype
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
+
+
 #ifndef LISTS_H_INCLUDED
 #define LISTS_H_INCLUDED
 
@@ -10,7 +25,6 @@
 
 #include "vsr_mv.h"  
   
-
 using namespace std;
 
 namespace vsr{
@@ -23,7 +37,9 @@ namespace vsr{
 template< typename ... XS >
 struct XList{ 
   template<class A, class B>
-  static constexpr VT Exec(const A& a, const B& b){ return 0; }  
+  
+  static constexpr double Exec(const A& a, const B& b){ return 0; }  
+  
   static void print() { printf("\n"); }   
   
   template<class R, class A, class B>
@@ -38,20 +54,23 @@ struct XList<X,XS...>{
   typedef XList<XS...> TAIL;
   template<class A, class B>
 
-  static constexpr VT Exec(const A& a, const B& b){
-    return X::Exec(a,b) + TAIL::Exec(a,b);
-  }                                  
+  /// Executes and sums specific type
+  static constexpr auto Exec(const A& a, const B& b) RETURNS(
+    X::Exec(a,b) + TAIL::Exec(a,b) //sum
+  )                                 
 
+  /// Makes a specific type
   template<class R, class A, class B>
   static constexpr R Make(const A& a, const B& b){
     return R(X::Exec(a,b), XS::Exec(a,b)...);
   }  
-    template<class A>
+  
+  template<class A>
   static constexpr A Make(const A& a){
     return A(X::Exec(a), XS::Exec(a)...);
   }           
   
-    template<class B, class A>
+  template<class B, class A>
   static constexpr B Cast(const A& a){
     return B(X::Exec(a), XS::Exec(a)...);
   }    
@@ -62,6 +81,11 @@ struct XList<X,XS...>{
   static constexpr int Num = sizeof...(XS)+1;
 };
 
+
+
+/*-----------------------------------------------------------------------------
+ *  CONCATENATION
+ *-----------------------------------------------------------------------------*/
 template<class ... XS, class ... YS>
 constexpr XList<XS..., YS...> cat(const XList< XS ... >& , const XList< YS ... >&) {
   return XList<XS..., YS...>();
@@ -77,7 +101,10 @@ struct XCat< XList<XS...>, XList<YS...> > {
 };
     
 
-//REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
+
+/*-----------------------------------------------------------------------------
+ *  REMOVE REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
+ *-----------------------------------------------------------------------------*/
 template<class X>
 struct RMV{ 
   typedef typename RMV<typename X::TAIL>::Type M;
@@ -95,6 +122,9 @@ struct RMV<XList<> >{
 
 
 
+/*-----------------------------------------------------------------------------
+ *  FIND ALL 
+ *-----------------------------------------------------------------------------*/
 template< int N, class A >   
 struct FindAll { 
    typedef typename FindAll<N, typename A::TAIL>::Type Next;
@@ -103,7 +133,6 @@ struct FindAll {
 
 template< int N >
 struct FindAll< N, XList<> >{ 
-   // SCA Call() RETURNS(  XList<>() )
   typedef XList<> Type;  
 };
 
@@ -111,7 +140,6 @@ struct FindAll< N, XList<> >{
 //input an instructionlist and a return type, get out a List of Executables 
 template< class I, class R >    
 struct Index{
-
   typedef typename FindAll<R::HEAD, I>::Type One;   
   typedef typename XCat< XList< One > , typename Index < I, typename R::TAIL >::Type  >::Type Type;
 
