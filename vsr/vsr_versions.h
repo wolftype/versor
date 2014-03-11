@@ -11,18 +11,16 @@
 #ifndef VERSIONS_H_INCLUDED
 #define VERSIONS_H_INCLUDED
 
-#include "vsr_lists.h"
-// #include "instructions.h"  
+#include "vsr_xlists.h"
 
 namespace vsr{                
 	  
-
 template<class A, int IDX=0>
 struct Reverse{
 	typedef typename XCat< XList< InstFlip< reverse(A::HEAD), IDX> > , typename Reverse<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Reverse< MV<>, IDX >{
+struct Reverse< MVBasis<>, IDX >{
 	typedef XList<> Type;  
 };
 
@@ -31,7 +29,7 @@ struct Conjugate{
 	typedef typename XCat< XList< InstFlip< conjugate(A::HEAD), IDX> > , typename Conjugate<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Conjugate< MV<>, IDX >{
+struct Conjugate< MVBasis<>, IDX >{
 	typedef XList<> Type;  
 };
 
@@ -40,12 +38,12 @@ struct Involute{
 	typedef typename XCat< XList< InstFlip< involute(A::HEAD), IDX> > , typename Involute<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Involute< MV<>, IDX >{
+struct Involute< MVBasis<>, IDX >{
 	typedef XList<> Type;  
 };
 
 
-constexpr int find(int n, const MV<>, int idx){
+constexpr int find(int n, const MVBasis<>, int idx){
 	return -1;
 }
 template<class A>
@@ -59,63 +57,59 @@ struct Cast{
 	typedef typename XCat< XList< InstCast< find( A::HEAD, B() ) > > , typename Cast< typename A::TAIL, B >::Type >::Type Type;  
 };  
 template<class B>
-struct Cast< MV<>, B >{
+struct Cast< MVBasis<>, B >{
 	typedef XList<> Type;  
 };     
 
 
 
-
-template<TT X, TT...XS> template<class A> 
-A MV<X,XS...>::cast() const{
- return Cast<  A, MV<X,XS...> >::Type::template Cast<A>( *this );
+/*-----------------------------------------------------------------------------
+ *  CONVERSIONS (CASTING, COPYING)
+ *-----------------------------------------------------------------------------*/
+template<typename B, typename T> template<class A> 
+A MV<B, T>::cast() const{
+ return Cast< typename A::Bases, B >::Type::template Cast<A>( *this );
 }  
 
-template<TT X, TT...XS> template<class A>
-A MV<X,XS...>::copy() const{
+template<typename B, typename T> template<class A>
+A MV<B,T>::copy() const{
 	A tmp;
-	for (int i = 0; i < A::Num; ++i) tmp[i] = (*this)[i];
+	for (int i = 0; i < A::Bases::Num; ++i) tmp[i] = (*this)[i];
 	return tmp;
 }
               
 
+/* template<TT X, TT...XS> template<TT IDX> */ 
+/* VT MV<X,XS...>::get() const{ */
+/*  return val[ find(IDX, *this) ]; */
+/* } */
+/* template<TT X, TT...XS> template<TT IDX> */ 
+/* VT& MV<X,XS...>::get() { */
+/*  return val[ find(IDX, *this) ]; */
+/* } */ 
 
-template<TT X, TT...XS> template<TT IDX> 
-VT MV<X,XS...>::get() const{
- return val[ find(IDX, *this) ];
+/* template<TT X, TT...XS> template<TT IDX> */ 
+/*  MV<X,XS...>& MV<X,XS...>::set(VT v) */
+/* { */
+/* 	get<IDX>() = v; */
+/* 	return *this; */
+/* } */  
+
+
+
+/*-----------------------------------------------------------------------------
+ *  UNARY OPERATIONS
+ *-----------------------------------------------------------------------------*/
+template<class B, class T> 
+MV<B,T> MV<B,T>::conjugation() const{
+	return Conjugate<B>::Type::template Make(*this);
 }
-template<TT X, TT...XS> template<TT IDX> 
-VT& MV<X,XS...>::get() {
- return val[ find(IDX, *this) ];
+template<class B, class T> 
+MV<B,T> MV<B,T>::involution() const{
+	return Involute<B>::Type::template Make(*this);
 } 
 
-template<TT X, TT...XS> template<TT IDX> 
- MV<X,XS...>& MV<X,XS...>::set(VT v)
-{
-	get<IDX>() = v;
-	return *this;
-}  
 
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::x = MV<X,XS...>().set<1>(1);
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::y = MV<X,XS...>().set<2>(1);  
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::z = MV<X,XS...>().set<4>(1);  
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::xy = MV<X,XS...>().set<3>(1);  
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::xz = MV<X,XS...>().set<5>(1);  
-// template<TT X, TT ... XS> MV<X,XS...> MV<X,XS...>::yz = MV<X,XS...>().set<6>(1);     
-
-template<TT X, TT...XS> 
-MV<X,XS...> MV<X,XS...>::conjugation() const{
-	return Conjugate<MV<X,XS...>>::Type::template Make(*this);
-}
-template<TT X, TT...XS> 
-MV<X,XS...> MV<X,XS...>::involution() const{
-	return Involute<MV<X,XS...>>::Type::template Make(*this);
-} 
-
-// template< TT X, TT ...XS>
-// MV<X,XS...> MV<X,XS...>::operator ~() const{
-// 	return Reverse< MV<X,XS...> >::Type::template Make(*this) ;
-// } 
 
 } //vsr::   
 

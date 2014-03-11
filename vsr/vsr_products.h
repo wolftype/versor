@@ -13,13 +13,12 @@
 #define PRODUCTS_ANYMET_H_INCLUDED
 
 #include <math.h>
-#include "vsr_lists.h"
-#include "vsr_instructions.h"  
+#include "vsr_xlists.h"
+#include "vsr_generic_instructions.h"  
 #include "vsr_split_met.h"
 #include "vsr_versions.h" 
 
 namespace vsr{
-
 
 template<class S, int idxA, int idxB>
 struct SplitInstructions{  
@@ -76,8 +75,6 @@ struct COP<MV<>,B, Metric,idxA,idxB> {
   typedef XList<> Type; 
 };
                                
-
-
 template<TT A, class B, class Metric, int idxA, int idxB>  
 struct SubCIP{ 
   typedef typename SplitIProd< A, B::HEAD, Metric>::Type Split;

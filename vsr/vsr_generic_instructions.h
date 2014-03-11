@@ -38,7 +38,7 @@ struct Inst{
   
   template<class TA, class TB>
   static constexpr auto Exec( const TA& a, const TB& b) RETURNS (
-    (a.template get<idxA>() * b.template get<idxB>())
+    a[idxA] * b[idxB] //.template get<idxA>() * b.template get<idxB>(
   )
   
   static void print(){
@@ -57,7 +57,7 @@ struct Inst<true, A,B,IDXA,IDXB>{
   
   template<class TA, class TB>
   static constexpr auto Exec( const TA& a, const TB& b) RETURNS (
-    (-a.template get<idxA>() * b.template get<idxB>())
+    -a[idxA] * b[idxB] //(-a.template get<idxA>() * b.template get<idxB>())
   )
   
   static void print(){
@@ -105,13 +105,13 @@ struct Instruct<true, R, IDXA, IDXB>{
 template<bool F, int IDX>
 struct InstFlip{
   template<class TA>
-  static constexpr auto Exec(const TA& a) RETURNS ( (a.template get<IDX>()) )
+  static constexpr auto Exec(const TA& a) RETURNS ( a[IDX] ) //(a.template get<IDX>()) )
 };    
 
 template<int IDX>
 struct InstFlip<true, IDX>{
   template<class TA>
-  static constexpr auto Exec(const TA& a) RETURNS ( (-a.template get<IDX>()) )
+  static constexpr auto Exec(const TA& a) RETURNS ( -a[IDX] )//(-a.template get<IDX>()) )
 };
 
 
@@ -124,7 +124,7 @@ template<int IDX>
 struct InstCast{ 
     template<class TA> 
      static constexpr auto Exec(const TA& a) RETURNS (
-      a.template get<IDX>()
+      a[IDX]//a.template get<IDX>()
     )
 };
 template<>

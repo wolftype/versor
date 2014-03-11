@@ -14,7 +14,7 @@ struct Inst{
   static const int idxB = IDXB;
   
   template<class TA, class TB>
-  static constexpr VT Exec( const TA& a, const TB& b){
+  static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return a[idxA] * b[idxB];
   } 
   
@@ -32,7 +32,7 @@ struct Inst<true, A,B,IDXA,IDXB>{
   static const int idxB = IDXB;
   
   template<class TA, class TB>
-  static constexpr VT Exec( const TA& a, const TB& b){
+  static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return -a[idxA] * b[idxB];
   } 
   
@@ -48,7 +48,7 @@ struct Instruct{
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   template<class TA, class TB>
-  static constexpr VT Exec( const TA& a, const TB& b){
+  static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return a[idxA] * b[idxB];
   } 
   static void print(){
@@ -61,7 +61,7 @@ struct Instruct<true, R, IDXA, IDXB>{
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   template<class TA, class TB>
-  static constexpr VT Exec( const TA& a, const TB& b){
+  static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return -a[idxA] * b[idxB];
   } 
   static void print(){
@@ -72,14 +72,14 @@ struct Instruct<true, R, IDXA, IDXB>{
 template<bool F, int IDX>
 struct InstFlip{
   template<class TA>
-  static constexpr VT Exec(const TA& a){
+  static constexpr typename TA::ValueType Exec(const TA& a){
     return a[IDX];
   }
 };    
 template<int IDX>
 struct InstFlip<true, IDX>{
   template<class TA>
-  static constexpr VT Exec(const TA& a){
+  static constexpr typename TA::ValueType Exec(const TA& a){
     return -a[IDX];
   }
 };
@@ -87,14 +87,14 @@ struct InstFlip<true, IDX>{
 template<int IDX>
 struct InstCast{ 
     template<class TA> 
-     static constexpr VT Exec(const TA& a){
+     static constexpr typename TA::ValueType Exec(const TA& a){
     return a[IDX];
   } 
 };
 template<>
 struct InstCast<-1>{       
     template<class TA> 
-    static constexpr VT Exec(const TA& a){
+    static constexpr typename TA::ValueType Exec(const TA& a){
     return 0;
   } 
 };

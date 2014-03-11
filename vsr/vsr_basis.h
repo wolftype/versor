@@ -114,8 +114,8 @@ constexpr bool compare(){
 }
 
 
-constexpr TT pss(TT dim){
-  return ( dim == 0 ) ? 0 : (1 << (dim-1)) | pss( dim-1 ); 
+constexpr TT _vsr_make_pss(TT dim){
+  return ( dim == 0 ) ? 0 : (1 << (dim-1)) | _vsr_make_pss( dim-1 ); 
 }
 
 } //vsr::

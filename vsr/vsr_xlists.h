@@ -23,16 +23,15 @@
 #include <stdio.h> 
 #include <bitset> 
 
-#include "vsr_mv.h"  
+#include "vsr_types.h"  
   
 using namespace std;
 
 namespace vsr{
 
 
-
 /*-----------------------------------------------------------------------------
- *  EXECUTION LISTS
+ *  EMPTY EXECUTION LIST
  *-----------------------------------------------------------------------------*/
 template< typename ... XS >
 struct XList{ 
@@ -43,39 +42,45 @@ struct XList{
   static void print() { printf("\n"); }   
   
   template<class R, class A, class B>
-  static constexpr MV<> Make(const A& a, const B& b){
-    return MV<>();
+  static constexpr MVBasis<> Make(const A& a, const B& b){
+    return MVBasis<>();
   }
 };                                                     
 
+/*-----------------------------------------------------------------------------
+ *  EXECUTION LIST
+ *-----------------------------------------------------------------------------*/
 template< typename X, typename ... XS >
 struct XList<X,XS...>{ 
+  
   typedef X HEAD;
   typedef XList<XS...> TAIL;
+  
+  /// Executes and sums specific blade
   template<class A, class B>
-
-  /// Executes and sums specific type
   static constexpr auto Exec(const A& a, const B& b) RETURNS(
     X::Exec(a,b) + TAIL::Exec(a,b) //sum
   )                                 
 
-  /// Makes a specific type
+  /// Makes a specific type (binary)
   template<class R, class A, class B>
   static constexpr R Make(const A& a, const B& b){
     return R(X::Exec(a,b), XS::Exec(a,b)...);
   }  
   
+  /// Makes a specific type (unary)
   template<class A>
   static constexpr A Make(const A& a){
     return A(X::Exec(a), XS::Exec(a)...);
   }           
-  
+ 
+  /// Executes a Cast List 
   template<class B, class A>
   static constexpr B Cast(const A& a){
     return B(X::Exec(a), XS::Exec(a)...);
   }    
   
-  
+  /// Prints Execution Instructions
   static void print() { HEAD::print(); TAIL::print(); } 
   
   static constexpr int Num = sizeof...(XS)+1;
@@ -103,11 +108,11 @@ struct XCat< XList<XS...>, XList<YS...> > {
 
 
 /*-----------------------------------------------------------------------------
- *  REMOVE REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
+ *  REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
  *-----------------------------------------------------------------------------*/
 template<class X>
-struct RMV{ 
-  typedef typename RMV<typename X::TAIL>::Type M;
+struct Reduce{ 
+  typedef typename Reduce<typename X::TAIL>::Type M;
   
   typedef typename Maybe< Exists< X::HEAD::Res, M>::Call() , 
     M, 
@@ -116,14 +121,14 @@ struct RMV{
 };                
 
 template<>
-struct RMV<XList<> >{
-  typedef MV<> Type;
+struct Reduce<XList<> >{
+  typedef MVBasis<> Type;
 };  
 
 
 
 /*-----------------------------------------------------------------------------
- *  FIND ALL 
+ *  FIND ALL N blade types in A
  *-----------------------------------------------------------------------------*/
 template< int N, class A >   
 struct FindAll { 
@@ -137,7 +142,7 @@ struct FindAll< N, XList<> >{
 };
 
 
-//input an instructionlist and a return type, get out a List of Executables 
+//input an instruction list and a return type, get out a Execution List 
 template< class I, class R >    
 struct Index{
   typedef typename FindAll<R::HEAD, I>::Type One;   
@@ -145,7 +150,7 @@ struct Index{
 
 };
 template< class I>    
-struct Index< I, MV<> > {  
+struct Index< I, MVBasis<> > {  
    typedef XList<> Type;
 };
  
