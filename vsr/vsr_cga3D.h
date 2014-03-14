@@ -2,16 +2,8 @@
 #define VSR_CGA_3D_INCLUDED  
 
 
-/*!
- *  \mainpage
- *
- *  Versor 2.0: A C++11 library for geometric algebra
- *  homepage: versor.mat.ucsb.edu
- */
-
-
 #include "vsr_cga3D_op.h"
-//#include "vsr_cga3D_funcs.h"
+//#include "old/vsr_cga3D_funcs.h"
 #include "vsr_cga3D_draw.h"
 #include "vsr_cga3D_interface.h"
  

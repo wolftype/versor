@@ -38,7 +38,7 @@ PROJECT_NUMBER         = 2.0
 # for a project that appears at the top of each page and should give viewer 
 # a quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "C++11 library for Geometric algebra and OpenGL"
+PROJECT_BRIEF          = "C++11 library for Geometric algebra"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is 
 # included in the documentation. The maximum height of the logo should not 
@@ -52,7 +52,7 @@ PROJECT_LOGO           = /Users/wolftype/code/vsr_output/images/lox_0.jpg
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = /Users/wolftype/code/vsr2.0/build/doc
+OUTPUT_DIRECTORY       = build/doc
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -671,7 +671,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = /Users/wolftype/code/vsr2.0/vsr
+INPUT                  = vsr
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

@@ -56,28 +56,28 @@ namespace vsr {
 
     
     /*! Discretized Volume Indexing (Isometric Cubic Lattice w/o data) */
-    template<class LPnt>
+    template<class LPnt> // Template on Lattice Point Type
     class CubicLattice  {
     
         public:
          
-       //using LPnt = NPnt<5>;  //Lattice Point no longer demands 3dcga . . .
 
         CubicLattice(int _w = 1, int _h = 1, int _d = 1, double _s = 1.0)
-        : mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
+        :mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
          mNum( mWidth * mHeight * mDepth),
          mNumVxl( (mWidth-1) * (mHeight-1) * (mDepth-1) ),
-          mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
+         mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
          {
             alloc(); init();
-        }
+         }
         
         ~CubicLattice() {
             onDestroy();
         }
         
         void onDestroy(){   
-      if (mPoint) delete[] mPoint;
+     
+            if (mPoint) delete[] mPoint;
             if (mVxl) delete[] mVxl;
             if (mNbr) delete[] mNbr;
             if (mNbrVxl) delete[] mNbrVxl;
@@ -123,8 +123,6 @@ namespace vsr {
             return i * mHeight * mDepth + j * mDepth + k; 
         }
         
-        
-     
         //VOXEL IDX
         Vxl vxl(int ix) const { return mVxl[ix]; }
         Vxl& vxl(int ix)  { return mVxl[ix]; }
@@ -169,8 +167,7 @@ namespace vsr {
         
         void init(){
             
-            
-                initPoints();
+             initPoints();
              
              ITER                           
                 int type = 0;
@@ -184,7 +181,6 @@ namespace vsr {
                 mNbr[tidx] = Nbr(tidx, mWidth, mHeight, mDepth, type);
 
             ITEND
-
         
             //VXLS
             BOUNDITER0
@@ -205,6 +201,7 @@ namespace vsr {
                 
                 mVxl[ix].type = type;          
                 mNbrVxl[ix] = Nbr(ix, mWidth, mHeight, mDepth, type);
+
             BOUNDEND
             
             //Assign Edges and Faces idx
@@ -546,31 +543,15 @@ namespace vsr {
 
     };
 
-
 //     extern template class CubicLattice< NPnt<5> >;
-  
-  //     extern template void CubicLattice< NPnt<5> >::initPoints();
-
-      template<> void CubicLattice< NPnt<5> > :: initPoints();
-      /* void CubicLattice< NPnt<5> > :: initPoints(){ */
-      /*    for (int i = 0; i < mWidth; ++i){ */
-      /*       for (int j = 0; j < mHeight; ++j){ */
-      /*           for (int k = 0; k < mDepth; ++k){ */
-      /*               int tidx = idx(i,j,k); */ 
-      /*               mPoint[ tidx ]  = Ro::null( px(i),  py(j),  pz(k) ); */ 
-      /*           } */
-      /*       } */
-      /*    } */
-      /* } */
-
-
-
-
+//     extern template void CubicLattice< NPnt<5> >::initPoints();
+       template<> void CubicLattice< NPnt<5> > :: initPoints();
     
     #undef ITER
     #undef ITERV
     #undef ITEND
     #undef BOUNDITER
+    #undef BOUNDITER0
     #undef BOUNDEND
 }
 #endif

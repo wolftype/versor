@@ -9,10 +9,6 @@ namespace vsr{
 	
 using namespace std;
 	
-//typedef EGAMV< typename Blade1<3>::VEC > Vec;
-
-
- 
 struct Edge{                                            
   int a, b;  
   Edge(int _a, int _b) : a(_a), b(_b){}  
@@ -20,11 +16,11 @@ struct Edge{
 	void print() { printf("%d, %d\n", a, b);}
 };
 
+/// ND Cube
 template<int DIM>
 struct NCube{         
 	
 	typedef EGAMV< DIM, typename Blade1<DIM>::VEC > TVec;
-   // typedef typename Blade1<DIM-1>::VEC Proj; //Projection Down  
 	typedef EGAMV< 3, typename Blade1<3>::VEC > Vec3;
 	
 	int NumVert = pow(2.f,DIM);
@@ -37,23 +33,17 @@ struct NCube{
 		va[DIM-1] = -.5;
 		vb[DIM-1] = .5;
 		
-		//int ix = 0;  
 		auto next = NCube<DIM-1>();  
 				
 		for (auto i :  next.roots ){
-		   
 		 	roots.push_back( TVec(i+va) );
 			roots.push_back( TVec(i+vb) ); 
-	
 		}   
-		
 
 		int d = pow(2.f, DIM-1); 
 		for (auto i : next.edges ){        
-  		
-			edges.push_back(i); 
+  	  edges.push_back(i); 
 			edges.push_back( Edge(i.a + d, i.b + d));   
-
 		}                                                
 		
 		for (int i = 0; i < next.NumVert; ++i ){
@@ -65,7 +55,7 @@ struct NCube{
 	vector< Vec3 > project(VT dist){ 
 		vector< Vec3 > res;
 		 for (auto i : roots ){
-			res.push_back( Proj<DIM>::Call(dist, i) );//i.cast<Proj>() * ( dist / (dist - i[DIM-1] ) ) ); 
+			res.push_back( Proj<DIM>::Call(dist, i) );
 		}  
 		return res;
 	}  
@@ -79,6 +69,8 @@ struct NCube{
 	} 
 };
 
+
+/// 1D Cube
 template<>
 struct NCube<1>{
 	typedef EGAMV< 1, typename Blade1<1>::VEC > TVec; 

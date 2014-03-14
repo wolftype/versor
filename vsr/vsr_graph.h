@@ -157,9 +157,9 @@ namespace vsr{
      /* HalfEdge eb() const { return *(edge->next); } */
      /* HalfEdge ec() const { return *(edge->next->next); } */
 
-     Node& na() { return * ( ec().node ); }
-     Node& nb() { return * ( ea().node ); }
-     Node& nc() { return * ( eb().node ); }
+     Node& na() { return * ( ea().node ); }
+     Node& nb() { return * ( eb().node ); }
+     Node& nc() { return * ( ec().node ); }
 
      /* Node na() const { return * ( ec().node ); } */
      /* Node nb() const { return * ( ea().node ); } */

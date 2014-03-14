@@ -18,36 +18,31 @@ using std::vector;
 
 namespace vsr{
 
-/// V are versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D
+/// A Group of Operations called with group( target )
+/// V are versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
 template< class V >
 struct Group {
 
-   bool bPin; //Spin or Pin
-
-   vector<V> ops;
+   bool bPin;                           ///< Spin or Pin Group (rotate or reflect)
+   vector<V> ops;                       ///< List of Operators (Dlps, Rots, etc)
 
    Group(bool p = true) : bPin(p) {}
    Group( vector<V> v, bool p = true ) : ops(v), bPin(p) {}
 
-    /* //Calculates all permuations of group and sets group to it */
-    /* void calc(){ */
-    /*   auto t = Root::System( ops ); */
-    /*   ops = t */
-    /* } */
-
-    /// Enacts All operators on p (sequentially)?, returns p and all results
+    /// Enacts All operators on p motif and returns results
 	  template<class T>
     vector<T> operator()(const T& p){
-        vector<T> res; //res.push_back(p);
-        T tp = p; 
+        vector<T> res;
         for (auto i : ops ){
-          tp = bPin ? p.re( i ) : p.sp( i ) ;
-          res.push_back( tp ); // Reflect or Spin in each member of the group
+          T tp = bPin ? p.re( i ) : p.sp( i ); // Reflect or Spin p by each member of group
+          res.push_back( tp ); 
         }       
         return res;
     }
 
 }; 
+
+
 
 /// ND lattice, on a metric specified by V's type.  Not a group, but a group can be made from it
 template< int DIM, class V >
@@ -97,7 +92,6 @@ struct Lattice {
 
 //A 2d point group at the origin . . . 
 //////V is the reflection type of the point group (dll or dlp)
-
 template< class V > 
 struct PointGroup2D : Group< V > {
   

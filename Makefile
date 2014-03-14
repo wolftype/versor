@@ -28,8 +28,8 @@ else
 ifneq ($(CLANG),0) 
 	CXX = $(CLANG) -std=c++11  
 else 
-	#CXX = clang++ -std=c++11 
-	 CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11
+	CXX = clang++ -std=c++11 
+#	 CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11
 endif 
 	CXX += -arch x86_64
 endif

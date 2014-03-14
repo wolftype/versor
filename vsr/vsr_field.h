@@ -65,8 +65,6 @@ namespace vsr{
     template < class T >
     class Field : public CubicLattice < typename T::template BType< typename T::Mode::Pnt > > {
               
-              
-               
         protected:
         
         T * mData;

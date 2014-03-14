@@ -21,8 +21,11 @@ using namespace std;
 
 namespace vsr{
 
+
+/*!-----------------------------------------------------------------------------
+ * CALCULATES POLYTOPES FROM SIMPLE ROOTS IN ND (beware infinite groups . . .)
+ *-----------------------------------------------------------------------------*/
 struct Root{
-  
   
   ///Utility function to compare two vectors (looks at norm of the difference)           
   template<class V>
@@ -47,7 +50,7 @@ struct Root{
       return System( initial );
    }
     
-  // Build a Root System from A vector of Simple Roots
+   // Build a Root System from A vector of Simple Roots
    template<class V>
    static vector<V> System( const vector<V>& root){
 
@@ -55,6 +58,54 @@ struct Root{
 
     //Copy simple roots into results first
     vector< V > results = root;
+
+    bool keepGoing = true; 
+    while (keepGoing){   
+
+        bool done = true;
+        
+        int cs = results.size(); 
+
+        for (int i = 0; i < cs; ++i){  
+        
+          int ns = results.size();
+        
+          for (int j = 0; j < ns; ++j ){
+
+              V nr = results[j].re( results[i] ); 
+
+              bool exists = 0; 
+              for ( int k = 0; k < ns; ++k){ 
+                exists = ( Compare(nr,results[k]) );
+                if (exists) {  
+                  break;
+                }
+              }
+
+              if (!exists)  { 
+//                nr.print();
+                results.push_back( nr );
+                done = false;  //if even one is new, try them all again
+              }   
+
+            }
+        } 
+        
+        if (done) { keepGoing = false; } // if not, then stop
+ 
+   }
+
+   return results;
+}  
+};
+
+            
+} //vsr::
+#endif
+
+
+
+
 
     //FIRST PASS: reflect all roots around each other, and save if new 
     /* for (int i = 0; i < n; ++i){ */
@@ -105,48 +156,4 @@ struct Root{
 
     /*           } */
     /*         } */  
-    /*     } */   
-
-
-    bool keepGoing = true; 
-    while (keepGoing){   
-
-        bool done = true;
-        
-        int cs = results.size(); 
-
-        for (int i = 0; i < cs; ++i){  
-        
-          int ns = results.size();
-        
-          for (int j = 0; j < ns; ++j ){
-
-              V nr = results[j].re( results[i] ); 
-
-              bool exists = 0; 
-              for ( int k = 0; k < ns; ++k){ 
-                exists = ( Compare(nr,results[k]) );
-                if (exists) {  
-                  break;
-                }
-              }
-
-              if (!exists)  { 
-                results.push_back( nr );
-                done = false;  //if even one is new, try them all again
-              }   
-
-            }
-        } 
-        
-        if (done) { keepGoing = false; } // if not, then stop
- 
-   }
-
-   return results;
-}  
-};
-
-            
-} //vsr::
-#endif
+    /*     } */  

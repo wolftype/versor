@@ -73,33 +73,45 @@ struct Proj<3>{
   return (x*x) + dot(xs...);
  }  
 
+
+
+/*!-----------------------------------------------------------------------------
+ * Operations on All Types 
+ *
+ *-----------------------------------------------------------------------------*/
 namespace Op{  
   
+  /// Dual of a Multivector in A Conformal Metric
   template<TT DIM, class A>  
   auto dl( const CGAMV<DIM,A>& a ) RETURNS (
     a * NPss<DIM>(-1)
   ) 
 
+  /// Undual of a Multivector in A Conformal Metric
   template<TT DIM, class A>  
   auto udl( const CGAMV<DIM,A>& a ) RETURNS (
     a * NPss<DIM>(1)
   )
 
-
+  /// Euclidean Dual of a Multivector in a Conformal Metric
   template<TT DIM, class A>  
   auto dle( const CGAMV<DIM,A>& a ) RETURNS (
     a * NEucPss<DIM>(-1)
   )
    
+  /// Euclidean Undual of a Multivector in a Conformal Metric
   template<TT DIM, class A>  
   auto udle( const CGAMV<DIM,A>& a ) RETURNS (
     a * NEucPss<DIM>(1)
   )
   
+  /// Euclidean Dual of a Euclidean Multivector
   template<TT DIM, class A>  
   auto dle( const EGAMV<DIM, A>& a ) RETURNS (
     a * ( NEPss< DIM >(-1) )
   ) 
+
+  /// Euclidean Undual of a Euclidean Multivector
   template<TT DIM, class A>  
   auto udle( const EGAMV<DIM,A>& a ) RETURNS (   
     a * ( NEPss< DIM >(1) )   
@@ -140,6 +152,7 @@ namespace Op{
 
 /*!-----------------------------------------------------------------------------
  * Operations on Euclidean Types 
+ *
  *-----------------------------------------------------------------------------*/
 namespace Euc{
   /*!
@@ -152,9 +165,24 @@ namespace Euc{
 }
 
 
+/*!-----------------------------------------------------------------------------
+ * Transformations and their Generators.
+ *
+ * Feed in a bivector generator to create the transformation operator,
+ * then apply to multivector:  
+ *
+ * To create a quaternionic spin transformation use Gen::rot( Biv b ) or Gen::rotor( Bivector b)
+ *
+ * To create a motor twist transformation use Gen::mot( Dll d ) or Gen::motor( DualLine d)
+ * 
+ * To create a boost transformation use Gen::bst( Par p) or Gen::boost(Pair p)
+ *
+ * To extract a Dual line from a motor use Gen::log( Mot m)
+ *
+ *-----------------------------------------------------------------------------*/
  namespace Gen{  
 
-    /* ND Rotor from Bivector b*/  
+    /*! ND Rotor from Bivector b*/  
     template<class A>
     auto rot ( const A& b ) -> decltype( b + 1 ) {  
       //  printf("me");
@@ -200,7 +228,7 @@ namespace Euc{
   
     /*! Get Bivector Generator from a Rotor  (3d Conformal)
           @param Rotor r
-      */
+     */
      template<TT DIM>
      auto log(const EGAMV<DIM, typename EGA<DIM>::Rot>& r) -> EGAMV<DIM, typename EGA<DIM>::Biv> {
                  
@@ -257,9 +285,9 @@ namespace Euc{
     //           return b / t;
     //       }  
 
-      /*! Normalized plane of rotation from Rotor 
-          @param Rotor r
-      */
+    /*! Normalized plane of rotation from Rotor 
+        @param Rotor r
+    */
     template< class A >
     auto pl( const A& r) -> typename A::template BType< typename A::Mode::Biv > { 
       using TBIV = typename A::template BType< typename A::Mode::Biv >;  
@@ -494,6 +522,7 @@ namespace Euc{
 
 /*!-----------------------------------------------------------------------------
  * Operations on Round types (Points, Point Pairs, Circles, Spheres, N-Spheres) 
+ *
  *-----------------------------------------------------------------------------*/
  namespace Ro {                          
      
@@ -890,6 +919,7 @@ namespace Euc{
 
  /*!-----------------------------------------------------------------------------
   * Operations On Flat Types (Lines, Dual Lines, Planes, Dual Planes, Flat Points, etc) 
+  *
   *-----------------------------------------------------------------------------*/
   namespace Fl {          
 
@@ -945,6 +975,7 @@ namespace Euc{
 
   /*!-----------------------------------------------------------------------------
    * Operations on Tangent Types ( tangent vector, bivectors, trivectors, etc) 
+   *
    *-----------------------------------------------------------------------------*/
    namespace Ta {
 

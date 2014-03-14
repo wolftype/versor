@@ -17,7 +17,7 @@
  */
 
 #include "vsr_cga3D_op.h"
-#include "vsr_cga3D_funcs.h"
+//#include "vsr_cga3D_funcs.h"
 
 #include "gfx/gfx_mesh.h"
 

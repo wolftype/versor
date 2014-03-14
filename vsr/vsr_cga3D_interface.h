@@ -4,7 +4,7 @@
 #include "gfx/gfx_interface.h" 
 
 #include "vsr_cga3D_op.h" 
-#include "vsr_frame.h" 
+#include "vsr_cga3D_frame.h" 
 
 #include <sstream>
  
