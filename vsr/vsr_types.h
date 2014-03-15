@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_types.h
  *
- *    Description:  type management classes
+ *    Description:  geometric algebra type management classes
  *
  *        Version:  1.0
  *        Created:  03/10/2014 12:00:46
@@ -11,7 +11,7 @@
  *       Compiler:  gcc4.7 or above or clang3.2 or above
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  pretty awesome
  *
  * =====================================================================================
  */
@@ -21,7 +21,8 @@
 #define MV_H_INCLUDED  
 
 #include <math.h>   
-#include "vsr_basis.h"  
+#include "vsr_basis.h"
+#include <iostream>  
 
 namespace vsr{
 
@@ -59,14 +60,15 @@ struct Maybe<false,A,B>{
 
 
 /*-----------------------------------------------------------------------------
- *  EMPTY MVBasis
+ *  EMPTY Basis
  *-----------------------------------------------------------------------------*/
 template<TT ... XS>
-struct MVBasis{
+struct Basis{
   
-  constexpr MVBasis(){}
+  constexpr Basis(){}
    
   static const int Num = 0;
+  static const TT HEAD = 0;
   static void print(){ printf("\n");} 
 };   
 
@@ -75,14 +77,14 @@ struct MVBasis{
  *  COMBINATORICS ONLY (NO STORAGE)
  *-----------------------------------------------------------------------------*/
 template<TT X, TT ... XS>
-struct MVBasis<X, XS...>{  
+struct Basis<X, XS...>{  
   
-  constexpr MVBasis(){}
+  constexpr Basis(){}
  
   static const int Num = sizeof...(XS) +1;  
   
   static const TT HEAD = X;
-  typedef MVBasis<XS...> TAIL;  
+  typedef Basis<XS...> TAIL;  
   
   static void print() { printf("%s\t%s\t%d\n", estring(X).c_str(), bitString<6>(X).c_str(), X);  TAIL::print(); } 
 
@@ -93,18 +95,18 @@ struct MVBasis<X, XS...>{
  *  CONCATENATE
  *-----------------------------------------------------------------------------*/
 template<TT ... XS, TT ... YS>
-constexpr MVBasis<XS...,YS...> cat ( const MVBasis<XS...>&, const MVBasis<YS...>&){  
-  return MVBasis<XS...,YS...>() ;
+constexpr Basis<XS...,YS...> cat ( const Basis<XS...>&, const Basis<YS...>&){  
+  return Basis<XS...,YS...>() ;
 }  
 
 template<class A, class B>
 struct Cat{   
-  typedef MVBasis<> Type;
+  typedef Basis<> Type;
 };
 
 template<TT ... XS, TT ... YS>
-struct Cat< MVBasis<XS...>, MVBasis<YS...> > {
-  typedef  MVBasis<XS..., YS...> Type; 
+struct Cat< Basis<XS...>, Basis<YS...> > {
+  typedef  Basis<XS..., YS...> Type; 
 }; 
 
 
@@ -113,16 +115,16 @@ struct Cat< MVBasis<XS...>, MVBasis<YS...> > {
  *  INSERT SORT
  *-----------------------------------------------------------------------------*/
 //sort as you add in . . .
-template <int A, class Rest, class First = MVBasis<> >
+template <int A, class Rest, class First = Basis<> >
 struct Insert{        
   typedef typename Maybe< compare<A, Rest::HEAD>(),
-    typename Cat< typename Cat< First, MVBasis<A> >::Type, Rest >::Type,
-    typename Insert< A, typename Rest::TAIL, typename Cat< First, MVBasis<Rest::HEAD> >::Type>::Type
+    typename Cat< typename Cat< First, Basis<A> >::Type, Rest >::Type,
+    typename Insert< A, typename Rest::TAIL, typename Cat< First, Basis<Rest::HEAD> >::Type>::Type
   >::Type Type; 
 };
 template <int A, class First>
-struct Insert<A, MVBasis<>, First>{
-  typedef typename Cat< First, MVBasis<A> >::Type Type;
+struct Insert<A, Basis<>, First>{
+  typedef typename Cat< First, Basis<A> >::Type Type;
 };
 
 
@@ -136,7 +138,7 @@ struct ICat{
   typedef typename ICat < typename A::TAIL, One  >::Type Type;
 };
 template<class B>
-struct ICat< MVBasis<>, B>{
+struct ICat< Basis<>, B>{
   typedef B Type;
 };
 
@@ -150,15 +152,15 @@ struct NotType{
   static const int IS = find( B::HEAD, A() );
   typedef typename Cat< 
     typename Maybe< IS == -1,
-      MVBasis< B::HEAD > , 
-      MVBasis<>
+      Basis< B::HEAD > , 
+      Basis<>
     >::Type,
       typename NotType< A, typename B::TAIL >::Type 
   >::Type Type;  
 };  
 template<class A>
-struct NotType< A, MVBasis<> >{
-  typedef MVBasis<> Type;  
+struct NotType< A, Basis<> >{
+  typedef Basis<> Type;  
 };
 
 template<class M, int AB, int SF>  
@@ -170,11 +172,11 @@ struct MSign<M, 0, SF>{
   static constexpr int Val = SF;
 };
 template<int AB, int SF >
-struct MSign<MVBasis<>, AB, SF >{
+struct MSign<Basis<>, AB, SF >{
   static constexpr int Val = SF;
 };
 template<int SF >
-struct MSign<MVBasis<>, 0, SF >{
+struct MSign<Basis<>, 0, SF >{
   static constexpr int Val = SF;
 };
 
@@ -188,14 +190,14 @@ constexpr TT bit(){ return 1 << N; }
 template<TT TOT, TT DIM = TOT>
 struct Blade1{  
   static constexpr auto Vec() RETURNS(
-    cat( MVBasis< bit<(TOT - DIM)>() >(), Blade1< TOT, DIM-1>::Vec() )
+    cat( Basis< bit<(TOT - DIM)>() >(), Blade1< TOT, DIM-1>::Vec() )
   ) 
   typedef decltype( Vec() ) VEC;           
 };
 template<TT TOT>
 struct Blade1<TOT,0>{  
   static constexpr auto Vec() RETURNS(
-    MVBasis<>()
+    Basis<>()
   )
 };
 
@@ -210,7 +212,7 @@ struct Exists{
 };
 
 template<TT N>
-struct Exists< N, MVBasis<> >{  
+struct Exists< N, Basis<> >{  
   static constexpr bool Call() { return false; }
 };
 
@@ -221,20 +223,20 @@ struct Exists< N, MVBasis<> >{
  *-----------------------------------------------------------------------------*/
 template<int P>
 struct RPlus{
-  typedef typename Cat< MVBasis<1>, typename RPlus<P-1>::Type>::Type Type;  
+  typedef typename Cat< Basis<1>, typename RPlus<P-1>::Type>::Type Type;  
 };
 template<>
 struct RPlus<0>{
-  typedef MVBasis<> Type;
+  typedef Basis<> Type;
 };
 
 template<int P>
 struct RMinus{
-  typedef typename Cat< MVBasis<-1>, typename RMinus<P-1>::Type>::Type Type;  
+  typedef typename Cat< Basis<-1>, typename RMinus<P-1>::Type>::Type Type;  
 };
 template<>
 struct RMinus<0>{
-  typedef MVBasis<> Type;
+  typedef Basis<> Type;
 };
 
 template<int P, int Q>   
@@ -247,48 +249,36 @@ struct RMetric{
 
 
 /*-----------------------------------------------------------------------------
- *  TYPES + DATA MV<MVBasis, ValueType (reals, complex, quats, etc) >
+ *  TYPES + DATA MV<Basis, ValueType (reals, complex, quats, etc) >
  *-----------------------------------------------------------------------------*/
 template<typename B, typename T> struct MV;
 
 
 /*-----------------------------------------------------------------------------
- *  PRINT
+ *  VALUE PRINT
  *-----------------------------------------------------------------------------*/
 struct VPrint {
 
   template<typename B, typename T>
   static void Call( const MV<B,T>& m ){
-    for(int i=0; i < B::Num; ++i ) printf("%f\t", m[i] ); printf("\n\n");
+    for(int i=0; i < B::Num; ++i ) cout << m[i] << "\t"; cout << endl; //printf("%f\t", m[i] ); printf("\n\n");
   }
 
-  /* template<typename B> */
-  /* static void Call( const MV<B,float>& m ){ */
-  /*   for(int i=0; i < B::Num; ++i ) printf("%f\t", m[i] ); printf("\n\n"); */
-  /* } */
-
-  template<typename B>
-  static void Call( const MV<B,int>& m ){
-    for(int i=0; i < B::Num; ++i ) printf("%d\t", m[i] ); printf("\n\n");
-  }
-
-  
   template<typename B, typename T, TT Dim, template<TT,typename> class S >
   static void Call( const MV< B, S<Dim,T> >& m ){
     for(int i=0; i < B::Num; ++i ) Call( m[i] );
   }
-  /* template<typename B, typename T, template<TT,typename> class S > */
-  /* static void Call( const MV< B, S<TT,T> >& m ){ */
-  /*   for(int i=0; i < B::Num; ++i ) Call( m[i] ); */
-  /* } */
 
 };
 
 
-/*-----------------------------------------------------------------------------
+/*!-----------------------------------------------------------------------------
  *  THE GENERIC MULTIVECTOR CLASS (built from a basis B over a value type T)
+ *
+ *  The value type can be anything that multiplies, including another Multivector,
+ *  allowing for tensor metrics C x C, etc a la Bott periodicity.
  *-----------------------------------------------------------------------------*/
-template<typename B, typename T>
+template<typename B, typename T=VSR_PRECISION>
 struct MV{
 
   static const int Num = B::Num;
@@ -340,15 +330,16 @@ struct MV{
 
 
 /*-----------------------------------------------------------------------------
- *  SUMMING AND DIFFERENCING
+ *  SUMMING
  *-----------------------------------------------------------------------------*/
-//same types
+/// Sum of Similar types
 template<class B, class T> MV<B,T> 
 sum( const MV<B,T> & a, const MV<B,T>& b) {
   MV<B,T> c;
   for (int i = 0; i < B::Num; ++i) c[i] = a[i] + b[i];
   return c;
 } 
+/// Difference of Similar types
 template<class B, class T> MV<B,T> 
 diff( const MV<B,T> & a, const MV<B,T>& b) {
   MV<B,T> c;
@@ -356,13 +347,14 @@ diff( const MV<B,T> & a, const MV<B,T>& b) {
   return c;
 } 
 
-//different types
+/// Sum of Different types
 template<class B1, class B2, class T>
 MV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type, T>
 sum( const MV<B1,T> & a, const MV<B2,T>& b) {
   typedef MV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type, T> Ret; 
   return sum( a.template cast<Ret>() ,  b.template cast<Ret>() );
 } 
+/// Difference of Different types
 template<class B1, class B2, class T>
 MV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type, T>
 diff( const MV<B1,T> & a, const MV<B2,T>& b) {
@@ -370,11 +362,11 @@ diff( const MV<B1,T> & a, const MV<B2,T>& b) {
   return diff( a.template cast<Ret>() ,  b.template cast<Ret>() );
 } 
 
-//VSR_PRECISION
+/// Sum some scalar value 
 template<class B, class T>
-MV<typename ICat< typename NotType< MVBasis<0>, B >::Type, MVBasis<0> >::Type,T>
+MV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type,T>
 sumv( VSR_PRECISION a, const  MV<B,T>& b) {
-  MV<typename ICat< typename NotType< MVBasis<0>, B >::Type, MVBasis<0> >::Type,T> Ret;
+  MV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type,T> Ret;
   return sum( Ret(a) , b.template cast<Ret>() );
 }
 

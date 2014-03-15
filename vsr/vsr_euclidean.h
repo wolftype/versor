@@ -31,73 +31,81 @@
 namespace vsr{
                              
 /*-----------------------------------------------------------------------------
- *  GEOMETRIC PRODUCT COMPILE-TIME ROUTINES
+ *  GEOMETRIC PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
+/// Geometric Product Type Calculation Sub Loop
 template<TT A, class B, int idxA, int idxB>  
 struct SubEGP{
   typedef typename XCat< XList< Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> >, typename SubEGP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
+/// Geometric Product Type Calculation Sub Loop End Case
 template<TT A, int idxA, int idxB>  
-struct SubEGP<A, MVBasis<>, idxA, idxB >{
+struct SubEGP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
-
+/// Geometric Product Type Calculation Main Loop
 template<class A, class B, int idxA=0, int idxB=0>  
 struct EGP{
   typedef typename XCat< typename SubEGP<A::HEAD,B, idxA,idxB>::Type, typename EGP<typename A::TAIL, B, idxA+1,idxB>::Type >::Type Type; 
 };
+/// Geometric Product Type Calculation Main Loop End Case
 template<class B, int idxA, int idxB>  
-struct EGP<MVBasis<>,B, idxA,idxB> {
+struct EGP<Basis<>,B, idxA,idxB> {
   typedef XList<> Type; 
 }; 
 
 
-
 /*-----------------------------------------------------------------------------
- *  OUTER PRODUCT COMPILE-TIME ROUTINES
+ *  OUTER PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
+/// Outer Product Type Calculation Sub Loop
 template<TT A, class B, int idxA, int idxB>  
 struct SubEOP{ 
   typedef Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEOP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
+/// Outer Product Type Calculation Sub Loop End Case
 template<TT A, int idxA, int idxB>  
-struct SubEOP<A, MVBasis<>, idxA, idxB >{
+struct SubEOP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
-
+/// Outer Product Type Calculation Main Loop
 template<class A, class B, int idxA=0, int idxB=0>  
 struct EOP{
   typedef typename XCat< typename SubEOP<A::HEAD,B, idxA,idxB>::Type, typename EOP<typename A::TAIL, B, idxA+1,idxB>::Type >::Type Type; 
 };
+/// Outer Product Type Calculation Main Loop End Case
 template<class B, int idxA, int idxB>  
-struct EOP<MVBasis<>,B, idxA,idxB> {
+struct EOP<Basis<>,B, idxA,idxB> {
   typedef XList<> Type; 
 };
 
 
 
 /*-----------------------------------------------------------------------------
- *  INNER PRODUCT COMPILE-TIME ROUTINES
+ *  INNER PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
+/// Inner Product Type Calculation Sub Loop
 template<TT A, class B, int idxA, int idxB>  
 struct SubEIP{ 
   typedef Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEIP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
+/// Inner Product Type Calculation Sub Loop End Case
 template<TT A, int idxA, int idxB>  
-struct SubEIP<A, MVBasis<>, idxA, idxB >{
+struct SubEIP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
-
+/// Inner Product Type Calculation Main loop
 template<class A, class B, int idxA=0, int idxB=0>  
 struct EIP{
   typedef typename XCat< typename SubEIP<A::HEAD,B, idxA,idxB>::Type, typename EIP<typename A::TAIL, B, idxA+1,idxB>::Type >::Type Type; 
 };
+/// Inner Product Type Calculation Main Loop End Case
 template<class B, int idxA, int idxB>  
-struct EIP<MVBasis<>,B, idxA,idxB> {
+struct EIP<Basis<>,B, idxA,idxB> {
   typedef XList<> Type; 
 };
 
@@ -114,23 +122,23 @@ struct Product {
 
 template<class A, class B>
 struct EProdInstructions{
-  typedef typename EGP<A,B>::Type InstList; 
-  typedef Product<InstList> Fun;
+  typedef typename EGP<A,B>::Type List; 
+  typedef Product<List> Fun;
 };
 template<class A, class B>
 struct EOProdInstructions{
-  typedef typename EOP<A,B>::Type InstList; 
-  typedef Product<InstList> Fun;
+  typedef typename EOP<A,B>::Type List; 
+  typedef Product<List> Fun;
 };
 template<class A, class B>
 struct EIProdInstructions{
-  typedef typename EIP<A,B>::Type InstList; 
-  typedef Product<InstList> Fun;
+  typedef typename EIP<A,B>::Type List; 
+  typedef Product<List> Fun;
 };
 
 
 /*-----------------------------------------------------------------------------
- *  Product Type Instantiation
+ *  Product Type Automatic Instantiation
  *-----------------------------------------------------------------------------*/
 template<class A, class B>
 struct EProd {  
@@ -159,6 +167,18 @@ struct EIProd{
   } 
 }; 
 
+/*-----------------------------------------------------------------------------
+ *  Product Type Explicit Control  
+ *-----------------------------------------------------------------------------*/
+template<class A, class B, class R>
+struct REProd{
+  typedef typename EGP<A,B>::Type InstList;      
+  typedef typename Index< InstList, R>::Type DO;   
+  static constexpr R Call(const A& a, const B& b) {
+    return DO::template Make<R>(a, b);
+  } 
+};
+
 
 /*-----------------------------------------------------------------------------
  *  Product Functions
@@ -177,24 +197,42 @@ CA eip(const A& a, const B& b) RETURNS(
 )
 
 
+/*-----------------------------------------------------------------------------
+ *  Transformation Functions
+ *-----------------------------------------------------------------------------*/
+/// Spin a by b, return a
+template<class A, class B>
+constexpr A esp(const A& a, const B& b) {
+  return REProd< typename EProd<B,A>::Type, B, A >::Call( egp(b, a),   Reverse< B >::Type::template Make(b) );
+}
+
+/// Reflect a by b, return a
+template<class A, class B>
+constexpr A ere(const A& a, const B& b) {
+  return REProd< typename EProd<B,A>::Type, B, A>::Call( egp(b, a.involution() ),   Reverse< B >::Type::template Make(b) );
+}
+
+
 
 /*-----------------------------------------------------------------------------
- *  EUCLIDEAN SPACE
+ *  EUCLIDEAN SPACE UTILITY
  *-----------------------------------------------------------------------------*/
 template<TT DIM>
 struct EGA {
   
-  typedef MVBasis<0> Sca; 
-  template<TT ... N> using e = MVBasis< blade( (1<<(N-1))... ) >;  
+  typedef Basis<0> Sca; 
+  template<TT ... N> using e = Basis< blade((1<<(N-1))...) >;  
   
   using Vec = typename Blade1<DIM>::VEC; 
-  using Pss = MVBasis< _vsr_make_pss(DIM) >;
+  using Pss = Basis< _vsr_make_pss(DIM) >;
 };
 
 
 
 /*!-----------------------------------------------------------------------------
  * EUCLIDEAN MULTIVECTOR 
+ *
+ * Euclidean multivectors templated on dimension and list of blades
  *-----------------------------------------------------------------------------*/
 template<TT NDIM, class A>
 struct EGAMV : public A {
@@ -207,7 +245,7 @@ struct EGAMV : public A {
   constexpr EGAMV(Args...v) : A(v...) {}  
   constexpr EGAMV(const A& a) : A(a) {}   
   
-  /// Construct from another Euclidean Dimension (make more specific)
+  /// Construct from another Euclidean Dimension (NOTE: make this more specific)
 //  template<TT BDIM, class B>
 //  constexpr EGAMV(const EGAMV<BDIM,B>& b) : A( b.template cast<A>() ) {}
    
@@ -240,7 +278,8 @@ struct EGAMV : public A {
     VT v = ((*this) * tmp)[0];    
     return (v==0) ? tmp : tmp / v;
   }
-  
+ 
+  // Division 
   template<class B>
   auto operator / (const B& b) const RETURNS(
     (  *this * !b )
@@ -345,7 +384,14 @@ template<TT N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<typename EGA<
 template<TT N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, MV<typename EGA<N>::Vec,T> >; 
 template<TT N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, MV<typename EGA<N>::Pss,T> >; 
 
-template<typename T, TT N, TT ... NN> using EucE   = EGAMV<N, MV<typename EGA<N>::template e<NN...>, T> >; 
+template<typename T=VSR_PRECISION>
+struct NE{
+    template <TT ... NN> using e = EGAMV< dimOf( blade((1<<(NN-1))...) ), MV<typename EGA<dimOf( blade((1<<(NN-1))...) )>::template e<NN...>, T> >;
+   // using Sca = EGAMV< 
+};
+
+//template< TT ... NN, typename T=VSR_PRECISION> using NE = EGAMV< dimOf( blade((1<<(NN-1))...) ), MV<typename EGA< blade((1<<(NN-1))...)>::template e<NN...>, T> >; 
+///template< template <TT N> class S, typename T=VSR_PRECISION> using NE = EGAMV< S::DIM, S, T> >; 
 
 template<TT N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N>() ^ NEVec<N>() );
 template<TT N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N>() ^ NEBiv<N>() );

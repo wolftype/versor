@@ -20,7 +20,7 @@ struct Reverse{
 	typedef typename XCat< XList< InstFlip< reverse(A::HEAD), IDX> > , typename Reverse<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Reverse< MVBasis<>, IDX >{
+struct Reverse< Basis<>, IDX >{
 	typedef XList<> Type;  
 };
 
@@ -29,7 +29,7 @@ struct Conjugate{
 	typedef typename XCat< XList< InstFlip< conjugate(A::HEAD), IDX> > , typename Conjugate<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Conjugate< MVBasis<>, IDX >{
+struct Conjugate< Basis<>, IDX >{
 	typedef XList<> Type;  
 };
 
@@ -38,12 +38,12 @@ struct Involute{
 	typedef typename XCat< XList< InstFlip< involute(A::HEAD), IDX> > , typename Involute<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
-struct Involute< MVBasis<>, IDX >{
+struct Involute< Basis<>, IDX >{
 	typedef XList<> Type;  
 };
 
 
-constexpr int find(int n, const MVBasis<>, int idx){
+constexpr int find(int n, const Basis<>, int idx){
 	return -1;
 }
 template<class A>
@@ -57,7 +57,7 @@ struct Cast{
 	typedef typename XCat< XList< InstCast< find( A::HEAD, B() ) > > , typename Cast< typename A::TAIL, B >::Type >::Type Type;  
 };  
 template<class B>
-struct Cast< MVBasis<>, B >{
+struct Cast< Basis<>, B >{
 	typedef XList<> Type;  
 };     
 

@@ -42,8 +42,8 @@ struct XList{
   static void print() { printf("\n"); }   
   
   template<class R, class A, class B>
-  static constexpr MVBasis<> Make(const A& a, const B& b){
-    return MVBasis<>();
+  static constexpr R Make(const A& a, const B& b){
+    return R();
   }
 };                                                     
 
@@ -122,7 +122,7 @@ struct Reduce{
 
 template<>
 struct Reduce<XList<> >{
-  typedef MVBasis<> Type;
+  typedef Basis<> Type;
 };  
 
 
@@ -150,7 +150,7 @@ struct Index{
 
 };
 template< class I>    
-struct Index< I, MVBasis<> > {  
+struct Index< I, Basis<> > {  
    typedef XList<> Type;
 };
  
