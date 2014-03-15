@@ -23,8 +23,8 @@ struct XList{
   static void print() { printf("\n"); }   
   
   template<class R, class A, class B>
-  static constexpr MV<> Make(const A& a, const B& b){
-    return MV<>();//R(X::Exec(a,b), XS::Exec(a,b)...);
+  static constexpr R Make(const A& a, const B& b){ // changed from MV<>() to R
+    return R();//R(X::Exec(a,b), XS::Exec(a,b)...);//changed from MV<>() to R
   }
 };                                                     
 
