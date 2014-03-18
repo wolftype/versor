@@ -76,7 +76,7 @@ struct XList<X,XS...>{
  
   /// Executes a Cast List 
   template<class B, class A>
-  static constexpr B Cast(const A& a){
+  static constexpr B doCast(const A& a){
     return B(X::Exec(a), XS::Exec(a)...);
   }    
   
@@ -153,9 +153,12 @@ template< class I>
 struct Index< I, Basis<> > {  
    typedef XList<> Type;
 };
- 
 
-
+template<class T>
+struct Product {
+  typedef typename Reduce<T>::Type Type;
+  typedef typename Index<T, Type>::Type DO;
+};
 
 } //vsr::
 

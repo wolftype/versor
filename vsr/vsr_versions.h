@@ -54,7 +54,11 @@ constexpr int find(int n, const A& a, int idx = 0){
 //CAST B TO A
 template<class A, class B>
 struct Cast{
-	typedef typename XCat< XList< InstCast< find( A::HEAD, B() ) > > , typename Cast< typename A::TAIL, B >::Type >::Type Type;  
+	typedef typename 
+  XCat< 
+      XList< InstCast< find( A::HEAD, B() ) > >, 
+      typename Cast< typename A::TAIL, B >::Type 
+      >::Type Type;  
 };  
 template<class B>
 struct Cast< Basis<>, B >{
@@ -68,8 +72,12 @@ struct Cast< Basis<>, B >{
  *-----------------------------------------------------------------------------*/
 template<typename B, typename T> template<class A> 
 A MV<B, T>::cast() const{
- return Cast< typename A::Bases, B >::Type::template Cast<A>( *this );
+ return Cast< typename A::Bases, B >::Type::template doCast<A>( *this );
 }  
+/* template<typename B, typename T> */
+/* B MV<B, T>::cast() const{ */
+/*  return B( *this ); */
+/* } */  
 
 template<typename B, typename T> template<class A>
 A MV<B,T>::copy() const{

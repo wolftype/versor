@@ -1,6 +1,7 @@
 /*!  @File
  *   bit operations on basis blades (compile-time or run-time)
- *   a compile-time version of the method introduced daniel fontijne
+ *   a compile-time version of the bit representation of basis blades 
+ *   method introduced by daniel fontijne
  *  
  *  VERSOR
  *
@@ -25,14 +26,18 @@ namespace vsr{
 using namespace std;
   
 
+/*!-----------------------------------------------------------------------------
+ *  CONSTEXPR BIT MANIPULATIONS
+ *-----------------------------------------------------------------------------*/
+namespace Bits {
 /// BLADE BIT REPRESENTATION TYPE (16 DIMENSIONS is plenty since they can be nested at 8. . .)
-typedef short TT; 
+typedef short Type; 
 
-constexpr TT blade(){ return 0; }
+constexpr Type blade(){ return 0; }
 
 /// Make bit representation of a blade from a list of unsigned integers
 template<class X, class...XS>
-constexpr TT blade( X x, XS ... xs){
+constexpr Type blade( X x, XS ... xs){
   return x | blade(xs...);  
 }
 
@@ -67,32 +72,32 @@ inline void beprint(int x){
  }
 
 /// Get grade of blade (count number of "on" bits)
-constexpr TT grade (TT a, TT c = 0){
+constexpr Type grade (Type a, Type c = 0){
   return a > 0 ? ( a & 1 ? grade( a >> 1, c + 1) :  grade( a >> 1, c ) ) : c;
 }
 
 /// Highest Dimension Represented by b (find leftmost bit)
-constexpr TT dimOf( TT b, TT dim=0 ){
+constexpr Type dimOf( Type b, Type dim=0 ){
   return (b > 0) ? dimOf( b >> 1, dim+1 ) : dim; 
 }
 
 /// Whether to Flip Signs when multiplying two blades a and b
-constexpr bool signFlip(TT a, TT b, int c = 0){
+constexpr bool signFlip(Type a, Type b, int c = 0){
   return (a >> 1 ) > 0 ? ( signFlip( a >> 1 , b, c + grade( ( a >> 1 ) & b ) ) ) : ( ( c & 1 ) ? true : false ); 
 }   
 
 /// Whether left contraction inner product is legit
-constexpr bool inner(TT a, TT b) {
+constexpr bool inner(Type a, Type b) {
   return !( ( grade(a) > grade(b) ) || ( grade( a ^ b ) != ( grade(b) - grade(a) )  ) );
 }
 
 /// Whether outer product is legit
-constexpr bool outer( TT a, TT b){
+constexpr bool outer( Type a, Type b){
   return !( a & b );
 } 
 
 /// Product is just an xor!
-constexpr TT product(TT a, TT b){
+constexpr Type product(Type a, Type b){
   return a ^ b;
 }   
 
@@ -108,15 +113,15 @@ constexpr int cpow(int x, int N)
  *-----------------------------------------------------------------------------*/
 
 /// Whether reversion causes a sign flip
-constexpr bool reverse(TT a){
+constexpr bool reverse(Type a){
   return cpow( -1, (grade(a) * (grade(a)-1) / 2.0) ) == -1;
 }
 /// Whether involution causes a sign flip
-constexpr bool involute(TT a){
+constexpr bool involute(Type a){
   return cpow( -1, grade(a) ) == -1;
 }
 /// Whether conjugation causes a sign flip
-constexpr bool conjugate(TT a){
+constexpr bool conjugate(Type a){
   return cpow( -1,(grade(a) * (grade(a)+1) / 2.0) ) == -1;   
 }
 
@@ -125,15 +130,17 @@ constexpr bool conjugate(TT a){
  *  COMPARISON FOR SORTING ALGORITHMS
  *-----------------------------------------------------------------------------*/
  /// Compare two blades and order them based on grade and value 
-template <TT A, TT B>
+template <Type A, Type B>
 constexpr bool compare(){
     return ( grade(A) == grade(B) ) ?  A < B : grade(A) < grade(B); //return A < B::HEAD;
 }
 
 
-constexpr TT _vsr_make_pss(TT dim){
-  return ( dim == 0 ) ? 0 : (1 << (dim-1)) | _vsr_make_pss( dim-1 ); 
+constexpr Type pss(Type dim){
+  return ( dim == 0 ) ? 0 : (1 << (dim-1)) | pss( dim-1 ); 
 }
+
+} //Bits:: 
 
 } //vsr::
 

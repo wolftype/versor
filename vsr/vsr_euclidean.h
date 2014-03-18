@@ -34,12 +34,12 @@ namespace vsr{
  *  GEOMETRIC PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
 /// Geometric Product Type Calculation Sub Loop
-template<TT A, class B, int idxA, int idxB>  
+template<Bits::Type A, class B, int idxA, int idxB>  
 struct SubEGP{
-  typedef typename XCat< XList< Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> >, typename SubEGP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
+  typedef typename XCat< XList< Inst<Bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> >, typename SubEGP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
 /// Geometric Product Type Calculation Sub Loop End Case
-template<TT A, int idxA, int idxB>  
+template<Bits::Type A, int idxA, int idxB>  
 struct SubEGP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
@@ -59,14 +59,14 @@ struct EGP<Basis<>,B, idxA,idxB> {
  *  OUTER PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
 /// Outer Product Type Calculation Sub Loop
-template<TT A, class B, int idxA, int idxB>  
+template<Bits::Type A, class B, int idxA, int idxB>  
 struct SubEOP{ 
-  typedef Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef Inst<Bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEOP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
 /// Outer Product Type Calculation Sub Loop End Case
-template<TT A, int idxA, int idxB>  
+template<Bits::Type A, int idxA, int idxB>  
 struct SubEOP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
@@ -87,14 +87,14 @@ struct EOP<Basis<>,B, idxA,idxB> {
  *  INNER PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
 /// Inner Product Type Calculation Sub Loop
-template<TT A, class B, int idxA, int idxB>  
+template<Bits::Type A, class B, int idxA, int idxB>  
 struct SubEIP{ 
-  typedef Inst<signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef Inst<Bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEIP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
 };
 /// Inner Product Type Calculation Sub Loop End Case
-template<TT A, int idxA, int idxB>  
+template<Bits::Type A, int idxA, int idxB>  
 struct SubEIP<A, Basis<>, idxA, idxB >{
   typedef XList<> Type;
 };
@@ -114,12 +114,6 @@ struct EIP<Basis<>,B, idxA,idxB> {
 /*-----------------------------------------------------------------------------
  *  Product Construction Instructions
  *-----------------------------------------------------------------------------*/
-template<class T>
-struct Product {
-  typedef typename Reduce<T>::Type Type;
-  typedef typename Index<T, Type>::Type DO;
-};
-
 template<class A, class B>
 struct EProdInstructions{
   typedef typename EGP<A,B>::Type List; 
@@ -217,14 +211,14 @@ constexpr A ere(const A& a, const B& b) {
 /*-----------------------------------------------------------------------------
  *  EUCLIDEAN SPACE UTILITY
  *-----------------------------------------------------------------------------*/
-template<TT DIM>
+template<Bits::Type DIM>
 struct EGA {
   
   typedef Basis<0> Sca; 
-  template<TT ... N> using e = Basis< blade((1<<(N-1))...) >;  
+  template<Bits::Type ... N> using e = Basis< Bits::blade((1<<(N-1))...) >;  
   
   using Vec = typename Blade1<DIM>::VEC; 
-  using Pss = Basis< _vsr_make_pss(DIM) >;
+  using Pss = Basis< Bits::pss(DIM) >;
 };
 
 
@@ -232,22 +226,34 @@ struct EGA {
 /*!-----------------------------------------------------------------------------
  * EUCLIDEAN MULTIVECTOR 
  *
- * Euclidean multivectors templated on dimension and list of blades
+ * Euclidean multivectors templated on dimension and list of Bits::blades
  *-----------------------------------------------------------------------------*/
-template<TT NDIM, class A>
+template<Bits::Type NDIM, class A>
 struct EGAMV : public A {
 
   static const int DIM = NDIM;
   typedef A Type;
   typedef typename A::ValueType VT;
 
-  template< class ... Args >
-  constexpr EGAMV(Args...v) : A(v...) {}  
+  /// Construct from a list of args
+  template< typename ... Args >
+  constexpr EGAMV(Args...v) : A(v...) {}
+  /// Construct from one instance of type A  
   constexpr EGAMV(const A& a) : A(a) {}   
-  
-  /// Construct from another Euclidean Dimension (NOTE: make this more specific)
-//  template<TT BDIM, class B>
-//  constexpr EGAMV(const EGAMV<BDIM,B>& b) : A( b.template cast<A>() ) {}
+  /// Construct from one instance of type A::ValueType (for tensored metrics)
+  constexpr EGAMV(const typename A::ValueType& a) : A(a) {}  
+
+  /// Construct from same Euclidean Dimension (NOTE: make this more specific) 
+   /* template<class B> */
+   /* constexpr EGAMV(const B& b) : A( b.template cast<A>() ) {} */
+   
+  /// Construct from another Euclidean Type and/or Dimension
+    template<Bits::Type BDIM, class B>
+    constexpr EGAMV(const EGAMV<BDIM,B>& b) : A( b.template cast<A>() ) {}
+
+//    template<Bits::Type BDIM, typename C, template<Bits::Type, typename> class B>
+//    constexpr EGAMV(const B<BDIM,C> & b) : A( b.template cast<A>() ) {}
+ 
    
   /// Geometric Product
   template<class B>
@@ -305,7 +311,7 @@ struct EGAMV : public A {
   EGAMV runit() const { VT t = rnorm(); if (t == 0) return  A(); return *this / t; }
   EGAMV tunit() const { VT t = norm(); if (t == 0) return A(); return *this / t; }  
 
-  template<TT BDIM, class B>
+  template<Bits::Type BDIM, class B>
   auto operator + (const EGAMV<BDIM, B>& b) -> EGAMV< (DIM>BDIM)?DIM:BDIM, decltype( sum( A(), B() ) ) > {
     return sum(*this,b);
   }   
@@ -380,22 +386,21 @@ struct EGAMV : public A {
 
 
 //EUCLIDEAN CANDIDATES
-template<TT N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<typename EGA<N>::Sca,T> >;   
-template<TT N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, MV<typename EGA<N>::Vec,T> >; 
-template<TT N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, MV<typename EGA<N>::Pss,T> >; 
+template<Bits::Type N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<typename EGA<N>::Sca,T> >;   
+template<Bits::Type N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, MV<typename EGA<N>::Vec,T> >; 
+template<Bits::Type N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, MV<typename EGA<N>::Pss,T> >; 
 
 template<typename T=VSR_PRECISION>
 struct NE{
-    template <TT ... NN> using e = EGAMV< dimOf( blade((1<<(NN-1))...) ), MV<typename EGA<dimOf( blade((1<<(NN-1))...) )>::template e<NN...>, T> >;
-   // using Sca = EGAMV< 
+    template <Bits::Type ... NN> using e = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename EGA<Bits::dimOf( Bits::blade((1<<(NN-1))...) )>::template e<NN...>, T> >; 
 };
 
-//template< TT ... NN, typename T=VSR_PRECISION> using NE = EGAMV< dimOf( blade((1<<(NN-1))...) ), MV<typename EGA< blade((1<<(NN-1))...)>::template e<NN...>, T> >; 
-///template< template <TT N> class S, typename T=VSR_PRECISION> using NE = EGAMV< S::DIM, S, T> >; 
+//template< Bits::Type ... NN, typename T=VSR_PRECISION> using NE = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename EGA< Bits::blade((1<<(NN-1))...)>::template e<NN...>, T> >; 
+///template< template <Bits::Type N> class S, typename T=VSR_PRECISION> using NE = EGAMV< S::DIM, S, T> >; 
 
-template<TT N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N>() ^ NEVec<N>() );
-template<TT N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N>() ^ NEBiv<N>() );
-template<TT N, typename T=VSR_PRECISION> using NERot = decltype( NEVec<N>() * NEVec<N>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N>() ^ NEVec<N>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N>() ^ NEBiv<N>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NERot = decltype( NEVec<N>() * NEVec<N>() );
 
 
 }//vsr::

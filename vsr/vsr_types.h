@@ -62,13 +62,14 @@ struct Maybe<false,A,B>{
 /*-----------------------------------------------------------------------------
  *  EMPTY Basis
  *-----------------------------------------------------------------------------*/
-template<TT ... XS>
+template<Bits::Type ... XS>
 struct Basis{
   
   constexpr Basis(){}
    
   static const int Num = 0;
-  static const TT HEAD = 0;
+  static const Bits::Type HEAD = 0;
+  typedef Basis<> TAIL;
   static void print(){ printf("\n");} 
 };   
 
@@ -76,17 +77,17 @@ struct Basis{
 /*-----------------------------------------------------------------------------
  *  COMBINATORICS ONLY (NO STORAGE)
  *-----------------------------------------------------------------------------*/
-template<TT X, TT ... XS>
+template<Bits::Type X, Bits::Type ... XS>
 struct Basis<X, XS...>{  
   
   constexpr Basis(){}
  
   static const int Num = sizeof...(XS) +1;  
   
-  static const TT HEAD = X;
+  static const Bits::Type HEAD = X;
   typedef Basis<XS...> TAIL;  
   
-  static void print() { printf("%s\t%s\t%d\n", estring(X).c_str(), bitString<6>(X).c_str(), X);  TAIL::print(); } 
+  static void print() { printf("%s\t%s\t%d\n", Bits::estring(X).c_str(), Bits::bitString<6>(X).c_str(), X);  TAIL::print(); } 
 
 }; 
  
@@ -94,7 +95,7 @@ struct Basis<X, XS...>{
 /*-----------------------------------------------------------------------------
  *  CONCATENATE
  *-----------------------------------------------------------------------------*/
-template<TT ... XS, TT ... YS>
+template<Bits::Type ... XS, Bits::Type ... YS>
 constexpr Basis<XS...,YS...> cat ( const Basis<XS...>&, const Basis<YS...>&){  
   return Basis<XS...,YS...>() ;
 }  
@@ -104,7 +105,7 @@ struct Cat{
   typedef Basis<> Type;
 };
 
-template<TT ... XS, TT ... YS>
+template<Bits::Type ... XS, Bits::Type ... YS>
 struct Cat< Basis<XS...>, Basis<YS...> > {
   typedef  Basis<XS..., YS...> Type; 
 }; 
@@ -117,7 +118,7 @@ struct Cat< Basis<XS...>, Basis<YS...> > {
 //sort as you add in . . .
 template <int A, class Rest, class First = Basis<> >
 struct Insert{        
-  typedef typename Maybe< compare<A, Rest::HEAD>(),
+  typedef typename Maybe< Bits::compare<A, Rest::HEAD>(),
     typename Cat< typename Cat< First, Basis<A> >::Type, Rest >::Type,
     typename Insert< A, typename Rest::TAIL, typename Cat< First, Basis<Rest::HEAD> >::Type>::Type
   >::Type Type; 
@@ -181,20 +182,20 @@ struct MSign<Basis<>, 0, SF >{
 };
 
 template<int N>
-constexpr TT bit(){ return 1 << N; }
+constexpr Bits::Type bit(){ return 1 << N; }
 
 
 /*-----------------------------------------------------------------------------
  * MAKE AN ND VEC
  *-----------------------------------------------------------------------------*/
-template<TT TOT, TT DIM = TOT>
+template<Bits::Type TOT, Bits::Type DIM = TOT>
 struct Blade1{  
   static constexpr auto Vec() RETURNS(
     cat( Basis< bit<(TOT - DIM)>() >(), Blade1< TOT, DIM-1>::Vec() )
   ) 
   typedef decltype( Vec() ) VEC;           
 };
-template<TT TOT>
+template<Bits::Type TOT>
 struct Blade1<TOT,0>{  
   static constexpr auto Vec() RETURNS(
     Basis<>()
@@ -206,12 +207,12 @@ struct Blade1<TOT,0>{
 /*-----------------------------------------------------------------------------
  *  CHECK FOR MEMBERSHIP
  *-----------------------------------------------------------------------------*/
-template<TT N, class M>
+template<Bits::Type N, class M>
 struct Exists{  
   static constexpr bool Call() { return M::HEAD == N ? true : Exists<N, typename M::TAIL>::Call(); }  
 };
 
-template<TT N>
+template<Bits::Type N>
 struct Exists< N, Basis<> >{  
   static constexpr bool Call() { return false; }
 };
@@ -264,7 +265,7 @@ struct VPrint {
     for(int i=0; i < B::Num; ++i ) cout << m[i] << "\t"; cout << endl; //printf("%f\t", m[i] ); printf("\n\n");
   }
 
-  template<typename B, typename T, TT Dim, template<TT,typename> class S >
+  template<typename B, typename T, Bits::Type Dim, template<Bits::Type,typename> class S >
   static void Call( const MV< B, S<Dim,T> >& m ){
     for(int i=0; i < B::Num; ++i ) Call( m[i] );
   }
@@ -315,7 +316,8 @@ struct MV{
   MV involution() const; 
 
   /// Casting
-  template<class A> A cast() const;   
+  template<class A> A cast() const; 
+ // A cast() const;  
   /// Copying
   template<class A> A copy() const; 
 

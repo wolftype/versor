@@ -5,11 +5,11 @@
 
 namespace vsr{
 
-template<bool F, TT A, TT B, int IDXA, int IDXB>
+template<bool F, Bits::Type A, Bits::Type B, int IDXA, int IDXB>
 struct Inst{
-  static const TT Res = A ^ B; 
-  static const bool IP = inner(A,B);
-  static const bool OP = outer(A,B);  
+  static const Bits::Type Res = A ^ B; 
+  static const bool IP = Bits::inner(A,B);
+  static const bool OP = Bits::outer(A,B);  
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   
@@ -19,15 +19,15 @@ struct Inst{
   } 
   
   static void print(){
-    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, estring(Res).c_str() );
+    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, Bits::estring(Res).c_str() );
   }  
 };   
 
-template<TT A, TT B, int IDXA, int IDXB>
+template<Bits::Type A, Bits::Type B, int IDXA, int IDXB>
 struct Inst<true, A,B,IDXA,IDXB>{
-  static const TT Res = A ^ B; 
-  static const bool IP = inner(A,B);
-  static const bool OP = outer(A,B);  
+  static const Bits::Type Res = A ^ B; 
+  static const bool IP = Bits::inner(A,B);
+  static const bool OP = Bits::outer(A,B);  
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   
@@ -37,14 +37,14 @@ struct Inst<true, A,B,IDXA,IDXB>{
   } 
   
   static void print(){
-    printf("-a[%d] * b[%d] /*%s*/\t",idxA, idxB,  estring(Res).c_str());
+    printf("-a[%d] * b[%d] /*%s*/\t",idxA, idxB,  Bits::estring(Res).c_str());
   }  
 }; 
 
 //ok, like Inst but without the product calculations inside it
-template<bool F, TT R, int IDXA, int IDXB>
+template<bool F, Bits::Type R, int IDXA, int IDXB>
 struct Instruct{
-  static const TT Res = R;
+  static const Bits::Type Res = R;
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   template<class TA, class TB>
@@ -52,12 +52,12 @@ struct Instruct{
     return a[idxA] * b[idxB];
   } 
   static void print(){
-    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, estring(Res).c_str());
+    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, Bits::estring(Res).c_str());
   }
 }; 
-template< TT R, int IDXA, int IDXB>
+template< Bits::Type R, int IDXA, int IDXB>
 struct Instruct<true, R, IDXA, IDXB>{
-  static const TT Res = R;
+  static const Bits::Type Res = R;
   static const int idxA = IDXA;
   static const int idxB = IDXB;
   template<class TA, class TB>
@@ -65,7 +65,7 @@ struct Instruct<true, R, IDXA, IDXB>{
     return -a[idxA] * b[idxB];
   } 
   static void print(){
-    printf("-a[%d] * b[%d] /*%s*/\t", idxA, idxB,  estring(Res).c_str());
+    printf("-a[%d] * b[%d] /*%s*/\t", idxA, idxB,  Bits::estring(Res).c_str());
   }
 };
 
