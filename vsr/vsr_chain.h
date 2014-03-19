@@ -17,7 +17,7 @@
 #ifndef VSR_CHAIN_H_INCLUDED
 #define VSR_CHAIN_H_INCLUDED
 
-#include "vsr_frame.h"
+#include "vsr_cga3D_frame.h"
 #include "vsr_twist.h"
 #include <map>
 #include <string>
@@ -127,6 +127,10 @@ struct  Spherical : public Joint {
 
       Frame& baseFrame() { return mBaseFrame; }
       Frame baseFrame() const { return mBaseFrame; }
+
+      void resetJoints(){
+        for (auto& i : mJoint) i.reset();
+      }
 
       void reset(){
         for (auto& i : mJoint) i.reset();

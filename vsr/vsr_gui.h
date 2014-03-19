@@ -18,6 +18,7 @@
 
 #include "GLV/glv.h"
 #include "vsr_std_types.h"
+#include <sstream>
 
 
 using namespace std;

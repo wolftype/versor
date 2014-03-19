@@ -101,6 +101,8 @@ namespace vsr{
        
         bool bSwitch = sin(amt) < 0 ? true : false;
 
+        resetJoints();
+
         mJoint[0].rot() = Gen::rot( Biv::xy * amt/2.0 );
         fk(1);
         
@@ -136,7 +138,7 @@ namespace vsr{
      /*!
       *  \brief  A linked Bennett mechanism, determined by ratio of original
       */
-     Bennett linkRatio(VT th, VT a, VT b, VT la = 0, VT lb = 0){
+     Bennett linkRatio(VT th, VT a = .5, VT b =.5, VT la = 0, VT lb = 0){
       
       Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);
       b2.baseFrame() = Frame( mFrame[2].mot() * !mJoint[2].rot() );
@@ -154,6 +156,28 @@ namespace vsr{
 
      }
 
+     /*!
+      *  \brief  A linked Bennett mechanism at joint N determined by ratio of original
+      */
+     Bennett linkAt(int N=0, VT th=1, VT a = .5, VT b =.5, VT la = 0, VT lb = 0){
+      
+      Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);
+      b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
+
+      b2( Gen::iphi( mJoint[N].rot() ) );
+
+     // return b2(mAmt);
+      
+      if (la==0) la = mLengthA; //else la = mLengthA;
+      if (lb==0) lb = mLengthB; //else lb *= mLengthB;
+
+      Bennett b3(mTheta * th, la, lb);
+
+      b3.baseFrame() = Frame( b2[2].mot() * !b2.joint(2).rot() );
+      
+      return b3( Gen::iphi( b2.joint(2).rot() ) );
+
+     }
 
   };
 

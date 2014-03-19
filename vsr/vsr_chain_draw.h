@@ -8,14 +8,17 @@
 
 namespace vsr{
 
-  void Draw(const Chain& c){
+  void Draw(const Chain& c, bool bLoop = false){
     for (int i = 0; i<c.num(); ++i){
-        DrawAt(c[i].z(), c[i].pos(), 0,0,1);
+        float t=(float)i/c.num();
+        DrawAt(c[i].z(), c[i].pos(), 1-t,0,t);
     }
 
     glColor3f(0,1,0);
-    glBegin(GL_LINE_STRIP);
+    glBegin( bLoop ? GL_LINE_LOOP : GL_LINE_STRIP);
     for (int i = 0; i<c.num(); ++i){
+        float t=(float)i/c.num();
+        glColor3f(0,t,1-t);
         gfx::GL::vertex( c[i].pos().begin() );
     }
     glEnd();
