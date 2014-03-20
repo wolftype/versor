@@ -36,6 +36,55 @@ namespace vsr{
 
 
 /*-----------------------------------------------------------------------------
+ *  EMPTY Basis
+ *-----------------------------------------------------------------------------*/
+template<Bits::Type ... XS>
+struct Basis{
+  
+  constexpr Basis(){}
+   
+  static const int Num = 0;
+  static const Bits::Type HEAD = 0;
+  typedef Basis<> TAIL;
+  static void print(){ printf("\n");} 
+};   
+
+
+/*-----------------------------------------------------------------------------
+ *  COMBINATORICS ONLY (NO STORAGE)
+ *-----------------------------------------------------------------------------*/
+template<Bits::Type X, Bits::Type ... XS>
+struct Basis<X, XS...>{  
+  
+  constexpr Basis(){} 
+  static const int Num = sizeof...(XS) +1;
+
+  static const Bits::Type HEAD = X;
+  typedef Basis<XS...> TAIL;  
+  
+  static void print() { printf("%s\t%s\t%d\n", Bits::estring(X).c_str(), Bits::bitString<6>(X).c_str(), X);  TAIL::print(); } 
+
+}; 
+
+/*-----------------------------------------------------------------------------
+ *  CONCATENATE
+ *-----------------------------------------------------------------------------*/
+template<Bits::Type ... XS, Bits::Type ... YS>
+constexpr Basis<XS...,YS...> cat ( const Basis<XS...>&, const Basis<YS...>&){  
+  return Basis<XS...,YS...>() ;
+}  
+
+template<class A, class B>
+struct Cat{   
+  typedef Basis<> Type;
+};
+
+template<Bits::Type ... XS, Bits::Type ... YS>
+struct Cat< Basis<XS...>, Basis<YS...> > {
+  typedef  Basis<XS..., YS...> Type; 
+}; 
+
+/*-----------------------------------------------------------------------------
  *  MAYBE
  *-----------------------------------------------------------------------------*/
 template<bool>
@@ -57,60 +106,6 @@ template<class A, class B>
 struct Maybe<false,A,B>{
   typedef B Type;  
 }; 
-
-
-/*-----------------------------------------------------------------------------
- *  EMPTY Basis
- *-----------------------------------------------------------------------------*/
-template<Bits::Type ... XS>
-struct Basis{
-  
-  constexpr Basis(){}
-   
-  static const int Num = 0;
-  static const Bits::Type HEAD = 0;
-  typedef Basis<> TAIL;
-  static void print(){ printf("\n");} 
-};   
-
-
-/*-----------------------------------------------------------------------------
- *  COMBINATORICS ONLY (NO STORAGE)
- *-----------------------------------------------------------------------------*/
-template<Bits::Type X, Bits::Type ... XS>
-struct Basis<X, XS...>{  
-  
-  constexpr Basis(){}
- 
-  static const int Num = sizeof...(XS) +1;  
-  
-  static const Bits::Type HEAD = X;
-  typedef Basis<XS...> TAIL;  
-  
-  static void print() { printf("%s\t%s\t%d\n", Bits::estring(X).c_str(), Bits::bitString<6>(X).c_str(), X);  TAIL::print(); } 
-
-}; 
- 
- 
-/*-----------------------------------------------------------------------------
- *  CONCATENATE
- *-----------------------------------------------------------------------------*/
-template<Bits::Type ... XS, Bits::Type ... YS>
-constexpr Basis<XS...,YS...> cat ( const Basis<XS...>&, const Basis<YS...>&){  
-  return Basis<XS...,YS...>() ;
-}  
-
-template<class A, class B>
-struct Cat{   
-  typedef Basis<> Type;
-};
-
-template<Bits::Type ... XS, Bits::Type ... YS>
-struct Cat< Basis<XS...>, Basis<YS...> > {
-  typedef  Basis<XS..., YS...> Type; 
-}; 
-
-
 
 /*-----------------------------------------------------------------------------
  *  INSERT SORT
@@ -246,6 +241,18 @@ struct RMetric{
 };
 
 
+/*-----------------------------------------------------------------------------
+ *  GENERIC UTILITY
+ *-----------------------------------------------------------------------------*/
+struct GA{
+  typedef Basis<0> Sca;
+  template<Bits::Type ... N> using e = Basis< Bits::blade((1<<(N-1))...) >;  
+  template<Bits::Type DIM> using pss = Basis< Bits::pss(DIM) >;
+  template<Bits::Type DIM> using origin = Basis< Bits::origin<DIM>() >;
+  template<Bits::Type DIM> using infinity = Basis< Bits::infinity<DIM>() >;
+  template<Bits::Type DIM> using eplane = Basis< Bits::eplane<DIM>() >;
+  template<Bits::Type DIM> using vec = typename Blade1<DIM>::VEC;
+};
 
 
 

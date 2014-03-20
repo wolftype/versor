@@ -115,7 +115,7 @@ struct EIP<Basis<>,B, idxA,idxB> {
  *  Product Construction Instructions
  *-----------------------------------------------------------------------------*/
 template<class A, class B>
-struct EProdInstructions{
+struct EGProdInstructions{
   typedef typename EGP<A,B>::Type List; 
   typedef Product<List> Fun;
 };
@@ -135,8 +135,8 @@ struct EIProdInstructions{
  *  Product Type Automatic Instantiation
  *-----------------------------------------------------------------------------*/
 template<class A, class B>
-struct EProd {  
-  typedef EProdInstructions< typename A::Bases, typename B::Bases> Instructions;
+struct EGProd {  
+  typedef EGProdInstructions< typename A::Bases, typename B::Bases> Instructions;
   typedef MV< typename Instructions::Fun::Type, typename A::ValueType > Type; 
   static constexpr Type Call(const A& a, const B& b) {
     return Instructions::Fun::DO::template Make<Type>(a, b);
@@ -166,7 +166,7 @@ struct EIProd{
  *-----------------------------------------------------------------------------*/
 template<class A, class B, class R>
 struct REProd{
-  typedef typename EGP<A,B>::Type InstList;      
+  typedef typename EGP<typename A::Bases, typename B::Bases>::Type InstList;      
   typedef typename Index< InstList, R>::Type DO;   
   static constexpr R Call(const A& a, const B& b) {
     return DO::template Make<R>(a, b);
@@ -179,7 +179,7 @@ struct REProd{
  *-----------------------------------------------------------------------------*/
 template<class A, class B>
 CA egp(const A& a, const B& b) RETURNS(
-  ( EProd<A,B>::Call(a, b) )
+  ( EGProd<A,B>::Call(a, b) )
 )
 template<class A, class B>
 CA eop(const A& a, const B& b) RETURNS(
@@ -197,13 +197,13 @@ CA eip(const A& a, const B& b) RETURNS(
 /// Spin a by b, return a
 template<class A, class B>
 constexpr A esp(const A& a, const B& b) {
-  return REProd< typename EProd<B,A>::Type, B, A >::Call( egp(b, a),   Reverse< B >::Type::template Make(b) );
+  return REProd< typename EGProd<B,A>::Type, B, A >::Call( egp(b, a),   Reverse<B>::Type::template Make(b) );
 }
 
 /// Reflect a by b, return a
 template<class A, class B>
 constexpr A ere(const A& a, const B& b) {
-  return REProd< typename EProd<B,A>::Type, B, A>::Call( egp(b, a.involution() ),   Reverse< B >::Type::template Make(b) );
+  return REProd< typename EGProd<B,A>::Type, B, A>::Call( egp(b, a.involution() ),   Reverse<B>::Type::template Make(b) );
 }
 
 
@@ -214,9 +214,9 @@ constexpr A ere(const A& a, const B& b) {
 template<Bits::Type DIM>
 struct EGA {
   
-  typedef Basis<0> Sca; 
-  template<Bits::Type ... N> using e = Basis< Bits::blade((1<<(N-1))...) >;  
-  
+  //typedef Basis<0> Sca; 
+ // template<Bits::Type ... N> using e = Basis< Bits::blade((1<<(N-1))...) >;  
+    
   using Vec = typename Blade1<DIM>::VEC; 
   using Pss = Basis< Bits::pss(DIM) >;
 };
@@ -243,21 +243,13 @@ struct EGAMV : public A {
   /// Construct from one instance of type A::ValueType (for tensored metrics)
   constexpr EGAMV(const typename A::ValueType& a) : A(a) {}  
 
-  /// Construct from same Euclidean Dimension (NOTE: make this more specific) 
-   /* template<class B> */
-   /* constexpr EGAMV(const B& b) : A( b.template cast<A>() ) {} */
-   
   /// Construct from another Euclidean Type and/or Dimension
-    template<Bits::Type BDIM, class B>
-    constexpr EGAMV(const EGAMV<BDIM,B>& b) : A( b.template cast<A>() ) {}
-
-//    template<Bits::Type BDIM, typename C, template<Bits::Type, typename> class B>
-//    constexpr EGAMV(const B<BDIM,C> & b) : A( b.template cast<A>() ) {}
- 
+  template<Bits::Type BDIM, class B>
+  constexpr EGAMV(const EGAMV<BDIM,B>& b) : A( b.template cast<A>() ) {}
    
   /// Geometric Product
   template<class B>
-  EGAMV<DIM, typename EProd< EGAMV, B >::Type > operator * ( const B& b) const{
+  EGAMV<DIM, typename EGProd< EGAMV, B >::Type > operator * ( const B& b) const{
     return egp(*this, b);
   }
 
@@ -370,12 +362,12 @@ struct EGAMV : public A {
   
   static EGAMV x, y, z, xy, xz, yz;  
   
-  auto dual() const -> EGAMV< DIM, typename EProd< A, MV<typename EGA<DIM>::Pss, VT> >::Type > { 
-    return egp( *this , MV<typename EGA<DIM>::Pss, VT>(-1) );
+  auto dual() const -> EGAMV< DIM, typename EGProd< A, MV<typename GA::pss<DIM>, VT> >::Type > { 
+    return egp( *this , MV<typename GA::pss<DIM>, VT>(-1) );
   }       
   
-  auto undual() const -> EGAMV< DIM, typename EProd< A, MV<typename EGA<DIM>::Pss, VT> >::Type > { 
-    return egp( *this , MV<typename EGA<DIM>::Pss, VT>(1) );
+  auto undual() const -> EGAMV< DIM, typename EGProd< A, MV<typename GA::pss<DIM>, VT> >::Type > { 
+    return egp( *this , MV<typename GA::pss<DIM>, VT>(1) );
   }  
   
   template<typename T>
@@ -386,13 +378,13 @@ struct EGAMV : public A {
 
 
 //EUCLIDEAN CANDIDATES
-template<Bits::Type N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<typename EGA<N>::Sca,T> >;   
+template<Bits::Type N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<GA::Sca,T> >;   
 template<Bits::Type N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, MV<typename EGA<N>::Vec,T> >; 
 template<Bits::Type N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, MV<typename EGA<N>::Pss,T> >; 
 
 template<typename T=VSR_PRECISION>
 struct NE{
-    template <Bits::Type ... NN> using e = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename EGA<Bits::dimOf( Bits::blade((1<<(NN-1))...) )>::template e<NN...>, T> >; 
+    template <Bits::Type ... NN> using e = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename GA::template e<NN...>, T> >; 
 };
 
 //template< Bits::Type ... NN, typename T=VSR_PRECISION> using NE = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename EGA< Bits::blade((1<<(NN-1))...)>::template e<NN...>, T> >; 

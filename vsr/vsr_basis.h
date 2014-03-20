@@ -135,11 +135,41 @@ constexpr bool compare(){
     return ( grade(A) == grade(B) ) ?  A < B : grade(A) < grade(B); //return A < B::HEAD;
 }
 
-
+//pseudoscalr of dimension dim
 constexpr Type pss(Type dim){
   return ( dim == 0 ) ? 0 : (1 << (dim-1)) | pss( dim-1 ); 
 }
 
+//get origin vec of dimension dim 
+template< Type dim >
+constexpr Type origin(){
+	return (1<<(dim-2));
+}  
+//get inty vec of dimension dim 
+template< Type dim > 
+constexpr Type infinity(){
+	return (1<<(dim-1));
+} 
+//get EP vec of dimension dim 
+template< Type dim >  
+constexpr Type EP(){
+	return (1<<(dim-2));
+}  
+//get EM vec of dimension dim  
+template< Type dim > 
+constexpr Type EM(){
+	return (1<<(dim-1));
+}
+//get basis of eplane in dimension dim 
+template< Type dim > 
+constexpr Type eplane(){
+	return (1 << (dim-1)) | ( 1 << (dim-2) ); 
+}
+//check for split
+template< Type a, Type dim >    
+constexpr bool checkMink() {
+	return ( (a & eplane<dim>()) == 0) || ( ( a & eplane<dim>()) == eplane<dim>() );
+}  
 } //Bits:: 
 
 } //vsr::

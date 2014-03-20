@@ -74,13 +74,20 @@ struct InstFlip{
   template<class TA>
   static constexpr typename TA::ValueType Exec(const TA& a){
     return a[IDX];
+  }  
+  static void print(){
+    printf("a[%d]\t",IDX);
   }
+
 };    
 template<int IDX>
 struct InstFlip<true, IDX>{
   template<class TA>
   static constexpr typename TA::ValueType Exec(const TA& a){
     return -a[IDX];
+  }
+  static void print(){
+    printf("-a[%d]\t",IDX);
   }
 };
 

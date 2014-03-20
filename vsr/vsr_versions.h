@@ -17,7 +17,7 @@ namespace vsr{
 	  
 template<class A, int IDX=0>
 struct Reverse{
-	typedef typename XCat< XList< InstFlip< reverse(A::HEAD), IDX> > , typename Reverse<typename A::TAIL, IDX+1>::Type >::Type Type; 
+	typedef typename XCat< XList< InstFlip< Bits::reverse(A::HEAD), IDX> > , typename Reverse<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
 struct Reverse< Basis<>, IDX >{
@@ -26,7 +26,7 @@ struct Reverse< Basis<>, IDX >{
 
 template<class A, int IDX=0>
 struct Conjugate{
-	typedef typename XCat< XList< InstFlip< conjugate(A::HEAD), IDX> > , typename Conjugate<typename A::TAIL, IDX+1>::Type >::Type Type; 
+	typedef typename XCat< XList< InstFlip< Bits::conjugate(A::HEAD), IDX> > , typename Conjugate<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
 struct Conjugate< Basis<>, IDX >{
@@ -35,7 +35,7 @@ struct Conjugate< Basis<>, IDX >{
 
 template<class A, int IDX=0>
 struct Involute{
-	typedef typename XCat< XList< InstFlip< involute(A::HEAD), IDX> > , typename Involute<typename A::TAIL, IDX+1>::Type >::Type Type; 
+	typedef typename XCat< XList< InstFlip< Bits::involute(A::HEAD), IDX> > , typename Involute<typename A::TAIL, IDX+1>::Type >::Type Type; 
 };
 template<int IDX>
 struct Involute< Basis<>, IDX >{

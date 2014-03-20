@@ -25,82 +25,86 @@
 #define Tangent Ta
 
 
-#include "vsr_products.h"
+#include "vsr_conformal.h"
 #include "vsr_constants.h" 
 #include <vector>  
 
 namespace vsr {           
   
  
-//Projection Down to 3D
-template<int DIM>
+/// Projection Down to 3D
+
+template<int DIM, typename T=VSR_PRECISION>
 struct Proj{
-     typedef EGAMV<DIM, typename Blade1<DIM>::VEC > TVec;
-  typedef EGAMV<DIM-1, typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
+  typedef EGAMV<DIM, MV<typename GA::vec<DIM>, T>> TVec;
+  typedef EGAMV<DIM-1, MV<typename GA::vec<DIM-1>, T>> OneDown; //Next Projection Down
      
-  static auto Call( VT dist, const TVec& v ) RETURNS (
-    ( Proj<DIM-1>::Call( dist, v.template cast<OneDown>() * ( dist / (dist - v[DIM-1] ) ) ) )
+  static auto Call( VSR_PRECISION dist, const TVec& v ) RETURNS (
+    ( Proj<DIM-1>::Call( dist, OneDown(v) * ( dist / (dist - v[DIM-1] ) ) ) )
   )  
     
   template<int DIM2>
   static auto Ortho( const TVec& v ) RETURNS (
-    ( v.template cast<typename Blade1<DIM2>::VEC >() )
+    ( v.template cast< MV<typename GA::vec<DIM-1>, T> > )
   )   
   
-  static VT Val( VT dist, const TVec & v ) { return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); }
-  // static VT Val( VT dist, const Vec& v) {
+  static VSR_PRECISION Val( VSR_PRECISION dist, const TVec & v ) { 
+    return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); 
+  }
+  // static VSR_PRECISION Val( VSR_PRECISION dist, const Vec& v) {
   //   return Proj< DIM, 4, DIM==TARGET >::Call(dist, v);
   // } 
 };    
      
-template<>
-struct Proj<3>{  
-    typedef EGAMV<3, typename Blade1<3>::VEC > TVec;
-  static TVec Call(VT dist, const TVec& v) { return v; }  
-  static VT Val(VT dist, const TVec & v ) { return 1.0; }
+template<typename T>
+struct Proj<3,T>{  
+  typedef EGAMV<3, MV<typename GA::vec<3>, T>> TVec;
+  static TVec Call(VSR_PRECISION dist, const TVec& v) { return v; }  
+  static VSR_PRECISION Val(VSR_PRECISION dist, const TVec & v ) { return 1.0; }
 }; 
 
 
- 
-
- template< class X>
- constexpr VT dot(X x){
+/*-----------------------------------------------------------------------------
+ *  DOT PRODUCT RECURSION
+ *-----------------------------------------------------------------------------*/
+template< class X>
+constexpr VSR_PRECISION dot(X x){
   return x*x;
 }
 
- template<class X, class ... XS>
- constexpr VT dot(X x, XS...xs){
+template<class X, class ... XS>
+  constexpr VSR_PRECISION dot(X x, XS...xs){
   return (x*x) + dot(xs...);
- }  
+}  
 
 namespace Op{  
   
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto dl( const CGAMV<DIM,A>& a ) RETURNS (
     a * NPss<DIM>(-1)
   ) 
 
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto udl( const CGAMV<DIM,A>& a ) RETURNS (
     a * NPss<DIM>(1)
   )
 
 
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto dle( const CGAMV<DIM,A>& a ) RETURNS (
     a * NEucPss<DIM>(-1)
   )
    
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto udle( const CGAMV<DIM,A>& a ) RETURNS (
-    a * NEucPss<DIM>(1)
+    (a * NEucPss<DIM, typename A::ValueType>(1))  
   )
   
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto dle( const EGAMV<DIM, A>& a ) RETURNS (
     a * ( NEPss< DIM >(-1) )
   ) 
-  template<TT DIM, class A>  
+  template<Bits::Type DIM, class A>  
   auto udle( const EGAMV<DIM,A>& a ) RETURNS (   
     a * ( NEPss< DIM >(1) )   
   )
@@ -145,9 +149,9 @@ namespace Euc{
   /*!
    *  Homegenize an ND Euclidean Vector (add a dimension with weight of 1.0)
    */
-    template< TT N >
+    template< Bits::Type N >
     NEVec<N+1> hom(const NEVec<N>& v){
-      return NEVec<N+1>(v) + NEe<N+1,N+1>(1.0);
+      return NEVec<N+1>(v) + NE<>::e<N+1>(1.0);
     }
 }
 
@@ -158,8 +162,8 @@ namespace Euc{
     template<class A>
     auto rot ( const A& b ) -> decltype( b + 1 ) {  
       //  printf("me");
-      VT  c = sqrt(- ( b.wt() ) );
-          VT sc = -sin(c);
+      VSR_PRECISION  c = sqrt(- ( b.wt() ) );
+          VSR_PRECISION sc = -sin(c);
           if (c != 0) sc /= c;
       return b * sc + cos(c);
     }
@@ -167,23 +171,23 @@ namespace Euc{
     
      
     /* template< class A> */ 
-    /* auto rot( VT angle, const A& v) RETURNS( */
+    /* auto rot( VSR_PRECISION angle, const A& v) RETURNS( */
     /*     rot( v * angle ) */
     /* ) */ 
     
     /*! Get Bivector Generator from a Rotor  (3d Conformal...)
           @param Rotor r
       */
-     template<TT DIM>
+     template<Bits::Type DIM>
      auto log(const CGAMV<DIM, typename CGA<DIM>::Rot>& r) -> CGAMV<DIM, typename CGA<DIM>::Biv> {
                  
       using TBIV = CGAMV<DIM, typename CGA<DIM>::Biv>;
 
-          VT t = r.template get<0>();                           //<--- Scalar Value from Rotor
+          VSR_PRECISION t = r.template get<0>();                           //<--- Scalar Value from Rotor
 
           TBIV b = r.template cast<TBIV>();
 
-          VT n = b.rnorm();
+          VSR_PRECISION n = b.rnorm();
 
           if (n <= 0) {
               if (t < 0) {
@@ -194,23 +198,23 @@ namespace Euc{
               }
           }
 
-          VT s = atan2( n, t );
+          VSR_PRECISION s = atan2( n, t );
           return b * ( s / n);
       }  
   
     /*! Get Bivector Generator from a Rotor  (3d Conformal)
           @param Rotor r
       */
-     template<TT DIM>
+     template<Bits::Type DIM>
      auto log(const EGAMV<DIM, typename EGA<DIM>::Rot>& r) -> EGAMV<DIM, typename EGA<DIM>::Biv> {
                  
       using TBIV = EGAMV<DIM, typename EGA<DIM>::Biv>;
 
-          VT t = r.template get<0>();                           //<--- Scalar Value from Rotor
+          VSR_PRECISION t = r.template get<0>();                           //<--- Scalar Value from Rotor
 
           TBIV b = r.template cast<TBIV>();
 
-          VT n = b.rnorm();
+          VSR_PRECISION n = b.rnorm();
 
           if (n <= 0) {
               if (t < 0) {
@@ -221,7 +225,7 @@ namespace Euc{
               }
           }
 
-          VT s = atan2( n, t );
+          VSR_PRECISION s = atan2( n, t );
           return b * ( s / n);
       }
   
@@ -229,30 +233,30 @@ namespace Euc{
     /*! Get Bivector Generator from a Rotor  (3d)
           @param Rotor r
       */
-     template<TT DIM>
+     template<Bits::Type DIM>
      auto log(const CGAMV<DIM, typename CGA<DIM>::Bst>& r) -> CGAMV<DIM, typename CGA<DIM>::Par> {
          
       using TPAR = CGAMV<DIM, typename CGA<DIM>::Par>;  
           
-          VT n;
+          VSR_PRECISION n;
 
       TPAR p;
       p = r; //extract 2-blade part
-          VT td = p.wt(); //get scalar
+          VSR_PRECISION td = p.wt(); //get scalar
 
-          if (td > 0 ) { VT s2 = sqrt(td);  n = asinh( s2 ) / s2; }
+          if (td > 0 ) { VSR_PRECISION s2 = sqrt(td);  n = asinh( s2 ) / s2; }
           else if ( td == 0 ) { n = 1; }
-          else if (td < 0 ) { VT s2 = sqrt(-td); n = atan2(s2, r[0] ) / s2; }
+          else if (td < 0 ) { VSR_PRECISION s2 = sqrt(-td); n = atan2(s2, r[0] ) / s2; }
 
           return p * n;
   
       }
   
-    // template< TT DIM >
+    // template< Bits::Type DIM >
     // auto pl( const EGAMV<DIM, typename EGA<DIM>::Rot>& r) { 
     //   using TBIV = EGAMV<DIM, typename EGA<DIM>::Biv>;      
     //           TBIV b = r.cast<TBIV>();
-    //           VT t = b.rnorm(); // use rnorm or norm here?
+    //           VSR_PRECISION t = b.rnorm(); // use rnorm or norm here?
     //           if (t == 0 ) return TBIV(1);
     //           return b / t;
     //       }  
@@ -265,7 +269,7 @@ namespace Euc{
       using TBIV = typename A::template BType< typename A::Mode::Biv >;  
           
           TBIV b = r.template cast<TBIV>();
-          VT t = b.rnorm(); // use rnorm or norm here?
+          VSR_PRECISION t = b.rnorm(); // use rnorm or norm here?
           if (t == 0 ) return TBIV(1);
           return b / t;
       } 
@@ -276,7 +280,7 @@ namespace Euc{
           @param Rotor r
       */
      template< class A > 
-      VT iphi( const A& r) { 
+      VSR_PRECISION iphi( const A& r) { 
           using TBIV = typename A::template BType< typename A::Mode::Biv >;  
           return TBIV ( log(r) * -2 ).norm();
       }
@@ -290,7 +294,7 @@ namespace Euc{
       using TVec = typename A::template BType< typename A::Mode::Vec >;//A<DIM, typename B<DIM>::Vec>;  
       
            TVec v = Op::dle( pl( r ) ) ;    
-          VT deg = iphi(r) * ( -180 / PI );
+          VSR_PRECISION deg = iphi(r) * ( -180 / PI );
 
           return TRot(deg, v[0], v[1], v[2]);
       }
@@ -304,7 +308,7 @@ namespace Euc{
           Generate Local Boost at origin as exponential of a Point Pair
           @param a tangent vector
       */
-    template<TT DIM, class A>
+    template<Bits::Type DIM, class A>
     auto trv ( const CGAMV<DIM,A>& a ) RETURNS (
        a.template copy< NTnv<DIM> >() + 1
     )
@@ -331,7 +335,7 @@ namespace Euc{
           Generate translation  as exponential of a direction vector
           @param a tangent vector
       */
-    template<TT DIM, class A>
+    template<Bits::Type DIM, class A>
     auto trs ( const CGAMV<DIM,A>& a ) RETURNS (
        ( a.template copy< NDrv<DIM> >() * -.5 ) + 1
     ) 
@@ -358,7 +362,7 @@ namespace Euc{
     /*! Generate a Dilation from Origin [[[ pass in ( log(t) * .5 ) ]]]
           @param Amt t
       */
-      template<TT DIM, class T>
+      template<Bits::Type DIM, class T>
       constexpr auto dil( T t) -> NDil<DIM> {
           return NDil<DIM>( cosh( t *.5 ), sinh( t * .5 ) );
       } 
@@ -371,7 +375,7 @@ namespace Euc{
           @param Point p (or Vec)
           @param Amt t -- to pass in a relative amt (i.e. t=.5 for half size or t=2 for VT), pass in std::log(t)
       */
-      template<TT DIM, class T>
+      template<Bits::Type DIM, class T>
       auto dil(const NPnt<DIM>& p, T t) -> NTsd<DIM>  {
           return NTsd<DIM>( NDil<DIM>( cosh( t*.5 ), sinh( t*.5 ) ) ).trs( p );
       }
@@ -386,12 +390,12 @@ namespace Euc{
           Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
           @param Point Pair generator
       */ 
-    template<TT DIM, class A>  
+    template<Bits::Type DIM, class A>  
       auto bst(const CGAMV<DIM,A>& tp) -> decltype( tp + 1 ) { //CGAMV<DIM, decltype( sumv( 1,A() ) ) > { 
 
-      VT norm; VT sn; VT cn;
+      VSR_PRECISION norm; VSR_PRECISION sn; VSR_PRECISION cn;
 
-          VT td = tp.wt(); 
+          VSR_PRECISION td = tp.wt(); 
 
           if (td < 0) { norm =  sqrt( - td );  sn = -sin(norm) / norm; cn = cosh(norm); }
           else if (td > 0) { norm = sqrt(td); sn = -sinh(norm) / norm; cn = cosh(norm); }
@@ -411,12 +415,12 @@ namespace Euc{
     //           Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
     //           @param Point Pair generator
     //       */ 
-    // template<TT DIM, class A>  
+    // template<Bits::Type DIM, class A>  
     //       auto gen(const CGAMV<DIM,A>& tp) -> decltype( tp + 1 ) { 
     // 
-    //   VT norm; VT sn; VT cn;
+    //   VSR_PRECISION norm; VSR_PRECISION sn; VSR_PRECISION cn;
     // 
-    //           VT td = tp.wt(); 
+    //           VSR_PRECISION td = tp.wt(); 
     // 
     //           if (td < 0) { norm =  sqrt( - td );  sn = -sin(norm) / norm; cn = cosh(norm); }
     //           else if (td > 0) { norm = sqrt(td); sn = -sinh(norm) / norm; cn = cosh(norm); }
@@ -429,7 +433,7 @@ namespace Euc{
     
      //feed in vectors!  
     /*! Rotor Ratio of two Conformal vectors */
-     template<TT DIM> 
+     template<Bits::Type DIM> 
      auto ratio( 
       const CGAMV<DIM, typename CGA<DIM>::Vec >& a, 
       const CGAMV<DIM, typename CGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
@@ -437,13 +441,13 @@ namespace Euc{
       using TVEC = CGAMV<DIM, typename CGA<DIM>::Vec >;
       using TROT = decltype( (a^b) + 1);
       
-          VT s = ( a <= b )[0];              
+          VSR_PRECISION s = ( a <= b )[0];              
   
       //180 degree check
       if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
           
-          VT ss = 2 * (s+1);
-          VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );
+          VSR_PRECISION ss = 2 * (s+1);
+          VSR_PRECISION n = ( ss >= 0 ? sqrt ( ss ) : 0 );
 
           TROT r = ( b * a ) ; //cout << r << endl;
           r[0] += 1;  
@@ -453,7 +457,7 @@ namespace Euc{
       } 
 
     /*! Rotor Ratio of two Euclidean vectors */  
-     template<TT DIM> 
+     template<Bits::Type DIM> 
      auto ratio( 
       const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 
       const EGAMV<DIM, typename EGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
@@ -461,13 +465,13 @@ namespace Euc{
       using TVEC = EGAMV<DIM, typename EGA<DIM>::Vec >;
       using TROT = decltype( (a^b) + 1);
 
-          VT s = ( a <= b )[0];              
+          VSR_PRECISION s = ( a <= b )[0];              
 
       //180 degree check
       if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
 
-          VT ss = 2 * (s+1);
-          VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );
+          VSR_PRECISION ss = 2 * (s+1);
+          VSR_PRECISION n = ( ss >= 0 ? sqrt ( ss ) : 0 );
 
           TROT r = ( b * a ) ; //cout << r << endl;
           r[0] += 1;  
@@ -477,7 +481,7 @@ namespace Euc{
       }
        
    /*! Rotor Ratio of two bivectors */ 
-     // template<TT DIM, template<TT> class B, template< TT, class C> class A> 
+     // template<Bits::Type DIM, template<TT> class B, template< TT, class C> class A> 
      // auto ratio( 
      //       const A<DIM, typename B<DIM>::Biv>& a, 
      //       const A<DIM, typename B<DIM>::Biv>& b ) -> decltype( (a*b) ) {
@@ -498,11 +502,12 @@ namespace Euc{
  namespace Ro {                          
      
     /*! Null Point from Arbirtary Multivector */   
-  template< TT DIM, class A >
-    constexpr NPnt<DIM> 
-  null( const CGAMV<DIM, A>& v ){  
-        return v.template copy< NVec<DIM> >() + NOri<DIM>( 1 ) + NInf<DIM>( v.template copy< NVec<DIM> >().wt() / 2.0 );
-    } 
+  template< Bits::Type DIM, class A >
+  constexpr NPnt<DIM, typename A::ValueType> 
+  null( const CGAMV<DIM, A>& v ){
+        using T = typename A::ValueType;  
+        return v.template copy< NVec<DIM,T> >() + NOri<DIM,T>( 1 ) + NInf<DIM,T>( v.template copy< NVec<DIM,T> >().wt() / 2.0 );
+  } 
     
   /*! Null Point from Coordinates */   
   template< class ... T>
@@ -527,7 +532,7 @@ namespace Euc{
   }
 
     /*! Null Point from Arbirtary Multivector */   
-  template< TT DIM, class A >
+  template< Bits::Type DIM, class A >
   constexpr NPnt<DIM> 
   point( const CGAMV<DIM, A>& v ){  
         return null(v);
@@ -540,29 +545,29 @@ namespace Euc{
     */
     template< class ... T >
   auto
-  dls(VT r, T ... v ) ->  NPnt< sizeof...(T) + 2 >  { 
+  dls(VSR_PRECISION r, T ... v ) ->  NPnt< sizeof...(T) + 2 >  { 
     using TPNT = NPnt< sizeof...(T) + 2 >;
         TPNT s = null(v...);
-        ( r > 0) ? s.template get< infinity< sizeof...(T) + 2>() >() -= .5 * (r * r) 
-      : s.template get< infinity< sizeof...(T) + 2 >() >() += .5 * (r*r);
+        ( r > 0) ? s.template get< Bits::infinity< sizeof...(T) + 2>() >() -= .5 * (r * r) 
+      : s.template get< Bits::infinity< sizeof...(T) + 2 >() >() += .5 * (r*r);
     return s;     
     } 
-    template< class ... T > auto dualSphere( VT r, T ... v ) RETURNS ( dls(r, v...) )
+    template< class ... T > auto dualSphere( VSR_PRECISION r, T ... v ) RETURNS ( dls(r, v...) )
 
     /*! Dual Sphere from Element FIRST and Radius
         @param Any input MV v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
-    template< TT DIM, class S >
+    template< Bits::Type DIM, class S >
     auto 
-  dls( const CGAMV<DIM,S>& v, VT r = 1.0 ) -> CGAMV<DIM, typename CGA<DIM>::Pnt > {
+  dls( const CGAMV<DIM,S>& v, VSR_PRECISION r = 1.0 ) -> CGAMV<DIM, typename CGA<DIM>::Pnt > {
         CGAMV<DIM, typename CGA<DIM>::Pnt > s = null(v);
-        ( r > 0) ? s.template get< infinity<DIM>() >() -= .5 * (r * r)
+        ( r > 0) ? s.template get< Bits::infinity<DIM>() >() -= .5 * (r * r)
 
-     : s.template get< infinity<DIM>() >() += .5 * (r*r);
+     : s.template get< Bits::infinity<DIM>() >() += .5 * (r*r);
     return s;     
     }
-    template< class T > auto dualSphere( const T& t, VT r = 1.0 ) RETURNS ( dls(t, r) )
+    template< class T > auto dualSphere( const T& t, VSR_PRECISION r = 1.0 ) RETURNS ( dls(t, r) )
 
 
     /*! Dual Sphere from Element FIRST and Radius
@@ -570,7 +575,7 @@ namespace Euc{
         @param Radius (enter a negative radius for an imaginary sphere)
     */
     template< class S >
-    auto sphere( const S& v, VT r = 1.0 ) RETURNS(
+    auto sphere( const S& v, VSR_PRECISION r = 1.0 ) RETURNS(
       dls( v, r )    
     )
 
@@ -580,12 +585,12 @@ namespace Euc{
         @param Point
         @param Radius (enter a negative radius for an imaginary sphere)
     */   
-    template< TT DIM >
+    template< Bits::Type DIM >
     NDls<DIM> 
-    dls_pnt( const NPnt<DIM>& p, VT r = 1.0 ) {
+    dls_pnt( const NPnt<DIM>& p, VSR_PRECISION r = 1.0 ) {
         NPnt<DIM> s = p;
-        (r > 0) ? s.template get< infinity<DIM>() >() -= .5 * (r * r) 
-    : s.template get< infinity<DIM>() >() += .5 * (r*r);
+        (r > 0) ? s.template get< Bits::infinity<DIM>() >() -= .5 * (r * r) 
+    : s.template get< Bits::infinity<DIM>() >() += .5 * (r*r);
         return s;
     } 
 
@@ -593,12 +598,12 @@ namespace Euc{
     Simple Center of A Round Element (not normalized -- use loc or location method)
   */
 
-    /* template<TT DIM, class T> */
+    /* template<Bits::Type DIM, class T> */
     /* constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > */ 
     /* center( const CGAMV<DIM, T>& s) { */
     /*     return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >(); */
     /* } */
-    template<TT DIM, class T>
+    template<Bits::Type DIM, class T>
     constexpr CGAMV<DIM, typename CGA<DIM>::Pnt > 
     cen( const CGAMV<DIM, T>& s) {
         return  ( s  / ( CGAMV<DIM, typename CGA<DIM>::Inf >(-1) <= s ) ).template cast< CGAMV<DIM, typename CGA<DIM>::Pnt > >();
@@ -607,7 +612,7 @@ namespace Euc{
   /*!
     Location of A Round Element (normalized)
   */
-  /* template<TT DIM, class T> */
+  /* template<Bits::Type DIM, class T> */
   /* constexpr NPnt<DIM> */ 
   /* location(const CGAMV<DIM, T>& s){ */
   /*   return null ( cen ( s ) ); */ 
@@ -616,7 +621,7 @@ namespace Euc{
     Location of A Round Element (normalized) (Shorthand)
   */
 
-  template<TT DIM, class T>
+  template<Bits::Type DIM, class T>
   constexpr NPnt<DIM> 
   loc(const CGAMV<DIM, T>& s){
     return null ( cen ( s ) ); 
@@ -627,27 +632,27 @@ namespace Euc{
         @param input normalized round (dual sphere, point pair, circle, or direct sphere)
         @param duality flag 
     */
-    template<TT DIM, class T> 
-    VT 
+    template<Bits::Type DIM, class T> 
+    VSR_PRECISION 
     size( const CGAMV<DIM, T>& r, bool dual){
         auto s = NInf<DIM>(1) <= r;
         return ( ( r * r.inv() ) / ( s * s ) * ( (dual) ? -1.0 : 1.0 )  )[0];
     } 
     /*! Radius of Round */
   template<class T> 
-    VT 
+    VSR_PRECISION 
     radius( const T& s ){
         return sqrt ( fabs ( size(s, false) ) );
     } 
-    template<class T> VT rad( const T& t) { return radius(t); }
+    template<class T> VSR_PRECISION rad( const T& t) { return radius(t); }
    
     /*! Curvature of Round 
         @param Round Element
     */
     template<class A>
-    VT 
+    VSR_PRECISION 
     curvature(const A& s){
-        VT r = rad( s );     
+        VSR_PRECISION r = rad( s );     
         return (r==0) ? 10000 : 1.0 / rad(s);
     }
     
@@ -656,47 +661,47 @@ namespace Euc{
     */ 
 
     template<class T> 
-    VT 
+    VSR_PRECISION 
     cur( const T& t) { return curvature(t); }
 
 
     /*! Squared Size of Normalized Dual Sphere (faster than general case)
         @param Normalized Dual Sphere
     */
-    template<TT DIM>
-    VT 
+    template<Bits::Type DIM>
+    VSR_PRECISION 
     dsize( const NPnt<DIM>& dls ){
         return (dls * dls)[0];
     }
    
    /*! Squared distance between two points */ 
-  template<TT DIM>
-    VT 
+  template<Bits::Type DIM>
+    VSR_PRECISION 
     squaredDistance(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return ( (a <= b)[0] ) * -2.0;
     }
-    template< class A> VT sqd( const A& a, const A& b) { return squaredDistance(a,b); }
+    template< class A> VSR_PRECISION sqd( const A& a, const A& b) { return squaredDistance(a,b); }
 
     
     /*! Distance between points a and b */  
-   template<TT DIM> 
-    VT 
+   template<Bits::Type DIM> 
+    VSR_PRECISION 
     distance(const NPnt<DIM>& a, const NPnt<DIM>& b){
         return sqrt( fabs(sqd(a,b) ) );
     }
-    template< class A> VT dist( const A& a, const A& b) { return distance(a,b); }
+    template< class A> VSR_PRECISION dist( const A& a, const A& b) { return distance(a,b); }
 
     /*! Split Points from Point Pair 
         @param PointPair input
         returns a vector<Pnt>
     */  
-    template<TT DIM>
+    template<Bits::Type DIM>
     std::vector< NPnt<DIM> > 
     split(const NPar<DIM>& pp){
         
       std::vector< NPnt<DIM> > pair;
           
-      VT r = sqrt( fabs( ( pp <= pp )[0] ) );
+      VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
           
       //dual line in 2d, dual plane in 3d
       auto d = NInf<DIM>(-1) <= pp;
@@ -723,11 +728,11 @@ namespace Euc{
      * @param Point Pair
      * @param bool which one
      * */
-    template<TT DIM> 
+    template<Bits::Type DIM> 
     NPnt<DIM> 
     split(const NPar<DIM>& pp, bool bFirst){
         
-        VT r = sqrt( fabs( ( pp <= pp )[0] ) );
+        VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
         
          auto d = NInf<DIM>(-1) <= pp;
         
@@ -740,7 +745,7 @@ namespace Euc{
     /*!
      * Split A Circle into its dual point pair poles
     */
-    template<TT DIM>
+    template<Bits::Type DIM>
     std::vector< NPnt<DIM> >
     split( const NCir<DIM>& nc ){
       return split( nc.dual() );
@@ -749,7 +754,7 @@ namespace Euc{
    /*! Direction of Round Element 
         @param Direct Round
     */    
-    template<TT DIM, class A>
+    template<Bits::Type DIM, class A>
     auto 
     direction( const CGAMV<DIM, A>& s ) RETURNS(
         ( ( NInf<DIM>(-1) <= s ) ^ NInf<DIM>(1) )
@@ -763,7 +768,7 @@ namespace Euc{
     /*! Carrier Flat of Direct? Round Element 
          @param Direct Round
      * */
-    template<TT DIM, class A>
+    template<Bits::Type DIM, class A>
     auto 
     carrier(const CGAMV<DIM, A>& s) RETURNS(
         s ^ NInf<DIM>(1)
@@ -771,7 +776,7 @@ namespace Euc{
     /*! Carrier Flat of Direct? Round Element (Shorthand) */
     template<class A> auto car( const A&s ) RETURNS( carrier(s) ) 
     /*! Dual Surround of a Direct or Dual Round Element */
-    template<TT DIM, class A>
+    template<Bits::Type DIM, class A>
     NDls<DIM> 
     surround( const CGAMV<DIM, A>& s) {
         return NDls<DIM>( s / ( s ^ NInf<DIM>(1) ));
@@ -784,7 +789,7 @@ namespace Euc{
      Direct Round From Dual Sphere and Euclidean Bivector
      Note: round will be imaginary if dual sphere is real . . .
      */  
-     template<TT DIM, class A>
+     template<Bits::Type DIM, class A>
      auto 
      round(const NDls<DIM>& dls, const A& flat) RETURNS (
          dls ^ ( ( dls <= ( flat.inv() * NInf<DIM>(1) ) )  * -1.0 ) 
@@ -809,7 +814,7 @@ namespace Euc{
         @param Center
         @param point on surface
       * */
-     template<TT DIM>
+     template<Bits::Type DIM>
       NDls<DIM> 
       at( const NDls<DIM>& c, const NDls<DIM>& p) {
         return NDls<DIM>( p <= (c^NInf<DIM>(1) ) );
@@ -819,8 +824,8 @@ namespace Euc{
 //  Direct Round From coordinates and Euclidean Bivector
 //  Note: round will be imaginary if dual sphere is real . . .
 //  */  
-//  template<TT DIM, class B, class A>
-//  auto round(const CGAMV<DIM, B>& s, const A& flat, VT radius=1.0) RETURNS (
+//  template<Bits::Type DIM, class B, class A>
+//  auto round(const CGAMV<DIM, B>& s, const A& flat, VSR_PRECISION radius=1.0) RETURNS (
 //     round( dls(s, radius*-1.0), flat ); 
 //  ) 
   
@@ -830,7 +835,7 @@ namespace Euc{
     /*!
      Direct Point From Dual Sphere and Euclidean Carrier Flat
      */        
-    template<TT DIM>
+    template<Bits::Type DIM>
       NPnt<DIM> pnt(const NDls<DIM>& dls, const NVec<DIM>& flat){
         return split( round(dls, flat), true ); // cout << "y" << endl; 
      }
@@ -843,8 +848,8 @@ namespace Euc{
 
     
     /*! Euclidean Vector of Circle at theta */
-    template<TT DIM>
-  NVec<DIM> vec(const NCir<DIM>& c, VT theta = 0){ 
+    template<Bits::Type DIM>
+  NVec<DIM> vec(const NCir<DIM>& c, VSR_PRECISION theta = 0){ 
     using TBIV = NBiv<DIM>;
     
         NDll<DIM> axis = (NInf<DIM>(1) <= c).runit();        
@@ -853,8 +858,8 @@ namespace Euc{
 
 
     /*! Point Pair on Circle at angle t*/
-    template<TT DIM>
-  NPar<DIM> par_cir(const NCir<DIM>& c, VT t){  
+    template<Bits::Type DIM>
+  NPar<DIM> par_cir(const NCir<DIM>& c, VSR_PRECISION t){  
     using TBIV = NBiv<DIM>;
     
       NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
@@ -866,20 +871,20 @@ namespace Euc{
    }       
   
     /*! Point on Circle at angle t*/
-    template<TT DIM>
-  NPnt<DIM> pnt_cir(const NCir<DIM>& c, VT t){
+    template<Bits::Type DIM>
+  NPnt<DIM> pnt_cir(const NCir<DIM>& c, VSR_PRECISION t){
       return null( split( par_cir(c,t), true) );
   }
 
     /*! Point on Circle at angle t*/
-    template<TT DIM>
-    NPnt<DIM> pointOnCircle(const NCir<DIM>& c, VT t){
+    template<Bits::Type DIM>
+    NPnt<DIM> pointOnCircle(const NCir<DIM>& c, VSR_PRECISION t){
       return null( split( par_cir(c,t), true) );
    }
 
 
 
-  /* template<TT DIM> */
+  /* template<Bits::Type DIM> */
   /* NPnt<DIM> pnt_dls( */
 
 
@@ -896,7 +901,7 @@ namespace Euc{
     /*! Direction of Direct Flat 
           @param Direct Flat [ Plane (Pln) or Line (Lin) ]
       */
-      template<TT DIM, class A> 
+      template<Bits::Type DIM, class A> 
       constexpr auto dir( const CGAMV<DIM, A>& f) RETURNS(
           NInf<DIM>(-1) <= f
       )  
@@ -906,7 +911,7 @@ namespace Euc{
           @param Point p
           @param Duality Flag
       */
-      template<TT DIM, class A, class P>
+      template<Bits::Type DIM, class A, class P>
       constexpr NPnt<DIM> loc(const CGAMV<DIM, A>& f, const P& p, bool dual){
           return dual ? NPnt<DIM>( ( p ^ f ) / f ) : NPnt<DIM> ( ( p <= f ) / f );
       } 
@@ -915,12 +920,12 @@ namespace Euc{
          @param Dual or Direct Flat
          @param boolean flag for duality
      */ 
-     template<TT DIM, class A>
-     constexpr VT wt(const CGAMV<DIM, A>& f, bool dual){
+     template<Bits::Type DIM, class A>
+     constexpr VSR_PRECISION wt(const CGAMV<DIM, A>& f, bool dual){
          return dual ? ( NOri<DIM>(1) <= dir( f.undual() ) ).wt() : ( NOri<DIM>(1) <= dir(f) ).wt();
      } 
      /*! Dual Plane from Point and Direction */
-     template<TT DIM>
+     template<Bits::Type DIM>
      constexpr auto dlp( const NPnt<DIM>& pnt, const NDrv<DIM>& drv) RETURNS (
         pnt <= drv
     )      
@@ -951,13 +956,13 @@ namespace Euc{
     /*! Direction of Tangent Element (similar formulation to Rounds) 
         @param Direct Tangent Element
     */
-      template <TT DIM, class A>
+      template <Bits::Type DIM, class A>
       constexpr auto dir (const CGAMV<DIM, A>& a) RETURNS (
         ( NInf<DIM>(-1) <= a ) ^ NInf<DIM>(1)
       )
 
     /*! Location of Tangent Element (similar formulation to Rounds) */
-    template< TT DIM, class A >
+    template< Bits::Type DIM, class A >
     constexpr NPnt<DIM> loc( const CGAMV<DIM, A>& s){
         return ( s / NInf<DIM>(-1) <= s );
     }
@@ -966,14 +971,14 @@ namespace Euc{
         @param Direct Round Element r
         @param Point p
     */
-    template< TT DIM, class A >
+    template< Bits::Type DIM, class A >
     constexpr auto at( const CGAMV<DIM, A>& r, const NPnt<DIM>& p) RETURNS(
        p <= r.inv()
     )
 
     /*! Weight of Tangent Element */
-    template<TT DIM, class A>
-    VT wt(const CGAMV<DIM, A>& s){
+    template<Bits::Type DIM, class A>
+    VSR_PRECISION wt(const CGAMV<DIM, A>& s){
         return ( NOri<DIM>(1) <= dir(s) ).wt();
     }
       
@@ -984,113 +989,114 @@ namespace Euc{
   //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
   
               
-  template<TT DIM, class A> template< class T>
-  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{
-    return this->sp( Gen::rot(t) );
-  }   
+  /* template<Bits::Type DIM, class A> template< class T> */
+  /* EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{ */
+  /*   return this->sp( Gen::rot(t) ); */
+  /* } */   
   
   
-  //TRANSLATIONS
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{
-    return this -> sp ( Gen::trs(t) );  
-  } 
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{
-    return this -> trs(t);  
-  }
-  template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{
-    return this -> sp ( Gen::trs(v...) );  
-  }
-  template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{
-    return this -> sp ( Gen::trs(v...) );  
-  }  
+  /* //TRANSLATIONS */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{ */
+  /*   return this -> sp ( Gen::trs(t) ); */  
+  /* } */ 
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{ */
+  /*   return this -> trs(t); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{ */
+  /*   return this -> sp ( Gen::trs(v...) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{ */
+  /*   return this -> sp ( Gen::trs(v...) ); */  
+  /* } */  
   
-  //TRANSVERSIONS
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{
-    return this -> sp ( Gen::trv(t) );  
-  }
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{
-    return this -> sp ( Gen::trv(t) );  
-  } 
+  /* //TRANSVERSIONS */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{ */
+  /*   return this -> sp ( Gen::trv(t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{ */
+  /*   return this -> sp ( Gen::trv(t) ); */  
+  /* } */ 
  
-  template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{
-    return this -> sp ( Gen::trv(v...) );  
-  }
-  template<TT DIM, typename A> template< class ... T> 
-  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{
-    return this -> sp ( Gen::trv(v...) );  
-  }
+  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{ */
+  /*   return this -> sp ( Gen::trv(v...) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{ */
+  /*   return this -> sp ( Gen::trv(v...) ); */  
+  /* } */
 
   
-  //ROTATIONS
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{
-      return this -> sp ( Gen::rot(t) );  
-  }
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{
-      return this -> rot(t);  
-  } 
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rot( VT a, const T& t) const{
-      return this -> sp ( Gen::rot(a,t) );  
-  }
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VT a, const T& t) const{
-      return this -> rot(a, t);  
-  } 
+  /* //ROTATIONS */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{ */
+  /*     return this -> sp ( Gen::rot(t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{ */
+  /*     return this -> rot(t); */  
+  /* } */ 
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::rot( VSR_PRECISION a, const T& t) const{ */
+  /*     return this -> sp ( Gen::rot(a,t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VSR_PRECISION a, const T& t) const{ */
+  /*     return this -> rot(a, t); */  
+  /* } */ 
 
 
-   //DILATIONS 
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{
-        return this -> sp ( Gen::dil<DIM>(t) );  
-  } 
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{
-        return this -> sp ( Gen::dil<DIM>(t) );  
-  }
-  template<TT DIM, typename A> template<typename P, typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{
-        return this -> sp ( Gen::dil(a, t) );  
-  }
-  template<TT DIM, typename A> template<typename P, typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{
-        return this -> sp ( Gen::dil(a, t) );  
-  }
-    template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{
-        return this -> dilate(t);  
-  }
-  template<TT DIM, typename A> template<typename P, typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{
-        return this -> sp ( Gen::dil(a, t) );  
-  }
+  /*  //DILATIONS */ 
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{ */
+  /*       return this -> sp ( Gen::dil<DIM>(t) ); */  
+  /* } */ 
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{ */
+  /*       return this -> sp ( Gen::dil<DIM>(t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{ */
+  /*       return this -> sp ( Gen::dil(a, t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{ */
+  /*       return this -> sp ( Gen::dil(a, t) ); */  
+  /* } */
+  /*   template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{ */
+  /*       return this -> dilate(t); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{ */
+  /*       return this -> sp ( Gen::dil(a, t) ); */  
+  /* } */
 
   
 
-  //BOOSTS
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{
-        return this -> sp ( Gen::bst(t) );  
-  }
-  template<TT DIM, typename A> template<typename T>
-  CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{
-        return this -> bst(t);  
-  }
+  /* //BOOSTS */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{ */
+  /*       return this -> sp ( Gen::bst(t) ); */  
+  /* } */
+  /* template<Bits::Type DIM, typename A> template<typename T> */
+  /* CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{ */
+  /*       return this -> bst(t); */  
+  /* } */
 
   //NULL
-  template<TT DIM, typename A>
-  CGAMV<DIM, typename CGA<DIM>::Pnt > CGAMV<DIM,A>::null() const{
+  template<Bits::Type DIM, typename A>
+  CGAMV<DIM, MV<Basis<1>>> CGAMV<DIM,A>::null() const {
         return Ro::null(*this);  
-  }            
+  }
   
+  //<t_úX>CGAMV<DIM, MV<Basis<1>, typename A::ValueType>> 
 }   //vsr::
 
 #endif

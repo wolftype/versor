@@ -5,7 +5,7 @@
 
 namespace vsr{
 		
-   typedef  NESca<3> Sca;    /// scalar    000   
+   typedef  NESca<3> Sca;         /// scalar    000   
    typedef  NE<>::e<1> e1;   		  ///< x 001
    typedef  NE<>::e<2> e2;   		  ///< y 010
    typedef  NE<>::e<3> e3;   		  ///< z 100 
@@ -17,7 +17,6 @@ namespace vsr{
 	 typedef  NEBiv<3> Biv;    	    ///< 011 + 101 + 110
    typedef  NETri<3> Tri;   	    ///< 111 aka e123
    typedef  NERot<3> Rot;   	    ///< 000 + 011 + 101 + 110  aka sca + bivector
-	                              
 
 }
 

@@ -1,25 +1,23 @@
 #ifndef VSR_CGA3D_TYPES_INCLUDED
 #define VSR_CGA3D_TYPES_INCLUDED
 
-#include "vsr_products.h"
-
-
+#include "vsr_conformal.h"
 
 namespace vsr{
 
 namespace cga3D{
 
 //3D CONFORMAL 
-typedef Ne<5,1> e1; 
-typedef Ne<5,2> e2; 
-typedef Ne<5,3> e3; 
-typedef Ne<5,4> no;
-typedef Ne<5,5> ni;
+/* typedef Ne<5,1> e1; */ 
+/* typedef Ne<5,2> e2; */ 
+/* typedef Ne<5,3> e3; */ 
+/* typedef Ne<5,4> no; */
+/* typedef Ne<5,5> ni; */
 
 //Euclidean Elements
 typedef NSca<5> Sca;      //Scalar    (s)
 typedef NVec<5> Vec;      //Vector    (e1, e2, e3)
-typedef NVec2D<5> Vec2D;  //2D Vector (e1,e2)
+//typedef NVec2D<5> Vec2D;  //2D Vector (e1,e2)
 typedef NBiv<5> Biv;      //Bivector  (e12, e13, e23)
 typedef NTri<5> Tri;      //Trivector (e123)
 typedef NRot<5> Rot;      //Rotor     (s, e12, e13, e23) 
@@ -56,41 +54,64 @@ typedef NBst<5> Bst;     //Boost
 typedef NDil<5> Dil;     //Dilator 
 typedef NTsd<5> Tsd;     //Translated Dilator      
 
+//FULL NAMES
+typedef  Sca Scalar;
+typedef  Biv Bivector;
+typedef  Tri Trivector ;
+typedef  Rot Rotor;
+typedef  Ori Origin;
+typedef  Inf Infinity;
+typedef  Mnk Minkowski;
+typedef  Pss Pseudoscalar;
+typedef  Pnt Point;
+typedef  Par Pair;
+typedef  Cir Circle;
+typedef  Sph Sphere;
+typedef  Pnt DualSphere;
+typedef  Drv DirectionVector;
+typedef  Drb DirectionBivector;
+typedef  Drt DirectionTrivector;
+typedef  Tnv TangentVector;
+typedef  Tnb TangentBivector;
+typedef  Tnt TangentTrivector;
+typedef  Dll DualLine;
+typedef  Lin Line;
+typedef  Flp FlatPoint;
+typedef  Pln Plane;
+typedef  Dlp DualPlane;
+typedef  Trs Translator;
+typedef  Mot Motor;
+typedef  Trv Transversor;
+typedef  Bst Boost;
+typedef  Dil Dilator;
+typedef  Tsd TranslatedDilator;
 
 
-    //FULL NAMES
-    typedef  Sca Scalar;
-    typedef  Biv Bivector;
-    typedef  Tri Trivector ;
-    typedef  Rot Rotor;
-    typedef  Ori Origin;
-    typedef  Inf Infinity;
-    typedef  Mnk Minkowski;
-    typedef  Pss Pseudoscalar;
-    typedef  Pnt Point;
-    typedef  Par Pair;
-    typedef  Cir Circle;
-    typedef  Sph Sphere;
-    typedef  Pnt DualSphere;
-    typedef  Drv DirectionVector;
-    typedef  Drb DirectionBivector;
-    typedef  Drt DirectionTrivector;
-    typedef  Tnv TangentVector;
-    typedef  Tnb TangentBivector;
-    typedef  Tnt TangentTrivector;
-    typedef  Dll DualLine;
-    typedef  Lin Line;
-    typedef  Flp FlatPoint;
-    typedef  Pln Plane;
-    typedef  Dlp DualPlane;
-    typedef  Trs Translator;
-    typedef  Mot Motor;
-    typedef  Trv Transversor;
-    typedef  Bst Boost;
-    typedef  Dil Dilator;
-    typedef  Tsd TranslatedDilator;
 
   }//cga3D::
+
+/* using namespace cga3D; */
+
+/* extern template Pnt Pnt::sp( const Rot& )const; */                         
+/* extern template Pnt Pnt::sp( const Trs& )const; */                         
+/* extern template Pnt Pnt::sp( const Mot& )const; */                       
+/* extern template Pnt Pnt::sp( const Bst& )const; */
+/* extern template Pnt Pnt::sp( const Tsd& )const; */
+/* extern template Pnt Pnt::sp( const Dil& )const; */
+                                                         
+/* extern template Par Par::sp( const Rot& )const; */
+/* extern template Par Par::sp( const Trs& )const; */
+/* extern template Par Par::sp( const Mot& )const; */
+/* extern template Par Par::sp( const Bst& )const; */
+/* extern template Par Par::sp( const Tsd& )const; */
+/* extern template Par Par::sp( const Dil& )const; */
+                                                       
+/* extern template Cir Cir::sp( const Rot& )const; */
+/* extern template Cir Cir::sp( const Trs& )const; */
+/* extern template Cir Cir::sp( const Mot& )const; */
+/* extern template Cir Cir::sp( const Bst& )const; */
+/* extern template Cir Cir::sp( const Tsd& )const; */
+/* extern template Cir Cir::sp( const Dil& )const; */
 
 } // vsr:: 
 

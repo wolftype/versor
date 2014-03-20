@@ -498,13 +498,13 @@ struct CGA{
   typedef typename RMetric<DIM-1,1>::Type M;   
   
   typedef MV<0> Sca; 
-  template<TT N> using e = MV< (1<<(N-1)) >;   
    // template<TT M, TT N> using ee = MV< (1<<(M-1)) (1<<(N-1)) >; 
   typedef MV< pss(DIM) > Pss;  
-  typedef MV< pss(DIM-2) > EucPss;           //Euclidean Pseudoscaler 
-    
+  typedef MV< pss(DIM-2) > EucPss;           //Euclidean Pseudoscaler
+  //typedef GA::pss<DIM> Pss;  
+  //typedef GA::pss<(DIM-2)> EucPss;           //Euclidean Pseudoscaler 
   typedef typename Blade1<DIM-2>::VEC   Vec;         //Euclidean Vector
-  typedef typename Blade1<2>::VEC   Vec2D;  
+  //typedef typename Blade1<2>::VEC   Vec2D;  
   typedef typename EOProd<Vec,Vec>::Type   Biv;        //Euclidean Bivector
   typedef typename EOProd<Biv,Vec>::Type   Tri;       //Euclidean Trivector
   typedef typename EProd<Vec,Vec>::Type   Rot;        //Euclidean Rotor (Complex number in 2d, Quaternion in 3d)
@@ -512,6 +512,7 @@ struct CGA{
   typedef MV< origin<DIM>() > Ori;
   typedef MV< infinity<DIM>() > Inf; 
   typedef MV< eplane<DIM>() > Mnk;
+
   typedef typename OProd<Vec, Ori, M, true>::Type Tnv;
   typedef typename OProd<Vec, Inf, M, true>::Type Drv;  
   typedef typename OProd<Biv, Ori, M, true>::Type Tnb;

@@ -57,10 +57,14 @@ struct XList<X,XS...>{
   typedef XList<XS...> TAIL;
   
   /// Executes and sums specific blade
+  /* template<class A, class B> */
+  /* static constexpr auto Exec(const A& a, const B& b) RETURNS( */
+  /*   X::Exec(a,b) + TAIL::Exec(a,b) //sum */
+  /* ) */                                 
   template<class A, class B>
-  static constexpr auto Exec(const A& a, const B& b) RETURNS(
-    X::Exec(a,b) + TAIL::Exec(a,b) //sum
-  )                                 
+  static constexpr auto Exec(const A& a, const B& b) -> typename A::ValueType {
+    return X::Exec(a,b) + TAIL::Exec(a,b);
+  }
 
   /// Makes a specific type (binary)
   template<class R, class A, class B>
