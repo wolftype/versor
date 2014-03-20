@@ -24,7 +24,7 @@
 #define Flat Fl
 #define Tangent Ta
 
-
+#include "vsr_euclidean.h"
 #include "vsr_conformal.h"
 #include "vsr_constants.h" 
 #include <vector>  
@@ -161,7 +161,6 @@ namespace Euc{
     /* ND Rotor from Bivector b*/  
     template<class A>
     auto rot ( const A& b ) -> decltype( b + 1 ) {  
-      //  printf("me");
       VSR_PRECISION  c = sqrt(- ( b.wt() ) );
           VSR_PRECISION sc = -sin(c);
           if (c != 0) sc /= c;
@@ -175,15 +174,15 @@ namespace Euc{
     /*     rot( v * angle ) */
     /* ) */ 
     
-    /*! Get Bivector Generator from a Rotor  (3d Conformal...)
-          @param Rotor r
+    /*! Get Bivector Generator from a Rotor
+     *     @param Rotor r
       */
-     template<Bits::Type DIM>
-     auto log(const CGAMV<DIM, typename CGA<DIM>::Rot>& r) -> CGAMV<DIM, typename CGA<DIM>::Biv> {
-                 
-      using TBIV = CGAMV<DIM, typename CGA<DIM>::Biv>;
+     template<Bits::Type DIM> 
+     auto log(const NERot<DIM>& r) -> NEBiv<DIM> {
 
-          VSR_PRECISION t = r.template get<0>();                           //<--- Scalar Value from Rotor
+         using TBIV = NEBiv<DIM>;
+
+          VSR_PRECISION t = r[0];//.template get<0>();                           //<--- Scalar Value from Rotor
 
           TBIV b = r.template cast<TBIV>();
 
@@ -191,7 +190,7 @@ namespace Euc{
 
           if (n <= 0) {
               if (t < 0) {
-                  printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
+                  //printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
                   return TBIV(PI);
               } else {
                   return TBIV(); 
@@ -201,16 +200,16 @@ namespace Euc{
           VSR_PRECISION s = atan2( n, t );
           return b * ( s / n);
       }  
-  
-    /*! Get Bivector Generator from a Rotor  (3d Conformal)
+
+     /*! Get Bivector Generator from a Rotor  (3d Conformal)
           @param Rotor r
       */
-     template<Bits::Type DIM>
-     auto log(const EGAMV<DIM, typename EGA<DIM>::Rot>& r) -> EGAMV<DIM, typename EGA<DIM>::Biv> {
-                 
-      using TBIV = EGAMV<DIM, typename EGA<DIM>::Biv>;
+      template<Bits::Type DIM> 
+      auto log(const NRot<DIM>& r) -> NBiv<DIM> {
 
-          VSR_PRECISION t = r.template get<0>();                           //<--- Scalar Value from Rotor
+         using TBIV = NBiv<DIM>;
+
+          VSR_PRECISION t = r[0];//.template get<0>();                           //<--- Scalar Value from Rotor
 
           TBIV b = r.template cast<TBIV>();
 
@@ -218,7 +217,7 @@ namespace Euc{
 
           if (n <= 0) {
               if (t < 0) {
-                  printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
+                  //printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
                   return TBIV(PI);
               } else {
                   return TBIV(); 
@@ -227,7 +226,7 @@ namespace Euc{
 
           VSR_PRECISION s = atan2( n, t );
           return b * ( s / n);
-      }
+      }   
   
   
     /*! Get Bivector Generator from a Rotor  (3d)
@@ -240,8 +239,8 @@ namespace Euc{
           
           VSR_PRECISION n;
 
-      TPAR p;
-      p = r; //extract 2-blade part
+          TPAR p;
+          p = r; //extract 2-blade part
           VSR_PRECISION td = p.wt(); //get scalar
 
           if (td > 0 ) { VSR_PRECISION s2 = sqrt(td);  n = asinh( s2 ) / s2; }
@@ -988,111 +987,108 @@ namespace Euc{
   
   //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
   
-              
-  /* template<Bits::Type DIM, class A> template< class T> */
-  /* EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{ */
-  /*   return this->sp( Gen::rot(t) ); */
-  /* } */   
+  template<Bits::Type DIM, class A> template< class T>
+  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{
+    return this->sp( Gen::rot(t) );
+  }   
   
   
-  /* //TRANSLATIONS */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{ */
-  /*   return this -> sp ( Gen::trs(t) ); */  
-  /* } */ 
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{ */
-  /*   return this -> trs(t); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{ */
-  /*   return this -> sp ( Gen::trs(v...) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{ */
-  /*   return this -> sp ( Gen::trs(v...) ); */  
-  /* } */  
+  //TRANSLATIONS
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{
+    return this -> sp ( Gen::trs(t) );  
+  } 
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{
+    return this -> trs(t);  
+  }
+  template<Bits::Type DIM, typename A> template< class ... T> 
+  CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{
+    return this -> sp ( Gen::trs(v...) );  
+  }
+  template<Bits::Type DIM, typename A> template< class ... T> 
+  CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{
+    return this -> sp ( Gen::trs(v...) );  
+  }  
   
-  /* //TRANSVERSIONS */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{ */
-  /*   return this -> sp ( Gen::trv(t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{ */
-  /*   return this -> sp ( Gen::trv(t) ); */  
-  /* } */ 
+  //TRANSVERSIONS
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{
+    return this -> sp ( Gen::trv(t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{
+    return this -> sp ( Gen::trv(t) );  
+  } 
  
-  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{ */
-  /*   return this -> sp ( Gen::trv(v...) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template< class ... T> */ 
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{ */
-  /*   return this -> sp ( Gen::trv(v...) ); */  
-  /* } */
+  template<Bits::Type DIM, typename A> template< class ... T> 
+  CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{
+    return this -> sp ( Gen::trv(v...) );  
+  }
+  template<Bits::Type DIM, typename A> template< class ... T> 
+  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{
+    return this -> sp ( Gen::trv(v...) );  
+  }
 
   
-  /* //ROTATIONS */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{ */
-  /*     return this -> sp ( Gen::rot(t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{ */
-  /*     return this -> rot(t); */  
-  /* } */ 
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::rot( VSR_PRECISION a, const T& t) const{ */
-  /*     return this -> sp ( Gen::rot(a,t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VSR_PRECISION a, const T& t) const{ */
-  /*     return this -> rot(a, t); */  
-  /* } */ 
+  //ROTATIONS
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{
+      return this -> sp ( Gen::rot(t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{
+      return this -> rot(t);  
+  } 
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::rot( VSR_PRECISION a, const T& t) const{
+      return this -> sp ( Gen::rot(a,t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VSR_PRECISION a, const T& t) const{
+      return this -> rot(a, t);  
+  } 
 
 
-  /*  //DILATIONS */ 
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{ */
-  /*       return this -> sp ( Gen::dil<DIM>(t) ); */  
-  /* } */ 
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{ */
-  /*       return this -> sp ( Gen::dil<DIM>(t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{ */
-  /*       return this -> sp ( Gen::dil(a, t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{ */
-  /*       return this -> sp ( Gen::dil(a, t) ); */  
-  /* } */
-  /*   template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{ */
-  /*       return this -> dilate(t); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename P, typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{ */
-  /*       return this -> sp ( Gen::dil(a, t) ); */  
-  /* } */
+   //DILATIONS 
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{
+        return this -> sp ( Gen::dil<DIM>(t) );  
+  } 
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{
+        return this -> sp ( Gen::dil<DIM>(t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename P, typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{
+        return this -> sp ( Gen::dil(a, t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename P, typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{
+        return this -> sp ( Gen::dil(a, t) );  
+  }
+    template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{
+        return this -> dilate(t);  
+  }
+  template<Bits::Type DIM, typename A> template<typename P, typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{
+        return this -> sp ( Gen::dil(a, t) );  
+  }
 
-  
-
-  /* //BOOSTS */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{ */
-  /*       return this -> sp ( Gen::bst(t) ); */  
-  /* } */
-  /* template<Bits::Type DIM, typename A> template<typename T> */
-  /* CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{ */
-  /*       return this -> bst(t); */  
-  /* } */
+  //BOOSTS
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{
+        return this -> sp ( Gen::bst(t) );  
+  }
+  template<Bits::Type DIM, typename A> template<typename T>
+  CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{
+        return this -> bst(t);  
+  }
 
   //NULL
   template<Bits::Type DIM, typename A>
-  CGAMV<DIM, MV<Basis<1>>> CGAMV<DIM,A>::null() const {
+  CGAMV<DIM, MV<typename GA::vec<DIM>, typename A::ValueType> > CGAMV<DIM,A>::null() const {
         return Ro::null(*this);  
   }
   

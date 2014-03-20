@@ -40,7 +40,7 @@ LDFLAGS =
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
 IPATH += -I/usr/include/ 
-LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr 
+LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ #-lvsr 
 #-lvsr
 LDFLAGS += -lm  
 else
@@ -84,9 +84,9 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
+OBJ = #vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
 ifneq ($(RPI),1)
-OBJ += vsr_cga3D_draw.o vsr_cga3D_interface.o gl2ps.o
+#OBJ += vsr_cga3D_draw.o vsr_cga3D_interface.o gl2ps.o
 endif
 
 OBJ_DIR = build/obj/
@@ -124,7 +124,7 @@ glv:
 	#install DESTDIR=../../$(BUILD_DIR)    
 
 
-$(EXEC): dir glv vsr FORCE 
+$(EXEC): dir glv FORCE 
 	@echo Building $@
 	$(CXX) -o $(BIN_DIR)$(*F) $@ $(IPATH) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)

@@ -2,161 +2,129 @@
 
 namespace vsr{  
   
-
-                         
-//template class CGAMV<5,   CGA<5>::Sca   >;  
-//template class CGAMV<5,   CGA<5>::Vec   >;  
-//template class CGAMV<5,   CGA<5>::Vec2D >;  
-//template class CGAMV<5,   CGA<5>::Biv   >;  
-//template class CGAMV<5,   CGA<5>::Tri   >;  
-//template class CGAMV<5,   CGA<5>::Rot   >;  
-//template class CGAMV<5,   CGA<5>::Mnk   >;  
-//template class CGAMV<5,   CGA<5>::Pss   >;     
-//template class CGAMV<5,   CGA<5>::Pnt   >;  
-//template class CGAMV<5,   CGA<5>::Par   >; 
-//template class CGAMV<5,   CGA<5>::Cir   >; 
-//template class CGAMV<5,   CGA<5>::Sph   >;  
-//template class CGAMV<5,   CGA<5>::Dll   >; 
-//template class CGAMV<5,   CGA<5>::Lin   >; 
-//template class CGAMV<5,   CGA<5>::Flp   >; 
-//template class CGAMV<5,   CGA<5>::Pln   >; 
-//template class CGAMV<5,   CGA<5>::Dlp   >; 
-//template class CGAMV<5,   CGA<5>::Trs   >;   
-//template class CGAMV<5,   CGA<5>::Mot   >; 
-//template class CGAMV<5,   CGA<5>::Trv   >; 
-//template class CGAMV<5,   CGA<5>::Bst   >; 
-//template class CGAMV<5,   CGA<5>::Dil   >; 
-//template class CGAMV<5,   CGA<5>::Tsd   >;
-
-
-                                                
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                        
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                        
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Mot& )const;                      
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Bst& )const;
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Tsd& )const;
-template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Dil& )const;
+                                            
+/* template Pnt Pnt::sp( const Rot& )const; */                        
+/* template Pnt Pnt::sp( const Trs& )const; */                        
+/* template Pnt Pnt::sp( const Mot& )const; */                      
+/* template Pnt Pnt::sp( const Bst& )const; */
+/* template Pnt Pnt::sp( const Tsd& )const; */
+/* template Pnt Pnt::sp( const Dil& )const; */
                                                           
-template Par CGAMV<5, CGA<5>::Par>::sp( const Rot& )const;
-template Par CGAMV<5, CGA<5>::Par>::sp( const Trs& )const;
-template Par CGAMV<5, CGA<5>::Par>::sp( const Mot& )const;
-template Par CGAMV<5, CGA<5>::Par>::sp( const Bst& )const;
-template Par CGAMV<5, CGA<5>::Par>::sp( const Tsd& )const;
-template Par CGAMV<5, CGA<5>::Par>::sp( const Dil& )const;
-                                                          
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Rot& )const;
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Trs& )const;
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Mot& )const;
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Bst& )const;
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Tsd& )const;
-template Cir CGAMV<5, CGA<5>::Cir>::sp( const Dil& )const;
-                                                          
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Rot& )const;
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Trs& )const;
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Mot& )const;
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Bst& )const;
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Tsd& )const;
-template Sph CGAMV<5, CGA<5>::Sph>::sp( const Dil& )const;
+/* template Par Par::sp( const Rot& )const; */
+/* template Par Par::sp( const Trs& )const; */
+/* template Par Par::sp( const Mot& )const; */
+/* template Par Par::sp( const Bst& )const; */
+/* template Par Par::sp( const Tsd& )const; */
+/* template Par Par::sp( const Dil& )const; */
+                                        
+/* template Cir Cir::sp( const Rot& )const; */
+/* template Cir Cir::sp( const Trs& )const; */
+/* template Cir Cir::sp( const Mot& )const; */
+/* template Cir Cir::sp( const Bst& )const; */
+/* template Cir Cir::sp( const Tsd& )const; */
+/* template Cir Cir::sp( const Dil& )const; */
+                                        
+/* template Sph Sph::sp( const Rot& )const; */
+/* template Sph Sph::sp( const Trs& )const; */
+/* template Sph Sph::sp( const Mot& )const; */
+/* template Sph Sph::sp( const Bst& )const; */
+/* template Sph Sph::sp( const Tsd& )const; */
+/* template Sph Sph::sp( const Dil& )const; */
+                
+                
+/* template Dll Dll::sp( const Rot& )const; */ 
+/* template Dll Dll::sp( const Trs& )const; */ 
+/* template Dll Dll::sp( const Mot& )const; */ 
+/* template Dll Dll::sp( const Bst& )const; */
+/* template Dll Dll::sp( const Tsd& )const; */
+/* template Dll Dll::sp( const Dil& )const; */
+                                
+/* template Lin Lin::sp( const Rot& )const; */
+/* template Lin Lin::sp( const Trs& )const; */
+/* template Lin Lin::sp( const Mot& )const; */
+/* template Lin Lin::sp( const Bst& )const; */
+/* template Lin Lin::sp( const Tsd& )const; */
+/* template Lin Lin::sp( const Dil& )const; */
+                              
+/* template Dlp Dlp::sp( const Rot& )const; */
+/* template Dlp Dlp::sp( const Trs& )const; */
+/* template Dlp Dlp::sp( const Mot& )const; */
+/* template Dlp Dlp::sp( const Bst& )const; */
+/* template Dlp Dlp::sp( const Tsd& )const; */
+/* template Dlp Dlp::sp( const Dil& )const; */
+                                
+/* template Pln Pln::sp( const Rot& )const; */
+/* template Pln Pln::sp( const Trs& )const; */
+/* template Pln Pln::sp( const Mot& )const; */
+/* template Pln Pln::sp( const Bst& )const; */
+/* template Pln Pln::sp( const Tsd& )const; */
+/* template Pln Pln::sp( const Dil& )const; */     
 
+/* template Rot Gen::ratio( const Vec&, const Vec& ); */                                                     
+/* template Rot Gen::rot( const Biv& ); */                         
+/* template Biv Gen::log( const Rot& ); */
+/* template Par Gen::log( const Bst& ); */ 
+/* template Trv Gen::trv( const Vec& ); */
+/* template Trv Gen::trv( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); */ 
+/* template Trv Gen::trv( const Drv& ); */
+/* template Trv Gen::trv( const Tnv& ); */ 
+/* template Trs Gen::trs( const Vec& ); */
+/* template Trs Gen::trs( const Drv& ); */ 
+/* template Trs Gen::trs( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); */ 
+/* template Dil Gen::dil( VSR_PRECISION ); */ 
+/* template Tsd Gen::dil( const Pnt&, VSR_PRECISION ); */ 
+/* template Bst Gen::bst( const Par& ); */ 
 
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const; 
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const; 
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Mot& )const; 
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Bst& )const;
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Tsd& )const;
-template Dll CGAMV<5, CGA<5>::Dll>::sp( const Dil& )const;
-                                                  
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Rot& )const;
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Trs& )const;
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Mot& )const;
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Bst& )const;
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Tsd& )const;
-template Lin CGAMV<5, CGA<5>::Lin>::sp( const Dil& )const;
-                                                
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Rot& )const;
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Trs& )const;
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Mot& )const;
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Bst& )const;
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Tsd& )const;
-template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Dil& )const;
-                                                  
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Rot& )const;
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Trs& )const;
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Mot& )const;
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Bst& )const;
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Tsd& )const;
-template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;     
+/* template Rot Gen::aa( const Rot& r); */
 
+/* template Par Ro::round( const Dls&, const Vec& ); */ 
+/* template Cir Ro::round( const Dls&, const Biv& ); */  
 
-template Rot Gen::ratio( const Vec&, const Vec& );                                                     
-template Rot Gen::rot( const Biv& );                         
-//template Rot Gen::rot( VT, const Biv& ); 
-template Biv Gen::log( const Rot& );
-template Par Gen::log( const Bst& ); 
-template Trv Gen::trv( const Vec& );
-template Trv Gen::trv( VT x, VT y, VT z ); 
-template Trv Gen::trv( const Drv& );
-template Trv Gen::trv( const Tnv& ); 
-template Trs Gen::trs( const Vec& );
-template Trs Gen::trs( const Drv& ); 
-template Trs Gen::trs( VT x, VT y, VT z ); 
-template Dil Gen::dil( VT ); 
-template Tsd Gen::dil( const Pnt&, VT ); 
-template Bst Gen::bst( const Par& ); 
+/* template Pnt Ro::null( const Vec& ); */
+/* template Pnt Ro::null( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z); */ 
 
-template Rot Gen::aa( const Rot& r);
+/* template VSR_PRECISION Ro::size( const Pnt&, bool); */ 
+/* template VSR_PRECISION Ro::size( const Par&, bool); */ 
+/* template VSR_PRECISION Ro::size( const Cir&, bool); */ 
+/* template VSR_PRECISION Ro::size( const Sph&, bool); */ 
 
-template Par Ro::round( const Dls&, const Vec& ); 
-template Cir Ro::round( const Dls&, const Biv& );  
+/* template VSR_PRECISION Ro::rad( const Pnt&); */ 
+/* template VSR_PRECISION Ro::rad( const Par&); */ 
+/* template VSR_PRECISION Ro::rad( const Cir&); */ 
+/* template VSR_PRECISION Ro::rad( const Sph&); */
 
-template Pnt Ro::null( const Vec& );
-template Pnt Ro::null( VT x, VT y, VT z); 
-
-template VT Ro::size( const Pnt&, bool); 
-template VT Ro::size( const Par&, bool); 
-template VT Ro::size( const Cir&, bool); 
-template VT Ro::size( const Sph&, bool); 
-
-template VT Ro::rad( const Pnt&); 
-template VT Ro::rad( const Par&); 
-template VT Ro::rad( const Cir&); 
-template VT Ro::rad( const Sph&);
-
-template Pnt Ro::cen( const Pnt&); 
-template Pnt Ro::cen( const Par&); 
-template Pnt Ro::cen( const Cir&); 
-template Pnt Ro::cen( const Sph&); 
+/* template Pnt Ro::cen( const Pnt&); */ 
+/* template Pnt Ro::cen( const Par&); */ 
+/* template Pnt Ro::cen( const Cir&); */ 
+/* template Pnt Ro::cen( const Sph&); */ 
          
-template Pnt Ro::loc( const Pnt&); 
-template Pnt Ro::loc( const Par&); 
-template Pnt Ro::loc( const Cir&); 
-template Pnt Ro::loc( const Sph&);  
+/* template Pnt Ro::loc( const Pnt&); */ 
+/* template Pnt Ro::loc( const Par&); */ 
+/* template Pnt Ro::loc( const Cir&); */ 
+/* template Pnt Ro::loc( const Sph&); */  
 
 
-template Drv Ro::dir( const Par&); 
-template Drb Ro::dir( const Cir&); 
+/* template Drv Ro::dir( const Par&); */ 
+/* template Drb Ro::dir( const Cir&); */ 
 
-template Lin Ro::car( const Par&); 
-template Pln Ro::car( const Cir&); 
+/* template Lin Ro::car( const Par&); */ 
+/* template Pln Ro::car( const Cir&); */ 
 
-template Pnt Ro::sur( const Par&);
-template Pnt Ro::sur( const Cir&);
+/* template Pnt Ro::sur( const Par&); */
+/* template Pnt Ro::sur( const Cir&); */
 
-template std::vector<Pnt> Ro::split( const Par&); 
-template Pnt Ro::dls_pnt( const Pnt&, VT r); 
+/* template std::vector<Pnt> Ro::split( const Par&); */ 
+/* template Pnt Ro::dls_pnt( const Pnt&, VSR_PRECISION r); */ 
 
-template Pnt Fl::loc( const Dll&, const Pnt&, bool);
-template Pnt Fl::loc( const Lin&, const Pnt&, bool);
-template Pnt Fl::loc( const Dlp&, const Pnt&, bool);  
-template Pnt Fl::loc( const Pln&, const Pnt&, bool); 
+/* template Pnt Fl::loc( const Dll&, const Pnt&, bool); */
+/* template Pnt Fl::loc( const Lin&, const Pnt&, bool); */
+/* template Pnt Fl::loc( const Dlp&, const Pnt&, bool); */  
+/* template Pnt Fl::loc( const Pln&, const Pnt&, bool); */ 
 
-template Drv Fl::dir( const Lin&);
-template Drb Fl::dir( const Pln&);  
+/* template Drv Fl::dir( const Lin&); */
+/* template Drb Fl::dir( const Pln&); */  
 
-// template VT Fl::wt( const Dll&, bool);
-// template VT Fl::wt( const Lin&, bool);
-// template VT Fl::wt( const Dlp&, bool);  
-// template VT Fl::wt( const Pln&, bool);  
+
 namespace Gen{               
 
   /*! Generate a Rotor (i.e quaternion) from spherical coordinates
@@ -193,11 +161,11 @@ namespace Gen{
       Dll b = dll;
       Biv B(b[0],b[1],b[2]); //Biv B(dll);  
 
-      VT w = B.wt();
+      VSR_PRECISION w = B.wt();
 
-      VT  c = ( sqrt( fabs ( w ) ) );
-      VT sc = sin(c);
-      VT cc = cos(c);
+      VSR_PRECISION  c = ( sqrt( fabs ( w ) ) );
+      VSR_PRECISION sc = sin(c);
+      VSR_PRECISION cc = cos(c);
 
       if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
 
@@ -229,9 +197,9 @@ namespace Gen{
 
           q = m;                                                  //extract grade 2 part
 
-          VT  ac = acos( m[0] );                                  //angle of rotor  
-          VT  den = Math::sinc(ac);
-          VT  den2 = ac * ac * den;
+          VSR_PRECISION  ac = acos( m[0] );                                  //angle of rotor  
+          VSR_PRECISION  den = Math::sinc(ac);
+          VSR_PRECISION  den2 = ac * ac * den;
 
           b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );     //bivector part - negative necessary . dll? . . 
           tq = (b * q);                                           //Make motor and extract Grade 2 part
@@ -257,16 +225,16 @@ namespace Gen{
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-    Dll log(const Dll& a, const Dll& b, VT t ){
-          Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n;
+    Dll log(const Dll& a, const Dll& b, VSR_PRECISION t ){
+          Mot m = b/a; VSR_PRECISION n = m.rnorm(); if (n!=0) m /= n;
           return Gen::log( m ) * (t/2.0) ;
       }
 
       /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
       */
-     Mot ratio( const Dll& a, const Dll& b, VT t){
-          //Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
+     Mot ratio( const Dll& a, const Dll& b, VSR_PRECISION t){
+          //Mot m = b/a; VSR_PRECISION n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
           return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
       }
 

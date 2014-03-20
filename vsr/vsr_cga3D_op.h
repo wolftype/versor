@@ -42,17 +42,17 @@ namespace Gen{
     /*! Dual Line Generator from a Motor 
         @param Motor m (a concatenation of rotation and translation)
     */  
-      Dll log( const Mot& m);
+     Dll log( const Mot& m);
 
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-     Dll log(const Dll& a, const Dll& b, VT t = 1.0);
+     Dll log(const Dll& a, const Dll& b, VSR_PRECISION t = 1.0);
 
       /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
       */
-    Mot ratio( const Dll& a, const Dll& b, VT t = 1.0);
+    Mot ratio( const Dll& a, const Dll& b, VSR_PRECISION t = 1.0);
 
 
       /*! Generate a Translated Transversion 
@@ -69,150 +69,145 @@ namespace Gen{
    
 }; 
     
-
-extern template Pnt Pnt::sp( const Rot& )const;                         
-extern template Pnt Pnt::sp( const Trs& )const;                         
-extern template Pnt Pnt::sp( const Mot& )const;                       
-extern template Pnt Pnt::sp( const Bst& )const;
-extern template Pnt Pnt::sp( const Tsd& )const;
-extern template Pnt Pnt::sp( const Dil& )const;
-                                                         
-extern template Par Par::sp( const Rot& )const;
-extern template Par Par::sp( const Trs& )const;
-extern template Par Par::sp( const Mot& )const;
-extern template Par Par::sp( const Bst& )const;
-extern template Par Par::sp( const Tsd& )const;
-extern template Par Par::sp( const Dil& )const;
-                                                       
-extern template Cir Cir::sp( const Rot& )const;
-extern template Cir Cir::sp( const Trs& )const;
-extern template Cir Cir::sp( const Mot& )const;
-extern template Cir Cir::sp( const Bst& )const;
-extern template Cir Cir::sp( const Tsd& )const;
-extern template Cir Cir::sp( const Dil& )const;
-                                                         
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Rot& )const;
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Trs& )const;
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Mot& )const;
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Bst& )const;
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Tsd& )const;
-extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Dil& )const; 
-
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const;                         
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const;                         
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Mot& )const;                       
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Bst& )const;
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Tsd& )const;
-extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Dil& )const;
-                                                         
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Rot& )const;
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Trs& )const;
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Mot& )const;
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Bst& )const;
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Tsd& )const;
-extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Dil& )const;
-                                                       
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Rot& )const;
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Trs& )const;
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Mot& )const;
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Bst& )const;
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Tsd& )const;
-extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Dil& )const;
-                                                         
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Rot& )const;
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Trs& )const;
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Mot& )const;
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Bst& )const;
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Tsd& )const;
-extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;  
-                                                           
-
-                                                           
-extern template Rot Gen::rot( const Biv& );                         
-
-extern template Biv Gen::log( const Rot& );
-extern template Par Gen::log( const Bst& ); 
-extern template Trv Gen::trv( const Vec& );
-extern template Trv Gen::trv( VT x, VT y, VT z ); 
-extern template Trv Gen::trv( const Drv& );
-extern template Trv Gen::trv( const Tnv& ); 
-extern template Trs Gen::trs( const Vec& );
-extern template Trs Gen::trs( const Drv& ); 
-extern template Trs Gen::trs( VT x, VT y, VT z ); 
-extern template Dil Gen::dil( VT ); 
-extern template Tsd Gen::dil( const Pnt&, VT ); 
-extern template Bst Gen::bst( const Par& ); 
-
-extern template Rot Gen::ratio( const Vec&, const Vec& );
-extern template Rot Gen::aa( const Rot& r);
-
-   
-extern template Par Ro::round( const Dls&, const Vec& ); 
-extern template Cir Ro::round( const Dls&, const Biv& );  
-
-extern template Pnt Ro::null( const Vec& );
-extern template Pnt Ro::null( VT x, VT y, VT z);
-
-extern template VT Ro::size( const Pnt&, bool); 
-extern template VT Ro::size( const Par&, bool); 
-extern template VT Ro::size( const Cir&, bool); 
-extern template VT Ro::size( const Sph&, bool); 
-
-extern template VT Ro::rad( const Pnt&); 
-extern template VT Ro::rad( const Par&); 
-extern template VT Ro::rad( const Cir&); 
-extern template VT Ro::rad( const Sph&);
-
-extern template Pnt Ro::cen( const Pnt&); 
-extern template Pnt Ro::cen( const Par&); 
-extern template Pnt Ro::cen( const Cir&); 
-extern template Pnt Ro::cen( const Sph&); 
-                
-extern template Pnt Ro::loc( const Pnt&); 
-extern template Pnt Ro::loc( const Par&); 
-extern template Pnt Ro::loc( const Cir&); 
-extern template Pnt Ro::loc( const Sph&);  
-
-extern template Drv Ro::dir( const Par&); 
-extern template Drb Ro::dir( const Cir&); 
-
-extern template Lin Ro::car( const Par&); 
-extern template Pln Ro::car( const Cir&);
-
-extern template Pnt Ro::sur( const Par&); 
-extern template Pnt Ro::sur( const Cir&);
-
-extern template std::vector<Pnt> Ro::split( const Par&);  
-extern template Pnt Ro::dls_pnt( const Pnt&, VT r);
- 
-
-extern template Pnt Fl::loc( const Dll&, const Pnt&, bool);
-extern template Pnt Fl::loc( const Lin&, const Pnt&, bool);
-extern template Pnt Fl::loc( const Dlp&, const Pnt&, bool); 
-extern template Pnt Fl::loc( const Pln&, const Pnt&, bool);
-       
-
-extern template Drv Fl::dir( const Lin&);
-extern template Drb Fl::dir( const Pln&);  
-       
-// extern template VT Fl::wt( const Dll&, bool);
-// extern template VT Fl::wt( const Lin&, bool);
-// extern template VT Fl::wt( const Dlp&, bool);  
-// extern template VT Fl::wt( const Pln&, bool);  
-
- 
-template<TT DIM, typename A> template<typename T>
+template<Bits::Type DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::mot( const T& t) const{
      return this -> sp ( Gen::mot(t) );  
 } 
-template<TT DIM, typename A> template<typename T>
+template<Bits::Type DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::motor( const T& t) const{
      return this -> mot(t);  
 }
-template<TT DIM, typename A> template<typename T>
+template<Bits::Type DIM, typename A> template<typename T>
 CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t) const{
      return this -> mot(t);  
 }
+
+
+/* extern template Pnt Pnt::sp( const Rot& )const; */                         
+/* extern template Pnt Pnt::sp( const Trs& )const; */                         
+/* extern template Pnt Pnt::sp( const Mot& )const; */                       
+/* extern template Pnt Pnt::sp( const Bst& )const; */
+/* extern template Pnt Pnt::sp( const Tsd& )const; */
+/* extern template Pnt Pnt::sp( const Dil& )const; */
+                                                         
+/* extern template Par Par::sp( const Rot& )const; */
+/* extern template Par Par::sp( const Trs& )const; */
+/* extern template Par Par::sp( const Mot& )const; */
+/* extern template Par Par::sp( const Bst& )const; */
+/* extern template Par Par::sp( const Tsd& )const; */
+/* extern template Par Par::sp( const Dil& )const; */
+                                                       
+/* extern template Cir Cir::sp( const Rot& )const; */
+/* extern template Cir Cir::sp( const Trs& )const; */
+/* extern template Cir Cir::sp( const Mot& )const; */
+/* extern template Cir Cir::sp( const Bst& )const; */
+/* extern template Cir Cir::sp( const Tsd& )const; */
+/* extern template Cir Cir::sp( const Dil& )const; */
+                                                         
+/* extern template Sph Sph::sp( const Rot& )const; */
+/* extern template Sph Sph::sp( const Trs& )const; */
+/* extern template Sph Sph::sp( const Mot& )const; */
+/* extern template Sph Sph::sp( const Bst& )const; */
+/* extern template Sph Sph::sp( const Tsd& )const; */
+/* extern template Sph Sph::sp( const Dil& )const; */ 
+                       
+/* extern template Dll Dll::sp( const Rot& )const; */                         
+/* extern template Dll Dll::sp( const Trs& )const; */                         
+/* extern template Dll Dll::sp( const Mot& )const; */                       
+/* extern template Dll Dll::sp( const Bst& )const; */
+/* extern template Dll Dll::sp( const Tsd& )const; */
+/* extern template Dll Dll::sp( const Dil& )const; */
+                                       
+/* extern template Lin Lin::sp( const Rot& )const; */
+/* extern template Lin Lin::sp( const Trs& )const; */
+/* extern template Lin Lin::sp( const Mot& )const; */
+/* extern template Lin Lin::sp( const Bst& )const; */
+/* extern template Lin Lin::sp( const Tsd& )const; */
+/* extern template Lin Lin::sp( const Dil& )const; */
+                                     
+/* extern template Dlp Dlp::sp( const Rot& )const; */
+/* extern template Dlp Dlp::sp( const Trs& )const; */
+/* extern template Dlp Dlp::sp( const Mot& )const; */
+/* extern template Dlp Dlp::sp( const Bst& )const; */
+/* extern template Dlp Dlp::sp( const Tsd& )const; */
+/* extern template Dlp Dlp::sp( const Dil& )const; */
+                                       
+/* extern template Pln Pln::sp( const Rot& )const; */
+/* extern template Pln Pln::sp( const Trs& )const; */
+/* extern template Pln Pln::sp( const Mot& )const; */
+/* extern template Pln Pln::sp( const Bst& )const; */
+/* extern template Pln Pln::sp( const Tsd& )const; */
+/* extern template Pln Pln::sp( const Dil& )const; */  
+                                                           
+/* extern template Rot Gen::rot( const Biv& ); */                         
+
+/* extern template Biv Gen::log( const Rot& ); */
+/* extern template Par Gen::log( const Bst& ); */ 
+/* extern template Trv Gen::trv( const Vec& ); */
+/* extern template Trv Gen::trv( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); */ 
+/* extern template Trv Gen::trv( const Drv& ); */
+/* extern template Trv Gen::trv( const Tnv& ); */ 
+/* extern template Trs Gen::trs( const Vec& ); */
+/* extern template Trs Gen::trs( const Drv& ); */ 
+/* extern template Trs Gen::trs( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); */ 
+/* extern template Dil Gen::dil( VSR_PRECISION ); */ 
+/* extern template Tsd Gen::dil( const Pnt&, VSR_PRECISION ); */ 
+/* extern template Bst Gen::bst( const Par& ); */ 
+
+/* extern template Rot Gen::ratio( const Vec&, const Vec& ); */
+/* extern template Rot Gen::aa( const Rot& r); */
+
+   
+/* extern template Par Ro::round( const Dls&, const Vec& ); */ 
+/* extern template Cir Ro::round( const Dls&, const Biv& ); */  
+
+/* extern template Pnt Ro::null( const Vec& ); */
+/* extern template Pnt Ro::null( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z); */
+
+/* extern template VSR_PRECISION Ro::size( const Pnt&, bool); */ 
+/* extern template VSR_PRECISION Ro::size( const Par&, bool); */ 
+/* extern template VSR_PRECISION Ro::size( const Cir&, bool); */ 
+/* extern template VSR_PRECISION Ro::size( const Sph&, bool); */ 
+
+/* extern template VSR_PRECISION Ro::rad( const Pnt&); */ 
+/* extern template VSR_PRECISION Ro::rad( const Par&); */ 
+/* extern template VSR_PRECISION Ro::rad( const Cir&); */ 
+/* extern template VSR_PRECISION Ro::rad( const Sph&); */
+
+/* extern template Pnt Ro::cen( const Pnt&); */ 
+/* extern template Pnt Ro::cen( const Par&); */ 
+/* extern template Pnt Ro::cen( const Cir&); */ 
+/* extern template Pnt Ro::cen( const Sph&); */ 
+                
+/* extern template Pnt Ro::loc( const Pnt&); */ 
+/* extern template Pnt Ro::loc( const Par&); */ 
+/* extern template Pnt Ro::loc( const Cir&); */ 
+/* extern template Pnt Ro::loc( const Sph&); */  
+
+/* extern template Drv Ro::dir( const Par&); */ 
+/* extern template Drb Ro::dir( const Cir&); */ 
+
+/* extern template Lin Ro::car( const Par&); */ 
+/* extern template Pln Ro::car( const Cir&); */
+
+/* extern template Pnt Ro::sur( const Par&); */ 
+/* extern template Pnt Ro::sur( const Cir&); */
+
+/* extern template std::vector<Pnt> Ro::split( const Par&); */  
+/* extern template Pnt Ro::dls_pnt( const Pnt&, VSR_PRECISION r); */
+ 
+
+/* extern template Pnt Fl::loc( const Dll&, const Pnt&, bool); */
+/* extern template Pnt Fl::loc( const Lin&, const Pnt&, bool); */
+/* extern template Pnt Fl::loc( const Dlp&, const Pnt&, bool); */ 
+/* extern template Pnt Fl::loc( const Pln&, const Pnt&, bool); */
+       
+
+/* extern template Drv Fl::dir( const Lin&); */
+/* extern template Drb Fl::dir( const Pln&); */  
+       
+ 
+
 
 
  

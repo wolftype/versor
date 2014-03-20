@@ -252,6 +252,7 @@ struct GA{
   template<Bits::Type DIM> using infinity = Basis< Bits::infinity<DIM>() >;
   template<Bits::Type DIM> using eplane = Basis< Bits::eplane<DIM>() >;
   template<Bits::Type DIM> using vec = typename Blade1<DIM>::VEC;
+  //template<Bits::Type DIM> using biv = vec<DIM>, vec<DIM
 };
 
 
@@ -375,7 +376,7 @@ diff( const MV<B1,T> & a, const MV<B2,T>& b) {
 template<class B, class T>
 MV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type,T>
 sumv( VSR_PRECISION a, const  MV<B,T>& b) {
-  MV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type,T> Ret;
+  typedef MV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type,T> Ret;
   return sum( Ret(a) , b.template cast<Ret>() );
 }
 
