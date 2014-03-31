@@ -157,7 +157,7 @@ struct Rigid2 {
     return Ro::pnt_cir( circle(), amt );
   }
 
-  /// Constrain original point to lie on circle (at closest point on circle to starting position)
+  /// Constrain original point to lie on circle (at closest point on possibility circle to starting position)
   Pnt operator()() { 
       return (*this)(origin);// Constrain::Tangency( origin, distA(), distB() );
   }

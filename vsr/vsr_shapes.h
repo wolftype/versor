@@ -72,7 +72,7 @@ namespace vsr{
         return m;
     }
 
-    ///Skin Circles
+    ///Skin Circles -- pass in an array or vector of circles
     template<typename T>
     static inline Mesh Skin( T cir, int num, int res = 100){
   
@@ -111,8 +111,8 @@ namespace vsr{
         //calc normals
         for (int i = 0; i < res; ++i){
             for (int j = 0; j < num-1; ++j){
-                a = i * num + j;        //<-- current idx
-                b = a + 1;              //<-- same on next circle
+                a = i * num + j;                //<-- current idx
+                b = a + 1;                      //<-- same on next circle
                 
                 if (i>=res-1) { 
                     c = j + 1;
@@ -120,7 +120,7 @@ namespace vsr{
                 }
                 else {
                     c = a + 1 + num ;           //<-- next on next circle
-                    d = a + num ;           //<-- next on same circle
+                    d = a + num ;               //<-- next on same circle
                 }
                 Vec3f ta = m[b].Pos - m[a].Pos;
                 Vec3f tb = m[d].Pos - m[a].Pos;
@@ -129,7 +129,7 @@ namespace vsr{
             }
         }
         
-        m.mode( GL::TS );//.useElements(true).useNormals(true);
+        m.mode( GL::TS );
         return m;      
     }
   

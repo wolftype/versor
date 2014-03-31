@@ -18,7 +18,11 @@
 //Q: Given a Circle, can we find it's associated HopfBundle, and thereby a commuting Circle?
 namespace vsr{
 
-    /** Feed in Coordinates of a 2-Sphere with One Pole Specified, get 3-Sphere Fiber out */
+    
+  /*!-----------------------------------------------------------------------------
+   * Hopf Fibration
+   *
+   *-----------------------------------------------------------------------------*/
     class HopfFiber{
         
         //Chirality
@@ -81,7 +85,8 @@ namespace vsr{
             Lin lim = mCir.sp( Gen::trv(v.unit()) ); 
             return Gen::ratio( lim.dual().runit(), dll(), phi );
         }
-        
+       
+        /** Feed in Coordinates of a 2-Sphere, get 3-Sphere Fiber out */ 
         //theta from -1 to 1, phi from -.5 to .5
         Cir fiber(double theta, double phi){
 

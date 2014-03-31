@@ -37,6 +37,12 @@ struct TorusKnot  {
     vector<Pnt> pnt;
     
     vector<double> energies;    ///< Energy at idx (from pnt 0) 
+
+    void clear(){
+      cir.clear();
+      pnt.clear();
+      energies.clear();
+    }
     
     double amt; //RES
     
@@ -89,6 +95,7 @@ struct TorusKnot  {
 
   //calculate full orbit from point p without normalizing each step
   void calc0( const Pnt& p){
+    pnt.clear();
     Pnt np = p; 
     Bst tbst = bst();
     for (int i = 0; i < iter(); ++ i ){

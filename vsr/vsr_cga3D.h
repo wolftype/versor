@@ -3,7 +3,7 @@
 
 
 #include "vsr_cga3D_op.h"
-//#include "old/vsr_cga3D_funcs.h"
+#include "vsr_cga3D_funcs.h"
 #include "vsr_cga3D_draw.h"
 #include "vsr_cga3D_interface.h"
  

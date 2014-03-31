@@ -70,14 +70,14 @@ namespace Gen{
 };
 
 
-namespace Ro {
+/* namespace Ro { */
 
-   template<class V>
-   inline Point point( const Lin& lin, const V& v){
-     return Ro::null( Fl::loc( lin, v, false) );
-   }          
+/*    template<class V> */
+/*    inline Point point( const Lin& lin, const V& v){ */
+/*      return Ro::null( Fl::loc( lin, v, false) ); */
+/*    } */          
 
-};
+/* }; */
     
 
 //extern template class CGAMV<5,   CGA<5>::Sca   >;  
