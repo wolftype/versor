@@ -1,18 +1,16 @@
 #ifndef VSR_CGA3D_INTERFACE_H_INCLUDED
 #define VSR_CGA3D_INTERFACE_H_INCLUDED        
 
-#include "gfx/gfx_interface.h" 
+#include <sstream>
 
+#include "gfx/gfx_interface.h" 
 #include "vsr_cga3D_op.h" 
 #include "vsr_cga3D_frame.h" 
 
-#include <sstream>
- 
-
 namespace gfx{    
    
-  using namespace vsr; 
-  
+  using namespace vsr;
+  using vsr::Vec; 
  
   //gfx interface (should be its own lib) templates implementation on X<A,B>
   //

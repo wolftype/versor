@@ -463,13 +463,21 @@ namespace Euc{
       const CGAMV<DIM, typename CGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
        
       using TVEC = CGAMV<DIM, typename CGA<DIM>::Vec >;
+      using TBIV = CGAMV<DIM, typename CGA<DIM>::Biv >;
       using TROT = decltype( (a^b) + 1);
       
-          VT s = ( a <= b )[0];              
+      VT s = ( a <= b )[0];              
   
+     //:  printf("CONJG\n"); 
+
       //180 degree check
-      if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
-          
+      if ( a == b.conjugation() ) {
+        if ( a == TVEC::y || a == -TVEC::y ) {
+         // printf("CONJG\n"); 
+          return rot( TBIV::xy * PIOVERTWO );
+        }        
+        return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
+      }          
           VT ss = 2 * (s+1);
           VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );
 
@@ -799,6 +807,7 @@ namespace Euc{
     ) 
     /*! Carrier Flat of Direct? Round Element (Shorthand) */
     template<class A> auto car( const A&s ) RETURNS( carrier(s) ) 
+    
     /*! Dual Surround of a Direct or Dual Round Element */
     template<TT DIM, class A>
     NDls<DIM> 
@@ -807,7 +816,6 @@ namespace Euc{
     } 
     /*! Dual Surround of a Direct or Dual Round Element (Shorthand) */
     template<class A> auto sur( const A& s) RETURNS ( surround(s) )
-
 
     /*!
      Direct Round From Dual Sphere and Euclidean Bivector
@@ -819,18 +827,16 @@ namespace Euc{
          dls ^ ( ( dls <= ( flat.inv() * NInf<DIM>(1) ) )  * -1.0 ) 
      )
 
-      /*!
-        Creates a real / imaginary round from an imaginary / real round
-       */
+    /*!
+      Creates a real / imaginary round from an imaginary / real round
+     */
      template<class A>
      auto
      real(const A& s) RETURNS (
-      
          round( 
                 Ro::dls( Ro::loc( s ), -Ro::rad( Ro::sur( s ) ) ), 
                 typename A::template BType < typename A::Mode::Ori > (-1) <= Ro::dir( s ) 
               )
-
      )
 
      /*!
@@ -994,7 +1000,7 @@ namespace Euc{
     }
 
     /*! Tangent Element of Direct Round r at Point p
-        @param Direct Round Element r
+        @param DIRECT Round Element r
         @param Point p
     */
     template< TT DIM, class A >

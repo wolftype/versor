@@ -235,6 +235,8 @@ struct  Spherical : public Joint {
       Frame joint(int k) const { return mJoint[k]; }        ///< Get kth Joint's In Socket Transformation
       Frame frame(int k) const { return mFrame[k]; }        ///< Get Absolute Displacement Motor
 
+      vector<Frame>& links() { return mLink; }
+      vector<Frame>& joints() { return mJoint; }
       
       Frame& operator [] (int k) { return mFrame[k]; }        ///< Set kth Absolute Frame
       Frame operator [] (int k) const { return mFrame[k]; }    ///< Get kth Absolute Frame
@@ -264,7 +266,7 @@ struct  Spherical : public Joint {
                 return Ro::null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
             }
             
-            Frame& base() { return mFrame[0]; }
+            Frame& base() { return mBaseFrame;} //mFrame[0]; }
             Frame& first() { return mFrame[0]; }        
             Frame& last() { return mFrame[mNum -1]; }
       
@@ -286,11 +288,11 @@ struct  Spherical : public Joint {
       /// Dual Line From Kth Joint to Input Target (Default is From Last joint)
       Dll lin(const Pnt& p ) { return Op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
 
-      /// relative (lagrangian) at kth joint
-      Mot rel(int idx){
-         if (idx==0) return mJoint[0].mot();
+      /// relative transformation (lagrangian) at kth joint
+      Mot rel(int k){
+         if (k==0) return mJoint[0].mot();
 
-         return mLink[idx-1].mot() * mJoint[idx].mot();
+         return mLink[k-1].mot() * mJoint[k].mot();
       }
 
       void calcBase(){
@@ -299,14 +301,14 @@ struct  Spherical : public Joint {
       }
       
       /// Forward Kinematics: Absolute Concatenations of previous frame, previous link, and current joint
-            void fk() {  
-                Motor mot = mJoint[0].mot();
-                mFrame[0].mot( mBaseFrame.mot() * mot );
-                for (int i = 1; i < mNum; ++i){    
-                  Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
-                  mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
-                }
-            }        
+      void fk() {  
+          Motor mot = mJoint[0].mot();
+          mFrame[0].mot( mBaseFrame.mot() * mot );
+          for (int i = 1; i < mNum; ++i){    
+            Mot rel =  mLink[i-1].mot() * mJoint[i].mot();//mLink[i-1].mot() * mJoint[i].mot();
+            mFrame[i].mot( mFrame[i-1].mot() * rel );// * mFrame[i-1].mot() );// mFrame[i-1].mot() * rel ) ;
+          }
+      }        
         
       /// Forward Kinematics: calculate forward to "end" joint
       void fk(int end){
@@ -331,6 +333,7 @@ struct  Spherical : public Joint {
       
       }
 
+            // What is difference between ifabrik and fabrik?
             void ik(int end, int begin){
                 
             }
@@ -384,7 +387,8 @@ struct  Spherical : public Joint {
                 calcJoints();               
             }
 
-            /// "FABRIK" Iterative Solver [see paper "Inverse Kinematic Solutions using Conformal Geometric Algebra", by Aristodou and Lasenby] feed target point, end frame and beginning frame,
+            /// "FABRIK" Iterative Solver [see paper "Inverse Kinematic Solutions using Conformal Geometric Algebra", 
+            ///  by Aristodou and Lasenby] feed target point, end frame and beginning frame,
             void fabrik(const Pnt& p, int end, int begin, double err = .01){
                 
                 //squared distance between last frame and goal p
@@ -409,11 +413,11 @@ struct  Spherical : public Joint {
                     
                     //backward reaching
                     for (int i = end; i > begin; --i){
-                        mFrame[i].pos( tmpGoal );        //set position of ith frame
-                        dls = prevDls(i);               //set boundary sphere through i-1 th frame;
-                        dll = linb(i);                  //get line from tmp to i-1th frame
-                        par = (dll ^ dls).dual();       //get point pair intersection of line and boundary sphere
-                        tmpGoal = Ro::split(par,true);  //extract point from point pair intersection
+                        mFrame[i].pos( tmpGoal );           //set position of ith frame
+                        dls = prevDls(i);                   //set boundary sphere through i-1 th frame;
+                        dll = linb(i);//.sp( !mLink[i].mot() );                      //get line from ith to i-1th frame
+                        par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
+                        tmpGoal = Ro::split(par,true);      //extract point from point pair intersection
                     }
                     
                     //forward correction
@@ -435,11 +439,8 @@ struct  Spherical : public Joint {
 
             }
         
-
-        
             /// Derive Joint Rotations from Current Positions
             void calcJoints(int start = 0){
-
 
                 Vec t = mBaseFrame.y(); // Vec::y;
                 Rot R = mBaseFrame.rot(); // (1,0,0,0);
@@ -449,12 +450,15 @@ struct  Spherical : public Joint {
                     t = t.sp( mFrame[i].rot() );
                 }
 
-                //From Here forward, what we need to get where we want to go
-                for (int i = start; i < mNum-1; ++i){
-                    Vec b = Op::dle( Biv( linf(i) ) );  //1. Goal (Direction of Line to next joint)                  
-                    Rot nr = Gen::ratio( t, b );        //2. What it takes to turn the current integration there
+                //From Here forward, what rotation we need to point where we want to go
+                for (int i=start;i<mNum-1;++i){
+                    Vec q;
+                    Vec b = Op::dle( Biv( linf(i) ) );  //0. Goal (Direction of Line to next joint) 
+                    if (i>0) t = t.sp( mLink[i-1].rot() );       //1. Consider Rotary Contribution of Previous Link 
+                    q = t.sp( Gen::ratio(Vec::y, mLink[i].vec().unit()) ); // And Translated Contribution of Current Link                
+                    Rot nr = Gen::ratio( q, b );        //2. What additional work it takes to turn the current integration towards Goal
                     R = nr * R;                         //3. Compound into R
-                    mFrame[i].rot( R );                 //4. Apply Rotation to Frame
+                    mFrame[i].rot( R );                 //4. Apply Rotation to Frame temporarily
                     t = t.sp( nr );                     //5. Save new integrated angle
                 }
                 
@@ -462,13 +466,15 @@ struct  Spherical : public Joint {
                 mJoint[0].rot( !mBaseFrame.rot() * mFrame[0].rot() );
                 
                 //Reverse engineer by getting relative transformations
-                for (int i = 1; i < mNum; ++i){                    
-                    Rot Rt = (!mFrame[i-1].rot()) * mFrame[i].rot();
+                for (int i = 1; i < mNum; ++i){   
+                    Rot Rt =  (!mFrame[i-1].rot()) *  mFrame[i].rot()    ;
                     mJoint[i].rot( Rt ); 
                 }
 
-                //Next step is to apply fk() and see if it all worked . . .
+                //Next apply fk() and see if it all worked !. . .
             }
+
+
         
             ///Satisfy Specific Angle Constraint at frame k
             void angle(int k, double theta){

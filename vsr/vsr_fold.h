@@ -117,6 +117,7 @@ struct DistancePtr {
 
 
 //2 distances and an origin define a circular ORBIT
+
 struct Rigid2 {
   
   Distance distA, distB;
@@ -127,7 +128,7 @@ struct Rigid2 {
 
   Rigid2() : mtn (true) {}
 
-  /// Input target, and two points 
+  /// Input target, and two points (CLOCKWISE)
   Rigid2( const Pnt& target, const Pnt& pa, const Pnt& pb, bool m = true ) :
   distA(pa, target), distB(pb, target), origin(target), mtn(m)
   {
@@ -180,6 +181,11 @@ struct Rigid2 {
   /// get point at theta t around constraint orbit
   Pnt orbit(VT t) { return Ro::pnt_cir( circle(), t * ( mtn?1:-1) ); }
 
+  /// Dual Plane Facet (CCW)
+  Dlp dlp(){
+    return ( (*this)() ^ distB.p ^ distA.p ^ Inf(1) ).dual(); 
+  }
+
 };
 
 //3 Distance constraints and a boolean define a point
@@ -192,7 +198,7 @@ struct Rigid3 {
    //
     Rigid3(){}
 
-
+    /// Clockwise Construction
     Rigid3 ( const Pnt& _target , const Pnt& pa, const Pnt& pb, const Pnt& pc, bool b)
     : a(pa, _target ), b(pb, _target), c(pc, _target), mtn(b) {}
 
@@ -235,6 +241,17 @@ struct Rigid3 {
     }
 
     Pair orbit() { return ( a() ^ b() ^ c() ).dual(); }
+
+    /// Dual Plane A (CCW)
+    Dlp dlpA(){
+      return ( (*this)() ^ b.p ^ a.p ^ Inf(1) ).dual();
+    }
+
+    /// Dual Plane B (CCW)
+    Dlp dlpB(){
+      return ( (*this)() ^ c.p ^ b.p ^ Inf(1) ).dual();
+    }
+
 
 
 };
@@ -466,7 +483,7 @@ struct Gusset {
 /*!
  * =====================================================================================
  *        Class:  RabbitEar
- *  Description:  Folds a triangle molecule
+ *  Description:  Folds a triangle molecule (aka spherical crank)
  * =====================================================================================
  */
 
@@ -481,10 +498,9 @@ struct RabbitEar{
   Rigid3 rb;
 
   RabbitEar(const Point& a, const Point& b, const Point& c)
-  : V{a,b,c}{//mA(a), mB(b), mC(c){
-    
+  : V{a,b,c}
+  {
     build();
-  
   }
   
   void build(){
@@ -499,13 +515,9 @@ struct RabbitEar{
   }
 
   RabbitEar::Data eval( double amt ){
-   // vector<Pnt> vp;
     Pnt td = ra(amt);
     rb.updateA( td );
     Pnt tb = rb();
-   // vp.push_back(td);
-   // vp.push_back(tb);
-    //Radial r(mA, mB, mC, mD, mE);
     return { V.a, tb, V.c, td, V.e };
   }
 

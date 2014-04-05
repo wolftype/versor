@@ -74,7 +74,7 @@ namespace vsr{
 
     ///Skin Circles -- pass in an array or vector of circles
     template<typename T>
-    static inline Mesh Skin( T cir, int num, int res = 100){
+    static inline Mesh Skin( T cir, int num, int res = 10){
   
         Mesh m;
         

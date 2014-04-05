@@ -12,7 +12,11 @@ namespace vsr{
     for (int i = 0; i<c.num(); ++i){
         float t=(float)i/c.num();
         DrawAt(c[i].z(), c[i].pos(), 1-t,0,t);
+        DrawAt(c[i].y(), c[i].pos(), 1,1,t);
+        DrawAt(c.joint(i).y() * .2, c[i].pos(), 0,1,0);
+        Draw( c[i].cxy(),0,1,0 );
     }
+
 
     glColor3f(0,1,0);
     glBegin( bLoop ? GL_LINE_LOOP : GL_LINE_STRIP);

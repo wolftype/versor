@@ -78,6 +78,8 @@ namespace vsr {
     
     /// Get Scale
     VT scale() const { return mScale; }
+    /// Get Scale
+    VT& scale() { return mScale; }
 
     /// Get 4x4 Rotation Matrix
     gfx::Mat4f image(){ return Xf::mat(mRot); }

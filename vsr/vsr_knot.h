@@ -44,7 +44,7 @@ struct TorusKnot  {
       energies.clear();
     }
     
-    double amt; //RES
+    double amt; //RES default 
     
     TorusKnot& add(const Pnt& p){
         pnt.push_back(p); return *this;
@@ -93,7 +93,7 @@ struct TorusKnot  {
     }
   }
 
-  //calculate full orbit from point p without normalizing each step
+  //calculate full orbit from point p without renormalizing at each step (no tube)
   void calc0( const Pnt& p){
     pnt.clear();
     Pnt np = p; 

@@ -111,6 +111,8 @@ namespace vsr{
     
     }//Fl::
 
+    
+    namespace cga3D{
 
       ///circle intersection of dual sphere and direct plane
        inline Circle meet( const Dls& s, const Dlp& d){
@@ -128,8 +130,10 @@ namespace vsr{
        inline Circle meet( const Sphere& s, const Plane& d){
         return (s.dual() ^ d.dual()).dual();
       } 
+
+
       //normalized and nulled point intersection of line and dual plane
-       inline FlatPoint meet( const Line& lin, const DualPlane& dlp){ 
+       inline Point meet( const Line& lin, const DualPlane& dlp){ 
         Flp flp = ( (lin).dual()^ dlp).dual();
         return (flp / flp[3]).null();
       } 
@@ -176,6 +180,8 @@ namespace vsr{
           return false;
 
       }
+
+} //cga3D::
 
   
 } //vsr::

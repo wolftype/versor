@@ -42,6 +42,17 @@ class Conic {
 
   public:
 
+
+    /// Transform a Euclidean Vec in direction v with eccentricity alpha
+    template<TT DIM>
+    static NPnt<DIM> Transform( const  NVec<DIM> &vec, const NVec<DIM>& v, VT alpha){
+      VT talpha = ( vec <= v)[0] * alpha;
+      NPnt<DIM> p = vec.null();
+      NPnt<DIM>  p2 =  p + NOri< DIM >(1) * talpha; // * beta
+      auto wt = p2 <= NInf< DIM >(1);
+      return Ro::loc( p2 / -wt );
+  }
+
     /// Transform a point in direction v with eccentricity alpha
     template<TT DIM>
     static NPnt<DIM> Transform( const  NPnt<DIM> & p, const NVec<DIM>& v, VT alpha){
