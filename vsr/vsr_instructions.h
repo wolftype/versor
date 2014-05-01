@@ -10,16 +10,16 @@ struct Inst{
   static const Bits::Type Res = A ^ B; 
   static const bool IP = Bits::inner(A,B);
   static const bool OP = Bits::outer(A,B);  
-  static const int idxA = IDXA;
-  static const int idxB = IDXB;
+//  static const int idxA = IDXA;
+//  static const int idxB = IDXB;
   
   template<class TA, class TB>
   static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
-    return a[idxA] * b[idxB];
+    return a[IDXA] * b[IDXB];
   } 
   
   static void print(){
-    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, Bits::estring(Res).c_str() );
+    printf(" a[%d] * b[%d] /*%s*/\t", IDXA, IDXB, Bits::estring(Res).c_str() );
   }  
 };   
 
@@ -28,16 +28,16 @@ struct Inst<true, A,B,IDXA,IDXB>{
   static const Bits::Type Res = A ^ B; 
   static const bool IP = Bits::inner(A,B);
   static const bool OP = Bits::outer(A,B);  
-  static const int idxA = IDXA;
-  static const int idxB = IDXB;
+//  static const int idxA = IDXA;
+//  static const int idxB = IDXB;
   
   template<class TA, class TB>
   static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
-    return -a[idxA] * b[idxB];
+    return -a[IDXA] * b[IDXB];
   } 
   
   static void print(){
-    printf("-a[%d] * b[%d] /*%s*/\t",idxA, idxB,  Bits::estring(Res).c_str());
+    printf("-a[%d] * b[%d] /*%s*/\t",IDXA, IDXB,  Bits::estring(Res).c_str());
   }  
 }; 
 

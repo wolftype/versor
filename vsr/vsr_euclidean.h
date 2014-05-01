@@ -218,7 +218,7 @@ constexpr A ere(const A& a, const B& b) {
 /*-----------------------------------------------------------------------------
  *  EUCLIDEAN SPACE UTILITY MULTIVECTORS
  *-----------------------------------------------------------------------------*/
-template<Bits::Type DIM, typename T> 
+template<Bits::Type DIM, typename T=VSR_PRECISION> 
 struct EGA {
   
   //typedef Basis<0> Sca; 
@@ -385,6 +385,11 @@ struct EGAMV : public A {
   
   template<typename T>
   EGAMV rot( const T& ) const;
+
+  template<class B>
+  static void PrintGP(){
+    EGProd<A,B>::Instructions::Fun::DO::print();
+  }
                                                                                         
 };   
 

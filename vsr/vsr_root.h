@@ -14,7 +14,8 @@
 #define ROOT_SYSTEM_INCLUDED
                       
 #include <vector>
-#include "vsr_products.h"   
+//#include "vsr_products.h"   
+#include "vsr_euclidean.h"
 #include "vsr_generic_op.h"
 
 using namespace std;
@@ -26,7 +27,7 @@ struct Root{
   
   ///Utility function to compare two vectors (looks at norm of the difference)           
   template<class V>
-  static bool Compare(const V& a, const V& b, VT amt =.00005){   
+  static bool Compare(const V& a, const V& b, VSR_PRECISION amt =.00005){   
     return ( ( a - b ).wt() ) < amt; 
   }            
     

@@ -58,25 +58,25 @@ namespace vsr{
 	}
 
 	               
-	template<TT DIM>
+	template<Bits::Type DIM>
 	NRot<DIM> AA( const NVec<DIM>& s){
         NRot<DIM> r = Gen::ratio( NVec<DIM>::z, s.unit() ); 
         return Gen::aa(r);
     }                                  
 
-  	template<TT DIM>
+  	template<Bits::Type DIM>
 	  NERot<DIM> AA( const NEVec<DIM>& s){
         NERot<DIM> r = Gen::ratio( NEVec<DIM>::z, s.unit() ); 
         return Gen::aa(r);
     }                                  
 
-  template<TT DIM>
+  template<Bits::Type DIM>
    NERot<DIM> AA( const NEBiv<DIM>& s){   
 		return Gen::aa( Gen::ratio( NEVec<DIM>::z, s.dual().unit() ) ); 
 	}
 
   //GENERIC EUCLIDEAN ORTHOGONAL PROJECTION
-  template<TT DIM>
+  template<Bits::Type DIM>
   void Immediate (const NEVec<DIM>& ts){  
       NEVec<3> s = ts;
       gfx::Glyph::Line(s);
@@ -87,7 +87,7 @@ namespace vsr{
       glPopMatrix();
   }
 
-  template<TT DIM>
+  template<Bits::Type DIM>
   void ImmediateB (const NEVec<DIM>& ts){  
       NEVec<3> s = ts;
       gfx::Glyph::Line(s);
@@ -97,7 +97,7 @@ namespace vsr{
       glPopMatrix();
   }
 
-    template<TT DIM>
+    template<Bits::Type DIM>
   void Immediate (const NEBiv<DIM>& s){  
 		double ta = s.norm(); 
 	    bool sn = Op::sn( s , NEBiv<DIM>::xy * (-1));
@@ -110,16 +110,16 @@ namespace vsr{
 
 
 	
-	template<TT DIM> 
+	template<Bits::Type DIM> 
 	NRot<DIM> AA( const NCir<DIM>& s){
 		NBiv<DIM> b = Ro::dir( s ).template copy< NBiv<DIM> >();               
         NRot<DIM> r = Gen::ratio(NVec<DIM>::z, Op::dle( b ).unit() ); 
         return Gen::aa(r);
     }
 	    
-	template<TT DIM>  
+	template<Bits::Type DIM>  
 	void Immediate( const NCir<DIM>& s )	{  
-		VT rad = Ro::rad( s );
+		VSR_PRECISION rad = Ro::rad( s );
 	    bool im = Ro::size(s, false) > 0 ? 1 : 0;  
 		 
 		//AA(s).vprint();
@@ -129,7 +129,7 @@ namespace vsr{
 			im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
 	}  
 	                               
-	template<TT DIM>
+	template<Bits::Type DIM>
 	void Immediate (const NLin<DIM>& s){
 	    NDrv<DIM> d = Fl::dir( s );
 	    NDls<DIM> v = Fl::loc( s , Ro::null( NVec<DIM>() ), false);
@@ -137,10 +137,10 @@ namespace vsr{
 	    gfx::Glyph::Line(d * 10, d * -10);	
 	}
                                    
-	template<TT DIM>
+	template<Bits::Type DIM>
 	void Immediate (const NPnt<DIM>& s){
  
-	    VT ta = Ro::size( s, true );
+	    VSR_PRECISION ta = Ro::size( s, true );
 
 	    //Draw as dual Sphere (if |radius^2| > 0.000001);
 	    if ( fabs(ta) >  FPERROR ) {
@@ -148,7 +148,7 @@ namespace vsr{
 	        bool real = ta > 0 ? 1 : 0;	
 
 	        NPnt<DIM> p = Ro::cen( s );
-	        VT t = sqrt ( fabs ( ta ) );
+	        VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
 	        gfx::GL::translate ( p.begin() );
 	        (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);	
@@ -158,14 +158,14 @@ namespace vsr{
 	    }
 	}   
 
-     template<TT DIM> 
+     template<Bits::Type DIM> 
      void Immediate (const NPar<DIM>& s){
 	        //Is Imaginary?
-	        VT size = Ro::size( s, false );
+	        VSR_PRECISION size = Ro::size( s, false );
 		  //  printf("size: %fn", size);
 	        std::vector< NPnt<DIM> > pp = Ro::split( s );
 
-	        VT ta = Ro::size( pp[0], true );   
+	        VSR_PRECISION ta = Ro::size( pp[0], true );   
 	                                     
 	        if ( fabs(ta) >  FPERROR ) {    
 	            NPnt<DIM> p1 = Ro::cen( pp[0] );

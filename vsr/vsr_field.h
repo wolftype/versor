@@ -167,7 +167,7 @@ namespace vsr{
 
 
         /*! Get BILINEAR Interpolated Data at eval u,v [0-1.0] */
-        T surf(VT u, VT v){
+        T surf(VSR_PRECISION u, VSR_PRECISION v){
             
             Patch p = this->surfIdx(u,v);
             
@@ -179,7 +179,7 @@ namespace vsr{
             return Interp::surface<T> (a,b,c,d, p.rw, p.rh);
         }
         
-        T vol(VT u, VT v, VT w) const {
+        T vol(VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) const {
             VPatch p = this->vidx(u,v,w);
             
             T a = mData[ p.a ]; T b = mData[ p.b ]; T c = mData[ p.c ]; T d = mData[ p.d ];
@@ -381,8 +381,8 @@ namespace vsr{
     Field& operator * ( N val ) { ITN mData[i] *= val; END  return *this; }
 
     //Operators Pairwise substraction
-    template< TT ... XS > 
-    Field& operator -= ( const Field< MV<XS...> >& f ) { ITN mData[i] -= f[i]; END  return *this; }
+    /* template< Bits::Type ... XS > */ 
+    /* Field& operator -= ( const Field< MV<XS...> >& f ) { ITN mData[i] -= f[i]; END  return *this; } */
     
     
     //here written fro a scalar fiedl: specialize below for vectors etcs
@@ -428,7 +428,7 @@ namespace vsr{
     //             if (type & LEFT) mData[ix][0] = ref ? -mData[n.xr][0] : mData[n.xr][0]; 
     //             if (type & RIGHT) mData[ix][0] = ref ? -mData[n.xl][0] : mData[n.xl][0]; 
     //             if (type & TOP) mData[ix][1] = ref ? -mData[n.yb][1] : mData[n.yb][1]; 
-    //             if (type & BOTTOM) mData[ix][1] = ref ? -mData[n.yt][1] : mData[n.yt][1]; 
+    //             if (type & BOBits::TypeOM) mData[ix][1] = ref ? -mData[n.yt][1] : mData[n.yt][1]; 
     //             if (type & BACK) mData[ix][2] = ref ? -mData[n.zf][2] : mData[n.zf][2]; 
     //             if (type & FRONT) mData[ix][2] = ref ? -mData[n.zb][2] : mData[n.zb][2];            
     //         }    

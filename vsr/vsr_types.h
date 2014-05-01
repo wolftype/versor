@@ -20,8 +20,9 @@
 #ifndef MV_H_INCLUDED
 #define MV_H_INCLUDED  
 
-#include <math.h>   
 #include "vsr_basis.h"
+
+#include <math.h>   
 #include <iostream>  
 
 namespace vsr{

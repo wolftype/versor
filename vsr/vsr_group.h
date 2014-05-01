@@ -197,7 +197,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
 
 //A-n (see also tetra / ortho)        
-template<TT DIM>
+template<Bits::Type DIM>
 class Simplex{
 	
 	typedef EGAMV< DIM, typename EGA<DIM>::Vec > Root;
