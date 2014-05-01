@@ -11,6 +11,7 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "vsr_generic_op.h"
+//#include "vsr_graph.h"
 #include "vsr_field.h"
 
 namespace vsr{ 
@@ -193,6 +194,25 @@ namespace vsr{
       for (int i = 0; i < f.num(); ++i){
         Draw(f[i]);
       }
+  }
+
+
+
+  //ColorTriangle
+  template<typename T>
+  void ColorTriangles( const T& a, const T& b, const T& c){
+
+    auto normal = -NEVec<3>( ( Euc::hom(a) ^ Euc::hom(b) ^ Euc::hom(c) ).dual() ).unit();
+
+    GL::normal( normal.begin() );
+    glBegin(GL_TRIANGLES);
+      glColor3f(1,0,0);
+      GL::vertex( a.begin() );
+      glColor3f(0,1,0);
+      GL::vertex( b.begin() );
+      glColor3f(0,0,1);
+      GL::vertex( c.begin() );
+    glEnd();
   }
  
 } //vsr::
