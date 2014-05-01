@@ -599,7 +599,14 @@ struct CGAMV : public A {
   // CGAMV<DIM, typename IProd<A, A, M, true>::Type> 
   // operator <= (const CGAMV& b) const {
   //   return CGAMV<DIM, typename IProd<A, A, M, true>::Type>( cip<M>( *this, b ) );
-  // }   
+  // }  
+  //
+
+  //Commutator
+  template<class B>
+  CGAMV operator % (const B& b) {
+    return ( (*this * b ) - (b*(*this)) ) / 2.0;
+  }
   
    
   CGAMV<DIM, typename Prod<A, typename CGA<DIM>::Pss, M, true>::Type > 

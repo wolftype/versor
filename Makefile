@@ -124,7 +124,6 @@ glv:
 	$(MAKE) --no-print-directory -C ext/glv
 	#install DESTDIR=../../$(BUILD_DIR)    
 
-
 $(EXEC): dir glv vsr FORCE 
 	@echo Building $@
 	$(CXX) -o $(BIN_DIR)$(*F) $@ $(IPATH) $(LDFLAGS)

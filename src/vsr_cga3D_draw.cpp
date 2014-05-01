@@ -70,7 +70,8 @@ namespace vsr{
   void Immediate (const Dlp& s){
       gfx::GL::translate( Pos(s).begin() );
     gfx::GL::rotate( AA(s).begin() ); 
-      Glyph::SolidGrid(5,5,5);
+      Glyph::SolidGrid(6,6,5);
+      Glyph::Rect(10,10);
   }
   void Immediate (const Pln& s){
     Immediate(s.dual());
