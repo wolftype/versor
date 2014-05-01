@@ -244,6 +244,9 @@ struct EGA {
 template<Bits::Type NDIM, class A>
 struct EGAMV : public A {
 
+  typedef EGA<NDIM> Mode;
+  template<class B> using BType = EGAMV<NDIM, B>; 
+
   static const int DIM = NDIM;
   typedef A Type;
   typedef typename A::ValueType VT;

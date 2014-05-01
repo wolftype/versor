@@ -289,13 +289,13 @@ namespace Euc{
       */ 
      template< class A > 
       auto aa (const A& r) -> typename A::template BType< typename A::Mode::Rot > {
-      using TRot = typename A::template BType< typename A::Mode::Rot >;//A<DIM, typename  B<DIM>::Rot>;
-      using TVec = typename A::template BType< typename A::Mode::Vec >;//A<DIM, typename B<DIM>::Vec>;  
+        using TRot = typename A::template BType< typename A::Mode::Rot >;//A<DIM, typename  B<DIM>::Rot>;
+        using TVec = typename A::template BType< typename A::Mode::Vec >;//A<DIM, typename B<DIM>::Vec>;  
       
-           TVec v = Op::dle( pl( r ) ) ;    
-          VSR_PRECISION deg = iphi(r) * ( -180 / PI );
+        TVec v = Op::dle( pl( r ) ) ;    
+        VSR_PRECISION deg = iphi(r) * ( -180 / PI );
 
-          return TRot(deg, v[0], v[1], v[2]);
+        return TRot(deg, v[0], v[1], v[2]);
       }
       /*! Axis Angle from Rotor (WARNING NOT GENERIC)
           @param Rotor input
@@ -458,16 +458,16 @@ namespace Euc{
     /*! Rotor Ratio of two Euclidean vectors */  
      template<Bits::Type DIM> 
      auto ratio( 
-      const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 
-      const EGAMV<DIM, typename EGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
+                const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 
+                const EGAMV<DIM, typename EGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
 
       using TVEC = EGAMV<DIM, typename EGA<DIM>::Vec >;
       using TROT = decltype( (a^b) + 1);
 
           VSR_PRECISION s = ( a <= b )[0];              
 
-      //180 degree check
-      if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
+          //180 degree check
+          if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
 
           VSR_PRECISION ss = 2 * (s+1);
           VSR_PRECISION n = ( ss >= 0 ? sqrt ( ss ) : 0 );

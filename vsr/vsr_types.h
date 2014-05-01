@@ -330,6 +330,14 @@ struct MV{
   /// Copying
   template<class A> A copy() const; 
 
+
+  bool operator == (const MV& mv) const{
+  for (int i = 0; i < Num; ++i) {
+    if (val[i] != mv[i]) return false;
+  }
+      return true;
+  }  
+
   //Printing
   void print(){
     Bases::print();
