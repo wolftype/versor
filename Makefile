@@ -86,7 +86,7 @@ EXEC = tests/%.cpp examples/%.cpp
 
 OBJ = #vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
 ifneq ($(RPI),1)
-#OBJ += vsr_cga3D_draw.o vsr_cga3D_interface.o gl2ps.o
+OBJ += gl2ps.o #vsr_cga3D_draw.o vsr_cga3D_interface.o 
 endif
 
 OBJ_DIR = build/obj/
@@ -124,7 +124,7 @@ glv:
 	#install DESTDIR=../../$(BUILD_DIR)    
 
 
-$(EXEC): dir glv FORCE 
+$(EXEC): dir glv vsr FORCE 
 	@echo Building $@
 	$(CXX) -o $(BIN_DIR)$(*F) $@ $(IPATH) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
