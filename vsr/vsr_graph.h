@@ -42,6 +42,8 @@ namespace vsr{
      /// Find both null edges around a node
      vector<HalfEdge*> nulls();
 
+     vector<Face*> faces();
+
         
    };
 
@@ -157,9 +159,9 @@ namespace vsr{
      /* HalfEdge eb() const { return *(edge->next); } */
      /* HalfEdge ec() const { return *(edge->next->next); } */
 
-     Node& na() { return * ( ec().node ); }
-     Node& nb() { return * ( ea().node ); }
-     Node& nc() { return * ( eb().node ); }
+     Node& na() { return * ( ea().node ); }
+     Node& nb() { return * ( eb().node ); }
+     Node& nc() { return * ( ec().node ); }
 
      /* Node na() const { return * ( ec().node ); } */
      /* Node nb() const { return * ( ea().node ); } */
@@ -449,10 +451,10 @@ namespace vsr{
 
 
     //all nodes connected to a node
-    vector<Node*> nodeLoop( Node& a){
-        vector<Node*> tmp;
-        for (auto i : edgeLoop(a) ) tmp.push_back( i -> node );
-    }
+    /* vector<Node*> nodeLoop( Node& a){ */
+    /*     vector<Node*> tmp; */
+    /*     for (auto i : edgeLoop(a) ) tmp.push_back( i -> node ); */
+    /* } */
 
     /// Get null edges of graph
     vector<HalfEdge*> nullEdges(){
@@ -536,6 +538,11 @@ namespace vsr{
     vector<Face*> face() const { return mFace; }
     vector<Node*> node() const { return mNode; }
 
+
+    //GENERIC GRAPHING UTIL
+    template<class S>
+    HEGraph& UV(int w, int h, S& p);
+
     private:
 
     vector<HalfEdge*>    mHalfEdge;
@@ -610,6 +617,49 @@ namespace vsr{
         return tmp;
     }
 
+    //faceloop around a node collects faces
+    template<class T>
+    inline vector<typename HEGraph<T>::Face*> HEGraph<T>::Node::faces(){
+      vector<HEGraph<T>::Face*> tmp;
+      for (auto& i : valence() ){
+        tmp.push_back( i -> face );
+      }
+    }
+
+    /* //for each  in valence, add in node at other end */
+    /* template<class T> */
+    /* inline vector<typename HEGraph<T>::Node*> HEGraph<T>::Node::neighbors(){ */
+
+    /* } */
+
+
+    template<class T> template<class S>
+    inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p){
+      HEGraph<T>& graph = *this;
+      for (int j = 0; j < h; ++j){
+          int idx = j;
+          int idxB = j+h;
+          if (j<2) graph.add( p[idx] );
+          else graph.addAt( p[idx], graph.edge(-3) );
+          if (j==0) graph.add( p[idxB] );
+          else if (j<2) graph.addAt( p[idxB], graph.edge(-2) );
+          else  graph.addAt( p[idxB], graph.edge(-1) );
+      }
+
+      for (int i = 2; i < w; ++i){
+        int idx = ((i-2) * (w-1) + 1)*6 -1;
+        int pidx = i * h;
+        int pidxB = pidx + 1;
+        graph.addAt( p[pidx], graph.edge( idx ) );
+        graph.addAt( p[pidxB], graph.edge(-3) );
+        for (int j = 2; j < h; ++j){
+           int pidxC = i * h + j; 
+            graph.close( graph.edge(-3), graph.edge( idx + (j-1) * 6 ) );
+            graph.add( p[pidxC] );  
+        }
+      }
+      return graph;
+    }
 
 } //vsr::
 
