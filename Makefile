@@ -96,7 +96,7 @@ BIN_DIR = build/bin/
 LIB_NAME = vsr
 LIB_FILE = libvsr.a
 
-#LDFLAGS += -l$(LIB_NAME)  
+LDFLAGS += -l$(LIB_NAME)  
 
 $(OBJ_DIR)%.o: %.cpp 
 	@echo Building libvsr: compiling $@ using $< 

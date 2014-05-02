@@ -311,7 +311,11 @@ struct MV{
   /// Constructors
   template<typename...Args>     
   constexpr explicit MV(Args...v) :
-  val{ static_cast<T>(v)...} {}  
+  val{ static_cast<T>(v)...} {} 
+  
+  template<Bits::Type IDX> T get() const;
+  template<Bits::Type IDX> T& get(); 
+  template<Bits::Type IDX> MV& set(T v); 
 
   /// Reset
   MV& reset(T v = T()){

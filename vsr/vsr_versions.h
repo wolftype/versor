@@ -87,21 +87,22 @@ A MV<B,T>::copy() const{
 }
               
 
-/* template<TT X, TT...XS> template<TT IDX> */ 
-/* VT MV<X,XS...>::get() const{ */
-/*  return val[ find(IDX, *this) ]; */
-/* } */
-/* template<TT X, TT...XS> template<TT IDX> */ 
-/* VT& MV<X,XS...>::get() { */
-/*  return val[ find(IDX, *this) ]; */
-/* } */ 
-
-/* template<TT X, TT...XS> template<TT IDX> */ 
-/*  MV<X,XS...>& MV<X,XS...>::set(VT v) */
-/* { */
-/* 	get<IDX>() = v; */
-/* 	return *this; */
-/* } */  
+/*-----------------------------------------------------------------------------
+ *  GETTER AND SETTER
+ *-----------------------------------------------------------------------------*/
+template<typename B, typename T> template<Bits::Type IDX> 
+T& MV<B,T>::get(){
+ return val[ find(IDX, B()) ];
+}
+template<typename B, typename T> template<Bits::Type IDX> 
+T MV<B,T>::get() const{
+ return val[ find(IDX, B()) ];
+}
+template<typename B, typename T> template<Bits::Type IDX> 
+MV<B,T>& MV<B,T>::set(T v){
+	get<IDX>() = v;
+	return *this;
+}  
 
 
 

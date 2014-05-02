@@ -376,8 +376,6 @@ struct EGAMV : public A {
     return sumv(a, *this); 
   }   
   
-  static EGAMV x, y, z, xy, xz, yz;  
-  
   auto dual() const -> EGAMV< DIM, typename EGProd< A, MV<typename GA::pss<DIM>, VT> >::Type > { 
     return egp( *this , MV<typename GA::pss<DIM>, VT>(-1) );
   }       
@@ -393,8 +391,17 @@ struct EGAMV : public A {
   static void PrintGP(){
     EGProd<A,B>::Instructions::Fun::DO::print();
   }
+
+  static EGAMV x,y,z,xy,xz,yz; 
                                                                                         
 };   
+
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::x  = A().A::template set<1>(1);
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::y  = A().A::template set<2>(1); 
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::z  = A().A::template set<4>(1); 
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xy = A().A::template set<3>(1); 
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xz = A().A::template set<5>(1); 
+template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().A::template set<6>(1); 
 
 
 
