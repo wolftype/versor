@@ -295,7 +295,7 @@ struct EGAMV : public A {
  
   // Division 
   template<class B>
-  auto operator / (const B& b) const RETURNS(
+  auto operator / (const EGAMV<DIM,B>& b) const RETURNS(
     (  *this * !b )
   )
   
@@ -363,6 +363,7 @@ struct EGAMV : public A {
   }
     
   EGAMV operator * (VSR_PRECISION f) const {
+    //cout << "vsr prec " << f << endl; 
     EGAMV tmp = *this;
     for (int i = 0; i < A::Num; ++i){ tmp[i] *= f; }
     return tmp;
@@ -403,18 +404,11 @@ template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xy = A().A::templat
 template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::xz = A().A::template set<5>(1); 
 template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().A::template set<6>(1); 
 
-
-
 //EUCLIDEAN CANDIDATES
 template<Bits::Type N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<GA::Sca,T> >;   
-/* template<Bits::Type N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, EGA::Vec<N,T> >; */ 
-/* template<Bits::Type N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, EGA::Pss<N,T> >; */ 
-/* template<Bits::Type N, typename T=VSR_PRECISION> using NERot = EGAMV<N, EGA::Rot<N,T> >; */
-
 template<Bits::Type N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, typename EGA<N,T>::Vec >; 
 template<Bits::Type N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, typename EGA<N,T>::Pss >; 
 template<Bits::Type N, typename T=VSR_PRECISION> using NERot = EGAMV<N, typename EGA<N,T>::Rot >;
-
 
 template<typename T=VSR_PRECISION>
 struct NE{
@@ -427,7 +421,6 @@ struct NE{
 template<Bits::Type N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N>() ^ NEVec<N>() );
 template<Bits::Type N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N>() ^ NEBiv<N>() );
 //decltype( NEVec<N>() * NEVec<N>() );
-
 
 }//vsr::
 
