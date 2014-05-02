@@ -384,8 +384,8 @@ struct EGAMV : public A {
     return egp( *this , MV<typename GA::pss<DIM>, VT>(1) );
   }  
   
-  template<typename T>
-  EGAMV rot( const T& ) const;
+  template<typename R>
+  EGAMV rot( const R& ) const;
 
   template<class B>
   static void PrintGP(){

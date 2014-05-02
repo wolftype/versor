@@ -987,8 +987,8 @@ namespace Euc{
   
   //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
   
-  template<Bits::Type DIM, class A> template< class T>
-  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{
+  template<Bits::Type DIM, class A> template<class B>
+  EGAMV<DIM, A> EGAMV<DIM, A>::rot( const B& t) const{
     return this->sp( Gen::rot(t) );
   }   
   
