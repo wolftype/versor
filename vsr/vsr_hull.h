@@ -79,7 +79,7 @@ struct ConvexHull {
       for (auto& i: group){
         auto hi = Euc::hom(i);
         auto halfspace = (hi <= dlp)[0];
-        cout << halfspace << endl; 
+       // cout << halfspace << endl; 
         if (halfspace < -0.0001 ) return false;
       }
       return true;
@@ -390,7 +390,7 @@ struct ConvexHull {
   /*-----------------------------------------------------------------------------
    *  CLOSE HOLES IN TOPOLOGY
    *-----------------------------------------------------------------------------*/
-  HEG& closeHoles(int N=0){
+  HEG& closeHoles(vector<Type> group, int N=0){
         int iter = 0; 
         while ( !graph.nullEdges().empty() && iter<N ) {
             iter++;
@@ -404,8 +404,6 @@ struct ConvexHull {
             auto ela = edgeLine(*ea);
             auto dlp = facetPlane( *( ea->face ) ).unit();
 
-
-
             // Find another edge with which to make new facet
             Edge * eb;
 
@@ -418,6 +416,7 @@ struct ConvexHull {
 
                 //2. Try simply sealing it up first (maybe edges share nodes)
                 if ( ea->isOpp(*i) ) {
+                //    cout << "simple seal" << endl;
                     ea->seal(*i); 
                     bFound = true;
                     break; //break if found
@@ -426,16 +425,18 @@ struct ConvexHull {
                 //3. Otherwise keep track of shallowest, most convex match 
                 auto n = Euc::hom( i->a() );    
                 auto ndlpA = ( n ^ ela ).dual().unit();
-                auto ndlpB = ( ela ^ n ).dual().unit();
+             //   auto ndlpB = ( ela ^ n ).dual().unit();
                 VT convex = (ndlpA <= dlp)[0];
-                cout << "test convex: " << convex << " " << (dlp<=ndlpB)[0] << endl;
-                if (convex > min ){  
+               // cout << "test convex: " << convex << " " << (dlp<=ndlpA)[0] << endl;
+                if (convex > min ){
+                   // add half space check (get rid of this...)
+                   if(isHalfSpace(ndlpA,group)){ 
                     min = convex;
                     eb = i;
-                    cout << "convex: " << min << endl;
+                  //  cout << "convex hs: " << min << endl;
+                   }
                 } 
               }   
-                 
             }
 
             // Called only if simple seal not found
@@ -446,16 +447,16 @@ struct ConvexHull {
                  //Are we closing a triangle?
                  if ( ea -> triangle() ) { graph.close( *ea ); }
                  //Otherwise close ccw
-                 else { graph.close( *ea, *eb ); cout << "ccw" << endl; }
+                 else { graph.close( *ea, *eb ); }//cout << "ccw" << endl; }
               } else if (ea->cwFrom( *eb )){
                  //Are we closing a triangle?
                  if ( ea -> triangle() ) { graph.close( *ea ); }
                  //Otherwise close cc
-                  else {graph.close( *eb, *ea ); cout << "cc" << endl; }
+                  else {graph.close( *eb, *ea ); }//cout << "cc" << endl; }
               } else {
                  //Or just add a point
                  graph.close( *ea, *(eb -> node) ); 
-                 cout << "pt" << endl; 
+                // cout << "pt" << endl; 
                  bTestBoth = true;
               }
 
@@ -465,7 +466,7 @@ struct ConvexHull {
               for (auto& i : nullEdges ){ 
                  if ( graph.edge( -1 ).isOpp(*i) ) { 
                     graph.edge( -1 ).seal(*i); 
-                    cout << "suture 1" << endl;
+                   // cout << "suture 1" << endl;
                     break; 
                  }
               }
@@ -474,7 +475,7 @@ struct ConvexHull {
                 for (auto& i : nullEdges ){ 
                  if ( graph.edge( -3 ).isOpp(*i) ) { 
                     graph.edge( -3 ).seal(*i); 
-                    cout << "suture 2" << endl;
+                    //cout << "suture 2" << endl;
                     break; 
                  }
                 }
