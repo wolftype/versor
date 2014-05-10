@@ -26,7 +26,7 @@ namespace vsr{
  * CALCULATES POLYTOPES FROM SIMPLE ROOTS IN ND (beware infinite groups . . .)
  *-----------------------------------------------------------------------------*/
 struct Root{
-  
+
   ///Utility function to compare two vectors (looks at norm of the difference)           
   template<class V>
   static bool Compare(const V& a, const V& b, VT amt =.00005){   
@@ -52,16 +52,17 @@ struct Root{
     
    // Build a Root System from A vector of Simple Roots
    template<class V>
-   static vector<V> System( const vector<V>& root){
+   static vector<V> System( const vector<V>& root, int nMaxIter = 5000){
 
     int n = root.size();                        //<-- Number of Simple Roots
 
     //Copy simple roots into results first
     vector< V > results = root;
 
-    bool keepGoing = true; 
+    bool keepGoing = true;
+    int iter = 0; 
     while (keepGoing){   
-
+        iter++;
         bool done = true;
         
         int cs = results.size(); 
@@ -83,7 +84,6 @@ struct Root{
               }
 
               if (!exists)  { 
-//                nr.print();
                 results.push_back( nr );
                 done = false;  //if even one is new, try them all again
               }   
@@ -91,7 +91,7 @@ struct Root{
             }
         } 
         
-        if (done) { keepGoing = false; } // if not, then stop
+        if (done || (iter > nMaxIter) ) { keepGoing = false; } // if not, then stop
  
    }
 

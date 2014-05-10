@@ -35,7 +35,7 @@ namespace vsr {
 //Projection Down to 3D
 template<int DIM>
 struct Proj{
-     typedef EGAMV<DIM, typename Blade1<DIM>::VEC > TVec;
+  typedef EGAMV<DIM, typename Blade1<DIM>::VEC > TVec;
   typedef EGAMV<DIM-1, typename Blade1<DIM-1>::VEC > OneDown; //Next Projection Down
      
   static auto Call( VT dist, const TVec& v ) RETURNS (
@@ -46,8 +46,16 @@ struct Proj{
   static auto Ortho( const TVec& v ) RETURNS (
     ( v.template cast<typename Blade1<DIM2>::VEC >() )
   )   
+
+  static auto Ortho3( const TVec& v ) RETURNS (
+    ( v.template cast<typename Blade1<3>::VEC >() )
+  )  
   
-  static VT Val( VT dist, const TVec & v ) { return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); }
+ 
+  
+  static VT Val( VT dist, const TVec & v ) { 
+    return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); 
+  }
   // static VT Val( VT dist, const Vec& v) {
   //   return Proj< DIM, 4, DIM==TARGET >::Call(dist, v);
   // } 
@@ -55,9 +63,10 @@ struct Proj{
      
 template<>
 struct Proj<3>{  
-    typedef EGAMV<3, typename Blade1<3>::VEC > TVec;
+  typedef EGAMV<3, typename Blade1<3>::VEC > TVec;
   static TVec Call(VT dist, const TVec& v) { return v; }  
   static VT Val(VT dist, const TVec & v ) { return 1.0; }
+   static TVec Ortho3( const TVec& v ) { return v; }
 }; 
 
 

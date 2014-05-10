@@ -25,9 +25,10 @@ struct MyApp : App {
 	         
 	
 	bool bOrtho;
-	static const int DIM = 6; 
-
+	static const int DIM = 4; 
 	NCube<DIM> tetra;
+  
+  float e14,e24,e34;
    	
 	MyApp(Window * w ) : App(w) {
 		initGui();
@@ -36,16 +37,19 @@ struct MyApp : App {
 	virtual void initGui(){  
 		printf("init gui\n");
 		gui(bOrtho, "ortho"); 
+    gui(e14,"e14",-1,1);
+    gui(e24,"e24",-1,1);
+    gui(e34,"e34",-1,1);
+
+
 	}   
 	
 	virtual void onDraw(){
-	   	// EGAMV< MV<9,12,34,96> > b( .01,.01,.01,.01 );// .01, .01 );   
+	   EGAMV< DIM, typename EGA<DIM>::Biv > b( 0,0,0,e14,e24,e34);// .01, .01 );   
 		// 
 		
 		scene.camera.lens.bOrtho = bOrtho;
 		
-		EGAMV<DIM, MV<24,12> > b(.01,.01);
-		//typedef EGAMV< DIM,typename EGA<3>::Vec > Vec; 
 		
 		vector<Vec> proj;  
 		vector<VT> col;   	  
@@ -73,16 +77,16 @@ struct MyApp : App {
 			float t = ( 1.0 * it) / proj.size();
 			it++;
 		   //   glColor4f(t,1,1-t, col[it]);
-			Draw(i, t, 1, 1-t, col[it] ); 
+			//Draw(i, t, 1, 1-t, col[it] ); 
 			//gfx::Glyph::Dir( i ); 
 		 } 
 		// 
-		glColor3f(0,1,0);                             
+		glColor3f(1,0,0);                             
 		// 
 		for (auto i : tetra.edges ) gfx::Glyph::Line( proj[i.a], proj[i.b] );     
 
 	 
-		text("Alt + Mouse Drag to Rotate View");
+		//text("Alt + Mouse Drag to Rotate View");
 		}
 
 };
