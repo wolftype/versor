@@ -222,12 +222,12 @@ template<Bits::Type DIM, typename T=VSR_PRECISION>
 struct EGA {
   
   //typedef Basis<0> Sca; 
- // template<Bits::Type ... N> using e = Basis< Bits::blade((1<<(N-1))...) >;  
+  template<Bits::Type ... N> using e = MV<Basis< Bits::blade((1<<(N-1))...)>, T>;  
     
   using Vec = MV<typename Blade1<DIM>::VEC,T>; 
   using Pss = MV<Basis<Bits::pss(DIM)>,T>;
-  using Biv = typename EOProd<Vec,Vec>::Type;
-  using Rot = typename EGProd<Vec,Vec>::Type;
+  //using Biv = typename EOProd<Vec,Vec>::Type;
+  //using Rot = typename EGProd<Vec,Vec>::Type;
 
   /* template<Bits::Type DIM, typename T> using Biv = typename EOProd<Vec<DIM,T>,Vec<DIM,T>>::Type; */
   /* template<Bits::Type DIM, typename T> using Rot = typename EGProd<Vec<DIM,T>,Vec<DIM,T>>::Type; */
@@ -408,7 +408,6 @@ template<Bits::Type DIM, class A> EGAMV<DIM,A> EGAMV<DIM,A>::yz = A().A::templat
 template<Bits::Type N, typename T=VSR_PRECISION> using NESca = EGAMV<N, MV<GA::Sca,T> >;   
 template<Bits::Type N, typename T=VSR_PRECISION> using NEVec = EGAMV<N, typename EGA<N,T>::Vec >; 
 template<Bits::Type N, typename T=VSR_PRECISION> using NEPss = EGAMV<N, typename EGA<N,T>::Pss >; 
-template<Bits::Type N, typename T=VSR_PRECISION> using NERot = EGAMV<N, typename EGA<N,T>::Rot >;
 
 template<typename T=VSR_PRECISION>
 struct NE{
@@ -418,9 +417,12 @@ struct NE{
 //template< Bits::Type ... NN, typename T=VSR_PRECISION> using NE = EGAMV< Bits::dimOf( Bits::blade((1<<(NN-1))...) ), MV<typename EGA< Bits::blade((1<<(NN-1))...)>::template e<NN...>, T> >; 
 ///template< template <Bits::Type N> class S, typename T=VSR_PRECISION> using NE = EGAMV< S::DIM, S, T> >; 
 
-template<Bits::Type N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N>() ^ NEVec<N>() );
-template<Bits::Type N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N>() ^ NEBiv<N>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NEBiv = decltype( NEVec<N,T>() ^ NEVec<N,T>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NETri = decltype( NEVec<N,T>() ^ NEBiv<N,T>() );
 //decltype( NEVec<N>() * NEVec<N>() );
+template<Bits::Type N, typename T=VSR_PRECISION> using NERot = decltype( NEBiv<N, T>() + NESca<N,T>() );
+//EGAMV<N, typename EGA<N,T>::Rot >;
+
 
 }//vsr::
 

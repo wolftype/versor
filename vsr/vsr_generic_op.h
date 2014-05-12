@@ -36,6 +36,7 @@ namespace vsr {
 
 template<int DIM, typename T=VSR_PRECISION>
 struct Proj{
+  typedef EGAMV<3, EGA<3>::Vec> Vec;
   typedef EGAMV<DIM, MV<typename GA::vec<DIM>, T>> TVec;
   typedef EGAMV<DIM-1, MV<typename GA::vec<DIM-1>, T>> OneDown; //Next Projection Down
      
@@ -43,10 +44,11 @@ struct Proj{
     ( Proj<DIM-1>::Call( dist, OneDown(v) * ( dist / (dist - v[DIM-1] ) ) ) )
   )  
     
-  template<int DIM2>
-  static auto Ortho( const TVec& v ) RETURNS (
-    ( v.template cast< MV<typename GA::vec<DIM-1>, T> > )
-  )   
+ // template<int DIM2>
+  static Vec Ortho( const TVec& v ) { return v; }
+  // RETURNS (
+  //  ( v.template cast< MV<typename GA::vec<DIM-1>, T> > )
+ // )   
   
   static VSR_PRECISION Val( VSR_PRECISION dist, const TVec & v ) { 
     return dist / (dist - v[DIM-1] )  * Proj<DIM-1>::Val(dist, OneDown(v) ); 
@@ -458,11 +460,11 @@ namespace Euc{
     /*! Rotor Ratio of two Euclidean vectors */  
      template<Bits::Type DIM> 
      auto ratio( 
-                const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 
-                const EGAMV<DIM, typename EGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
+                const NEVec<DIM>& a, 
+                const NEVec<DIM>& b ) -> decltype( (a*b) ) {
 
-      using TVEC = EGAMV<DIM, typename EGA<DIM>::Vec >;
-      using TROT = decltype( (a^b) + 1);
+          using TVEC = NEVec<DIM>;
+          using TROT = decltype( (a^b) + 1);
 
           VSR_PRECISION s = ( a <= b )[0];              
 
@@ -478,6 +480,31 @@ namespace Euc{
           if (r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n");
           return r;    
       }
+
+    /*  Rotor Ratio of a Euclidean Vector and some blades *1/ */  
+    /*  template<Bits::Type DIM, typename B> */ 
+    /*  auto ratio( */ 
+    /*             const NEVec<DIM>& a, */ 
+    /*             const B& b ) -> decltype( (a*b) ) { */
+
+    /*       using TVEC = NEVec<DIM>; */
+    /*       using TROT = decltype( (a^b) + 1); */
+
+    /*       VSR_PRECISION s = ( a <= b )[0]; */              
+
+    /*       //180 degree check */
+    /*       if ( a == NEVec<DIM>( b.conjugation() ) ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades */
+
+    /*       VSR_PRECISION ss = 2 * (s+1); */
+    /*       VSR_PRECISION n = ( ss >= 0 ? sqrt ( ss ) : 0 ); */
+
+    /*       TROT r = ( b * a ) ; //cout << r << endl; */
+    /*       r[0] += 1; */  
+    /*       if (n != 0 ) r /= n; */
+    /*       if (r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n"); */
+    /*       return r; */    
+    /*   } */
+      
        
    /*! Rotor Ratio of two bivectors */ 
      // template<Bits::Type DIM, template<TT> class B, template< TT, class C> class A> 
