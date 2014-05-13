@@ -71,7 +71,7 @@ namespace vsr{
       gfx::GL::translate( Pos(s).begin() );
     gfx::GL::rotate( AA(s).begin() ); 
       Glyph::SolidGrid(6,6,5);
-      Glyph::Rect(10,10);
+      //Glyph::Rect(10,10);
   }
   void Immediate (const Pln& s){
     Immediate(s.dual());

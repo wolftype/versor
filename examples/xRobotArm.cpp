@@ -9,7 +9,7 @@ using namespace vsr::cga3D;
 
 struct MyApp : App {
 	
-	float amt;
+	float amt,linewidth;
 	Chain k;
    // Frame baseFrame, targetFrame, secondFrame, finalFrame;
 	Pnt targetPos;
@@ -18,31 +18,39 @@ struct MyApp : App {
 	
 	MyApp(Window * win) : App(win),
 	k(5)
-	{}
+	{
+   // colors().back.set(1,1,1);      
+  }
 	
 	virtual void initGui(){
-       gui(distA, "LinkLength", 1,10);
-     	distA = 1.0;
+      gui(distA, "LinkLength", 1,10);
+      gui(linewidth,"linewidth",0,10);
+     	distA = 5.0;
+      linewidth=3;
+
 	}
 
 	void onDraw(){
+
+    glLineWidth(linewidth);
         
-		MFrame baseFrame;
+		Frame baseFrame;
 		
   		//Target: Mouse Position 
 		
     auto line =  Fl::line( interface.mouse.projectNear, interface.vd().ray );
 		targetPos = Ro::point( line, Ori(1) );  
 		
-		MFrame targetFrame ( targetPos ); 
+		Frame targetFrame ( targetPos ); 
 
 		Draw(targetPos, 1,0,0); 
 		
 		
-         MFrame secondFrame( 0, distA, 0 );
+    Frame secondFrame( 0, distA, 0 );
 
-		 auto firstSphere = Ro::sphere( secondFrame.pos(), distA ); 	// Make a sphere from a point and a radius, calls Ro::dls( Pnt, float )
-         auto targetSphere = Ro::sphere( targetPos, distA ); 
+   // Make a sphere from a point and a radius, calls Ro::dls( Pnt, float )
+	 auto firstSphere = Ro::sphere( secondFrame.pos(), distA ); 	
+   auto targetSphere = Ro::sphere( targetPos, distA ); 
         
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
@@ -62,7 +70,7 @@ struct MyApp : App {
 		 Draw(fjoint);  
 		
  	   	 //Pick the one closest to the base frame
-		 MFrame finalFrame ( Ro::split(fjoint,false), Rot(1,0,0,0) );
+		 Frame finalFrame ( Ro::split(fjoint,false), Rot(1,0,0,0) );
 
 		 //Sphere around fframe
 		 auto ffsphere = Ro::sphere( finalFrame.pos(), distA);
@@ -76,7 +84,7 @@ struct MyApp : App {
 		 Draw(fpair, 1,.5,.5);
 
 		 //Pick One and put the middle frame there
-		 MFrame middleFrame( Ro::split(fpair,true) );
+		 Frame middleFrame( Ro::split(fpair,true) );
 
 
 		 //We can store the `positions in a chain class which will sort out relative orientations for us
@@ -91,7 +99,7 @@ struct MyApp : App {
 		 k[0].rot( r1 );
 
 		 //for all the other frames, calculate joint rotations and link lengths from current positions
-		 k.joints(1); 
+		 k.calcJoints(1); 
 		 k.links();
          
 
@@ -105,8 +113,8 @@ struct MyApp : App {
 		 }
 
 
-		 Draw(ffsphere,1,0,0,.2);
-		 Draw(firstSphere,1,0,0,.2);
+		 Draw(ffsphere,1,0,0,.4);
+		 Draw(firstSphere,1,0,0,.4);
 	}
 };
                         

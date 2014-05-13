@@ -281,12 +281,17 @@ struct Truss{
    // Pnt a, b, c;
 
     Truss( const Pnt& b, const Pnt& c, const Pnt& d, 
-             const Pnt& a, const Pnt& f, const Pnt& e, bool mtn)
-    : rigidA( c, a, f, e, mtn ),
-      rigidB( b, a, f, c, mtn ),
-      rigidC( d, c, f, e, mtn ),
-      bUseSplit( true )
+             const Pnt& a, const Pnt& f, const Pnt& e, bool mtn) :
+     /* rigidA( c, a, f, e, mtn ), */
+     /*  rigidB( b, a, f, c, mtn ), */
+     /*  rigidC( d, c, f, e, mtn ), */
+     /*  bUseSplit( true ) */
       //a(pb), b(pc), c(pd)
+      rigidA( c, e, f, a, mtn ),
+      rigidB( b, c, f, a, mtn ),
+      rigidC( d, e, f, c, mtn ),
+      bUseSplit( true )
+
       
       {
         p.tl = rigidB(); p.tm = rigidA(); p.tr = rigidC();
