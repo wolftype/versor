@@ -40,12 +40,12 @@ namespace vsr {
     Point mPos;   ///< Position                                          
     Rotor mRot;   ///< Orientation
    
-    VT aBiv;    ///< Rotational acceleration 
+    VSR_PRECISION aBiv;    ///< Rotational acceleration 
     Biv dBiv;   ///< Rotational Velocity 
-    VT aVec;    ///< Translational acceleration 
+    VSR_PRECISION aVec;    ///< Translational acceleration 
     Vec dVec;   ///< Translational Velocity
 
-    VT mScale;  ///< Scale
+    VSR_PRECISION mScale;  ///< Scale
 
     public:
 
@@ -56,9 +56,9 @@ namespace vsr {
     /// Default Constructor
     Frame();
     /// Construct from x,y,z Coordinates
-    Frame(VT _x, VT _y, VT _z);
+    Frame(VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z);
     /// Construct from Point, Rotor, and Scale
-    Frame(const Point& p, const Rotor& r = Rot(1,0,0,0), VT s = 1 );
+    Frame(const Point& p, const Rotor& r = Rot(1,0,0,0), VSR_PRECISION s = 1 );
     /// Construct from Dual Line (log of motor relative to origin)
     Frame(const DualLine& d );
     /// Construct from Motor (relative to origin)
@@ -67,17 +67,17 @@ namespace vsr {
     /// Set Position from Point p
     Frame& pos( Pnt p ) { mPos = p; return *this; } 
     /// Set Position from x,y,z coordinates
-    Frame& pos( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
-    //Frame& set( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; }
+    Frame& pos( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
+    //Frame& set( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Ro::null(_x,_y,_z); return *this; }
     /// Set Position and Orientation from Point and Rotor
     Frame& set( Pnt p, Rot r = Rot(1,0,0,0) ) { mPos = p; mRot = r; return *this; } 
     /// Set Scale
-    Frame& scale( VT s ) { mScale = s; return *this; }    
+    Frame& scale( VSR_PRECISION s ) { mScale = s; return *this; }    
     /// Reset to Origin
     Frame& reset() { mPos = Ro::null(0,0,0); mRot = Rot(1,0,0,0); return *this; }
     
     /// Get Scale
-    VT scale() const { return mScale; }
+    VSR_PRECISION scale() const { return mScale; }
 
     /// Get 4x4 Rotation Matrix
     gfx::Mat4f image(){ return Xf::mat(mRot); }
@@ -185,10 +185,10 @@ namespace vsr {
     DualLine dualLine() const;
         
     
-    VT& ab() { return aBiv; }             ///< Set bivector accelerator (rotational)
-    VT ab() const { return aBiv; }        ///< Get bivector accelerator (rotational)
-    VT& ax() { return aVec; }             ///< Set vector accelerator
-    VT ax() const { return aVec; }        ///< Get vector accelerator
+    VSR_PRECISION& ab() { return aBiv; }             ///< Set bivector accelerator (rotational)
+    VSR_PRECISION ab() const { return aBiv; }        ///< Get bivector accelerator (rotational)
+    VSR_PRECISION& ax() { return aVec; }             ///< Set vector accelerator
+    VSR_PRECISION ax() const { return aVec; }        ///< Get vector accelerator
     Biv& db() { return dBiv; }            ///< Set bivector velocity (rotational)
     Biv db() const { return dBiv; }       ///< Get bivector velocity (rotational)
     Vec& dx() { return dVec; }            ///< Set vector velocity
@@ -208,14 +208,14 @@ namespace vsr {
     Frame& dilate(double t);
 
     /// Rotate around local xy and return a new frame
-    Frame rotXY( VT amt) const;
+    Frame rotXY( VSR_PRECISION amt) const;
 
     /// Move by dx, dy, dz and return a new frame
-    Frame move( VT dx = 0.0, VT dy= 0.0, VT dz = 0.0) const;
+    Frame move( VSR_PRECISION dx = 0.0, VSR_PRECISION dy= 0.0, VSR_PRECISION dz = 0.0) const;
 
-    Frame moveX( VT amt ) const;
-    Frame moveY( VT amt ) const;
-    Frame moveZ( VT amt ) const;
+    Frame moveX( VSR_PRECISION amt ) const;
+    Frame moveY( VSR_PRECISION amt ) const;
+    Frame moveZ( VSR_PRECISION amt ) const;
 
 
   };

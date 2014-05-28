@@ -84,9 +84,9 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = #vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
+OBJ = vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
 ifneq ($(RPI),1)
-OBJ += gl2ps.o #vsr_cga3D_draw.o vsr_cga3D_interface.o 
+OBJ += gl2ps.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
 endif
 
 OBJ_DIR = build/obj/

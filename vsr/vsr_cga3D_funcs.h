@@ -32,7 +32,7 @@ namespace vsr{
        return a ^ b;
      }
      //circle at x,y,z facing in biv
-      inline Pair pair(VT x, VT y, VT z, Vec vec = Vec::y, VT r=1.0){ 
+      inline Pair pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec = Vec::y, VSR_PRECISION r=1.0){ 
        return Ro::round( Ro::dls(r*-1,x,y,z), vec );//a ^ b ^ c; 
      }
      
@@ -43,11 +43,11 @@ namespace vsr{
        return Ro::round( Ro::dls(1,0,0,0), B);//a ^ b ^ c; 
      }                          
      //circle Facing v
-      inline Circle circle(const Vec& v, VT r=1.0){
+      inline Circle circle(const Vec& v, VSR_PRECISION r=1.0){
        return Ro::round( Ro::dls(r*-1,0,0,0), Op::dle(v) );//a ^ b ^ c; 
      }                    
      //circle at x,y,z facing in biv
-      inline Circle circle(VT x, VT y, VT z, Biv biv = Biv::xy, VT r=1.0){ 
+      inline Circle circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv = Biv::xy, VSR_PRECISION r=1.0){ 
        return Ro::round( Ro::dls(r*-1,x,y,z), biv );//a ^ b ^ c; 
      }
       inline Sphere sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
@@ -56,7 +56,7 @@ namespace vsr{
      
 
      
-     inline DualSphere sphere(VT x, VT y, VT z, VT r=1.0){
+     inline DualSphere sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r=1.0){
        return Ro::dls(r, x, y, z );
      }
 
@@ -65,11 +65,11 @@ namespace vsr{
     namespace Fl {
                              
     ///Dual plane with normal and distance from center
-     inline DualPlane plane( VT a, VT b, VT c, VT d=0.0){
+     inline DualPlane plane( VSR_PRECISION a, VSR_PRECISION b, VSR_PRECISION c, VSR_PRECISION d=0.0){
       return Dlp(a,b,c,d);
     } 
     ///Dual plane from vec and distance from center
-     inline DualPlane plane( const Vec& v, VT d=0.0){
+     inline DualPlane plane( const Vec& v, VSR_PRECISION d=0.0){
       return v + Inf(d);
     } 
     ///Direct plane through three points
@@ -83,7 +83,7 @@ namespace vsr{
         return Ro::point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
      }
      ///Direct line 
-     inline Line line( VT x, VT y, VT z ){
+     inline Line line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
        return Ori(1) ^ Vec(x,y,z) ^ Inf(1);
     }
       
@@ -105,7 +105,7 @@ namespace vsr{
       } 
        
        //Squared Distances
-       inline VT Distance( const Lin& lin, const Pnt& pnt){
+       inline VSR_PRECISION Distance( const Lin& lin, const Pnt& pnt){
         return ( pnt <= lin.dual() )[0] * -2.0;
       }
     

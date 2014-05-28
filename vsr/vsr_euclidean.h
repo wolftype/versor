@@ -33,6 +33,31 @@ namespace vsr{
 /*-----------------------------------------------------------------------------
  *  GEOMETRIC PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
  *-----------------------------------------------------------------------------*/
+/* template<int idxA, class B> */
+/* struct MakeIndices; */
+
+/* template<int idxA, int X, int...XS> */
+/* struct MakeIndices< idxA, XList<X,XS...> >{ */
+/*    using Type = XList< Instruction<X::Flip, idxA, > >, */ 
+/* }; */
+
+/* template<Bits::Type A, class B, int idx> */
+/* struct TestSubEGP; */
+
+/* template<int idx, Bits::Type A, Bits::Type X, Bits::Type ... XS> */
+/* struct TestSubEGP<A, Basis<X,XS...>, idx>{ */
+/*   using Ret = XList< Rule< A, X >, Rule< A, XS >...>; */
+/*   using Ind = typename MakeIndices<idx, 0, Ret>::Type; */
+/* }; */
+
+/* template<class A, class B> */
+/* struct TestEGP; */
+
+/* template<Bits::Type AX, Bits::Type  ... AXS, class B> */
+/* struct TestEGP<Basis<AX, AXS...>, B>{ */
+/*   using Ret = XList< Rule<AX, BX>, Rule<AX,BXS>... */
+/* }; */
+
 /// Geometric Product Type Calculation Sub Loop
 template<Bits::Type A, class B, int idxA, int idxB>  
 struct SubEGP{

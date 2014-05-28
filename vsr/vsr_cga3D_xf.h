@@ -40,7 +40,7 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Translation Vector, and Scale
         */
-        gfx::Mat4f mat( const Vec& v, VT s);  
+        gfx::Mat4f mat( const Vec& v, VSR_PRECISION s);  
         /*!
          4x4 Transformation Matrix From Rotor, Translation Vector
         */
@@ -65,7 +65,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from dual sphere with known size
         */
-        gfx::Mat4f mat(const Dls& v, VT s);
+        gfx::Mat4f mat(const Dls& v, VSR_PRECISION s);
 
         /*
         4x4 Transformation matrix from dual sphere 

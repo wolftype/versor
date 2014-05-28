@@ -23,10 +23,10 @@ namespace vsr{
     Frame::Frame() 
     : mPos( Ro::null(0,0,0) ), mRot(1,0,0,0), mScale(1), aBiv(.9), aVec(.9) {}
     
-    Frame::Frame(VT _x, VT _y, VT _z) 
+    Frame::Frame(VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) 
     : mPos( Ro::null(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
 
-    Frame::Frame(const Point& p, const Rotor& r, VT s ) 
+    Frame::Frame(const Point& p, const Rotor& r, VSR_PRECISION s ) 
     : mPos( p ), mRot( r ), mScale(s), aBiv(.9), aVec(.9) {} 
 
     Frame::Frame(const DualLine& d)
@@ -102,7 +102,7 @@ namespace vsr{
     /// Get Absolute Motor Relative to Origin 
      Mot Frame::mot() const { 
       Mot m(trs() * rot()); 
-      VT n = m.rnorm();
+      VSR_PRECISION n = m.rnorm();
       return (n !=0 ) ? m / n : m ; 
     }  
 
@@ -151,22 +151,22 @@ namespace vsr{
     }
 
     /// Rotate around local xy and return a new frame
-    Frame Frame::rotXY( VT amt) const {
+    Frame Frame::rotXY( VSR_PRECISION amt) const {
       return Frame ( mPos, Gen::rot( xy() * amt )  * mRot, mScale );
     }
 
     /// Move by dx, dy, dz and return a new frame
-    Frame Frame::move( VT dx, VT dy, VT dz) const {
+    Frame Frame::move( VSR_PRECISION dx, VSR_PRECISION dy, VSR_PRECISION dz) const {
       return Frame ( (mPos + Vec(dx,dy,dz) ).null(), mRot, mScale );
     }
 
-    Frame Frame::moveX( VT amt ) const{
+    Frame Frame::moveX( VSR_PRECISION amt ) const{
       return Frame( mPos.trs( x() * amt) , mRot, mScale );
     }
-    Frame Frame::moveY( VT amt ) const {
+    Frame Frame::moveY( VSR_PRECISION amt ) const {
       return Frame( mPos.trs( y() * amt) , mRot, mScale );
     }
-    Frame Frame::moveZ( VT amt ) const{
+    Frame Frame::moveZ( VSR_PRECISION amt ) const{
       return Frame( mPos.trs( z() * amt) , mRot, mScale );
     }
 

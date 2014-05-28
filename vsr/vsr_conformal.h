@@ -422,6 +422,11 @@ struct CGAMV : public A {
   
   CGAMV<DIM, MV<typename GA::vec<DIM>, typename A::ValueType>> null() const;
 
+
+  template<class B>
+  static void PrintGP(){
+    CGProd<A,B,M>::Instructions::Fun::DO::print();
+  }
   
   template<typename T>
   CGAMV rot( const T&) const;
@@ -515,12 +520,12 @@ struct CGAMV : public A {
   template<Bits::Type N, typename T=VSR_PRECISION> using NTnt = decltype( NTri<N,T>() ^ NOri<N,T>() );
   template<Bits::Type N, typename T=VSR_PRECISION> using NDrt = decltype( NTri<N,T>() ^ NInf<N,T>() );
   
-  template<Bits::Type N, typename T=VSR_PRECISION> using NTrs = decltype(sumv(1., NDrv<N,T>()));
-  template<Bits::Type N, typename T=VSR_PRECISION> using NTrv = decltype(sumv(1., NTnv<N,T>()));
-  template<Bits::Type N, typename T=VSR_PRECISION> using NDil = decltype(sumv(1., NMnk<N,T>()));
+  template<Bits::Type N, typename T=VSR_PRECISION> using NTrs = decltype(NDrv<N,T>() + 1);//sumv(1., NDrv<N,T>()));
+  template<Bits::Type N, typename T=VSR_PRECISION> using NTrv = decltype(NTnv<N,T>() + 1);
+  template<Bits::Type N, typename T=VSR_PRECISION> using NDil = decltype(NMnk<N,T>() + 1);
   template<Bits::Type N, typename T=VSR_PRECISION> using NMot = decltype(NRot<N,T>() * NTrs<N,T>());
-  template<Bits::Type N, typename T=VSR_PRECISION> using NBst = decltype(sumv(1., NPar<N,T>()));
-  template<Bits::Type N, typename T=VSR_PRECISION> using NTsd = decltype(sumv(1., NFlp<N,T>()));
+  template<Bits::Type N, typename T=VSR_PRECISION> using NBst = decltype(NPar<N,T>() + 1);
+  template<Bits::Type N, typename T=VSR_PRECISION> using NTsd = decltype(NFlp<N,T>() + 1);
 
 }//vsr::
 

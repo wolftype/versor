@@ -67,7 +67,7 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Translation Vector, and Scale
         */
-        inline gfx::Mat4f mat( const Vec& v, VT s) {
+        inline gfx::Mat4f mat( const Vec& v, VSR_PRECISION s) {
                     
             double x = v[0]; double y = v[1]; double z = v[2];
   
@@ -118,7 +118,7 @@ namespace vsr {
             Biv b = Ro::dir( s ).copy<Biv>(); // Get Direction 
             Rot r = Gen::ratio( Vec::z, Op::dle(b).unit() );
             Vec v = Ro::loc(s);
-            VT scale = Ro::rad( s ); 
+            VSR_PRECISION scale = Ro::rad( s ); 
        // printf("rad: %f\n", scale);
             return mat(r,v,scale);//,scale
         }    
@@ -135,7 +135,7 @@ namespace vsr {
         /*
         4x4 Transformation matrix from dual sphere with known size
         */
-        inline gfx::Mat4f mat(const Dls& v, VT s){
+        inline gfx::Mat4f mat(const Dls& v, VSR_PRECISION s){
 
       Pnt p = Ro::cen( v );
       return mat( Vec(p), s );     
@@ -146,7 +146,7 @@ namespace vsr {
         */
         inline gfx::Mat4f mat(const Dls& v ){
     
-      VT ta = Ro::size( v, true );    
+      VSR_PRECISION ta = Ro::size( v, true );    
       Pnt p = Ro::cen( v );
       return mat( Vec(p), sqrt( fabs(ta) ) ); 
         }   

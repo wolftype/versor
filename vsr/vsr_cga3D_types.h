@@ -65,6 +65,7 @@ typedef  Mnk Minkowski;
 typedef  Pss Pseudoscalar;
 typedef  Pnt Point;
 typedef  Par Pair;
+//using Pair = NPar<5,VSR_PRECISION>;
 typedef  Cir Circle;
 typedef  Sph Sphere;
 typedef  Pnt DualSphere;

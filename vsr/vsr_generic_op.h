@@ -436,8 +436,8 @@ namespace Euc{
     /*! Rotor Ratio of two Conformal vectors */
      template<Bits::Type DIM> 
      auto ratio( 
-      const CGAMV<DIM, typename CGA<DIM>::Vec >& a, 
-      const CGAMV<DIM, typename CGA<DIM>::Vec >& b ) -> decltype( (a*b) ) {
+      const CGAMV<DIM, MV<typename CGA<DIM>::Vec, VSR_PRECISION>>& a, 
+      const CGAMV<DIM, MV<typename CGA<DIM>::Vec, VSR_PRECISION>>& b ) -> decltype( (a*b) ) {
        
       using TVEC = CGAMV<DIM, typename CGA<DIM>::Vec >;
       using TROT = decltype( (a^b) + 1);
@@ -586,8 +586,8 @@ namespace Euc{
     */
     template< Bits::Type DIM, class S >
     auto 
-  dls( const CGAMV<DIM,S>& v, VSR_PRECISION r = 1.0 ) -> CGAMV<DIM, typename CGA<DIM>::Pnt > {
-        CGAMV<DIM, typename CGA<DIM>::Pnt > s = null(v);
+  dls( const CGAMV<DIM,S>& v, VSR_PRECISION r = 1.0 ) -> CGAMV<DIM,  MV<typename CGA<DIM>::TPnt, VSR_PRECISION> > {
+        CGAMV<DIM, MV<typename CGA<DIM>::TPnt, VSR_PRECISION> > s = null(v);
         ( r > 0) ? s.template get< Bits::infinity<DIM>() >() -= .5 * (r * r)
 
      : s.template get< Bits::infinity<DIM>() >() += .5 * (r*r);
@@ -754,9 +754,22 @@ namespace Euc{
      * @param Point Pair
      * @param bool which one
      * */
+    NPnt<5> 
+    split(const NPar<5, VSR_PRECISION>& pp, bool bFirst){
+        
+        VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
+        
+         auto d = NInf<5>(-1) <= pp;
+        
+        NBst<5> bst = pp + ( bFirst ? r : -r ); 
+        
+        return ( ( bst ) / d ).template cast< NPnt<5> >();  
+
+    }  
+
     template<Bits::Type DIM> 
     NPnt<DIM> 
-    split(const NPar<DIM>& pp, bool bFirst){
+    split(const NPar<DIM, VSR_PRECISION>& pp, bool bFirst){
         
         VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
         

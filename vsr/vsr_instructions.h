@@ -5,14 +5,34 @@
 
 namespace vsr{
 
+template<bool Flip, int IDXA, int IDXB>
+struct Instruction{
+  static const int Sign = Flip ? -1 : 1;
+ 
+  template<class TA, class TB>
+  static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
+    return Sign * a[IDXA] * b[IDXB];
+  } 
+  
+  static void print(){
+    printf("%d * a[%d] * b[%d]", Sign, IDXA, IDXB );
+  }  
+}; 
+
+template<Bits::Type A, Bits::Type B>
+struct Rule {
+  static const Bits::Type Res = A ^ B; 
+  static const int Flip = Bits::signFlip(A,B);
+  static const bool IP = Bits::inner(A,B);
+  static const bool OP = Bits::outer(A,B);  
+};
+
 template<bool F, Bits::Type A, Bits::Type B, int IDXA, int IDXB>
 struct Inst{
   static const Bits::Type Res = A ^ B; 
   static const bool IP = Bits::inner(A,B);
   static const bool OP = Bits::outer(A,B);  
-//  static const int idxA = IDXA;
-//  static const int idxB = IDXB;
-  
+ 
   template<class TA, class TB>
   static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return a[IDXA] * b[IDXB];
@@ -28,9 +48,7 @@ struct Inst<true, A,B,IDXA,IDXB>{
   static const Bits::Type Res = A ^ B; 
   static const bool IP = Bits::inner(A,B);
   static const bool OP = Bits::outer(A,B);  
-//  static const int idxA = IDXA;
-//  static const int idxB = IDXB;
-  
+ 
   template<class TA, class TB>
   static constexpr typename TA::ValueType Exec( const TA& a, const TB& b){
     return -a[IDXA] * b[IDXB];

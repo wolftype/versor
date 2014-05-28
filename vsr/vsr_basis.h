@@ -35,7 +35,7 @@ typedef short Type;
 
 constexpr Type blade(){ return 0; }
 
-/// Make bit representation of a blade from a list of unsigned integers
+/// Make bit representation of a blade from a list of shorts 
 template<class X, class...XS>
 constexpr Type blade( X x, XS ... xs){
   return x | blade(xs...);  
@@ -134,6 +134,15 @@ template <Type A, Type B>
 constexpr bool compare(){
     return ( grade(A) == grade(B) ) ?  A < B : grade(A) < grade(B); //return A < B::HEAD;
 }
+
+constexpr bool lessThan(Type A, Type B){
+    return ( grade(A) == grade(B) ) ?  A < B : grade(A) < grade(B); //return A < B::HEAD;
+}
+template <Type A, Type B>
+constexpr bool greaterThan(){
+    return ( grade(A) == grade(B) ) ?  A > B : grade(A) > grade(B); //return A < B::HEAD;
+}
+
 
 //pseudoscalr of dimension dim
 constexpr Type pss(Type dim){
