@@ -8,7 +8,7 @@
 
 #include "vsr_cga3D_op.h"
 #include "vsr_xf.h"
-#include "vsr_frame.h"  
+#include "vsr_cga3D_frame.h"  
 #include "vsr_field.h"
 
 namespace vsr{   
@@ -47,7 +47,13 @@ namespace vsr{
   MBO& MeshBuffer( const Dlp& p) {  return MeshBuffer( Pln() ); }
   MBO& MeshBuffer( const Biv& p) {  static MBO mbo( Mesh::Circle() ); return mbo; }
 
- 
+
+  /* template<class T> */
+  /* void BindToBuffer(const T& t){ */
+  /*   MBO& m = MeshBuffer(t); */
+  /*   pipe.begin(m); */
+  /* } */
+
   
   /*-----------------------------------------------------------------------------
    *  FIELDS CAN VARY IN SIZE, SO USER IS RESPONSIBLE TO MAKE BUFFER ONLY ONCE
@@ -56,68 +62,71 @@ namespace vsr{
       return MBO( Mesh::Points2( f.gridPtr(), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
   }
  
+    /*-----------------------------------------------------------------------------
+    *  RENDER MANY OF THE SAME THING
+    *-----------------------------------------------------------------------------*/
+  template<class T>
+  void Render(T * ptr, int num, Renderer *re){
+    MBO& m = MeshBuffer(ptr[0]);
+    re -> pipe.begin(m);
+    for (int i=0;i<num;++i){
+      re -> modelview( vsr::Xf::mat( ptr[num] ) );
+      re -> pipe.draw( m );
+    }
+    re -> pipe.end(m);
+  }
+
   
   /*!
    *  Render a Coordinate Frame
    */
-  void Render(const Frame& frame, Renderer * r )  { 
-    
+  void Render(const Frame& frame, Renderer * re )  { 
     MBO& fm = MeshBuffer( frame );
- 
-    r -> modelview( vsr::Xf::mat( frame.rot(), frame.vec(), frame.scale() ) );
-
-    r -> pipe.line( fm );
-
+    re -> modelview( vsr::Xf::mat( frame.rot(), frame.vec(), frame.scale() ) );
+    re -> pipe.line( fm );
   }  
- 
  
   
   /*!
    *  Render a Circle
    */
-   void Render(const Cir& cir, Renderer * r )  {
+   void Render(const Cir& cir, Renderer * re, 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
         
-   // static MBO circle ( Mesh::Circle(), GL::DYNAMIC );
     MBO& circle = MeshBuffer(cir);
 
-    static float mv[16];
-    static Mat4f mat;
-    static Mat4f tmp;
-    
-    r -> modelview( vsr::Xf::mat( cir ) );
-        
-      //circle.mesh.color(r,g,b,a);
+    if(bUpdate) {
+      circle.mesh.color(r,g,b,a);
       circle.update();
-        
-      r -> pipe.line( circle );                    
-  
-  } 
-  
-  void Render( const Vec& vec, Renderer * r) { 
+    }
     
-    //static MBO cone ( Mesh::Cone(.3) );
-    //static MBO line ( Mesh::Line( vsr::Vec(0,0,0),  vec), GL::DYNAMIC );
+    re -> modelview( vsr::Xf::mat( cir ) );
+    re -> pipe.line( circle );                    
+  } 
 
+
+
+  void Render( const Vec& vec, Renderer * re, 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+ 
     auto mbo = MeshBuffer( vec );
     MBO& cone = mbo[0];
     MBO& line = mbo[1];
 
-    r -> modelview();
+    re -> modelview();
  
     line.mesh[1].Pos = Vec3f(vec[0],vec[1], vec[2]);
-   // line.mesh.color(r,g,b,a);
+    if(bUpdate) {
+      line.mesh.color(r,g,b,a);
+      cone.mesh.color(r,g,b,a);
+      cone.update();
+    }
     line.update(); 
     
-    r -> pipe.line( line );
+    re -> pipe.line( line );
          
-    /* mat = r->mvm * tmp.copy( vsr::Xf::mat(vec) ); */
-    /* mat.fill( mv ); */
-    /* r -> pipe.program -> uniform("modelView", mv ); */ 
-
-    r -> modelview( vsr::Xf::mat(vec) );
-    //cone.mesh.color(r,g,b,a);
-    cone.update();   
-    r -> pipe.line( cone );   
+    re -> modelview( vsr::Xf::mat(vec) ); 
+    re -> pipe.line( cone );   
 
   }
 
@@ -127,7 +136,9 @@ namespace vsr{
    *
    *  If point is above a certain size, rendered as a sphere
    */
-  void Render( const Pnt& pnt, Renderer * r  ){
+  void Render( const Pnt& pnt, Renderer * re, 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
 
     auto mbo = MeshBuffer( pnt );
     MBO& sphere = mbo[0];
@@ -139,27 +150,31 @@ namespace vsr{
 
         bool real = ta > 0 ? 1 : 0;  
 
-        r -> modelview( vsr::Xf::mat( pnt, sqrt( fabs(ta) ) ) );
-          sphere.update();   
-        r -> pipe.line( sphere );
+        re -> modelview( vsr::Xf::mat( pnt, sqrt( fabs(ta) ) ) );
+        if (bUpdate) { sphere.mesh.color(r,g,b,a); sphere.update(); }  
+        re -> pipe.line( sphere );
 
     } else {
 
-        r -> modelview();
+        re -> modelview();
 
         point.mesh[0].Pos = Vec3f(pnt[0],pnt[1],pnt[2]);
+        if (bUpdate) point.mesh.color(r,g,b,a);
         point.update();
-        r -> pipe.line( point );
+        re -> pipe.line( point );
 
     }
 
   } 
 
-  void Render(const Sph& sph, Renderer * r ){
-    Render( sph.dual(), r );
+  void Render(const Sph& sph, Renderer * re,
+   bool up, float r=1.0,float g=1.0,float b=1.0, float a=1.0 ) {
+    Render( sph.dual(), re, up,r,g,b,a );
   }
   
-  void Render(const Par& par, Renderer * r ){
+  void Render(const Par& par, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
  
         auto sphere = MeshBuffer(par)[0];
         auto points = MeshBuffer(par)[1];
@@ -174,70 +189,82 @@ namespace vsr{
 
         if ( fabs(ta) >  FPERROR ) {        
             
-          //sphere.mesh.color(r,g,b,a);
-          sphere.update();
+          if (bUpdate) {
+            sphere.mesh.color(r,g,b,a);
+            sphere.update();
+          }
                 
           double t = sqrt ( fabs ( ta ) );
           bool real = size > 0 ? 1 : 0;  
           real ? sphere.set(GL::TS) : sphere.set(GL::P);
       
-          r -> modelview( vsr::Xf::mat(p1) );
+          re -> modelview( vsr::Xf::mat(p1) );
                     
-            r -> pipe.line( sphere ); 
+            re -> pipe.line( sphere ); 
 
-          r -> modelview( vsr::Xf::mat(p2) );
+          re -> modelview( vsr::Xf::mat(p2) );
           
-            r -> pipe.line( sphere ); 
+            re -> pipe.line( sphere ); 
 
       } else { 
         
-          r -> modelview();
+          re -> modelview();
 
             points.mesh[0].Pos = Vec3f( p1 );
             points.mesh[1].Pos = Vec3f( p2 ); 
-            //points.mesh.color(r,g,b,a);
+            if (bUpdate) points.mesh.color(r,g,b,a);
             points.update();
           
-            r -> pipe.line( points );
+            re -> pipe.line( points );
       }
     
   } 
   
-  void Render(const Dll& dll, Renderer * r ){
+  void Render(const Dll& dll, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
     
     MBO& line = MeshBuffer(dll);
 
-    r -> modelview( vsr::Xf::mat(dll) );
-   // line.mesh.color(r,g,b,a);
+    re -> modelview( vsr::Xf::mat(dll) );
+    if(bUpdate) line.mesh.color(r,g,b,a);
     line.update();  
-    r -> pipe.line(line);
+    re -> pipe.line(line);
   }  
  
-  void Render(const Lin& lin, Renderer * r ){
-    Render( lin.dual(), r);
+  void Render(const Lin& lin, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
+    Render( lin.dual(), re, bUpdate, r,g,b,a);
   }   
   
-  void Render(const Dlp& dlp, Renderer * r ){
+  void Render(const Dlp& dlp, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
     
     MBO& plane = MeshBuffer( dlp ); 
         
-    r -> modelview( vsr::Xf::mat( dlp ) );
+    re -> modelview( vsr::Xf::mat( dlp ) );
 
+    if (bUpdate) plane.mesh.color( r,g,b,a);
     plane.update();
      
-    r -> pipe.line( plane );
+    re -> pipe.line( plane );
   }   
   
-  void Render( const Biv& biv, Renderer * r ){
+  void Render( const Biv& biv, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
     
     
     MBO& cir = MeshBuffer( biv ); 
         
-    r -> modelview( vsr::Xf::mat( biv ) );
+    re -> modelview( vsr::Xf::mat( biv ) );
 
+    if (bUpdate) cir.mesh.color(r,g,b,a);
     cir.update(); 
     
-    r -> pipe.line( cir );
+    re -> pipe.line( cir );
      
   }
   
@@ -316,7 +343,9 @@ namespace vsr{
   
   /* } */ 
   
-  void Render( Field<Vec>& f, MBO& points, Renderer * r ){
+  void Render( Field<Vec>& f, MBO& points, Renderer * re , 
+   bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
   
     for (int i = 0; i < f.num(); ++i){  
       Vec3f v( f.grid(i) );
@@ -324,9 +353,10 @@ namespace vsr{
       points.mesh[idx].Pos = v + Vec3f( f[i] ); 
     }
 
+    if (bUpdate) points.mesh.color(r,g,b,a);
     points.update();
 
-    r -> pipe.line(points);
+    re -> pipe.line(points);
   
   }   
   
@@ -370,9 +400,8 @@ namespace vsr{
   
   #define DRAW(x) Render(x,this);
   #define DRAWFIELD(x,m) Render(x,m,this);
-
-//  #define DRAWRGB(x,r,g,b) Render(x, mvm, pipe, r, g, b); 
-//  #define DRAWRGBA(x,r,g,b,a) Render(x, mvm, pipe, r, g, b,a);
+  #define DRAWRGB(x,r,g,b) Render(x, this, true, r, g, b);
+  #define DRAWRGBA(x,r,g,b,a) Render(x, this, true, r, g, b, a);
   //#define DRAWFUNC(x,c) Render(x,mvm,pipe,c);
 }
 
