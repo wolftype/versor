@@ -77,35 +77,89 @@ struct XCat< XList<XS...>, XList<YS...> > {
     
 
 //REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
-template<class X>
-struct RMV{ 
-  typedef typename RMV<typename X::TAIL>::Type M;
+/* template<class X> */
+/* struct RMV{ */ 
+/*   typedef typename RMV<typename X::TAIL>::Type M; */
   
-  typedef typename Maybe< Exists< X::HEAD::Res, M>::Call() , 
-    M, 
-    typename Insert< X::HEAD::Res, M >::Type
-  >::Type Type; 
+/*   typedef typename Maybe< Exists< X::HEAD::Res, M>::Call() , */ 
+/*     M, */ 
+/*     typename Insert< X::HEAD::Res, M >::Type */
+/*   >::Type Type; */ 
+/* }; */                
+
+/* template<> */
+/* struct RMV<XList<> >{ */
+/*   typedef MV<> Type; */
+/* }; */  
+
+
+
+/* template< int N, class A > */   
+/* struct FindAll { */ 
+/*    typedef typename FindAll<N, typename A::TAIL>::Type Next; */
+/*    typedef typename Maybe< A::HEAD::Res == N, typename XCat< XList< typename A::HEAD >, Next >::Type,  Next >::Type Type; */       
+/* }; */
+
+/* template< int N > */
+/* struct FindAll< N, XList<> >{ */ 
+/*    // SCA Call() RETURNS(  XList<>() ) */
+/*   typedef XList<> Type; */  
+/* }; */
+
+
+/*-----------------------------------------------------------------------------
+ *  REDUCTION OF INSTRUCTION LIST TO RETURN TYPE : Note lazy sorts
+ *-----------------------------------------------------------------------------*/
+template<class X>
+struct Reduce{ 
+  typedef typename Reduce<typename X::TAIL>::Type M;
+  using Type = typename Insert< X::HEAD::Res, M >::Type;
 };                
 
 template<>
-struct RMV<XList<> >{
+struct Reduce<XList<> >{
   typedef MV<> Type;
 };  
 
+/*-----------------------------------------------------------------------------
+ *  FIND ALL N blade types in A
+ *-----------------------------------------------------------------------------*/
+template<bool B, class A>
+struct FindAllImpl;
+template<int N, class>
+struct FindAll;
 
-
+template<>
+struct FindAllImpl<true,XList<>>{
+  template<int N, class Add, class Tally>
+  using Result = typename XCat<Add,Tally>::Type;
+};
+template<>
+struct FindAllImpl<false,XList<>>{
+  template<int N, class Add, class Tally>
+  using Result = Tally;
+};
+template<class A>
+struct FindAllImpl<true, A>{
+  template<int N, class Add, class Tally>
+  using Result = typename FindAllImpl<A::HEAD::Res == N, typename A::TAIL>::
+    template Result< N, XList<typename A::HEAD>, typename XCat<Add, Tally>::Type >;
+};
+template<class A>
+struct FindAllImpl<false,A>{
+  template<int N, class Add, class Tally >
+  using Result = typename FindAllImpl<A::HEAD::Res == N, typename A::TAIL>::
+    template Result< N, XList<typename A::HEAD>, Tally>;
+};
 template< int N, class A >   
 struct FindAll { 
-   typedef typename FindAll<N, typename A::TAIL>::Type Next;
-   typedef typename Maybe< A::HEAD::Res == N, typename XCat< XList< typename A::HEAD >, Next >::Type,  Next >::Type Type;       
+   using Type = typename FindAllImpl< A::HEAD::Res == N, typename A::TAIL >::
+    template Result<N, XList<typename A::HEAD>, XList<>>;     
 };
-
 template< int N >
 struct FindAll< N, XList<> >{ 
-   // SCA Call() RETURNS(  XList<>() )
-  typedef XList<> Type;  
+   using Type = XList<>;  
 };
-
 
 //input an instructionlist and a return type, get out a List of Executables 
 template< class I, class R >    

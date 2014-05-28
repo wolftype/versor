@@ -100,8 +100,7 @@ constexpr bool conjugate(TT a){
   return cpow( -1,(grade(a) * (grade(a)+1) / 2.0) ) == -1;   
 }
 
-template <TT A, TT B>
-constexpr bool compare(){
+constexpr bool compare(TT A, TT B){
     return ( grade(A) == grade(B) ) ?  A < B: grade(A) < grade(B); //return A < B::HEAD;
 }
 

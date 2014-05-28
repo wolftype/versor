@@ -126,17 +126,150 @@ struct Cat< MV<XS...>, MV<YS...> > {
 }; 
 
 //sort as you add in . . .
-template <int A, class Rest, class First = MV<> >
-struct Insert{        
-  typedef typename Maybe< compare<A, Rest::HEAD>(),
-    typename Cat< typename Cat< First, MV<A> >::Type, Rest >::Type,
-    typename Insert< A, typename Rest::TAIL, typename Cat< First, MV<Rest::HEAD> >::Type>::Type
-  >::Type Type; 
+/* template <int A, class Rest, class First = MV<> > */
+/* struct Insert{ */        
+/*   typedef typename Maybe< compare<A, Rest::HEAD>(), */
+/*     typename Cat< typename Cat< First, MV<A> >::Type, Rest >::Type, */
+/*     typename Insert< A, typename Rest::TAIL, typename Cat< First, MV<Rest::HEAD> >::Type>::Type */
+/*   >::Type Type; */ 
+/* }; */
+/* template <int A, class First> */
+/* struct Insert<A, MV<>, First>{ */
+/*   typedef typename Cat< First, MV<A> >::Type Type; */
+/* }; */
+
+
+
+/*-----------------------------------------------------------------------------
+ *  TAKE FIRST S elements
+ *-----------------------------------------------------------------------------*/
+template<int S,class B>
+struct Take{
+  using Type = typename Cat< MV<B::HEAD>, typename Take<S-1,typename B::TAIL>::Type>::Type;
 };
-template <int A, class First>
-struct Insert<A, MV<>, First>{
-  typedef typename Cat< First, MV<A> >::Type Type;
+
+template<class B>
+struct Take<0,B>{
+  using Type = MV<>;
 };
+
+
+/*-----------------------------------------------------------------------------
+ *  REMOVE FIRST S elements
+ *-----------------------------------------------------------------------------*/
+template<int S, class B>
+struct Remove{
+  using Type = typename Remove<S-1, typename B::TAIL>::Type;
+};
+template<class B>
+struct Remove<0,B>{
+  using Type = B;
+};
+
+
+/*-----------------------------------------------------------------------------
+ *  INSERT SORT
+ *-----------------------------------------------------------------------------*/
+template<bool B>
+struct InsertIdxOfExists;
+
+template<bool B>
+struct InsertIdxOfImpl;
+
+template<bool B>
+struct InsertIdxOfEnd;
+
+
+template<>
+struct InsertIdxOfExists<true>{
+  template<int A, class B>
+  static constexpr int Call(int c) { return -1; }
+};
+
+template<>
+struct InsertIdxOfImpl<true>{
+  template<int A, class B>
+  static constexpr int Call(int c) { return c==0 ? 0 : c-1; }
+};
+
+template<>
+struct InsertIdxOfEnd<true>{
+  template<int A, class B>
+  static constexpr int Call(int c) { return A==B::HEAD ? -1 : compare(A,B::HEAD) ? c : c+1; }
+};
+
+
+template<>
+struct InsertIdxOfImpl<false>{
+  template<int A, class B>
+  static constexpr int Call(int c) { 
+    return InsertIdxOfEnd< B::TAIL::Num == 0 >::            // Is Last Element?
+      template Call<A, B>(c); 
+  }
+};
+
+
+template<>
+struct InsertIdxOfEnd<false>{
+  template<int A, class B>
+  static constexpr int Call(int c) { 
+    return InsertIdxOfExists< A == B::HEAD >::              // Already Exists?
+      template Call<A, B>(c);
+  }    
+};
+
+template<>
+struct InsertIdxOfExists<false>{
+  template<int A, class B>
+  static constexpr int Call(int c) { 
+    return InsertIdxOfImpl< compare(A, B::HEAD) >:: // Is in Correct Position?
+      template Call<A, typename B::TAIL>(c+1); 
+  }
+};
+
+template<int A, class B>
+struct InsertIdxOf{
+  static constexpr int Call(){
+      return InsertIdxOfImpl< compare(A, B::HEAD) >::
+        template Call<A, B>(0); 
+  }
+};
+
+template<int A>
+struct InsertIdxOf<A, MV<>> {
+  static constexpr int Call(int c = 0){
+      return c;
+  }
+};
+
+template<bool b>
+struct InsertImpl;
+
+template<>
+struct InsertImpl<false>{
+  template<int A, int S, class B>
+  using Result = 
+    typename Cat< 
+      typename Take<S, B>::Type,
+      typename Cat<MV<A>, typename Remove<S,B>::Type>::Type
+    >::Type;
+};
+
+template<>
+struct InsertImpl<true>{
+  template<int A, int S, class B>
+  using Result = B;
+};
+
+
+template<int A, class B>
+struct Insert{
+  static const int Switch = InsertIdxOf<A,B>::Call();
+  using Type = typename InsertImpl< Switch == -1 >::template Result<A,Switch,B>;
+};
+
+
+
 
 
 //cat insert A into B

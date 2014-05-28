@@ -254,7 +254,7 @@ struct Prod{
   
   typedef  typename MGP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -268,7 +268,7 @@ struct Prod<A,B,Metric,true>{
    
   typedef  typename CGP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -282,7 +282,7 @@ struct OProd{
   
   typedef  typename MOP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -296,7 +296,7 @@ struct OProd<A,B,Metric,true>{
    
   typedef  typename COP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -310,7 +310,7 @@ struct IProd{
   
   typedef  typename MIP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -324,7 +324,7 @@ struct IProd<A,B,Metric,true>{
    
   typedef  typename CIP<A,B,Metric>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -340,7 +340,7 @@ struct EProd{
    
   typedef  typename EGP<A,B>::Type InstList;  
   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -353,7 +353,7 @@ template<class A, class B>
 struct EOProd{
 
   typedef typename EOP<A,B>::Type  InstList;   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
@@ -365,7 +365,7 @@ template<class A, class B>
 struct EIProd{
 
   typedef typename EIP<A,B>::Type  InstList;   
-  typedef typename RMV<InstList>::Type Type; 
+  typedef typename Reduce<InstList>::Type Type; 
   
   typedef typename Index< InstList, Type>::Type DO;
   
