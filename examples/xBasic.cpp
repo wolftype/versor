@@ -17,11 +17,10 @@ struct MyApp : public App {
     
          
     //Dual plane with Normal in Y direction
-    static DualPlane dualplane = Fl::plane(0,1,0);
+    static DualPlane dualplane(0,1,0);// = Fl::plane(0,1,0);
          
     //Calculate their Intersection (which is the dual of the outer product of duals . . . )
     auto pair = meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual();
-
 
     //Draw 'em with colors
     Draw(circle,0,1,0);     //<-- Green
