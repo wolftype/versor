@@ -20,6 +20,14 @@ namespace vsr{
   /*-----------------------------------------------------------------------------
    *  STATIC CREATION OF MESH BUFFER OBJECTS FOR DIFFERENT GEOMETRIC ELEMENTS 
    *-----------------------------------------------------------------------------*/
+  /* template<class T> */
+  /* struct MeshBuffer; */
+
+  /* template<> */ 
+  /* struct MeshBuffer< Frame >{ */
+  /*   static MBO mbo = Mesh::Frame(); */
+  /*   MBO& operator()(){ return mbo; } */ 
+  /* } */
 
   MBO& MeshBuffer(const Frame& s){ static MBO mbo( Mesh::Frame() ); return mbo; }
   MBO& MeshBuffer(const Cir& s){ static MBO mbo( Mesh::Circle() ); return mbo; }
@@ -48,18 +56,38 @@ namespace vsr{
   MBO& MeshBuffer( const Biv& p) {  static MBO mbo( Mesh::Circle() ); return mbo; }
 
 
-  /* template<class T> */
-  /* void BindToBuffer(const T& t){ */
-  /*   MBO& m = MeshBuffer(t); */
-  /*   pipe.begin(m); */
+  template<class T>
+  void Bind(const T& t, Renderer * rend){
+    MBO& m = MeshBuffer(t);
+    rend -> pipe.begin(m);
+  }
+
+  /* void Draw(const Frame& frame, Renderer * rend){ */
+  /*   re -> modelview( vsr::Xf::mat( frame.rot(), frame.vec(), frame.scale() ) ); */
+  /*   rend -> pipe.draw( MeshBuffer(type) ); */
   /* } */
 
+  template<class T>
+  void Draw(const T& type, Renderer * rend ){
+    rend -> modelview( vsr::Xf::mat(type) );
+    rend -> pipe.draw( MeshBuffer(type) );
+  }
+
+  template<class T>
+  void Unbind(const T& t, Renderer * rend ){
+    MBO& m = MeshBuffer(t);
+    rend -> pipe.end(m);
+  }
   
   /*-----------------------------------------------------------------------------
    *  FIELDS CAN VARY IN SIZE, SO USER IS RESPONSIBLE TO MAKE BUFFER ONLY ONCE
    *-----------------------------------------------------------------------------*/
   MBO MakeMeshBuffer( Field<Vec>& f ){
       return MBO( Mesh::Points2( f.gridPtr(), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
+  }
+
+  MBO MakeMeshBuffer( Field<Pnt>& f){
+     return MBO( Mesh::Points( f.dataPtr(), f.num() ), GL::DYNAMIC );
   }
  
     /*-----------------------------------------------------------------------------
@@ -351,6 +379,20 @@ namespace vsr{
       Vec3f v( f.grid(i) );
       int idx = i*2+1;
       points.mesh[idx].Pos = v + Vec3f( f[i] ); 
+    }
+
+    if (bUpdate) points.mesh.color(r,g,b,a);
+    points.update();
+
+    re -> pipe.line(points);
+  
+  }   
+
+   void Render( Field<Pnt>& f, MBO& points, Renderer * re , 
+    bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
+
+    for (int i = 0; i < f.num(); ++i){  
+      points.mesh[i].Pos = Vec3f( f[i] ); 
     }
 
     if (bUpdate) points.mesh.color(r,g,b,a);

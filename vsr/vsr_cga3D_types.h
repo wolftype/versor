@@ -29,20 +29,20 @@ typedef NInf<5> Inf;      //Infinity      (ni)
 typedef NMnk<5> Mnk;      //E Plane       (noni)
 typedef NPss<5> Pss;      //PseudoScalar  (e123noni)
 
-typedef NPnt<5> Pnt; 	    //Point         (e1, e2, e3, no, ni)  
-typedef Pnt Dls; 		      //Dual Sphere   (e1, e2, e3, no, ni) 
+typedef NPnt<5> Pnt;       //Point         (e1, e2, e3, no, ni)  
+typedef Pnt Dls;           //Dual Sphere   (e1, e2, e3, no, ni) 
 
-typedef NPar<5> Par;	    //Point Pair    (e12,e13,e23,e1no,e2no,e3no,e1ni,e2ni,e3ni,noni)
-typedef NCir<5> Cir;	    //Circle        
-typedef NSph<5> Sph;	    //Sphere          
-                    	
-typedef NDrv<5> Drv;	    //Direction Vector
-typedef NTnv<5> Tnv;	    //Tangent Vector   
+typedef NPar<5> Par;      //Point Pair    (e12,e13,e23,e1no,e2no,e3no,e1ni,e2ni,e3ni,noni)
+typedef NCir<5> Cir;      //Circle        
+typedef NSph<5> Sph;      //Sphere          
+                      
+typedef NDrv<5> Drv;      //Direction Vector
+typedef NTnv<5> Tnv;      //Tangent Vector   
 typedef NDrb<5> Drb;     //Direction Bivector
 typedef NTnb<5> Tnb;     //Tangent Bivector  
 typedef NDrt<5> Drt;     //Direction Trivector
 typedef NTnt<5> Tnt;     //Tangent Trivector  
-                    	
+                      
 typedef NDll<5> Dll;     //Dual Line        
 typedef NLin<5> Lin;     //Dual Line    
 typedef NFlp<5> Flp;     //Flat Plane
