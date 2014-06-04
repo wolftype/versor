@@ -16,6 +16,11 @@
  * =====================================================================================
  */
 
+
+#ifndef  vsr_simplex_INC
+#define  vsr_simplex_INC
+
+
 #include "vsr_products.h"
 #include "vsr_generic_op.h"
 
@@ -150,3 +155,5 @@ struct Simplex {
 };
 
 } // vsr::
+
+#endif   /* ----- #ifndef vsr_simplex_INC  ----- */
