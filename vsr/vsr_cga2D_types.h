@@ -14,7 +14,6 @@ typedef Ne<4,3> e3;
 
 typedef NSca<4> Sca; 
 typedef NVec<4> Vec; 
-//typedef NVec2D<4> Vec2D; 
 typedef NBiv<4> Biv; 
 typedef NTri<4> Tri; 
 typedef NRot<4> Rot;

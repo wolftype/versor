@@ -30,7 +30,7 @@ namespace vsr {
         /*!
          4x4 Transformation Matrix From Rotor
         */
-
+        template<class MAT4>
         gfx::Mat4f mat( const Rot& r) {
           
             Vec xi = Vec::x.sp(r);

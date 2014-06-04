@@ -216,8 +216,8 @@ struct App : public View3D{
   void renderB(){     
                     
        // glViewport(0,0,surface.width,surface.height); 
-       //            glClearColor(background[0],background[1],background[2],background[3]);
-       //            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     
+       // glClearColor(background[0],background[1],background[2],background[3]);
+       // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     
              
              scene.onFrame();    //update matrices
        // scene.camera.print(); 

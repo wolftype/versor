@@ -284,7 +284,6 @@ namespace vsr{
    bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
 
     
-    
     MBO& cir = MeshBuffer( biv ); 
         
     re -> modelview( vsr::Xf::mat( biv ) );
