@@ -1,3 +1,13 @@
+
+/*-----------------------------------------------------------------------------
+ *@file  
+ *  
+ *  Some useful functions for calculating intersections in CGA
+ *
+ *  Todo: make these lambdas so they can be passed as arguments
+ *
+ *-----------------------------------------------------------------------------*/
+
 #ifndef VSR_CGA3D_FUNCS_INCLUDED
 #define VSR_CGA3D_FUNCS_INCLUDED
 
@@ -8,6 +18,17 @@ namespace vsr{
   
 
     using namespace cga3D;
+
+
+
+
+  template<bool _a, bool _b>
+  struct meet_impl{
+    template<class A, class B>
+    auto operator()(const A& a, const B& b) RETURNS
+    ( (a^b).dual() )
+  };
+
     
     namespace Ro {
 
@@ -53,8 +74,6 @@ namespace vsr{
       inline Sphere sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
        return a ^ b ^ c ^ d;
      }  
-     
-
      
      inline DualSphere sphere(VT x, VT y, VT z, VT r=1.0){
        return Ro::dls(r, x, y, z );
@@ -114,6 +133,7 @@ namespace vsr{
     
     namespace cga3D{
 
+
       ///circle intersection of dual sphere and direct plane
        inline Circle meet( const Dls& s, const Dlp& d){
         return (s ^ d).dual();
@@ -144,10 +164,10 @@ namespace vsr{
       } 
 
     
-      //flat point intersection of two lines
+      //Point intersection of two lines
        inline Point meet( const Line& la, const Line& lb){
-          Line r = la.reflect(lb);// Draw(r,1,1,0);
-          Line r2 = (la - r.unit()).unit();//  Draw(r2,0,1,1);
+          Line r = la.reflect(lb);
+          Line r2 = (la - r.unit()).unit();
           Point pori = Fl::loc(r2, Ori(1), false);
           Point tp = pori.re( lb ); 
           return ( ( (tp / tp[3]) + pori)/2.0 ).null(); 

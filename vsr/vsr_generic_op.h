@@ -69,7 +69,14 @@ struct Proj<3>{
    static TVec Ortho3( const TVec& v ) { return v; }
 }; 
 
-
+//lift up to 3 from 2
+template<>
+struct Proj<2>{  
+  typedef EGAMV<3, typename Blade1<3>::VEC > TVec;
+  static TVec Call(VT dist, const TVec& v) { return v; }  
+  static VT Val(VT dist, const TVec & v ) { return 1.0; }
+   static TVec Ortho3( const TVec& v ) { return v; }
+}; 
  
 
  template< class X>
@@ -251,7 +258,7 @@ namespace Euc{
 
           if (n <= 0) {
               if (t < 0) {
-                  printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
+          //        printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
                   return TBIV(PI);
               } else {
                   return TBIV(); 
@@ -580,6 +587,8 @@ namespace Euc{
     } 
 
 
+
+
   /*! Dual Sphere from Radius FIRST and Coordinate Center
         @param Radius (enter a negative radius for an imaginary sphere)
         @param any number of coordinates    
@@ -806,7 +815,7 @@ namespace Euc{
     template<class A> auto dir( const A&s ) RETURNS( direction(s) ) 
 
 
-    /*! Carrier Flat of Direct? Round Element 
+    /*! Carrier Flat of Direct Round Element 
          @param Direct Round
      * */
     template<TT DIM, class A>
@@ -848,6 +857,18 @@ namespace Euc{
               )
      )
 
+
+    /*!
+      Creates an imaginary round from an real round
+     */
+     template<class A>
+     auto
+     imag(const A& s) RETURNS (
+         round( 
+                Ro::dls( Ro::loc( s ), Ro::rad( Ro::sur( s ) ) ), 
+                typename A::template BType < typename A::Mode::Ori > (-1) <= Ro::dir( s ) 
+              )
+     )
      /*!
        Dual Round from Center and Point on Surface
         @param Center
@@ -888,7 +909,8 @@ namespace Euc{
     
     /*! Euclidean Vector of Circle at theta */
     template<TT DIM>
-  NVec<DIM> vec(const NCir<DIM>& c, VT theta = 0){ 
+    NVec<DIM> 
+    vec(const NCir<DIM>& c, VT theta = 0){ 
     using TBIV = NBiv<DIM>;
     
         NDll<DIM> axis = (NInf<DIM>(1) <= c).runit();        
@@ -898,7 +920,8 @@ namespace Euc{
 
     /*! Point Pair on Circle at angle t*/
     template<TT DIM>
-  NPar<DIM> par_cir(const NCir<DIM>& c, VT t){  
+    NPar<DIM> 
+    par_cir(const NCir<DIM>& c, VT t){  
     using TBIV = NBiv<DIM>;
     
       NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
@@ -911,13 +934,17 @@ namespace Euc{
   
     /*! Point on Circle at angle t*/
     template<TT DIM>
-  NPnt<DIM> pnt_cir(const NCir<DIM>& c, VT t){
+    NPnt<DIM> 
+    pnt_cir(const NCir<DIM>& c, VT t){
       return null( split( par_cir(c,t), true) );
   }
 
+    
+
     /*! Point on Circle at angle t*/
     template<TT DIM>
-    NPnt<DIM> pointOnCircle(const NCir<DIM>& c, VT t){
+    NPnt<DIM> 
+    pointOnCircle(const NCir<DIM>& c, VT t){
       return null( split( par_cir(c,t), true) );
    }
 

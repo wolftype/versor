@@ -13,6 +13,7 @@
 #include "vsr_cga3D_op.h"
 #include "vsr_cga3D_funcs.h"
 #include "vsr_set.h"
+#include "vsr_rigid.h"
 
 namespace vsr{
 
@@ -28,47 +29,7 @@ namespace vsr{
 /* }; */
 
 
-struct Constrain {
 
-    /* Pnt * target; */
-    /* Dls * sphere; */
-    /* Dll * line; */
-
-    /* void crease() { */
-    /*   *target */
-    /* } */
-
-    static Point Crease (const Pnt& a, const Pnt& dls, const Dll d, bool mtn){
-      // Dls dls = Ro::at(b, a);
-       Circle cir = a ^ d;
-       Pair par = ( dls ^ cir.dual()).dual();
-       return Ro::loc( Ro::split(par,mtn) );
-    }
-
-    // three distances
-    static Point Triple (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
-       return Ro::loc( Ro::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
-    }
-    // three distances NO SPLIT
-    static Point Triple0 (const Dls& da, const Dls& db, const Dls& dc){
-       return Ro::loc( (da ^ db ^ dc).dual()  ) ; 
-    }
-  
-    //tangency constraint, two distances and an original point
-    static Point Tangency(const Pnt& p, const Dls& da, const Dls& db){
-
-      auto meet = (da ^ db).dual();
-      auto tan =  Ro::loc( Ta::at( meet, p ) );
-      auto sur = Ro::sur( meet );
-      auto line = tan ^ sur ^ Inf(1);
-      auto np = Ro::split ( ( line.dual() ^ sur).dual(), false );
-
-      return np;
-      
-    }
-
-
-};
 
 //distance from point p
 struct Distance {
@@ -103,18 +64,6 @@ struct Distance {
 };
 
 
-//experimental
-struct DistancePtr {
-  Pnt *src;// *target; 
-  float t;
-
-  DistancePtr( Pnt& a, const Pnt& target) :
-  src(&a), t( Ro::rad( Ro::at(a, target) ) )
-  {}
-
-  Dls constraint(){ return Ro::dls( *src, t ); }
-};
-
 
 //2 distances and an origin define a circular ORBIT
 
@@ -128,8 +77,8 @@ struct Rigid2 {
 
   Rigid2() : mtn (true) {}
 
-  /// Input target, and two points (CLOCKWISE)
-  Rigid2( const Pnt& target, const Pnt& pa, const Pnt& pb, bool m = true ) :
+  /// Input target, and two points (COUNTER CLOCKWISE)
+  Rigid2( const Pnt& target, const Pnt& pa, const Pnt& pb, bool m ) :
   distA(pa, target), distB(pb, target), origin(target), mtn(m)
   {
       //pa.vprint(); pb.vprint();    
@@ -198,7 +147,7 @@ struct Rigid3 {
    //
     Rigid3(){}
 
-    /// Clockwise Construction
+    ///counter clockwise Construction results in b=false as valley
     Rigid3 ( const Pnt& _target , const Pnt& pa, const Pnt& pb, const Pnt& pc, bool b)
     : a(pa, _target ), b(pb, _target), c(pc, _target), mtn(b) {}
 
@@ -256,11 +205,11 @@ struct Rigid3 {
 
 };
 
-//6 point Truss
+//6 point Truss (flakey, fix)
 struct Truss{
 
     struct Points{
-      Pnt tl, tm, tr;//, br, bm, bl;
+      Pnt tl, tm, tr;
     };
 
     Points p;
@@ -268,39 +217,37 @@ struct Truss{
     bool bUseSplit;
 
     Truss::Points base() const {
-      return {rigidA.a.p, rigidA.b.p, rigidA.c.p};
+      return {rigidM.a.p, rigidM.b.p, rigidM.c.p};
     }
 
-    Rigid3 rigidA, rigidB, rigidC;
+    Rigid3 rigidL,rigidM,rigidR;
 
     void reverse() {
-      rigidA.reverse();
-      rigidB.reverse();
-      rigidC.reverse();
+      rigidM.reverse();
+      rigidL.reverse();
+      rigidR.reverse();
     }
-   // Pnt a, b, c;
 
-    Truss( const Pnt& b, const Pnt& c, const Pnt& d, 
-             const Pnt& a, const Pnt& f, const Pnt& e, bool mtn) :
-     /* rigidA( c, a, f, e, mtn ), */
-     /*  rigidB( b, a, f, c, mtn ), */
-     /*  rigidC( d, c, f, e, mtn ), */
-     /*  bUseSplit( true ) */
-      //a(pb), b(pc), c(pd)
-      rigidA( c, e, f, a, mtn ),
-      rigidB( b, c, f, a, mtn ),
-      rigidC( d, e, f, c, mtn ),
+    Truss( const Pnt& b, const Pnt& d, const Pnt& f, 
+           const Pnt& a, const Pnt& c, const Pnt& e, bool mtn) :
+      /* rigidM( d, e, c, a, mtn ), */
+      /* rigidL( b, d, c, a, mtn ), */
+      /* rigidR( f, e, c, d, mtn ), */
+      rigidM( d, a, c, e, mtn ),
+      rigidL( b, a, c, d, mtn ),
+      rigidR( f, d, c, e, mtn ),
       bUseSplit( true )
-
-      
       {
-        p.tl = rigidB(); p.tm = rigidA(); p.tr = rigidC();
+        p.tl = rigidL(); p.tm = rigidM(); p.tr = rigidR();
       }
 
       Truss::Points update(const Pnt& pa, const Pnt& pb, const Pnt& pc){
-        p.tm = rigidA( pa, pb, pc, bUseSplit );
-        p.tl = rigidB( pa, pb, p.tm, bUseSplit);
-        p.tr = rigidC( p.tm, pb, pc,  bUseSplit);
+        /* p.tm = rigidM( pc, pb, pa, bUseSplit ); */
+        /* p.tl = rigidL( p.tm, pb, pa, bUseSplit); */
+        /* p.tr = rigidR( pc, pb, p.tm,  bUseSplit); */
+        p.tm = rigidM( pa, pb, pc, bUseSplit );
+        p.tl = rigidL( pa, pb, p.tm, bUseSplit);
+        p.tr = rigidR( p.tm, pb, pc,  bUseSplit);
         return p;
       }
 
@@ -310,7 +257,7 @@ struct Truss{
          return update( tp.tl, tp.tm, tp.tr);// p;
       }
 
-            //self update
+      //self update
       Truss::Points update(){
         return update(*this);
       }
@@ -335,6 +282,7 @@ struct Fold {
   /* } */
 
 
+    //Perimeter lines of a triangle
     static vector<Line> Lines(const Point& a, const Point& b, const Point& c){
       vector<Line> vl;
       vl.push_back( (a ^ b ^ Inf(1)).runit() );
@@ -343,7 +291,7 @@ struct Fold {
       return vl;
     }
 
-    //Perimeter
+    //Perimeter lines of a quadralateral
     static vector<Line> Lines(const Point& a, const Point& b, const Point& c, const Point& d){
       vector<Line> vl;
       vl.push_back( (a ^ b ^ Inf(1)).runit() );
@@ -353,7 +301,7 @@ struct Fold {
       return vl;
     }
 
-    //Perimeter
+    //Perimeter lines of an arbitrary polygon
     static vector<Line> Lines( const vector<Point>& src ){
         vector<Line> vl;
         for (int i = 0; i < src.size()-1; ++i){
@@ -363,7 +311,7 @@ struct Fold {
         return vl;
     }
     
-    //Perimeter
+    //Perimeter lines of an arbitrary polygon
     static vector<Line> Lines( Point * src, int num ){
         vector<Line> vl;
         for (int i = 0; i < num -1; ++i){
@@ -373,7 +321,7 @@ struct Fold {
         return vl;
     }
 
-    //Radial
+    //Radial lines out from a center
     static vector<Line> Lines( const Point& center, const vector<Point>& nodes){
         
         vector<Line> vl;
@@ -383,7 +331,6 @@ struct Fold {
 
         return vl;
     }
-
 
 
     static vector<Line> Bisect( const vector<Line>& lines ){
@@ -425,6 +372,12 @@ struct Fold {
 
 
 };
+
+
+
+/*-----------------------------------------------------------------------------
+ *  MOLECULES
+ *-----------------------------------------------------------------------------*/
 
 struct Waterbomb {
 

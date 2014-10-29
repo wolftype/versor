@@ -26,18 +26,24 @@ else
 endif
 else  
 ifneq ($(CLANG),0) 
-	CXX = $(CLANG) -std=c++11  
+	CXX = $(CLANG)  
 else 
-	CXX = clang++ -std=c++11 
-#	 CXX = /Users/wolftype/code/clangbuild2/Release+Asserts/bin/clang++ -std=c++11
+	CXX = clang++ 
 endif 
 	CXX += -arch x86_64
 endif
+
+ifeq ($(C14),1)
+CXX += -std=c++14  $(USRFLAGS) 
+else
+CXX += -std=c++11  $(USRFLAGS)
+endif
+
 CXX += -O3 -ftemplate-depth-5000  -Wno-switch -Wno-int-to-pointer-cast
 AR 	= ar crs 
 
 IPATH = -Ivsr/ 
-LDFLAGS =  
+LDFLAGS +=  
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
 IPATH += -I/usr/include/ 

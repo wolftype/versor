@@ -49,10 +49,13 @@ namespace Gen{
     */ 
      Dll log(const Dll& a, const Dll& b, VT t = 1.0);
 
-      /*! Generate Motor That Twists Dual Line a to Dual Line b;
-
-      */
+    /*! Generate Motor That Twists Dual Line a to Dual Line b;
+    */
     Mot ratio( const Dll& a, const Dll& b, VT t = 1.0);
+
+    /*! Generate Motor That Twists Motor a to Motor b;
+    */
+    Mot ratio( const Mot& a, const Mot& b, VT t);
 
 
       /*! Generate a Translated Transversion 
@@ -68,7 +71,6 @@ namespace Gen{
       }
    
 };
-
 
 /* namespace Ro { */
 

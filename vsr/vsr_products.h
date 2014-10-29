@@ -573,6 +573,12 @@ struct CGAMV : public A {
   operator * (const CGAMV<DIM, B>& b) const {
     return CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,  B>::Type, M, true>::Type>( cgp<M>( *this, b ) );
   }      
+    /* template< class B > */
+  /* CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,B>::Type, M, true>::Type>& */ 
+  /* operator *= (const CGAMV<DIM, B>& b) const { */
+    /* return CGAMV<DIM, typename Prod<A, typename CGAMV<DIM,  B>::Type, M, true>::Type>( cgp<M>( *this, b ) ); */
+  /* } */  
+  
   // //self 
   // CGAMV<DIM, typename Prod<A, A, M, true>::Type> 
   // operator * (const CGAMV& b) const {

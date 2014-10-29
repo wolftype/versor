@@ -19,16 +19,22 @@ namespace vsr{
   // FEATURE ExTRAcTION (ROTATION AND POSITION)
 
    Rot AA( const Vec& s){
-    //Biv b = Ro::dir( s ).copy<Biv>();               
         Rot r = Gen::ratio(Vec::z, s.unit() ); 
         return Gen::aa(r);
-    }                    
+    }  
+    
+    Rot AA( const Biv& s){
+       Rot r = Gen::ratio(Vec::z, s.duale().unit() ); 
+       return Gen::aa(r);
+    }     
+                      
 
   Rot AA( const Dlp& s){
     //Biv b = Ro::dir( s ).copy<Biv>();               
-  Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
+      Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
         return Gen::aa(r);
-    }  
+    } 
+     
   Vec Pos( const Dlp& s){ 
     return Fl::loc( s , Ori(1), true );   
   }   
@@ -53,6 +59,8 @@ namespace vsr{
       Glyph::Cone();
     glPopMatrix();
   }  
+
+
   
     void ImmediateB (const Vec& s){
       //cout << "ehl" << endl;
@@ -62,7 +70,22 @@ namespace vsr{
       gfx::Glyph::SolidSphere(.05,5,5);
       glPopMatrix();                       
   }
-                   
+  
+  void Immediate(const Biv& s){
+		double ta = s.norm(); 
+	  bool sn = Op::sn( s , Biv::xy * (-1));
+	
+		glPushMatrix();	
+			gfx::GL::rotate( AA(s).begin() );  
+			gfx::Glyph::DirCircle( ta, sn );
+		glPopMatrix();
+  }
+  
+  void Immediate (const Tnv& s){
+    Immediate( s.copy<Vec>() );
+  }   
+  
+                    
    void Immediate (const Drv& s){ 
     Immediate( s.copy<Vec>() );
   }
@@ -135,29 +158,38 @@ namespace vsr{
      void Immediate (const Par& s){
           //Is Imaginary?
           VT size = Ro::size( s, false );
-      //  printf("size: %fn", size);
-          std::vector<Pnt> pp = Ro::split( s );
 
-          VT ta = Ro::size( pp[0], true );   
-                                       
-          if ( fabs(ta) >  FPERROR ) {    
-              Pnt p1 = Ro::cen( pp[0] );
-              Pnt p2 = Ro::cen( pp[1] );
-              double t = sqrt ( fabs ( ta ) );
-              bool real = size > 0 ? 1 : 0;  
+          //is null?
+          if (size < FPERROR ){
+              GL::translate( Ro::loc(s).begin() );
+              Immediate( -Ro::dir(s).copy<Vec>() ); 
+            
+          }else{
+          
+            std::vector<Pnt> pp = Ro::split( s );
 
-              glPushMatrix();
-              gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]);
-              (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);  
-              glPopMatrix();
+            VT ta = Ro::size( pp[0], true );   
+                                         
+            if ( fabs(ta) >  FPERROR ) {    
+                Pnt p1 = Ro::cen( pp[0] );
+                Pnt p2 = Ro::cen( pp[1] );
+                double t = sqrt ( fabs ( ta ) );
+                bool real = size > 0 ? 1 : 0;  
 
-              gfx::GL::translate ( p2.begin() );
-              (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);  
+                glPushMatrix();
+                gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]);
+                (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);  
+                glPopMatrix();
 
-          } else {
-         // pp[0].vprint(); pp[1].vprint();
-              gfx::Glyph::Point(pp[0]);
-              gfx::Glyph::Point(pp[1]);
+                gfx::GL::translate ( p2.begin() );
+                (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t);  
+
+            } else {
+           // pp[0].vprint(); pp[1].vprint();
+                gfx::Glyph::Point(pp[0]);
+                gfx::Glyph::Point(pp[1]);
+                gfx::Glyph::Line(pp[0],pp[1]);
+            }
           }
   }  
   
@@ -232,6 +264,13 @@ namespace vsr{
       DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
     }
   }
+
+  template<>
+  void Immediate( const Field<Tnv>& f){
+    for (int i = 0; i < f.num(); ++i){  
+      DrawAt( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
+    }
+  }  
 
   template<>
   void Immediate( const Field<Frame>& f){

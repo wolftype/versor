@@ -16,10 +16,8 @@
  * =====================================================================================
  */
 
-
 #ifndef  vsr_simplex_INC
 #define  vsr_simplex_INC
-
 
 #include "vsr_products.h"
 #include "vsr_generic_op.h"
@@ -47,6 +45,8 @@ struct Simplex {
 
   //temporary higher dimensional elements for init
   typedef NEVec<N+1> TVec;
+  //lower dimensional elements
+ // typedef Simplex<N-1>
 
   vector<Vec>  verts;
   vector<TVec> roots;
@@ -56,7 +56,6 @@ struct Simplex {
   Simplex() { init(); }
 
   TVec vec;
- // TRot rot;
 
   TVec doBary(){
     TVec center;

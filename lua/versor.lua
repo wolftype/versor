@@ -16,6 +16,16 @@ is possible by setting metric to
 EXAMPLE:
 
 local V = require"versor"
+local EGA = V{
+  metric={1,1,1},
+  types = {
+    {name="vec", bases={"e1","e2","e3"}},
+    {name="biv", bases={"e12","e13","e23"}},
+  }
+}
+
+
+local V = require"versor"
 local STA = V{
   metric={-1,-1,-1,1},
   types = {
@@ -33,7 +43,6 @@ local bxor = bit.bxor
 local bor = bit.bor
 local lshift = bit.lshift
 local rshift = bit.rshift
-
 
 --------------------------------------------------------
 --------------------------------------------------------
@@ -68,7 +77,6 @@ local grade = function (x)
 	end
 	return n
 end
-
 
 --DETERMINE SIGN FLIP OF TWO BASIS BLADES
 local sign = function(a,b)
@@ -273,6 +281,7 @@ local productListCode = function(x)
        elseif ( k > 1  ) then out = out .. "+" end
        out = out .. " a["..(kv.a-1).."]*b[" .. (kv.b-1).."] "
     end
+    if (i < #x.blades)then out = out.."," end
     out = out .. " // " .. basisString( iv )
         
     inst[#inst+1] = out
@@ -296,9 +305,9 @@ M.__index = M
 
 setmetatable(M, {
 
-	__call = function(_, t)
+	  __call = function(_, t)
 	
-  	    t = t or {}
+  	t = t or {}
 		t.metric = t.metric or {1, 1, 1}
 		t.types = t.types or {}
 		t.binops = t.binops or {}

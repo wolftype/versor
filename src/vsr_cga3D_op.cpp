@@ -270,7 +270,12 @@ namespace Gen{
           return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
       }
 
+      /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
+      */
+     Mot ratio( const Mot& a, const Mot& b, VT t){
+          return Gen::mot( Gen::log(b/a) * t );
+      }
 
       // /*! Generate a Translated Transversion 
       //     @param Tangent Direction

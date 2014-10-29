@@ -1,4 +1,3 @@
-//Get mouse position as an "unprojected" point in 3D space
 
 #include "vsr_cga3D.h"   
 #include "vsr_GLVimpl.h"
@@ -15,6 +14,8 @@ struct MyApp : App {
   float time;
   float amt;
 
+  bool bReset;
+
   MyApp(Window * win ) : App(win){
     scene.camera.pos( 0,0,10 ); 
     time = 0;
@@ -22,6 +23,7 @@ struct MyApp : App {
 
   void initGui(){
       gui(amt,"amt",-100,100);
+      gui(bReset,"reset");
   }
   
     void getMouse(){
@@ -35,7 +37,6 @@ struct MyApp : App {
     virtual void onDraw(){ 
         
       getMouse();
-    
   }
    
 

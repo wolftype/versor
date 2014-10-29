@@ -1,9 +1,11 @@
 /*
  *  xConstants.h
- *  gelatin
+ *  gelatin (!) old school name
  *
  
- IRRATIONALS
+ IRRATIONALS AND ROUTINES
+
+ to do: redefine as VERSOR_PI etc ...
  
  *  Created by x on 5/22/09.
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
@@ -39,6 +41,8 @@ namespace vsr{
 
 #define CLAMP(val,min,max) val<min?min:val>max?max:val
 #define D2R(val) PI*val/180.0
+
+#define ZERO(x) (fabs(x)<FPERROR?0:x)
 
 #endif
 //#define EPSILON

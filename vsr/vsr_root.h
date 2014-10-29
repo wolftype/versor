@@ -30,7 +30,8 @@ struct Root{
   ///Utility function to compare two vectors (looks at norm of the difference)           
   template<class V>
   static bool Compare(const V& a, const V& b, VT amt =.00005){   
-    return ( ( a - b ).wt() ) < amt; 
+   // return ( ( a - b ).wt() ) < amt; 
+    return ( ( a <= b ).wt() ) > .99999;// amt; 
   }            
     
     //Build a Root System from Simple Root Generators (ANY Dimension!)

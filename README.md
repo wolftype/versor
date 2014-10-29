@@ -11,18 +11,18 @@ CSS: style0.css
 
 Versor (vsr)
 ===
-A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.  
+A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.  Spacetime Algebra too (etc).  
 ---
 ### Currently tested on Linux and Mac OS X ###
 
 [Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu) 
 
-Versor is a C++ Library for Geometric Algebra with built-in draw routines. Version 2.0 generates optimized geometric algebra code at compile-time
-through template meta-programming, and supports arbitrary dimensions and metrics (limited by your compiler...).
+Versor is a C++ Library for Geometric Algebra.   The repository includes built in draw routines, but these are optional. 
+The headers generate optimized geometric algebra code at compile-time through template meta-programming, 
+and supports arbitrary dimensions and metrics (limited by your compiler...).
 
 Developer: Pablo Colapinto  
 `gmail: wolftype`  
-
 
 ## CONTENTS: ##
                                
@@ -77,8 +77,11 @@ QUICKSTART
 
 Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For version 2.0 you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
 
-	git clone git://github.com/wolftype/vsr2.0.git
-	cd vsr2.0
+	git clone git://github.com/wolftype/versor.git 
+ 
+You'll want to initialize the submodules to build any graphics examples:
+
+	cd versor
 	git submodule init
 	git submodule update
 
@@ -101,6 +104,8 @@ For clang on a snow leopard (with thanks to Karl Yerkes for this tidbit)
 
 	brew tap home-brew/versions
 	brew install --HEAD llvm34 --rtti, --disable-assertions, --with-libcxx, --with-clang
+	
+Or just download llvm and build clang from scratch.
  
 If you don't want to or can't compile C++11 code try an [older flavor of vsr](https://github.com/wolftype/versor_1.0.git). 
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.

@@ -4,16 +4,32 @@ VERSOR
 ===
  
 Various Notes (in progress)
----
+---                      
+#CONSTRUCTIONS
 
-Points and Lines
+##Lines
+
+`Line` | `Lin`
+
+`DualLine` | `Dll`
+
+We will often assume normalized lines (`.unit()`) and dualLines (`.runit()`)
+  
+  Dll <= Dll is a (reversed) scalar dot product.  Zero when Orthogonal. Positive when pointing in opposite directions
+  Dll ^ Dll is a Direction Trivector and specfies Relative Chirality and distance.  Is ZERO when they intersect OR are parellel. 
+  Increases in Magnitude as closest point gets farther away (except for parallel lines)    
+  In the Case of Parallel lines, Lin <= Lin, is 1 if oriented same direction and -1 if opposite directions. 
+  L1-L2 The bisector line of two normalized lines L1 and L2
+  L2L1L2 reflects L1 through L2 by twisting through it
+  L1 - L2L1L2 is a line orthogonal to L2
+
+
+##Constructing Planes
 
 `Point` is also `Pnt`
-`Line` is also `Lin`
-`DualLine` is also `Dll`
 
-  Pnt <= Dll returns the shared DualPlane. 
-    The dot() of the DualPlane is the squared distance betwen point and line.
+	Pnt <= Dll returns the shared DualPlane. 
+    The dot() of the DualPlane is the squared distance betwen point and line, if the line has been normalized.
 
   Pnt ^ Dll returns the Direct Circle about the DualLine through the Point.
     The Ro::size(Circle,false) returns the squared radius of the Circle.
@@ -23,17 +39,10 @@ Points and Lines
 
   Pnt <= Drv is Dual Plane through p with normal n
 
+##DualLines and Lines
 
-DualLines and Lines
 
-  Dll <= Dll is a (reversed) scalar dot product.  Zero when Orthogonal. Positive when pointing in opposite directions
-  Dll ^ Dll is a Direction Trivector and specfies Relative Chirality.  Is ZERO when they intersect OR are parellel. 
-  Increases in Magnitude as closest point gets farther away (except for parallel lines)
-  L1-L2 The bisector line of two normalized lines L1 and L2
-  L2L1L2 reflects L1 through L2 by twisting through it
-  L1 - L2L1L2 is a line orthogonal to L2
-
-Rounds
+##Rounds
 
   'Point' is also 'Pnt' is also 'DualSphere' is also 'Dls'
   'PointPair' is also 'Par'
@@ -51,10 +60,15 @@ Distances
 
   Dual Line and Point: ( pnt <= dll.runit() ).wt() seems to return -dist^2/2.0 
   Dual Plane and Point: ( pnt <= dlp ) returns distance and which side of plane . .
-
+  Circle and Point: ( pnt <= cir ).wt()  
 
 
 TO DO
 ---
 
-* 
+*   Cylinder - Cylinder intersection
+Point to cylinder is okay (within surround, colinear with carrier)
+
+*   Two Point Pairs that share a point are ___
+*   Inversion in a point pair is ____ (useful for what)	
+

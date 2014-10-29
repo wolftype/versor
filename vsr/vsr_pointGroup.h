@@ -1,5 +1,5 @@
-//
-//  vsr_group.h
+//  DEPRECATED (use vsr_group.h instead)
+//  vsr_pointgroup.h
 //  Versor
 //
 

@@ -108,7 +108,9 @@ void DrawEvery( const A& a, const B& b){
   void Immediate (const Vec& s);  
 
   void ImmediateB (const Vec& s);                        
-  
+
+
+  void Immediate (const Biv& s);    
   void Immediate (const Drv& s); 
   
   void Immediate (const Dlp& s);
@@ -152,6 +154,7 @@ void DrawEvery( const A& a, const B& b){
   template<> void Immediate( const Field<Vec>& f);
   template<> void ImmediateB( const Field<Vec>& f);
   template<> void Immediate( const Field<Sca>& f);
+  template<> void Immediate( const Field<Tnv>& f);
   template<> void Immediate( const Field<Frame>& f);
 
   //triangle and normal

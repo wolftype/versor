@@ -30,28 +30,42 @@
 
 namespace vsr{
 
-
-  
   /*!
    *  \brief  The bennett 4 bar linkage
+   *  
+   *         lb
+   *   2-------------1
+   *    |           |
+   * la |           | la
+   *    |           |
+   *   3-------------0
+   *         lb
    *
+   *   - alternating link lengths have equal lengths
+   *   - alternating link transformations have equal xz rotations
+   *   - everything else is figured out analytically.
   */
   class Bennett : public Chain {
      
-     VT mLengthA;
-     VT mLengthB;
+     VT mLengthA; ///< Length of first alternating sides
+     VT mLengthB; ///< Length of second alternating sides
 
-     VT mTheta;
-     VT mPhi;
+     VT mTheta;  ///< skew of first alternating links
+     VT mPhi;    ///< skew of second alternating links
 
-     VT mAmt;
+     VT mPhase;    ///< phase of rotation
 
      public:
 
-     Bennett( VT theta, VT lengthA = 1.0, VT lengthB = 1.0 )
-     : Chain("RRRR"), mTheta(theta), mLengthA( lengthA ), mLengthB( lengthB ), mAmt(0) {
+     Bennett( VT theta=0, VT lengthA = 1.0, VT lengthB = 1.0 )
+     : Chain("RRRR"), mTheta(theta), mLengthA( lengthA ), mLengthB( lengthB ), mPhase(0) {
       
         init();    
+     }
+
+     void set( VT theta, VT lengthA, VT lengthB){
+       mTheta = theta; mLengthA = lengthA, mLengthB = lengthB;
+       init();
      }
      
     void init() { 
@@ -70,8 +84,8 @@ namespace vsr{
         mLink[0].rot() = Gen::rot(la);
         mLink[2].rot() = Gen::rot(la);
 
-        mLink[1].rot() = !Gen::rot(lb);
-        mLink[3].rot() = !Gen::rot(lb);
+        mLink[1].rot() = Gen::rot(-lb);
+        mLink[3].rot() = Gen::rot(-lb);
 
     }
 
@@ -97,8 +111,7 @@ namespace vsr{
 
      Bennett& operator()( VT amt ){
 
-        mAmt = amt;
-       
+        mPhase = amt;      
         bool bSwitch = sin(amt) < 0 ? true : false;
 
         resetJoints();
@@ -110,7 +123,6 @@ namespace vsr{
         
         //calculate intersection
         auto dualMeet = Ro::dls_pnt(mFrame[1].pos(), mLengthB) ^ Ro::dls_pnt(mFrame[3].pos(), mLengthA);
-       // Draw( dualMeet.dual() );
         Pair p = ( mFrame[1].dxy() ^ dualMeet).dual();
         
         mFrame[2].pos() = Ro::loc( Ro::split(p,!bSwitch) );           
@@ -131,9 +143,6 @@ namespace vsr{
         return *this;
      }
 
-
-    
-
     
      /*!
       *  \brief  A linked Bennett mechanism, determined by ratio of original
@@ -143,7 +152,7 @@ namespace vsr{
       Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);
       b2.baseFrame() = Frame( mFrame[2].mot() * !mJoint[2].rot() );
 
-      b2(mAmt);
+      b2(mPhase);
       
       if (la==0) la = mLengthA; //else la = mLengthA;
       if (lb==0) lb = mLengthB; //else lb *= mLengthB;
@@ -158,26 +167,54 @@ namespace vsr{
 
      /*!
       *  \brief  A linked Bennett mechanism at joint N determined by ratio of original
+      *  We first create a sublinkage inside the first, and then use the [2] frame to set
+      *  the base of our resulting linkage.
+      *
+      *  @param Nth link (default 2)
+      *  @param linkage skew RELATIVE to parent
+      *  @param length along edge a (default .5)
+      *  @param length along edge b (default .5)
+      *  @param new length a (default same as parent)
+      *  @param new length b (default same as parent)
       */
-     Bennett linkAt(int N=0, VT th=1, VT a = .5, VT b =.5, VT la = 0, VT lb = 0){
+     Bennett linkAt(int N=2, VT th=1, VT a = .5, VT b =.5, VT la = 0, VT lb = 0){
       
-      Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);
+      //necessary boolean to reverse direction 
+      bool bSwitch = sin(mPhase) < 0 ? true : false;
+
+      //make linkage relative to original
+      Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);      
+      //set baseframe of new linkage to nth frame and undo local in-socket transformation
       b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
+      //set phase of new linkage mechanism from nth joint's rotation
+      b2( bSwitch ? -Gen::iphi( mJoint[N].rot())  : Gen::iphi( mJoint[N].rot() ) );
+      //use linkAt_ to debug this point
 
-      b2( Gen::iphi( mJoint[N].rot() ) );
-
-     // return b2(mAmt);
-      
       if (la==0) la = mLengthA; //else la = mLengthA;
       if (lb==0) lb = mLengthB; //else lb *= mLengthB;
 
+      //repeat
       Bennett b3(mTheta * th, la, lb);
-
       b3.baseFrame() = Frame( b2[2].mot() * !b2.joint(2).rot() );
-      
-      return b3( Gen::iphi( b2.joint(2).rot() ) );
+      for (int i=0;i<b3.num();++i){
+        b3[i].scale() = (*this)[i].scale();
+      }
+      return b3( bSwitch ? -Gen::iphi( b2.joint(2).rot() ) : Gen::iphi( b2.joint(2).rot() )  );
 
      }
+
+    //alt
+     Bennett linkAt_(int N, VT th=1, VT a = .5, VT b =.5, VT la = 0, VT lb = 0){
+        
+      bool bSwitch = sin(mPhase) < 0 ? true : false;
+      
+      Bennett b2(mTheta * th, mLengthA * a, mLengthB * b);      
+      //set baseframe to nth frame and undo local transformation
+      b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
+      //set phase of new linkage mechanism from nth joint's rotation
+      return b2( bSwitch ? -Gen::iphi( mJoint[N].rot())  : Gen::iphi( mJoint[N].rot() ) );
+      
+     }     
 
   };
 

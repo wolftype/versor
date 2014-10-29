@@ -126,7 +126,7 @@ namespace vsr{
         //INITIALIZE
         void basicInit(){
             ITER
-                mData[ tidx ] = T( this->mPoint[ tidx ] );
+                mData[ tidx ] = this->mPoint[tidx].template copy<T>();//T( this->mPoint[ tidx ] );
             ITEND
         }
         //SPECIALIZE HERE
