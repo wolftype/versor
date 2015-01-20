@@ -1,6 +1,6 @@
 /*
  *
- *
+ *  SEE ALSO vsr_rigid.h for alternative (uses pointers)
  *
  *
  *
@@ -18,20 +18,11 @@
 namespace vsr{
 
 
-//Set of points around a center
-/* struct Radial : Set<Point> { */
-  
-/*   template< typename ... T> */
-/*   Radial( T ... p ) { */
-/*     add( p )...; */
-/*   } */
 
-/* }; */
-
-
-
-
-//distance from point p
+  /*-----------------------------------------------------------------------------
+   *  DISTANCE CONSTRAINT MECHANISMS (using spheres...)
+   *-----------------------------------------------------------------------------*/
+/// Distance constraint from point p
 struct Distance {
   
     Pnt p; 
@@ -39,21 +30,22 @@ struct Distance {
 
     Distance(){}
 
+    /// Construct from two points
     Distance ( const Pnt& a, const Pnt& target) :  
     p( a ), t( Ro::rad( Ro::at(a, target) ) )
     {}
 
-    //new target
+    /// Set a new target (change distance)
     void set( const Pnt& target ){
         t = Ro::rad( Ro::at(p,target) );
     }
 
-    //updated source
+    /// Update point location (source)
     void src( const Pnt& s ) {
        p = s;
     }
 
-    //new source and target
+    /// Set a new source and target
     void set(const Pnt& a, const Pnt& target){
        p = a; set( target);
     }
@@ -65,8 +57,7 @@ struct Distance {
 
 
 
-//2 distances and an origin define a circular ORBIT
-
+/// 2 distances and an origin define a circular ORBIT
 struct Rigid2 {
   
   Distance distA, distB;
@@ -117,7 +108,7 @@ struct Rigid2 {
       return (*this)( origin * (1-t) + p * t );
   }
 
-  //Constrain by some linear amt of two other points
+  /// Constrain by some linear amt of two other points
   Pnt operator() (const Pnt& pa, const Pnt& pb, float t ){
       return (*this)( pa * (1-t) + pb * t );
   }
@@ -140,11 +131,9 @@ struct Rigid2 {
 //3 Distance constraints and a boolean define a point
 struct Rigid3 {
 
-    Distance a, b, c;
-    bool mtn; //mountain or valley crease
+    Distance a, b, c; ///< distances
+    bool mtn;         ///< mountain or valley crease (which point to pick)
 
-   // Point target;
-   //
     Rigid3(){}
 
     ///counter clockwise Construction results in b=false as valley
@@ -153,7 +142,6 @@ struct Rigid3 {
 
     void update(const Pnt& pa, const Pnt& pb, const Pnt& pc) {
       a.src(pa); b.src(pb); c.src(pc);
-      //return (*this)();
     }
 
     void updateA(const Pnt& pa ) { a.src(pa); }
@@ -200,8 +188,6 @@ struct Rigid3 {
     Dlp dlpB(){
       return ( (*this)() ^ c.p ^ b.p ^ Inf(1) ).dual();
     }
-
-
 
 };
 
@@ -265,22 +251,12 @@ struct Truss{
 
 };
 
+
+
+/*-----------------------------------------------------------------------------
+ *  FOLD LINE CONSTRUCTION
+ *-----------------------------------------------------------------------------*/
 struct Fold {
-
-  /* static Line Bisect(const Point& a, const Point& b, const Point& c){ */
-  /*     Line lab =  a ^ b ^ Inf(1); */
-  /*     Line lbc = b ^ c ^ Inf(1); */
-      
-  /*     return (lab - lac).unit(); */
-  /* } */
-
-  /* static vector<Line> Bisect(const Point& a, const Point& b, const Point& c){ */
-  /*     Line lab =  a ^ b ^ Inf(1); */
-  /*     Line lbc = b ^ c ^ Inf(1); */
-      
-  /*     return (lab - lbc).unit(); */
-  /* } */
-
 
     //Perimeter lines of a triangle
     static vector<Line> Lines(const Point& a, const Point& b, const Point& c){

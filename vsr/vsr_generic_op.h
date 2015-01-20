@@ -484,23 +484,22 @@ namespace Euc{
       
       VT s = ( a <= b )[0];              
   
-     //:  printf("CONJG\n"); 
-
       //180 degree check
       if ( a == b.conjugation() ) {
         if ( a == TVEC::y || a == -TVEC::y ) {
-         // printf("CONJG\n"); 
           return rot( TBIV::xy * PIOVERTWO );
         }        
         return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
-      }          
+      }         
+      
+         // printf("not 180\n");  
           VT ss = 2 * (s+1);
-          VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );
+          VT n = ( ss >= 0 ? sqrt ( ss ) : -sqrt(-ss) );
 
           TROT r = ( b * a ) ; //cout << r << endl;
           r[0] += 1;  
-          if (n != 0 ) r /= n;
-          if (r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n");
+          if (!FERROR(n)) r /= n;
+          if ( r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n");
           return r;    
       } 
 
@@ -517,6 +516,8 @@ namespace Euc{
 
       //180 degree check
       if ( a == b.conjugation() ) return rot( a ^ TVEC::y * PIOVERTWO); //mind the ordering of blades
+
+        //printf("euc not 180\n");  
 
           VT ss = 2 * (s+1);
           VT n = ( ss >= 0 ? sqrt ( ss ) : 0 );
@@ -918,17 +919,20 @@ namespace Euc{
     }    
 
 
-    /*! Point Pair on Circle at angle t*/
+    /*! Point Pair on Direct Circle at angle t*/
     template<TT DIM>
     NPar<DIM> 
     par_cir(const NCir<DIM>& c, VT t){  
-    using TBIV = NBiv<DIM>;
+        using TBIV = NBiv<DIM>;
+        using TVEC = NVec<DIM>;
     
-      NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
-        
-        NRot<DIM> rot = Gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() );
-        NVec<DIM> vec = NVec<DIM>::x.sp( rot * Gen::rot(TBIV::xz * t/2.0)); //BIG CHANGE . . .
-        
+        //NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
+        //NRot<DIM> rot = Gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() );
+       // NVec<DIM> vec = NVec<DIM>::x.sp( rot * Gen::rot(TBIV::xz * t/2.0)); //BIG CHANGE . . .
+        auto normal = TVEC( Ro::carrier(c).dual() ).unit();
+        auto rot = Gen::ratio( TVEC::z, normal );
+        auto vec = TVEC::x.spin( Gen::rot( TBIV::xy.spin( rot ) * t/2.0 ) * rot ); 
+                    
         return round( sur( c ), vec );
    }       
   

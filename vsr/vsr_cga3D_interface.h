@@ -30,11 +30,6 @@ namespace gfx{
       //2D coordinates of Defining Sphere
       Vec3f sc = i->screenCoord(tv, i->scene -> xf );  
 
-     // printf("selected\n");
-      
-      //Point in 3D space on Projection Ray closest to pos.
-     // Pnt cp  = Fl::loc( vd().ray, Ro::loc(pos), 1);  
-
 
           switch(i->keyboard.code){
 

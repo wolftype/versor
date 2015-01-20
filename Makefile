@@ -39,6 +39,12 @@ else
 CXX += -std=c++11  $(USRFLAGS)
 endif
 
+ifeq ($(STDLIB),1)
+#export DYLD_LIBRARY_PATH=$HOME/code/libcxx/lib
+#@echo DYLD_LIBRARY_PATH
+CXX += -stdlib=libc++ -nostdinc++ -I../libcxx/include -L../libcxx/lib
+endif
+
 CXX += -O3 -ftemplate-depth-5000  -Wno-switch -Wno-int-to-pointer-cast
 AR 	= ar crs 
 
@@ -48,7 +54,6 @@ LDFLAGS +=
 ifeq ($(RPI),0)  
 IPATH += -I/usr/include/ 
 LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr 
-#-lvsr
 LDFLAGS += -lm  
 else
 IPATH += -I../gfx/

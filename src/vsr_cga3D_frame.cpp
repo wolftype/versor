@@ -11,7 +11,6 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
  *
  * =====================================================================================
  */
@@ -26,6 +25,9 @@ namespace vsr{
     Frame::Frame(VT _x, VT _y, VT _z) 
     : mPos( Ro::null(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
 
+    Frame::Frame(const Vec& v, const Rotor& r, VT s ) 
+    : mPos( v.null() ), mRot( r ), mScale(s), aBiv(.9), aVec(.9) {} 
+
     Frame::Frame(const Point& p, const Rotor& r, VT s ) 
     : mPos( p ), mRot( r ), mScale(s), aBiv(.9), aVec(.9) {} 
 
@@ -39,29 +41,35 @@ namespace vsr{
 
      Frame::Frame(const Motor& m ) : mPos( PAO.sp(m) ), mRot(m), mScale(1), aBiv(.9), aVec(.9) {} 
 
-
+    
+    /*-----------------------------------------------------------------------------
+     *  Local X, Y, Z axes (calculated every time, could be stored into 3x3 image)
+     *-----------------------------------------------------------------------------*/
     Vec Frame::x()  const { return Vec::x.sp( mRot ); }
     Vec Frame::y()  const { return Vec::y.sp( mRot ); }
     Vec Frame::z()  const { return Vec::z.sp( mRot ); }   
 
+    /* Local Euclidean Planes (at origin) -- for homogenous planes see dxy(), dxz() etc */
     Biv Frame::xy()  const { return x() ^ y(); }    ///< xz euclidean bivector
     Biv Frame::xz()  const { return x() ^ z(); }    ///< xy euclidean bivector
     Biv Frame::yz()  const { return y() ^ z(); }    ///< yz euclidean bivector
     
+    /* Lines along axes */
     Lin Frame::lx() const { return mPos ^ x() ^ Inf(1); }  ///< x direction direct line
     Lin Frame::ly() const { return mPos ^ y() ^ Inf(1); }  ///< y direction direct line
     Lin Frame::lz() const { return mPos ^ z() ^ Inf(1); }  ///< z direction direct line      
     
+    /* Dual Lines along Axes */
     Dll Frame::dlx() const { return lx().dual(); }    ///< x direction dual line
     Dll Frame::dly() const { return ly().dual(); }    ///< y direction dual line
     Dll Frame::dlz() const { return lz().dual(); }    ///< z direction dual line
     
-    /* Homogenous Planes in Conformal Space */
+    /* Homogenous Planes */
     Dlp Frame::dxz() const  { return -z() <= dlx(); }    ///< xz dual plane
     Dlp Frame::dxy() const { return y() <= dlx(); }      ///< xy dual plane
     Dlp Frame::dyz() const  { return y() <= dlz(); }      ///< yz dual plane  
     
-    /* Real Pair */
+    /* Real Pair of Points around Center */
     Par Frame::px() const { return  Ro::round( ibound(), x() ); }       ///< x direction point pair around center
     Par Frame::py() const { return  Ro::round( ibound(), y() );  }      ///< y direction point pair around center
     Par Frame::pz() const { return Ro::round( ibound(),  z() );  }      ///< z direction point pair around center  
@@ -85,11 +93,7 @@ namespace vsr{
     Cir Frame::icxy() const { return Ro::round( bound(), xy() ); }     ///< xy circle (imaginary, direct)
     Cir Frame::icxz() const { return Ro::round( bound(), xz() ); }     ///< xz circle (imaginary, direct)
     Cir Frame::icyz() const { return Ro::round( bound(), yz() ); }     ///< yz circle (imaginary, direct)
-
-/*     Vec Frame::right() const { return x(); } */
-/*     Vec Frame::up() const { return y(); } */   
-/*     Vec Frame::forward() const { return -z(); } */  
-  
+ 
     /// Set position and orientation by motor 
     void Frame::mot(const Mot& m) { 
           mPos = PAO.sp(m); 
@@ -129,6 +133,13 @@ namespace vsr{
       return *this;
     }
 
+    /// Dilate by t around some point p 
+    Frame& Frame::dilate(const Pnt& p, double t) { 
+      Dls s =  bound().dil( p, t ) ;
+      mScale = Ro::rad(s);
+      return *this;
+    }
+
     /// Move and Spin 
     Frame& Frame::step(){
       move();              
@@ -155,9 +166,53 @@ namespace vsr{
       return Frame ( mPos, Gen::rot( xy() * amt )  * mRot, mScale );
     }
 
-    /// Move by dx, dy, dz and return a new frame
-    Frame Frame::move( VT dx, VT dy, VT dz) const {
-      return Frame ( (mPos + Vec(dx,dy,dz) ).null(), mRot, mScale );
+    //DEPRECATED
+    /* /// Move by dx, dy, dz and return a new frame */
+    /* Frame Frame::move( VT dx, VT dy, VT dz) const { */
+    /*   return Frame ( (mPos + Vec(dx,dy,dz) ).null(), mRot, mScale ); */
+    /* } */
+
+    /// Move by dx, dy, dz and return this
+    Frame& Frame::move( VT dx, VT dy, VT dz) {
+      mPos = (mPos + Vec(dx,dy,dz) ).null();     
+      return *this; 
+    }
+
+    /// Twist by dualLine and return this
+    Frame& Frame::twist( const Dll& d ){
+      return twist(Gen::mot(d));
+    }
+
+    /// Twist by motor and return this
+    Frame& Frame::twist( const Mot& mot ){
+      mPos = mPos.spin(mot);
+      mRot = mRot.spin(mot);
+      return *this;
+    }
+
+    /// Boost by point pair and return this
+    Frame& Frame::boost( const Par& p){
+      return boost( Gen::bst(p) );
+    }
+
+    /// Boost by boost, renormalize, and return this
+    Frame& Frame::boost( const Bst& b){
+      mPos = Ro::loc( mPos.spin(b) );
+      mRot = mRot.spin(b);
+      mRot = mRot.unit();
+      return *this;
+    }
+
+    //orient -z to target, and keep y as vertical as possible
+    Frame& Frame::orient( const Vec& v ){
+      //Vec current = z();
+      Rot tRot = Gen::ratio( -Vec::z, (v-vec()).unit() );
+      mRot = tRot;
+      Vec ty = Op::pj( Vec::y, xy() ).unit();
+      //auto cs = ty <= y();
+      Rot yRot = Gen::ratio( y(), ty );
+      mRot = yRot * tRot; 
+      return *this;
     }
 
     Frame Frame::moveX( VT amt ) const{

@@ -20,9 +20,11 @@ namespace vsr{
    
    struct Node {
 
-     Node() : ptr(NULL), edge(NULL) {}
+     Node() : ptr(NULL), edge(NULL), bVisited(false){}
      T * ptr;                           ///< Pointer to type T
      HalfEdge * edge;                   ///< An emanating half-edge
+      
+     bool bVisited;                     ///< Flag for keeping track of visitation
 
      /// Get reference to data;
      T& data() { return *ptr; }    
@@ -31,10 +33,11 @@ namespace vsr{
      Node& data( T& v ) { ptr = &v; return *this; }
 
      /// Find all outgoing Edges
-     vector<HalfEdge*> valence();
+     vector<HalfEdge*> valence() const;
 
      /// Test for node closure (no null Edges in loop)
-     bool closed();
+     bool closed() const;
+    // bool bClosed; //save state for cheaper comp
 
      /// Find any null edge of a node 
      HalfEdge& null();
@@ -42,8 +45,15 @@ namespace vsr{
      /// Find both null edges around a node
      vector<HalfEdge*> nulls();
 
+     /// Find all faces
      vector<Face*> faces();
 
+     /// Find all Neighboring nodes
+     vector<Node*> neighbors();
+
+     void visited(bool t) { bVisited=t; }
+     bool visited(){ return bVisited; }
+     void reset() { bVisited=false; }
         
    };
 
@@ -197,16 +207,10 @@ namespace vsr{
    //once three nodes exist, seed them into a facet
     void seedNodes(){
 
-        cout << "seeding " << endl ;
-
         Node *na, *nb, *nc; 
-       //
-       //cout << mNode.size() << endl; 
-       
         HalfEdge *ea, *eb, *ec;
         Face *f;
         
-        //*na = *(mNode[0]); *nb = *( mNode[1] ); *nc = *(mNode[2]);
         na = &(*(mNode[0]));  nb = &(*( mNode[1] ));  nc = &(*(mNode[2]));
 
          
@@ -224,14 +228,12 @@ namespace vsr{
         f -> edge = ea; //Pick any old edge
 
         na -> edge = ea; nb -> edge = eb; nc -> edge = ec;
-//        na.edge = ea; nb.edge = eb; nc.edge = ec;
 
-         ea -> next = eb; ea -> face = f;  // assign next edge and face
-         eb -> next = ec; eb -> face = f;
-         ec -> next = ea; ec -> face = f;
+        ea -> next = eb; ea -> face = f;  // assign next edge and face
+        eb -> next = ec; eb -> face = f;
+        ec -> next = ea; ec -> face = f;
 
         //Store
-
         mHalfEdge.push_back(ea);
         mHalfEdge.push_back(eb);
         mHalfEdge.push_back(ec);
@@ -307,6 +309,10 @@ namespace vsr{
       mFace.push_back(f);
       
       return *this;
+    }
+
+    HEGraph& addAt( T& v, int x ){
+      return addAt(v, edge(x));
     }
 
     //Given Four Points, make two triangles
@@ -510,6 +516,9 @@ namespace vsr{
       for (auto& i : mHalfEdge){
         i -> bVisited = false;
       }
+      for (auto& i : mNode){
+        i -> visited(false);
+      }
     }
 
     void clear() {
@@ -566,7 +575,7 @@ namespace vsr{
     }
 
     template<class T>
-    inline bool HEGraph<T>::Node::closed(){
+    inline bool HEGraph<T>::Node::closed() const{
       HEGraph<T>::HalfEdge * e = edge -> opp;
       if (e == NULL) return false;
       while ( e != edge -> next -> next ){
@@ -595,25 +604,35 @@ namespace vsr{
     }
 
     
-    //edge loop around a node collects incident edges
+    //edge loop around a node collects (emanating) edges
     template<class T>
-    inline vector<typename HEGraph<T>::HalfEdge*> HEGraph<T>::Node::valence(){
+    inline vector<typename HEGraph<T>::HalfEdge*> HEGraph<T>::Node::valence() const {
         vector<HEGraph<T>::HalfEdge*> tmp;
         HEGraph<T>::HalfEdge * e = edge;
-        do {
-          tmp.push_back(e);
-          e = e -> next -> next -> opp;
-        } while( e != NULL && e != edge );
-
-        //if it doesn't loop around to the beginning, start again and add in the opposite direction
-        if ( e == NULL ){
-          e = edge -> opp;
-          while (e != NULL ){
-            tmp.push_back(e->next);
-            e = e -> next -> opp;
+       
+        if (closed()){
+       
+          do {
+            tmp.push_back(e);
+            e = e -> next -> next -> opp;
+          } while( e != edge );
+       
+          return tmp; 
+       
+        } else {
+          //if it doesn't loop around to the beginning, 
+          //iterate to end in clockwise direction, and then add in counter clockwise
+          auto te = edge->opp;
+          while (te != NULL ){
+            e = te->next;
+            te = te->next->opp;
+          }
+          //now e is cw most edge, add in all . . . there will always be one node left.. 
+          while(e != NULL){
+            tmp.push_back(e);
+            e = e -> next -> next -> opp;
           }
         }
-
         return tmp;
     }
 
@@ -626,11 +645,17 @@ namespace vsr{
       }
     }
 
-    /* //for each  in valence, add in node at other end */
-    /* template<class T> */
-    /* inline vector<typename HEGraph<T>::Node*> HEGraph<T>::Node::neighbors(){ */
-
-    /* } */
+    //for each  in valence, add in node at other end (plus last node if open)
+    template<class T>
+    inline vector<typename HEGraph<T>::Node*> HEGraph<T>::Node::neighbors(){
+      vector<typename HEGraph<T>::Node*> tmp;
+      auto res = valence();
+      for(auto& i : res){
+        tmp.push_back( i->node );
+      }
+      if( !closed() ) tmp.push_back( res.back()->next->node ); 
+      return tmp;
+    }
 
 
     template<class T> template<class S>

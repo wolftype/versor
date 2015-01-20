@@ -88,11 +88,10 @@ void DrawEvery( const A& a, const B& b){
 
  
   Rot AA( const Vec& s);                
-  
   Rot AA( const Dlp& s);
-  Vec Pos( const Dlp& s); 
-  
   Rot AA( const Cir& s);
+  
+  Vec Pos( const Dlp& s); 
   Pnt Pos( const Cir& s);   
   
   template<class T>
@@ -106,35 +105,24 @@ void DrawEvery( const A& a, const B& b){
   }
       
   void Immediate (const Vec& s);  
-
   void ImmediateB (const Vec& s);                        
+                     
 
 
   void Immediate (const Biv& s);    
   void Immediate (const Drv& s); 
-  
   void Immediate (const Dlp& s);
-
   void Immediate (const Pln& s); 
-    
   void Immediate( const Cir& s ); 
-  
   void Immediate (const Pnt& s);
-  
   void Immediate (const Sph& s);
-  
   void Immediate (const Flp& s);
-  
   void Immediate (const Par& s); 
-  
   void Immediate (const Dll& s);  
-  
   void Immediate (const Lin& s);
-
   void Immediate (const Tnv& t);
-  
   void Immediate( const Frame& f);
-
+  void ImmediateB (const Frame& s);   
   
   template<class T>
   void Immediate( const Field<T>& f){

@@ -2,9 +2,9 @@
 
 Generic Group 
             
-see also root.h
+see also vsr_root.h for generating reflection groups
 
-replaces vsr_pointGroup.h (eventuallY)
+replaces vsr_pointGroup.h 
 
 */
   
@@ -18,7 +18,29 @@ using std::vector;
 
 namespace vsr{
 
-/// A Group of Operations called with group( target )
+/// Simple Reflection Group (no translating spinors)
+template<class V>
+struct SimpleGroup{
+   vector<V> ops;                       ///< Pin Operators (Vec, etc)
+
+   SimpleGroup() {}
+   SimpleGroup( vector<V> v ) : ops(v) {} ///< Instantiate with unit length pin group
+ 
+    /// Applies all operators on p motif and returns results
+	  template<class T>
+    vector<T> operator()(const T& p){
+        vector<T> res;
+        for (auto& i : ops ){
+           T tp = p.reflect( i ); //assuming all i's are unit
+           res.push_back( tp );
+           //reflect back over first mirror plane to get original ...
+           res.push_back( tp.reflect( ops[0] ) );
+        }
+        return res;
+    }
+};
+
+/// A Group of Operations called with group( sometype t ) or group( vector<sometype> t)
 /// V are  versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
 template< class V >
 struct Group {
@@ -26,7 +48,7 @@ struct Group {
   /// Trs is the translator type of whatever conformal metric we are in
   typedef typename V::template BType< typename V::Mode::Trs > Trs; 
 
-   vector<V> ops;                       ///< Pin Operators (Dlp, etc)
+   vector<V> ops;                       ///< Pin Operators (Vec, etc)
    vector<decltype(V()*V())> sops;      ///< Spin Operators (Rot, etc)
    vector<decltype(V()*Trs())> gops;    ///< Glide Operators 
 
@@ -50,6 +72,7 @@ struct Group {
             res.push_back(tp);
           }
 
+           //apply glides and reapply pins
            for (auto& i : gops){
               T tg = p.reflect(i);
               if (ops.empty()) {
@@ -66,6 +89,7 @@ struct Group {
           return res;
     }
 
+    /// Applies all operations on a vector of type T
     template<class T>
     vector<T> operator()(const vector<T>& p){
       vector<T> res;
@@ -81,7 +105,7 @@ struct Group {
 }; 
 
 //A 2d point group at the origin . . . 
-//////V is the reflection type of the point group (e.g. dll or dlp)
+//////V is the reflection type of the point group (e.g. Vec)
 template< class V > 
 struct PointGroup2D : Group<V> {
   
@@ -116,6 +140,7 @@ struct PointGroup2D : Group<V> {
 };
 
 //a pointgroup + a lattice formed by translating along the generators a and b
+//we generate the point group calcOps() and then replace by glide reflections if called for
 //To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
 template<class V > 
 struct SpaceGroup2D : PointGroup2D<V> {
@@ -128,6 +153,13 @@ struct SpaceGroup2D : PointGroup2D<V> {
   int mDiv;  //(p)rimitive lattice = 1.0 (default); (c)entered lattice = 2; (h)exagonal lattice = 3
   float mRatio; 
 
+  /// Constructor
+  // @param mP: symmetry group (1,2,3,4,6)
+  // @param mRatio: for translations on the lattice 
+  // @param bPin: pin or spin generators
+  // @param mDiv: number of divisions into lattice cell
+  // @param ga: glide reflection replaces first mirror generator
+  // @param gb: glide reflection replaces second mirror generator 
   SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) 
   : PointGroup2D<V>(p,pin), mRatio(ratio), mDiv(div)  {
    
@@ -163,8 +195,6 @@ struct SpaceGroup2D : PointGroup2D<V> {
       return this->a*x + this->b*y*mRatio; 
     }
 
-  //  using PointGroup2D<V>::apply;
-
     template<class T>
     vector<T> apply(const T& motif, int x, int y){
       
@@ -184,6 +214,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
       return res;
     }
 
+    /// Apply to a vector of elements
     template<class T>
     vector<T> apply(const vector<T>& motif, int x, int y){
       vector<T> res;
@@ -194,6 +225,36 @@ struct SpaceGroup2D : PointGroup2D<V> {
       return res;
     }
 
+    /// Don't apply operations, just hang on lattice points
+    template<class T>
+    vector<T> hang(const T& motif, int x, int y){      
+      vector<T> res;
+        for (int j=-x/2.0;j<x/2.0;++j){
+          for (int k=-y/2.0;k<y/2.0;++k){
+            for (int m =0;m<mDiv;++m){
+              float t = (float)m/mDiv;
+              res.push_back( motif.trs( vec(j,k) + vec(t,t) ) );
+            }
+          }
+        }
+      return res;
+    }    
+    /// Don't apply operations, just hang on lattice points
+    template<class T>
+    vector<T> hang(const vector<T>& motif, int x, int y){      
+      vector<T> res;
+      for (auto& i : motif){
+        for (int j=-x/2.0;j<x/2.0;++j){
+          for (int k=-y/2.0;k<y/2.0;++k){
+            for (int m =0;m<mDiv;++m){
+              float t = (float)m/mDiv;
+              res.push_back( i.trs( vec(j,k) + vec(t,t) ) );
+            }
+          }
+        }
+      }
+      return res;
+    }    
 };
 
 

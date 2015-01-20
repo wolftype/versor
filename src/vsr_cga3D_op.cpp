@@ -1,4 +1,4 @@
-#include "vsr_cga3D_op.h"
+  #include "vsr_cga3D_op.h"
 
 namespace vsr{  
   
@@ -237,8 +237,8 @@ namespace Gen{
           tq = (b * q);                                           //Make motor and extract Grade 2 part
 
           if (den2 == 0 ) {                                       // Pure Rotation (no slide along screw)
-               printf("%f, %f, %f\n", ac, den, den2 );
-               printf("den2 = 0 in motor log\n"); 
+             //  printf("%f, %f, %f\n", ac, den, den2 );
+             //  printf("den2 = 0 in motor log\n"); 
               //cperp = b * -1.0;
               cpara = b * tq * -1.0;// * -1.0; or q
           } else {
@@ -265,7 +265,7 @@ namespace Gen{
       /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
       */
-     Mot ratio( const Dll& a, const Dll& b, VT t){
+     Mot  ratio( const Dll& a, const Dll& b, VT t){
           //Mot m = b/a; VT n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
           return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
       }

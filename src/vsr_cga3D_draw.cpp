@@ -18,15 +18,15 @@ namespace vsr{
            
   // FEATURE ExTRAcTION (ROTATION AND POSITION)
 
-   Rot AA( const Vec& s){
-        Rot r = Gen::ratio(Vec::z, s.unit() ); 
-        return Gen::aa(r);
-    }  
-    
-    Rot AA( const Biv& s){
-       Rot r = Gen::ratio(Vec::z, s.duale().unit() ); 
-       return Gen::aa(r);
-    }     
+  Rot AA( const Vec& s){
+      Rot r = Gen::ratio(Vec::z, s.unit() ); 
+      return Gen::aa(r);
+  }  
+  
+  Rot AA( const Biv& s){
+     Rot r = Gen::ratio(Vec::z, s.duale().unit() ); 
+     return Gen::aa(r);
+  }     
                       
 
   Rot AA( const Dlp& s){
@@ -160,7 +160,7 @@ namespace vsr{
           VT size = Ro::size( s, false );
 
           //is null?
-          if (size < FPERROR ){
+          if ( fabs(size) < FPERROR ){
               GL::translate( Ro::loc(s).begin() );
               Immediate( -Ro::dir(s).copy<Vec>() ); 
             
@@ -212,6 +212,16 @@ namespace vsr{
      gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); 
      gfx::GL::scale( f.scale() );  
      gfx::Glyph::Axes( Vec::x, Vec::y, Vec::z );
+  }  
+
+  void ImmediateB( const Frame& f){
+
+     gfx::GL::translate( f.pos().begin() );
+     gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); 
+     gfx::GL::scale( f.scale() );  
+     Draw( Vec::x,1,0,0);
+     Draw( Vec::y,0,1,0);
+     Draw( Vec::z,0,0,1);
   }  
   
    /* void Immediate( const MFrame& f){ */
@@ -281,7 +291,6 @@ namespace vsr{
     }
   }  
 
-    
   template void Draw(const Vec&, float, float, float ,float);
   template void DrawB(const Vec&, float, float, float ,float);
   template void Draw(const Dlp&, float, float, float ,float);
@@ -294,6 +303,8 @@ namespace vsr{
   template void Draw(const Dll&, float, float, float ,float);
   template void Draw(const Lin&, float, float, float ,float);
   template void Draw(const Frame&, float, float, float ,float);
+  template void DrawB(const Frame&, float, float, float ,float);
+
 //  template void Draw(const MFrame&, float, float, float ,float);
   template void Draw(const Field<Vec>&, float, float ,float,float); 
   template void DrawB(const Field<Vec>&, float, float ,float,float); 
@@ -301,6 +312,8 @@ namespace vsr{
   // template void Draw(const Vec&, float, float, float ,float);
   // template void Draw(const Vec&, float, float, float ,float);
   // template void Draw(const Vec&, float, float, float ,float);  
+    
+
 }
 
     

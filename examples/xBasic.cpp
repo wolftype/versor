@@ -1,7 +1,6 @@
 #include "vsr_cga3D.h" 
 #include "vsr_GLVimpl.h" 
 
-
 using namespace vsr;
 using namespace vsr::cga3D;
 using namespace glv;  
@@ -23,9 +22,9 @@ struct MyApp : public App {
     auto pair = meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual();
 
     //Draw 'em with colors
-    Draw(circle,0,1,0);     //<-- Green
-    Draw(dualplane,0,0,1);  //<-- Blue
-    Draw(pair,1,0,0);  //<-- Red
+    Draw(circle,0,1,0);     //<-- Draw Green Circle
+    Draw(dualplane,0,0,1);  //<-- Draw Blue Plane
+    Draw(pair,1,0,0);       //<-- Draw Red Point Pair (intersection)
 
     //Enable Mouse Control with 'G' 'R' and 'S' keys
     Touch( interface, circle );

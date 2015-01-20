@@ -93,7 +93,7 @@ int main(){
 	GLV glv(0,0);	
     		        
 	Window * win = new Window(500,500,"4D ROOTS",&glv);    
-    myApp = new MyApp;
+  myApp = new MyApp;
 	myApp -> init( win ); 
 	myApp -> initGui();
   

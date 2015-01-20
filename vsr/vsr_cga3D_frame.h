@@ -40,10 +40,10 @@ namespace vsr {
     Point mPos;   ///< Position                                          
     Rotor mRot;   ///< Orientation
    
-    VT aBiv;    ///< Rotational acceleration 
-    Biv dBiv;   ///< Rotational Velocity 
-    VT aVec;    ///< Translational acceleration 
-    Vec dVec;   ///< Translational Velocity
+    VT aBiv;      ///< Rotational acceleration 
+    Biv dBiv;     ///< Rotational Velocity 
+    VT aVec;      ///< Translational acceleration 
+    Vec dVec;     ///< Translational Velocity
 
     VT mScale;  ///< Scale
 
@@ -57,6 +57,8 @@ namespace vsr {
     Frame();
     /// Construct from x,y,z Coordinates
     Frame(VT _x, VT _y, VT _z);
+    /// Construct from Vec
+    Frame(const Vec& v, const Rotor& r = Rot(1,0,0,0), VT s = 1);
     /// Construct from Point, Rotor, and Scale
     Frame(const Point& p, const Rotor& r = Rot(1,0,0,0), VT s = 1 );
     /// Construct from Dual Line (log of motor relative to origin)
@@ -64,11 +66,6 @@ namespace vsr {
     /// Construct from Motor (relative to origin)
     Frame(const Motor& m );
 
-    /// Set Position from Point p
-    Frame& pos( Pnt p ) { mPos = p; return *this; } 
-    /// Set Position from x,y,z coordinates
-    Frame& pos( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
-    //Frame& set( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; }
     /// Set Position and Orientation from Point and Rotor
     Frame& set( Pnt p, Rot r = Rot(1,0,0,0) ) { mPos = p; mRot = r; return *this; } 
     /// Set Scale
@@ -81,31 +78,47 @@ namespace vsr {
     /// Get Scale
     VT& scale() { return mScale; }
 
+
+    /*-----------------------------------------------------------------------------
+     *  ORIENTATION METHODS (ROTOR, QUATERNION, ETC)
+     *-----------------------------------------------------------------------------*/
     /// Get 4x4 Rotation Matrix
     gfx::Mat4f image(){ return Xf::mat(mRot); }
     /// Get Rotor
     Rotor rot() const { return mRot; }
+    /// Get Rotor
     Rotor rotor() const { return mRot; }
 
-    ///  Get / Set Rotor by reference 
+    /// Set Rotor by reference 
     Rot& rot() { return mRot; } 
-    // Get / Set Rotor by reference
-    Rot& rotor() { return mRot; }
-     
+    // Set Rotor by reference
+    Rot& rotor() { return mRot; }     
     /// Set rotor with rotor 
     Frame& rot( const Rot& r) { mRot = r; return *this; }  
     /// Set rotor with bivector generator 
     Frame& rot( const Biv& B) { mRot = Gen::rot(B); return *this; }      
-    /// Transpose to quaternionic representation
+    /// Transpose rotor to quaternionic representation
     Rot quat() const { return Rot( mRot[0], -mRot[3], mRot[2], mRot[1] ); }
+    /// Orient z axis towards v
+    Frame& orient( const Vec& );
+    
+
+    /*-----------------------------------------------------------------------------
+     *  POSITION METHODS
+     *-----------------------------------------------------------------------------*/
     /// Get Position
     Point pos() const { return mPos; }  
     /// Get / Set Position by Reference
     Point& pos() { return mPos; }  
     /// Get Euclidean Vector of position
     Vec vec() const { return mPos; }   
-    
+    /// Set Position from Point p
+    Frame& pos( Pnt p ) { mPos = p; return *this; } 
+    /// Set Position from x,y,z coordinates
+    Frame& pos( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
+    //Frame& set( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; }
 
+    
     Vec x() const;    ///< Local x 
     Vec y() const;    ///< Local y
     Vec z() const;    ///< Local z
@@ -165,7 +178,7 @@ namespace vsr {
     Vec up() const { return y(); }   
     Vec forward() const { return -z(); }  
   
-    /// Set position and orientation by motor 
+    /// Set position and orientation by motor (absolute) 
     void mot(const Mot& m);
 
     /// Generate Translation versor based on Position
@@ -183,10 +196,10 @@ namespace vsr {
     /// Dual Imaginary Sphere Shell
     Dls ibound() const;
     
+    /// DualLine Representation of Pose
     Dll dll() const;
     DualLine dualLine() const;
-        
-    
+          
     VT& ab() { return aBiv; }             ///< Set bivector accelerator (rotational)
     VT ab() const { return aBiv; }        ///< Get bivector accelerator (rotational)
     VT& ax() { return aVec; }             ///< Set vector accelerator
@@ -199,7 +212,6 @@ namespace vsr {
     /// Move and Spin 
     Frame& step();
   
-  
     /// Translation Step (translate by velocity vector)
     Frame& move();
     
@@ -208,12 +220,27 @@ namespace vsr {
 
     /// Dilate by t around center
     Frame& dilate(double t);
+    /// Dilate by t around some point p
+    Frame& dilate(const Point& p, double t);
 
     /// Rotate around local xy and return a new frame
     Frame rotXY( VT amt) const;
 
+    //DEPRECATED
     /// Move by dx, dy, dz and return a new frame
-    Frame move( VT dx = 0.0, VT dy= 0.0, VT dz = 0.0) const;
+    //Frame move( VT dx , VT dy, VT dz ) const;
+    /// Move by dx, dy, dz and return this
+    Frame& move( VT dx , VT dy, VT dz );
+    /// Twist by dualLine and return *this
+    Frame& twist( const Dll& );
+    /// Twist by Motor and return *this
+    Frame& twist( const Mot& );
+    /// Boost by point pair and return *this
+    Frame& boost( const Par&);
+    /// Boost by bst and return *this
+    Frame& boost( const Bst&);
+    
+
 
     Frame moveX( VT amt ) const;
     Frame moveY( VT amt ) const;

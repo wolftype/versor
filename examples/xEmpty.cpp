@@ -37,6 +37,7 @@ struct MyApp : App {
     virtual void onDraw(){ 
         
       getMouse();
+      
   }
    
 

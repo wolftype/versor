@@ -6,13 +6,25 @@
 using namespace vsr;
 using namespace vsr::cga3D;
 
+
+struct watt{
+  
+   float distance; ///< distance between points a and b
+   float ra,rb;    ///< length of end rods in terms of distance
+   float rc;       ///< length of connecting rod absolute
+
+   float fitness;  ///< fitness metric of linkage to accomplish desired path
+
+};
+
+
 struct MyApp : App {    
    
   Pnt mouse;
   Lin ray; 
   
   float time;
-  float radius;
+  float radius, ratio, radius2, theta;
 
   MyApp(Window * win ) : App(win){
     scene.camera.pos( 0,0,10 ); 
@@ -28,6 +40,9 @@ struct MyApp : App {
 
   void initGui(){
     gui(radius,"radius",0,10); 
+    gui(ratio,"ratio",0,10); 
+    gui(radius2,"radius2",0,10); 
+    gui(theta,"theta",0,10); 
     radius = 1.0;
   }
 
@@ -36,43 +51,61 @@ struct MyApp : App {
     getMouse();
     
     time += .01;
-     
-    //Pnt a, b;
+
+    //ideal
+    auto ln = LN(0,1,0);
+    Draw(ln,0,.2,1);
     
+    //starting points 
     Point a = Ro::point(-5,0,0);
-    Point b = Ro::point(5,0,0); 
-    
-    Draw(a); Draw(b);
-    
-    auto sa = Ro::sphere( a, -radius );
-    auto sb = Ro::sphere( b, radius );   
+    Point b = Ro::point(5,0,0);     
+    Draw(a,0,0,0); Draw(b,0,0,0);
+        
+    auto sa = Ro::sphere( a, radius );
+    auto sb = Ro::sphere( b, radius * ratio );   
 
-    //same as spin( Gen::rot . . .)
-    auto p = Ro::round( sa, Vec::x.rot( Biv::xy * time ) );
-    auto splitp = Ro::split( p, true); 
-    
-    Draw(splitp,1,0,0);
-    
-    Draw( LN(1,0,0), 0,1,0 ); 
-    
-    
-    auto sc = Ro::sphere( splitp, radius );
-
-    auto c = ( sb ^ sc ).dual();
-    
-    Draw(c,1,1,.2);
-    
-    if ( Ro::size(c, false) > 0 ){
-        auto cir = ( sb ^ Dlp(0,0,1) ).dual();
-        Draw(cir,1,0,0);
+    double fit =0;
+    //MOVEMENT
+    for (int i=0;i<100;++i){
+      auto ttheta = PI*i/100;
+      //Point on sphere at theta
+      auto p = Ro::round( Ro::sphere( a, -radius ), Vec::x.rot( Biv::xy * ttheta ) );
+      auto splitp = Ro::split( p, true);    
+      Draw(splitp,1,0,0);
       
-        auto par = ( c.dual() ^ Dlp(0,0,1) ).dual();
-        Draw(par,0,0,1);
-    } 
-    
-    Draw(sc,0,1,0,.4);  
-    Draw(sa); 
-    Draw(sb,0,1,0,.4);    
+      //sphere of size radius2
+      auto sc = Ro::sphere( splitp, radius2 );
+
+      //meet of end and first
+      auto c = ( sb ^ sc ).dual();    
+      //Draw(c,1,1,.2);
+      
+      //Is legit?
+      if ( Ro::size(c, false) > 0 ){
+         // Draw( (sc^Dlp(0,0,1)).dual(),0,0,1);
+         // Draw( c,0,0,1);
+          auto cir = ( sb ^ Dlp(0,0,1) ).dual();
+          auto par = ( c.dual() ^ Dlp(0,0,1) ).dual();
+          auto splitq = Ro::loc( Ro::split(par,true));
+
+          auto mid = ( splitp + ( (splitq - splitp ) *.5) ).null();
+
+          auto pln = mid ^ ln;
+          fit += pln.rnorm();
+         // cout << pln.rnorm() << endl; 
+          glVertex4f(0,0,0,0);
+          Glyph::Line(splitq, splitp);
+          Glyph::Line(sa, splitp);
+          Glyph::Line(sb, splitq);
+          Draw(mid,0,1,1);
+
+      } 
+    }
+
+    cout << fit << endl; 
+    //Draw(sc,0,1,0,.4);  
+    Draw((sa^Dlp(0,0,1)).dual(),0,0,0); 
+    Draw((sb^Dlp(0,0,1)).dual(),0,0,0);    
     
   }
    

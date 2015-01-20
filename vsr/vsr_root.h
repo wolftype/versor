@@ -1,5 +1,5 @@
-//Versor
-//Author: pablo colapinto
+// Versor
+// Author: pablo colapinto
 //
 // this file was written with the help of Pierre Dechant
 //
@@ -24,14 +24,16 @@ namespace vsr{
 
 /*!-----------------------------------------------------------------------------
  * CALCULATES POLYTOPES FROM SIMPLE ROOTS IN ND (beware infinite groups . . .)
+ *
+ * Systems can be reflection groups, which include inverses, or not
  *-----------------------------------------------------------------------------*/
 struct Root{
 
-  ///Utility function to compare two vectors (looks at norm of the difference)           
+  ///Utility function to compare two vectors (looks at dot product, or norm of diff...)           
   template<class V>
-  static bool Compare(const V& a, const V& b, VT amt =.00005){   
+  static bool Compare(const V& a, const V& b, bool ref = true){   
    // return ( ( a - b ).wt() ) < amt; 
-    return ( ( a <= b ).wt() ) > .99999;// amt; 
+    return ( ref ? (a<=b)[0] > .99999999 : fabs ((a<=b)[0]) > .99999999 );// amt; 
   }            
     
     //Build a Root System from Simple Root Generators (ANY Dimension!)
@@ -42,7 +44,7 @@ struct Root{
  
       V root[] = {x, v... };
 
-      vector< V > initial; //<-- Initial Simple Roots
+      vector< V > initial;                      //<-- Initial Simple Roots
     
       for ( int i = 0; i < n; ++i ){
          initial.push_back( root[i] );    
@@ -74,7 +76,7 @@ struct Root{
         
           for (int j = 0; j < ns; ++j ){
 
-              V nr = results[j].re( results[i] ); 
+              V nr = results[j].reflect( results[i] ); 
 
               bool exists = 0; 
               for ( int k = 0; k < ns; ++k){ 
@@ -95,6 +97,8 @@ struct Root{
         if (done || (iter > nMaxIter) ) { keepGoing = false; } // if not, then stop
  
    }
+
+   //cout << "NUM ROOTS: " << results.size() << endl;
 
    return results;
 }  

@@ -158,9 +158,9 @@ struct ConvexHull {
 
      // cout << idxA << " " << idxB << " " << idxC << endl; 
 
-      group[idxA].print();
-      group[idxB].print();
-      group[idxC].print();
+      //group[idxA].print();
+     //  group[idxB].print();
+     // group[idxC].print();
 
       graph.add( group[idxA] );  bVisited[idxA] = true;
       graph.add( group[idxB] );  bVisited[idxB] = true;

@@ -20,8 +20,6 @@ namespace vsr{
     using namespace cga3D;
 
 
-
-
   template<bool _a, bool _b>
   struct meet_impl{
     template<class A, class B>
@@ -41,6 +39,10 @@ namespace vsr{
      /* inline Point point( const V& v){ */
      /*   return Ro::null( v ); */
      /* } */        
+     
+     inline Dll axis( const Cir& c){
+       return (Inf(-1) <= c).runit();
+     }
       
       inline Point pointA(const Pair& p){
        return Ro::split(p, true);

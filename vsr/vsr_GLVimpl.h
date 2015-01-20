@@ -121,7 +121,7 @@ struct App : public View3D{
 
   virtual void init(Window * win){
     stretch(1,1);
-    colors().back.set(0,0,0);
+    colors().back.set(.3,.3,.3);
       *this << gui;  
   
     //gui.colors().back.set(0,1,0);
@@ -277,7 +277,7 @@ struct App : public View3D{
              interface.mouseNavigateStop();
              break;
          case Event::KeyDown:
-             App::onKeyDown(glv);
+             onKeyDown(glv);
              interface.onKeyDown();
              interface.keyboardNavigate(); 
              break;

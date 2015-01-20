@@ -86,7 +86,7 @@ struct Helical {
 
 struct Planar {
   Planar() : mFrame() {}
-  Frame operator() (VT dx, VT dy, VT rotate) { return mFrame.move(dx,dy).rotXY( rotate ); }
+  Frame operator() (VT dx, VT dy, VT rotate) { Frame f(mFrame); return f.move(dx,dy,0).rotXY( rotate ); }
   Frame mFrame;
 };
  

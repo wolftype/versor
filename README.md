@@ -87,9 +87,9 @@ You'll want to initialize the submodules to build any graphics examples:
 
 To test a graphics example
 
-	make examples/xBasics.cpp 
+	make examples/xBasic.cpp 
      
-which both builds and runs the file.  
+which both compiles and runs the file.  
 
 Not Working?
 ---                 
@@ -525,10 +525,10 @@ In addition to the above "even" spinors, we can also reflect.  Reflections (in a
 
 	Pnt p = PT(1,0,0);
 	Pnt r = p.re( CXY(1) ); //Reflection of a point in a circle
-	r = r / r[3]; 			//Renormalization of a point
+	r = r / r[3]; 			    //Renormalization of a point
 
-The re() method calculates `v.re(C)` as `C*v.inv()*~C`.  With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the 
-weight of the element (for at Point at x, it will change it by x^2)        
+The re() method calculates `v.re(C)` as `C*v.inv()*~C` where inv() is an involution. With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the 
+weight of the element (for a Point at x, it will change it by x^2)        
 
 
 LINKS

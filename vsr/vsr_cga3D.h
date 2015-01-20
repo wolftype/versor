@@ -7,6 +7,4 @@
 #include "vsr_cga3D_draw.h"
 #include "vsr_cga3D_interface.h"
  
-
-
 #endif

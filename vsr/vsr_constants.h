@@ -12,40 +12,99 @@
  *
  */
 
-#ifndef XCONSTANTS_H_INCLUDED
-#define XCONSTANTS_H_INCLUDED
+#ifndef VSR_CONSTANTS_H_INCLUDED
+#define VSR_CONSTANTS_H_INCLUDED
 
 namespace vsr{
 
-#ifndef CONSTANTSDEFINED
-#define CONSTANTSDEFINED
-    
+#ifndef PI
 #define PI 3.141592653589793
-#define TWOPI 6.283185307179586
-#define PIOVERTWO 1.570796326794897
-#define PIOVERFOUR 0.785398163397448
-#define THREEPIOVERTWO 4.71238898038469
-#define PHI 1.61803
-#define ONEOVERPHI .61803
-#define CHANCE 1.13198824
-#define GOLDENANGLE 137.507764
-#define GOLDENRADIAN 2.399963
-#define SMALLRAD (PI * 36 / 180)
-#define MEDIUMRAD (PI * 72 / 180)
-#define LARGERAD (PI * 108 / 180)
-#define ROOT2 1.41421
-#define ROOT3 1.73205
-#define FPERROR 0.000001
-#define ERROR(x,y) (x<=y && x>=-y)
-#define MAXRADIUS 100000
-
-#define CLAMP(val,min,max) val<min?min:val>max?max:val
-#define D2R(val) PI*val/180.0
-
-#define ZERO(x) (fabs(x)<FPERROR?0:x)
-
 #endif
-//#define EPSILON
+
+#ifndef TWOPI
+#define TWOPI 6.283185307179586
+#endif
+
+#ifndef PIOVERTWO
+#define PIOVERTWO 1.570796326794897
+#endif
+
+#ifndef PIOVERFOUR
+#define PIOVERFOUR 0.785398163397448
+#endif
+
+#ifndef THREEPIOVERTWO
+#define THREEPIOVERTWO 4.71238898038469
+#endif
+
+#ifndef PHI
+#define PHI 1.61803
+#endif
+
+#ifndef ONEOVERPHI
+#define ONEOVERPHI .61803
+#endif
+
+#ifndef CHANCE
+#define CHANCE 1.13198824
+#endif
+
+#ifndef GOLDENANGLE
+#define GOLDENANGLE 137.507764
+#endif
+
+#ifndef GOLDENRADIAN 
+#define GOLDENRADIAN 2.399963
+#endif
+
+#ifndef SMALLRAD 
+#define SMALLRAD (PI * 36 / 180)
+#endif
+
+#ifndef MEDIUMRAD
+#define MEDIUMRAD (PI * 72 / 180)
+#endif
+
+#ifndef LARGERAD
+#define LARGERAD (PI * 108 / 180)
+#endif
+
+#ifndef ROOT2
+#define ROOT2 1.41421
+#endif
+
+#ifndef ROOT3
+#define ROOT3 1.73205
+#endif
+
+#ifndef FPERROR
+#define FPERROR .00000001
+#endif
+
+#ifndef ERROR
+#define ERROR(x,y) (x<=y && x>=-y)
+#endif   
+
+#ifndef MAXRADIUS
+#define MAXRADIUS 100000
+#endif
+
+#ifndef FERROR
+#define FERROR(x) (fabs(x)<=FPERROR)
+#endif
+
+#ifndef CLAMP
+#define CLAMP(val,min,max) val<min?min:val>max?max:val
+#endif
+
+#ifndef D2R
+#define D2R(val) PI*val/180.0
+#endif
+
+#ifndef ZERO
+#define ZERO(x) (fabs(x)<FPERROR?0:x)
+#endif
+
 
 } //vsr::
 
