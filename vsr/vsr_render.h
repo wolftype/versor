@@ -1,4 +1,4 @@
-//render using advanced es2.0  
+//render using advanced graphics  
 
 #ifndef  vsr_render_INC
 #define  vsr_render_INC

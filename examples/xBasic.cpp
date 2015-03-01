@@ -1,55 +1,56 @@
-#include "vsr_cga3D.h" 
-#include "vsr_GLVimpl.h" 
+#include "vsr_cga3D_app.h"
 
 using namespace vsr;
 using namespace vsr::cga3D;
-using namespace glv;  
 
+struct MyApp : App {  
 
-struct MyApp : public App {  
+  //DualSphere
+  DualSphere s = sphere(2,0,0,.5);//Ro::dls(.5,2,0,0);
+
+  //Circle through 3 Points
+  Circle c = point(1,0,0) ^ point(0,1,0) ^ point(-1,0,0) ; //Ro::point(1,0,0) ^ Ro::point(0,1,0) ^ Ro::point(-1,0,0);
+    
+  //Dual plane with Normal in Y direction
+  DualPlane dualplane = DualPlane(0,1,0);
+
+  void setup(){
+   
+    //bind glv gui 
+    bindGLV();
+
+    //set renderer to use programmable pipeline
+    mSceneRenderer.immediate(false);
+
+    //Enable Mouse Control with 't' 'r' and 's' keys
+    objectController.attach(&c);
+    objectController.attach(&s);
+  }
 
   void onDraw(){
 
-                                                                            
-    //Circle through 3 Points
-    static Circle circle = Ro::point(1,0,0) ^ Ro::point(0,1,0) ^ Ro::point(-1,0,0); ///< i.e. CXY(1)
-    
-         
-    //Dual plane with Normal in Y direction
-    static DualPlane dualplane(0,1,0);// = Fl::plane(0,1,0);
-         
-    //Calculate their Intersection (which is the dual of the outer product of duals . . . )
-    auto pair = meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual();
+    //Calculate  Intersection (which is the dual of the outer product of duals . . . )
+    auto pair = meet(c,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual()
+    auto cir = meet(s,dualplane);
 
     //Draw 'em with colors
-    Draw(circle,0,1,0);     //<-- Draw Green Circle
-    Draw(dualplane,0,0,1);  //<-- Draw Blue Plane
-    Draw(pair,1,0,0);       //<-- Draw Red Point Pair (intersection)
+    draw(c,0,1,0);          //<-- Draw Green Circle
+    draw(dualplane,0,0,1);  //<-- Draw Blue Plane
+    draw(pair,1,0,0);       //<-- Draw Red Point Pair (intersection)
 
-    //Enable Mouse Control with 'G' 'R' and 'S' keys
-    Touch( interface, circle );
-           
-    text("use G, R and S keys and drag with mouse to Grab, Rotate and Scale the Circle");
+    draw(s,1,0,0);          //<-- Draw Red Sphere
+    draw(cir,0,1,0);        //<-- Draw circle (intersection)
+
+//    text("use t, r and s keys and drag with mouse to Translate, Rotate and Scale the Circle");
   } 
 
 };
                         
-MyApp * myApp;
 
 int main(){
-
-
   
-  GLV glv(0,0);  
-                
-  Window * win = new Window(800,500,"Versor",&glv);    
-  
-  myApp = new MyApp;
-  myApp -> init(win);
-      
-  glv << *myApp;
-
-  Application::run();
+  MyApp app;
+  app.start();
   
   return 0;
   

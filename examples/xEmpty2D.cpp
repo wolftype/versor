@@ -1,17 +1,17 @@
-
 #include "vsr_cga2D.h"   
-#include "vsr_GLVimpl.h"
+#include "gfx/util/gfx_glv_app.h"
 
 using namespace vsr;
 
 
-struct MyApp : App {    
+struct MyApp : GFXAppGui {    
    
-	MyApp(Window * win ) : App(win){
-		scene.camera.pos( 0,0,10 ); 
-	}
-  
-  	virtual void onDraw(){ 
+   void setup(){ 
+     bindGLV();
+      
+    }
+     
+   void onDraw(){ 
         
 	}
    
@@ -19,20 +19,11 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
-
 
 int main(){
                              
-	GLV glv(0,0);	
-
-	Window * win = new Window(500,500,"Versor",&glv);    
-	app = new MyApp( win ); 
-  
-	
-	glv << *app;
-
-	Application::run();
+  MyApp app;
+  app.start();
 
 	return 0;
 

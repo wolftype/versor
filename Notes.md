@@ -48,20 +48,24 @@ We will often assume normalized lines (`.unit()`) and dualLines (`.runit()`)
   'PointPair' is also 'Par'
   'Circle' is also 'Cir'
 
-  Pnt p <= Cir k returns the Tangent to Circle k at Point p
-  Pnt p ^ k.dual() returns the orthogonal "plunge" of k through p and the inversion of p in k
+  Point p <= Cir k returns the Tangent to Circle k at Point p
+  Point p ^ k.dual() returns the orthogonal "plunge" of k through p (and the inversion of p in k)
+  Point p <= DualSphere dls is POSITIVE if p is within dls
+	relates to distance of p to dls by .... 
 
 Extendors
 
   Group theory includes the notion of an Extendor (i.e. a Glide Plane or a Roto-inversion)
-  A GLD (glide plane) is a Reflection followed by a Translation (or vice versa): a Line * FlatPoint
+  A GLD (glide plane) is a Reflection followed by a Translation (or vice versa): a Line * FlatPoint  
+  Not to be confused with Extensors (from tensor theory)
 
 Distances
 
   Dual Line and Point: ( pnt <= dll.runit() ).wt() seems to return -dist^2/2.0 
   Dual Plane and Point: ( pnt <= dlp ) returns distance and which side of plane . .
-  Circle and Point: ( pnt <= cir ).wt()  
 
+  Circle and Point: -( pnt <= cir ).wt()  
+  Sphere and point: ( pnt <= dls).wt()
 
 TO DO
 ---

@@ -13,8 +13,8 @@
 #include "vsr_cga3D_frame.h" 
 #include "vsr_field.h"
 
-namespace vsr{
-                           
+namespace vsr{ 
+                             
   using namespace gfx;
   
 
@@ -37,7 +37,6 @@ namespace vsr{
       ImmediateB(s);
     glPopMatrix();
   }
-
 
   ///Draw glyph of A at location of B
    template<class A, class B>
@@ -87,12 +86,7 @@ void DrawEvery( const A& a, const B& b){
 }
 
  
-  Rot AA( const Vec& s);                
-  Rot AA( const Dlp& s);
-  Rot AA( const Cir& s);
-  
-  Vec Pos( const Dlp& s); 
-  Pnt Pos( const Cir& s);   
+
   
   template<class T>
   void Immediate( const T& t ){
@@ -106,9 +100,6 @@ void DrawEvery( const A& a, const B& b){
       
   void Immediate (const Vec& s);  
   void ImmediateB (const Vec& s);                        
-                     
-
-
   void Immediate (const Biv& s);    
   void Immediate (const Drv& s); 
   void Immediate (const Dlp& s);
@@ -156,7 +147,7 @@ void DrawEvery( const A& a, const B& b){
 
   
   
-}
+} 
 
 
 #endif

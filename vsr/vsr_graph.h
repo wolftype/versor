@@ -10,6 +10,9 @@ namespace vsr{
  
  /*! Templated half edge structure (pointers to any type)
   *  Navigates references to surface topology of data only (DOES NOT STORE DATA)
+  *
+  *  thoughts: could this be applied to any complex?  perhaps by treating edges
+  *  as generic k-1 simplices...
   */ 
  template<class T>
  struct HEGraph {
@@ -18,9 +21,16 @@ namespace vsr{
    struct Face;
    struct Node;
    
+
+   /*!-----------------------------------------------------------------------------
+    *  A Node stores address of value of type T and pointer to an emanating edge.
+    *  It includes functions for finding all emanating edges, faces, connected neighbors,
+    *  and a boolean visitation flag that can be set to avoid endless looping algorithms  
+    *-----------------------------------------------------------------------------*/
    struct Node {
 
      Node() : ptr(NULL), edge(NULL), bVisited(false){}
+
      T * ptr;                           ///< Pointer to type T
      HalfEdge * edge;                   ///< An emanating half-edge
       
@@ -34,10 +44,14 @@ namespace vsr{
 
      /// Find all outgoing Edges
      vector<HalfEdge*> valence() const;
+     
+     /// Find edge loop (next of edges)
+     vector<HalfEdge*> edgeLoop() const;
 
      /// Test for node closure (no null Edges in loop)
      bool closed() const;
-    // bool bClosed; //save state for cheaper comp
+
+    // bool bClosed; //maybe save state for cheaper comp
 
      /// Find any null edge of a node 
      HalfEdge& null();
@@ -148,7 +162,20 @@ namespace vsr{
         if ( &nextNull(true) == &(eb.nextNull(false)) ) return true;
         else return false;
      }
-     
+    
+     /// Edge Looop around graph until we return to this (or until null edge)
+    /* vector<HalfEdge*> loop(){ */
+    /*   vector<HalfEdge*> redge; */
+    /*   HalfEdge * te; */
+    /*   do{ */
+    /*     if ( (next->opp)!=NULL) { */
+    /*       te = next->opp->next; */
+    /*     } else{ */
+    /*       te = next; */
+    /*     } */
+    /*     redge.push_back(te); */
+    /*   return redge; */
+    /* } */
 
 
 
@@ -455,6 +482,53 @@ namespace vsr{
 
     }
 
+    //given an edge loop around a node, find next outer edge loop
+    vector<HalfEdge*> edgeLoop( vector<HalfEdge*> loop ){//const Node& n){
+      
+      vector<HalfEdge*> result;
+      
+      if (!loop.empty()){
+        //pick one node and get emanating edges
+        auto v = loop[0]->node->valence();
+        //find first one that is does not point to any node on current loop
+        HalfEdge * first = NULL;
+        for (auto& i : v){
+          bool bExists=false;
+          for (auto& j : loop){
+            if (j->node==i->node){
+              bExists=true;
+              break;
+            }
+          }
+          if (!bExists){
+            first=i;
+            break;
+          }
+        }
+
+        //assuming we found a new emanating edge, add all first
+        //cw edges that don't point back 
+        //until we get back to first or hit border
+        HalfEdge * tmp = first;
+        while (tmp!=NULL && (tmp->node != first->node)  ){
+          
+          bool bExists=false;
+          tmp = tmp->next;
+          for (auto& j : loop){
+            if (j->node==tmp->node){
+              bExists=true;
+              break;
+            }
+           }
+           if (bExists) tmp = tmp->opp; //repeat
+           else {
+            result.push_back(tmp); 
+           }        
+        }
+      }
+
+      return result;
+    }
 
     //all nodes connected to a node
     /* vector<Node*> nodeLoop( Node& a){ */
@@ -636,6 +710,18 @@ namespace vsr{
         return tmp;
     }
 
+    template<class T>
+    inline vector<typename HEGraph<T>::HalfEdge*> HEGraph<T>::Node::edgeLoop() const {
+      vector<HEGraph<T>::HalfEdge*> tmp;
+      auto v = valence();
+      for(auto& i : v){
+        tmp.push_back(i->next);
+      }
+      return tmp;
+    }
+
+
+
     //faceloop around a node collects faces
     template<class T>
     inline vector<typename HEGraph<T>::Face*> HEGraph<T>::Node::faces(){
@@ -657,15 +743,31 @@ namespace vsr{
       return tmp;
     }
 
+    /* //for each  in valence, add next to get edge loop */
+    /* template<class T> */
+    /* inline vector<typename HEGraph<T>::Node*> HEGraph<T>::Node::edgeLoop(){ */
+    /*   vector<typename HEGraph<T>::Node*> tmp; */
+    /*   auto res = valence(); */
+    /*   for(auto& i : res){ */
+    /*     tmp.push_back( i->node ); */
+    /*   } */
+    /*   if( !closed() ) tmp.push_back( res.back()->next->node ); */ 
+    /*   return tmp; */
+    /* } */
 
+
+    /// class S needs only be indexable by operator[]
     template<class T> template<class S>
     inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p){
       HEGraph<T>& graph = *this;
+      //left column
       for (int j = 0; j < h; ++j){
           int idx = j;
           int idxB = j+h;
+          //add first two points
           if (j<2) graph.add( p[idx] );
           else graph.addAt( p[idx], graph.edge(-3) );
+          //add next row over
           if (j==0) graph.add( p[idxB] );
           else if (j<2) graph.addAt( p[idxB], graph.edge(-2) );
           else  graph.addAt( p[idxB], graph.edge(-1) );

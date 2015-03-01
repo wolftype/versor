@@ -1,33 +1,27 @@
-#include "vsr_cga3D.h"
-#include "vsr_GLVimpl.h" 
+#include "vsr_cga3D_app.h"
 #include "vsr_chain.h"
 
 
 using namespace vsr;
-using namespace glv;  
 using namespace vsr::cga3D;
 
 struct MyApp : App {
 	
 	float amt,linewidth;
 	Chain k;
-   // Frame baseFrame, targetFrame, secondFrame, finalFrame;
 	Pnt targetPos;
 	float distA;
-
 	
-	MyApp(Window * win) : App(win),
-	k(5)
-	{
-   // colors().back.set(1,1,1);      
-  }
+	MyApp(int w=900, int h=500, string name="Robot") : App(w,h,name),
+	k(5){}
 	
-	virtual void initGui(){
+	void setup(){
+      bindGLV();
       gui(distA, "LinkLength", 1,10);
       gui(linewidth,"linewidth",0,10);
      	distA = 5.0;
       linewidth=3;
-
+      //immediate(false);
 	}
 
 	void onDraw(){
@@ -36,15 +30,16 @@ struct MyApp : App {
         
 		Frame baseFrame;
 		
-  		//Target: Mouse Position 
-		
-    auto line =  Fl::line( interface.mouse.projectNear, interface.vd().ray );
-		targetPos = Ro::point( line, Ori(1) );  
+    auto mouse = calcMouse3D(0);
+    
+    auto v = io().viewdata.ray;
+    auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
+
+		targetPos = Ro::pointOnLine( line, Ori(1) );  
 		
 		Frame targetFrame ( targetPos ); 
 
-		Draw(targetPos, 1,0,0); 
-		
+		draw(targetPos, 1,0,0); 
 		
     Frame secondFrame( 0, distA, 0 );
 
@@ -55,19 +50,19 @@ struct MyApp : App {
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
 		
-		 Draw(rotationPlane,0,1,0);   
+		 draw(rotationPlane,0,1,0);   
           
  		//XZ plane of Target
 		 Dlp targetXZ = targetFrame.dxz();
-		 Draw(targetXZ,0,.5,1);
+		 draw(targetXZ,0,.5,1);
  
 		 //Line of Target
 		 Dll tline = targetXZ ^ rotationPlane.dual();
-		 Draw(tline,1,1,0);
+		 draw(tline,1,1,0);
  
 		 //Point Pairs of Final joint
 		 Pair fjoint = ( tline ^ targetSphere ).dual();
-		 Draw(fjoint);  
+		 draw(fjoint);  
 		
  	   	 //Pick the one closest to the base frame
 		 Frame finalFrame ( Ro::split(fjoint,false), Rot(1,0,0,0) );
@@ -77,11 +72,11 @@ struct MyApp : App {
 
 		 //Circle of Possibilities
 		 Circle cir = ( ffsphere ^ firstSphere).dual();
-		 Draw(cir,.5,1,1);
+		 draw(cir,.5,1,1);
 
 		 //TWo points where the middle joint could be
 		 Pair fpair = ( rotationPlane.dual() ^ cir.dual() ).dual();
-		 Draw(fpair, 1,.5,.5);
+		 draw(fpair, 1,.5,.5);
 
 		 //Pick One and put the middle frame there
 		 Frame middleFrame( Ro::split(fpair,true) );
@@ -109,30 +104,20 @@ struct MyApp : App {
 			 glColor3f(0,1,0);
 			 gfx::Glyph::Line( k[i].pos(), k[i+1].pos() );
 			
-		     Draw(k[i]);
+		     draw(k[i]);
 		 }
 
 
-		 Draw(ffsphere,1,0,0,.4);
-		 Draw(firstSphere,1,0,0,.4);
+		 draw(ffsphere,1,0,0,.4,true);
+		 draw(firstSphere,1,0,0,.4,true);
 	}
 };
                         
-MyApp * myApp;
 
 int main(){
                           
-	
-	GLV glv(0,0);	
-    		        
-	Window * win = new Window(500,500,"Versor",&glv);    
-                          
-	myApp = new MyApp(win);
-	myApp -> initGui();
-	
-	glv << *myApp;
-
-	Application::run();
+  MyApp app;
+  app.start();
 	
 	return 0;
 	

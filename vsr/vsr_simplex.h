@@ -43,10 +43,9 @@ struct Simplex {
   typedef NEVec<N> Vec;
   typedef NEBiv<N> Biv;
 
-  //temporary higher dimensional elements for init
+  //temporary higher dimensional elements for coordinate init
+  //this will be projected out after rotation
   typedef NEVec<N+1> TVec;
-  //lower dimensional elements
- // typedef Simplex<N-1>
 
   vector<Vec>  verts;
   vector<TVec> roots;

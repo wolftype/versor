@@ -158,8 +158,8 @@ struct SpaceGroup2D : PointGroup2D<V> {
   // @param mRatio: for translations on the lattice 
   // @param bPin: pin or spin generators
   // @param mDiv: number of divisions into lattice cell
-  // @param ga: glide reflection replaces first mirror generator
-  // @param gb: glide reflection replaces second mirror generator 
+  // @param ga: whether a glide reflection replaces first mirror generator
+  // @param gb: whether a glide reflection replaces second mirror generator 
   SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) 
   : PointGroup2D<V>(p,pin), mRatio(ratio), mDiv(div)  {
    

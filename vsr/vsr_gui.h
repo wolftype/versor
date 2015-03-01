@@ -16,12 +16,17 @@
  * =====================================================================================
  */
 
+#ifndef  vsr_gui_INC
+#define  vsr_gui_INC
+
 #include "GLV/glv.h"
 #include "vsr_std_types.h"
+#include <iostream>
 #include <sstream>
 
 
 using namespace std;
+
 //using namespace gfx;
 
 
@@ -208,3 +213,4 @@ enum {
 
 } //glv gui
                           
+#endif   /* ----- #ifndef vsr_gui_INC  ----- */

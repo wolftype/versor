@@ -7,47 +7,9 @@
 
 #include "vsr_cga3D_draw.h"
 
-namespace vsr{
-                           
+namespace vsr{ 
+                          
   using namespace gfx;
-  
-
-  
-   // void Seg( const Cir& c )
-  
-           
-  // FEATURE ExTRAcTION (ROTATION AND POSITION)
-
-  Rot AA( const Vec& s){
-      Rot r = Gen::ratio(Vec::z, s.unit() ); 
-      return Gen::aa(r);
-  }  
-  
-  Rot AA( const Biv& s){
-     Rot r = Gen::ratio(Vec::z, s.duale().unit() ); 
-     return Gen::aa(r);
-  }     
-                      
-
-  Rot AA( const Dlp& s){
-    //Biv b = Ro::dir( s ).copy<Biv>();               
-      Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
-        return Gen::aa(r);
-    } 
-     
-  Vec Pos( const Dlp& s){ 
-    return Fl::loc( s , Ori(1), true );   
-  }   
-  
-  Rot AA( const Cir& s){
-    Biv b = Ro::dir( s ).copy<Biv>();               
-        Rot r = Gen::ratio(Vec::z, Op::dle( b ).unit() ); 
-        return Gen::aa(r);
-    } 
-     
-  Pnt Pos( const Cir& s){
-    return Ro::loc( s );
-  }          
   
   
   void Immediate (const Vec& s){
@@ -55,11 +17,10 @@ namespace vsr{
       gfx::Glyph::Line(s);
     glPushMatrix();  
       gfx::GL::translate( s.begin() );
-      gfx::GL::rotate( AA(s).begin() );  
+      gfx::GL::rotate( Op::AA(s).begin() );  
       Glyph::Cone();
     glPopMatrix();
   }  
-
 
   
     void ImmediateB (const Vec& s){
@@ -76,7 +37,7 @@ namespace vsr{
 	  bool sn = Op::sn( s , Biv::xy * (-1));
 	
 		glPushMatrix();	
-			gfx::GL::rotate( AA(s).begin() );  
+			gfx::GL::rotate( Op::AA(s).begin() );  
 			gfx::Glyph::DirCircle( ta, sn );
 		glPopMatrix();
   }
@@ -91,8 +52,8 @@ namespace vsr{
   }
 
   void Immediate (const Dlp& s){
-      gfx::GL::translate( Pos(s).begin() );
-    gfx::GL::rotate( AA(s).begin() ); 
+      gfx::GL::translate( Op::Pos(s).begin() );
+    gfx::GL::rotate( Op::AA(s).begin() ); 
       Glyph::SolidGrid(6,6,5);
       //Glyph::Rect(10,10);
   }
@@ -104,9 +65,9 @@ namespace vsr{
     VT rad = Ro::rad( s );
       bool im = Ro::size(s, false) > 0 ? 1 : 0;  
      
-    //AA(s).vprint();
-    gfx::GL::translate( Pos(s).begin() );
-    gfx::GL::rotate( AA(s).begin() ); 
+    //Op::AA(s).vprint();
+    gfx::GL::translate( Op::Pos(s).begin() );
+    gfx::GL::rotate( Op::AA(s).begin() ); 
 
       im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
   }  
@@ -188,7 +149,7 @@ namespace vsr{
            // pp[0].vprint(); pp[1].vprint();
                 gfx::Glyph::Point(pp[0]);
                 gfx::Glyph::Point(pp[1]);
-                gfx::Glyph::Line(pp[0],pp[1]);
+                gfx::Glyph::DashedLine(pp[0],pp[1]);
             }
           }
   }  
@@ -314,6 +275,5 @@ namespace vsr{
   // template void Draw(const Vec&, float, float, float ,float);  
     
 
-}
-
+} 
     

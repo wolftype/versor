@@ -157,6 +157,42 @@ template Drb Fl::dir( const Pln&);
 // template VT Fl::wt( const Lin&, bool);
 // template VT Fl::wt( const Dlp&, bool);  
 // template VT Fl::wt( const Pln&, bool);  
+//
+//
+namespace Op{
+
+  Rot AA( const Vec& s){
+      Rot r = Gen::ratio(Vec::z, s.unit() ); 
+      return Gen::aa(r);
+  }  
+  
+  Rot AA( const Biv& s){
+     Rot r = Gen::ratio(Vec::z, s.duale().unit() ); 
+     return Gen::aa(r);
+  }     
+
+  Rot AA( const Dlp& s){
+      Rot r = Gen::ratio(Vec::z, Vec(s).unit() ); 
+      return Gen::aa(r);
+    } 
+     
+  Rot AA( const Cir& s){
+      Biv b = Ro::dir( s ).copy<Biv>();               
+      Rot r = Gen::ratio(Vec::z, Op::dle( b ).unit() ); 
+      return Gen::aa(r);
+    } 
+
+
+  Vec Pos( const Dlp& s){ 
+    return Fl::loc(s , Ori(1), true );   
+  }   
+     
+  Pnt Pos( const Cir& s){
+    return Ro::loc( s );
+  }  
+
+}
+
 namespace Gen{               
 
   /*! Generate a Rotor (i.e quaternion) from spherical coordinates

@@ -221,6 +221,7 @@ struct  Spherical : public Joint {
             }           
         }
             
+       //set first joint to this frame's position and rotation
         void frameSet(){
             mJoint[0].set( mPos, mRot ); fk();
         }

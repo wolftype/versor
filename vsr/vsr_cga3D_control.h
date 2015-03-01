@@ -12,7 +12,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  pretty awesome
  *
  * =====================================================================================
  */
@@ -23,7 +23,8 @@
 
 #include <sstream>
 
-#include "gfx/gfx_control.h" 
+#include "gfx/gfx_objectController.h"
+
 #include "vsr_cga3D_op.h" 
 #include "vsr_cga3D_frame.h" 
 
@@ -34,14 +35,14 @@ namespace gfx{
 
   //FOR ALL ROUND MULTIVECTOR TYPES:
   template<class A>  
-  Vec3f ObjectController :: ObjectPtr<A> :: getPosition(){
+  Vec3f ObjectController :: ObjectPtr<A> :: worldPosition(){
     auto p = Ro::loc(*mAddress);
     return Vec3f(p[0],p[1],p[2]);
   }
 
   /// FOR FRAMES
   template<>  
-  Vec3f ObjectController :: ObjectPtr<Frame> :: getPosition(){
+  Vec3f ObjectController :: ObjectPtr<Frame> :: worldPosition(){
     auto p = mAddress->pos();
     return Vec3f(p[0],p[1],p[2]);
   }
@@ -60,8 +61,7 @@ namespace gfx{
       Pnt pnt = Ro::loc(ts); //was pos
               
       //2D coordinates of Defining Sphere
-      Vec tv = pnt;   
-      Vec3f sc = i->screenCoord(tv);  
+      Vec3f sc = i->mScene->project(pos);  
 
           switch(i->io().keyboard.code){
 
@@ -96,7 +96,7 @@ namespace gfx{
 
               default: // DESELECT
               {
-                  i->deselect(mAddress);
+               //   i->deselect(mAddress);
                   break;
               }
           }
@@ -106,8 +106,7 @@ namespace gfx{
 
     template<>
     void ObjectController :: ObjectPtr<Frame> :: transform() {
-
-        
+     
       //Address of State
       Frame& ts = *mAddress;
       //Temp Stored State
@@ -117,8 +116,8 @@ namespace gfx{
       Pnt pnt = ps.pos();
               
       //2D coordinates of Defining Sphere
-      Vec tv = pnt;   
-      Vec3f sc = i->screenCoord(tv);  
+      Vec3f sc = i->mScene->project(pos);  
+ 
 
         switch(i->io().keyboard.code){
           case 's': //SCALE

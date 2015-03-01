@@ -76,11 +76,11 @@ LDFLAGS += -lvcos
 endif
 
 ifeq ($(GFX),1) 
-IPATH += -Iext/glv/ -Iext/gfx/ -Iext/ 
+IPATH += -Iext/glv/ -Iext/gfx/ -Iext/gfx/gfx -Iext/ 
 ifeq ($(PLATFORM),Linux)
-	LDFLAGS += -lGLV -lGLEW -lGLU -lGL -lglut 
+	LDFLAGS += -lGLV -lGLEW -lGL -lglut 
 else
-	LDFLAGS += -lglv -framework OpenGL -framework GLUT 
+	LDFLAGS += -lglv -lGLEW -framework OpenGL -framework GLUT 
 endif
 endif
                            
@@ -98,7 +98,7 @@ EXEC = tests/%.cpp examples/%.cpp
 
 OBJ = vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
 ifneq ($(RPI),1)
-OBJ += vsr_cga3D_draw.o vsr_cga3D_interface.o gl2ps.o
+OBJ += gl2ps.o  vsr_cga3D_draw.o #vsr_cga3D_interface.o gl2ps.o 
 endif
 
 OBJ_DIR = build/obj/

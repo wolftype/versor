@@ -17,7 +17,7 @@
 
 #include "vsr_generic_op.h" 
 #include "vsr_interp.h"  
-#include "gfx/gfx_data.h"
+#include "gfx/gfx_patch.h"
 
 using namespace std;
 using namespace gfx;   
@@ -514,7 +514,7 @@ namespace vsr {
      vector<int>& faceVxl() { return mFaceVxl; } 
      Vxl faceVxl(int ix) { return mVxl[ mFaceVxl[ix] ]; }    
     
-     LPnt * gridPtr() { return mPoint; }
+     LPnt * gridPtr() const { return mPoint; }
      void gridPtr(LPnt * lp) { mPoint = lp; } 
 
      protected:

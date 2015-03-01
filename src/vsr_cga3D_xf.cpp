@@ -105,7 +105,7 @@ namespace vsr {
         }    
 
         /*
-        4x4 Transformation matrix from Vector
+        4x4 Transformation matrix from Vector (translate to end of vector and rotate)
         */
         gfx::Mat4f mat(const Vec& v){
             Rot r = Gen::ratio( Vec::z, v.unit() );  

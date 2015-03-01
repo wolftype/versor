@@ -18,6 +18,20 @@ namespace vsr{
 using namespace cga3D;
 
 
+
+namespace Op{
+  
+  Rot AA( const Vec& s);                
+  Rot AA( const Dlp& s);
+  Rot AA( const Cir& s);
+  Rot AA( const Biv& s);
+  
+  Vec Pos( const Dlp& s); 
+  Pnt Pos( const Cir& s);       
+  
+};
+
+
 namespace Gen{               
   
   /*! Generate a Rotor (i.e quaternion) from spherical coordinates
@@ -71,6 +85,8 @@ namespace Gen{
       }
    
 };
+
+
 
 /* namespace Ro { */
 

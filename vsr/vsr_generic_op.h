@@ -32,7 +32,10 @@
 namespace vsr {           
   
  
-//Projection Down to 3D
+
+  /*-----------------------------------------------------------------------------
+   *  PROJECTION (fron ND down to 3D)
+   *-----------------------------------------------------------------------------*/
 template<int DIM>
 struct Proj{
   typedef EGAMV<DIM, typename Blade1<DIM>::VEC > TVec;
@@ -162,6 +165,9 @@ namespace Op{
   constexpr auto reject(const A& a, const B& b) RETURNS ( rj(a,b) )
   template< class A, class B>
   constexpr auto sign(const A& a, const B& b) RETURNS ( sn(a,b) )
+
+
+
 } // Op::  
 
 
@@ -952,6 +958,15 @@ namespace Euc{
       return null( split( par_cir(c,t), true) );
    }
 
+    
+    /*!
+     *  angle theta of point p on direct circle...
+     */
+    template<TT DIM>
+    VT
+    thetaOfPoint(const NCir<DIM>& c, const NPnt<DIM>& p){
+      return 0;
+    }
 
 
   /* template<TT DIM> */

@@ -49,7 +49,7 @@ struct Constrain {
        return Ro::loc( Ro::split( (da ^ dc ^ plane.dual() ).dual(), mtn ) );
     }
 
-    //tangency constraint, two distances and an original point (closest to original)
+    //Circle tangency constraint, two distances and an original point (closest to original)
     static Point Tangency(const Pnt& p, const Dls& da, const Dls& db){
 
       auto meet = (da ^ db).dual();
@@ -61,6 +61,38 @@ struct Constrain {
       return np;
       
     }
+
+    //Spherical tangency constrain, one distance and an original point (returns point on sphere closest to p);
+     static Point Tangency(const Pnt& p, const Dls& da){
+       auto line =  p ^ da ^ Inf(1);
+       auto np = Ro::split( (line.dual() ^ da).dual(), false);
+       return np;
+     }
+
+    //Tension tangency constrain, one distance and an original point 
+    //(returns point on sphere closest to p if p is outside da, otherwise just p);
+     static Point Tension(const Pnt& p, const Dls& da){
+       if ( (p<=da)[0] > 0 ) return p;
+       auto line =  p ^ da ^ Inf(1);
+       auto np = Ro::split( (line.dual() ^ da).dual(), false);
+       return np;
+     }
+
+    //tension constraint from two distances
+    static Point Tension(const Pnt& p, const Dls& da, const Dls& db){
+       
+       if ( ( (p<=da)[0] > 0 ) && ( (p<=db)[0] > 0 ) ) return p; // returns input point if it lies within both spheres 
+       
+       //otherwise, constrain to lie on circle meet
+       auto meet = (da ^ db).dual();
+       auto tan =  Ro::loc( Ta::at( meet, p ) );
+       auto sur = Ro::sur( meet );
+       auto line = tan ^ sur ^ Inf(1);
+       auto np = Ro::split ( ( line.dual() ^ sur).dual(), false );
+
+       return np;     
+    }
+
 
 
     // three distances, center of meet pre-SPLIT (experimental)
@@ -134,9 +166,10 @@ struct Rigid{
   bool bCalc, bTriple;
   Pnt result;
 
+  //Has three distances
   DistancePtr da,db,dc;
   
-  //Dependent on three parents
+  //Is Dependent on three parents
   Rigid *ra, *rb, *rc;
 
   //Has n children which depend on it
@@ -177,6 +210,7 @@ struct Rigid{
     db.set(rb->result,result);
     dc.set(rc->result,result); 
 
+    //add this to children of three others
     ra->child.push_back(this); rb->child.push_back(this); rc->child.push_back(this);
   }
 
@@ -187,6 +221,7 @@ struct Rigid{
     db.set(rb->result,result);
     dc.set(rc->result,result);
 
+    //add this to children of three others
     ra->child.push_back(this); rb->child.push_back(this); rc->child.push_back(this);
   }
 
@@ -196,8 +231,8 @@ struct Rigid{
 
   Pnt up(){
     if (bCalc) {
-      bCalc=false; // lock in case network graph is looped
-      for (auto& i : child) i -> down(); 
+      bCalc=false;                             // lock in case network graph is looped
+      for (auto& i : child) i -> down();       // cascade children
       (*ra).up(); (*rb).up(); (*rc).up();
       // satisfy();
       result = bTriple ? Constrain::Triple(da(),db(),dc(),mtn) : Constrain::Planar(da(),db(),dc(),mtn);
@@ -212,7 +247,7 @@ struct Rigid{
     }
   }
 
-  //broadcast position to child and fix any errors
+  //broadcast position to child
   void down(){
       if (bCalc){
         bCalc=false;
@@ -336,13 +371,28 @@ struct Rigid{
 
 
 struct Rigid2{
-  Pnt result;
+  
+  /// Meet of parents
+  Point result;
 
- // Rigid2 *ra, *rb;          //parents
+  /// iteration
+  int iter=0;
 
-  struct Parent{
+  /*-----------------------------------------------------------------------------
+   *  Parents Generate Circles to Control This Result
+   *-----------------------------------------------------------------------------*/
+  struct Parents{
     DistancePtr da,db;
     Rigid2 *ra, *rb;          //parents
+
+    Circle meet(){
+      return (da()^db()).dual();
+    }
+
+    bool inside(const Point& p){
+      return ( (p<=da())[0] > 0 ) && ( (p<=db())[0] > 0 );
+    }
+
     void operator()(){
       (*ra)(); (*rb)();
     }
@@ -350,8 +400,10 @@ struct Rigid2{
 
   bool bMtn,bCalc,bReCalc;
 
+  /// possibly many couples (one per valence)
+  vector<Parents> parents;
   vector<Rigid2*> child;    //children
-  vector<Parent> parent;
+
 
   Rigid2() : bCalc(false), bReCalc(false) {}
   Rigid2(const Pnt& res) { set(res); }
@@ -361,29 +413,23 @@ struct Rigid2{
     result=res;
   }
 
-
-  /* void set(Rigid2 *pa, Rigid2 *pb, bool m){ */
-    
-  /*   ra=pa; rb=pb; */
-
-  /*   bCalc=true; bMtn = m; */
-    
-  /*   da.set(ra->result,result); */
-  /*   db.set(rb->result,result); */
-    
-  /*   ra->child.push_back(this); rb->child.push_back(this); */
-  /* } */
-
-  //add parent
+  //add parents
   void add(Rigid2 *pa, Rigid2 *pb, bool m){
+    
     bCalc=true; bReCalc=true;
-    Parent p;
+    
+    //make new parents
+    Parents p;
     p.ra=pa; p.rb=pb;
+    
+    //set distance contraints based on pa and pb
     p.da.set(pa->result,result);
     p.db.set(pb->result,result);
+
+    //add this to list of children of just pa 
     pa->child.push_back(this);
-    pb->child.push_back(this);
-    parent.push_back(p); 
+   // pb->child.push_back(this);
+    parents.push_back(p); 
   }
 
 
@@ -396,13 +442,13 @@ struct Rigid2{
   /*   ra->child.push_back(this); rb->child.push_back(this); */
   /* } */
  
-  void reset(){ bCalc=true; bReCalc=true; }
+  void reset(){ bCalc=true; bReCalc=true; iter=0; }
 
   void operator()(){
     if (bCalc){
-      Pnt np = result;
+     // Pnt np = result;
       bCalc=false;
-      for(auto& i : parent){
+      for(auto& i : parents){
         i();
         //np = Constrain::Tangency(np, i.da(), i.db());
       }
@@ -414,27 +460,303 @@ struct Rigid2{
 
   void update(){
     if(bReCalc){
-      for(auto& i : parent){
+      for(auto& i : parents){
         result = Constrain::Tangency(result, i.da(), i.db());
       }
     }
   }
 
-  void cascade(){
-    if (bCalc){
-      bCalc=false;
-      for(auto& i : child) {
-        i->update();
-        //(*i)();
-        i->cascade();
+  //update only relative to parents with r
+  void satisfy_old(Rigid2 * r){
+    if(bReCalc){
+      bReCalc=false;
+      bool bRepeat = true;
+      int iter=0;
+      while(bRepeat && (iter<10) ){
+        bRepeat=false;
+        iter++;
+        for(auto& i : parents){
+          if ( (r==i.ra) || (r==i.rb) ){
+            bool bCocircular = ( fabs( (result <= i.meet()).wt() ) < .001);
+           // bool bInside = i.inside(result);
+            if (!bCocircular) {
+              result = Constrain::Tangency(result, i.da(), i.db());
+              bRepeat = true;
+             }           
+           }
+          }
+        }
+
+       // cout << "rigid satisfy iterations " << iter << endl;
+      }
+  }
+
+  bool hasA(Rigid2 * r){
+    for (auto& i : parents){
+      if (r==i.ra) return true;
+    }
+    return false;
+  }
+
+  bool hasB(Rigid2 * r){
+    for (auto& i : parents){
+      if (r==i.rb) return true;
+    }
+    return false;
+  }
+
+
+
+  void satisfy_forward(Rigid2 * r){
+    if (bReCalc){
+      for(auto& i : parents){
+        if (r==i.ra){
+            result = Constrain::Tangency(result, i.da(), i.db());
+         }
       }
     }
   }
+  void satisfy_backward(Rigid2 * r){
+     if (bReCalc){
+      for(auto& i : parents){
+        if (r==i.rb){
+            result = Constrain::Tangency(result, i.da(), i.db());
+         }
+      }
+     }
+  }
 
-  Cir circle(int idx =0) { return ( parent[idx].da() ^  parent[idx].db() ).dual(); }
+  float error(Rigid2 * r){
+    float tf=0; bool bFound=false;
+    for (auto& i : parents){
+      if (r==i.ra){
+         bFound=true;
+         tf = fabs((result <= i.meet()).wt());
+       }
+    }
+    if (!bFound){
+      for (auto& i : parents){
+        if (r==i.rb){
+          tf = fabs((result <= i.meet()).wt());
+        }
+      }
+    }
+    return tf;
+
+  }
+
+
+  /* void fabrik(Rigid2 * r){ */
+  /*   if (bReCalc){ */
+  /*     bool bRepeat = true; */
+  /*     int iter =0; */
+  /*     while (bRepeat && (iter<100)){ */
+  /*       bRepeat=false; */
+  /*       iter++; */
+  /*       for (auto& i : parents){ */
+  /*         if (r==i.ra) */
+  /*       } */
+  /*     } */
+  /*   } */
+  /* } */
+
+  //set bReCalc to true
+  bool checkRecalc(){
+    for (auto& i : parents){
+      if (i.ra->error(this)>.001){
+        bCalc=true;
+        bReCalc=true;
+        i.ra->bReCalc=true;
+        i.ra->bCalc=true;
+      }
+    }
+    return bReCalc;
+  }
+
+  vector<Rigid2*> satisfy(int begin, int end){
+    
+      if (!parents.empty()){
+        int tIter=0;
+        float tf;
+        //find first not already locked
+        Rigid2 * tr;
+        for (auto& i : parents){
+          if (i.ra->bReCalc){
+            tr = i.ra;
+            break; 
+          }
+        }
+        //cout << parents[0].ra->hasA(this) << endl;
+        bool bLoop = parents[0].ra->hasA(this);
+        if (bLoop){
+            do{
+              tIter++;         
+              for (int i=begin; i<=end;++i){
+                parents[i].ra->satisfy_forward(this);
+              }
+              for(int i =end; i >= begin; i-- ) {
+                parents[i].ra->satisfy_backward(this);
+              }
+              tf = tr->error(this);//parents[begin].ra->error(this);
+            }while( (tf>.001) && (tIter < 10));
+        } else {
+            do{
+              tIter++;         
+              for (int i=begin; i<=end;++i){
+                parents[i].ra->satisfy_forward(this); 
+                parents[i].rb->satisfy_forward(this); //only last one
+              }
+              for(int i =end; i >= begin; i-- ) {
+                parents[i].rb->satisfy_backward(this);
+                parents[i].ra->satisfy_backward(this); //only first one
+              }
+              //this should test for first non-already bound ...
+              tf = tr->error(this);//parents[begin].ra->error(this);
+            }while( (tf>.001) && (tIter < 10));
+            //cout << "iter " << tIter << endl;
+        }
+      }
+      
+       vector<Rigid2*> temp;
+
+       //mark parents as satisfied
+       for (auto& i : parents){
+         if(i.ra->bReCalc==true) temp.push_back(i.ra);
+         i.ra->bReCalc=false;
+        // i.rb->bReCalc=false;
+       }
+       bool bLoop = parents[0].ra->hasA(this);
+       if (!bLoop){
+         if(parents.back().rb->bReCalc==true) temp.push_back(parents.back().rb);
+         parents.back().rb->bReCalc=false;
+       }
+
+       return temp;
+  }
+
+  
+  // go through all parents satisfy relationship to this
+  void cascade(int begin, int end){
+   
+      //do this forward and backward reach how many times?
+      //until first node is within error of first forward meet
+      auto rp = satisfy(begin,end);
+      cout << "parents to solve: " <<  rp.size() << endl;
+      while (!rp.empty()){
+        //cascade connections 
+        vector<Rigid2*> temp;
+        for (auto& i : rp){
+            auto r = i->satisfy(0, i->parents.size()-1);
+            for (auto& j : r){
+              temp.push_back(j);
+            }
+            //i.ra->cascade(0,i.ra->parents.size()-1);
+         }
+         //cout << temp.size() << endl;
+         rp = temp;
+      }
+
+  }
+
+  Cir circle(int idx =0) { return ( parents[idx].da() ^  parents[idx].db() ).dual(); }
 
   /// get point at theta t around constraint orbit
-  Pnt orbit(VT t) { return Ro::pnt_cir( circle(), t * ( bMtn?1:-1) ); }
+  Pnt orbit(VT t, int idx=0) { return Ro::pnt_cir( circle(idx), t * ( bMtn?1:-1) ); }
+};
+
+
+
+/*!
+ *  \brief  Rig has n spherical constraints to satisfy (try using fabrik solver here)
+ */
+struct Rig {
+
+    Point result; ///< result of constraint computation
+    bool bCalc,bReCalc;
+    int iter=0;
+
+    void set(const Pnt& res){
+      bCalc=false; bReCalc=false;
+      result=res;
+    }
+
+    void reset(){
+      bCalc=true; bReCalc=true; iter=0;
+    }
+
+    struct Parent{
+      DistancePtr da;
+      Rig * rig;
+      bool bStrut =true;
+
+      //set distance constraint to rig r
+      void set(const Point& p){
+        da.set(rig->result, p);
+      }
+
+      //constrain a point p to spherical distance via strut or cable
+      Point constrain(const Point& p){//, bool strut){
+        return bStrut ? Constrain::Tangency(p,da()) : Constrain::Tension(p, da()); 
+      }
+
+      float distance(const Point& p){
+        return (p<=da())[0];
+      }
+    };
+
+    vector<Parent> parent;
+    vector<Rig*> child;
+
+    //add a constraint
+    void add(Rig * r, bool bStrut=true){
+       Parent p;
+       p.bStrut = bStrut;
+       p.rig = r;
+       p.set(result);
+       parent.push_back(p);
+       p.rig->child.push_back(this);
+    }
+
+    void modify(Rig * r, bool bStrut){
+      for (auto& i : parent){
+        if (r==i.rig) i.bStrut=bStrut;
+      }
+    }
+
+    //satisfy constraint to rig r
+    void satisfy(Rig * r){
+      if (bReCalc){       
+        for (auto& i : parent){
+          bool tCalc=false;
+          //if parent is r
+          if (r==i.rig) tCalc=true;
+          //...or is connected to r
+          for (auto& j : i.rig->parent){
+            if (r==j.rig) tCalc=true;
+          }
+          //..calc
+          if (tCalc){
+            result = i.constrain(result);
+          }
+        }
+      }
+    }
+
+    void cascade(){
+      if (bCalc){
+        iter++;
+        if (iter>1000) {
+          bCalc=false;  
+        }   
+        for (auto& i : child){
+          i->satisfy(this);
+        }
+        for (auto& i : child){
+        //  i->cascade();
+        }
+      }
+    }
+
 };
 
 

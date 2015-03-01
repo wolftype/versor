@@ -44,8 +44,9 @@ namespace vsr{
     glPushMatrix();
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );// - 2 * f.scale() );
       gfx::GL::rotate( Gen::aa( rot * Gen::rot( Biv::yz * PIOVERFOUR ) ).begin() );
-      gfx::GL::scale( f.scale() ); 
-      ma.drawElements(r,g,b,a);
+      gfx::GL::scale( f.scale() );
+      glColor4f(r,g,b,a); 
+      ma.drawElements();
     glPopMatrix();
 
     glPushMatrix();
@@ -56,7 +57,8 @@ namespace vsr{
     
      // glPushMatrix();
         gfx::GL::scale( f.scale() * .5 );    
-        ma.drawElements(g,r,b,a); 
+        glColor4f(g,r,b,a); 
+        ma.drawElements(); 
      // glPopMatrix();
     
       /* gfx::GL::scale( 1, 10, 1); */    

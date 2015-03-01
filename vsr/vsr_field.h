@@ -13,7 +13,7 @@
 //#include "vsr_frame.h"
 #include "vsr_cubicLattice.h" 
 #include "vsr_math.h" 
-#include "gfx/gfx_data.h"
+#include "gfx/gfx_patch.h"
 
 namespace vsr{
 
@@ -76,7 +76,7 @@ namespace vsr{
         //Vector Derivative in Euclidean Metric
         //typedef typename ProductN<VEC,T::idx>::GP VecDeriv;
         
-        T * dataPtr() { return mData; }
+        T * dataPtr() const { return mData; }
         void dataPtr( T* d ) { mData = d; }
         
         /// Zero Out All Data

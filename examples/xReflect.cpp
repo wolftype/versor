@@ -1,19 +1,20 @@
 // EUCLIDEAN REFLECTIONS
 
 #include "vsr_ega3D_draw.h" 
-#include "vsr_GLVimpl.h" 
+
+#include "gfx/util/gfx_glv_app.h" 
  
 
 using namespace vsr;
-using namespace glv;  
 
-struct MyApp : App {
+struct MyApp : gfx::GFXAppGui {
 	
 	float theta, phi;
 	float time;
 	bool bRef;
 	
-	virtual void initGui(){
+	void setup(){
+    bindGLV();
 		gui(theta,"theta",-TWOPI,TWOPI); 
 		gui(phi,"phi",-PIOVERTWO,PIOVERTWO);
 		gui(bRef,"reflections");  
@@ -24,16 +25,16 @@ struct MyApp : App {
 		//VECTORS
 		Vec x(1,0,0);   
 		Vec y(0,1,0);    
-        Vec z(0,0,1);    
+    Vec z(0,0,1);    
 
 		Draw(x,1,0,0); 		
 		Draw(y,0,1,0);  
 		Draw(z,0,0,1);
 		  	    
-        //BIVECTORS
+    //BIVECTORS
 		Biv xy = y^x;    
 		Biv xz = x^z;    
-	    Biv yz = y^z;    
+	  Biv yz = y^z;    
 
 		Draw(xy,1,1,0); 
 		Draw(xz,1,0,1);  
@@ -54,33 +55,15 @@ struct MyApp : App {
 			Draw( nv.re( z ),.5,.5,1 ); 
 		} 
 		
-		//Join
-		// Biv nvy =  nv ^ nv.re( y ); 
-		// Draw(nvy, .7, 1, .7);
-		// Draw( nvy.dual(), .2, 1, .2); 
-		
 	}
 
 };
                         
-MyApp * myApp;
-
-
 
 int main(){
  
-	GLV glv(0,0);	
-    		        
-	Window * win = new Window(500,500,"Versor",&glv);    
-                          
-	myApp = new MyApp;
-	myApp -> init(win);
-	myApp -> initGui();
-	
-	glv << *myApp;
-
-	Application::run();
-	
+  MyApp app;
+  app.start();	
 	return 0;
 	
 }
