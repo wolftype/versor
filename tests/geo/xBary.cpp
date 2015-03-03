@@ -77,9 +77,6 @@ struct MyApp : App {
 
         Draw(iab,0,1,0); Draw(iac,0,1,0); Draw(ibc,0,1,0);
         
-        /* Draw(iab ^ iac ^ EP,0,0,1); */ 
-        /* Draw(iba ^ ibc ^ EP,0,0,1); */
-        /* Draw(ica ^ icb ^ EP,0,0,1); */ 
       }      
  
       /*-----------------------------------------------------------------------------
@@ -91,7 +88,7 @@ struct MyApp : App {
       auto sqnorm = norm * norm;
       pss /= -sqnorm; 
 
-      //circles edges
+      //circle edges
       auto cirA = pb ^ pa ^ mysphere;
       auto cirB = pc ^ pa ^ mysphere;
 
@@ -118,23 +115,25 @@ struct MyApp : App {
      
       //plunge
       auto plunge = sa ^ sb ^ mysphere;
+      Draw(plunge);
       auto versor = (mysphere<=plunge).runit();
+      auto sdist = 1.0/Ro::size(plunge,true);
 
-      auto pairA = meet(plunge,sa);
-      auto pairB = meet(plunge,sb);
+      /* auto pairA = meet(plunge,sa); */
+      /* auto pairB = meet(plunge,sb); */
 
-      auto a = Ro::loc( Ro::split(pairA,true) );
-      auto b = Ro::loc( Ro::split(pairB,false) );   
+      /* auto a = Ro::loc( Ro::split(pairA,true) ); */
+      /* auto b = Ro::loc( Ro::split(pairB,false) ); */   
 
      // Draw(a,0,0,1);  
      // Draw(b,0,0,1);  
       
-      auto gen = hgen(a,b,amtA);
+      //auto gen = hgen(a,b,amtA);
      // double dist = hdist(ca,cb);
 
      // Draw( cirA.boost(gen) );
      // Draw( cirA.boost( versor * amtB * (1-dist)*.5 ),0,0,1 );
-      Draw( cirA.boost( vers * hdist * amtC * .5), 0,1,0 ) ;
+      Draw( cirA.boost( versor * sdist * amtC * .5), 0,1,0 ) ;
 
       //Draw(mysphere,0,1,.2,.3);
       //Draw(plunge,1,0,1,.3);

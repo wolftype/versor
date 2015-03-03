@@ -184,6 +184,15 @@ namespace Euc{
     NEVec<N+1> hom(const NEVec<N>& v){
       return NEVec<N+1>(v) + NEe<N+1,N+1>(1.0);
     }
+
+
+    /*!
+     *  Homogenize a 3d conformal point (warning not generic)
+     */
+    template<TT N>
+    NEVec<N-1> hom(const NPnt<N>& p){
+      return NEVec<N-1>(p[0],p[1],p[2]) + NEe<N-1,N-1>(1.0);
+    }
 }
 
 
@@ -947,16 +956,15 @@ namespace Euc{
     NPnt<DIM> 
     pnt_cir(const NCir<DIM>& c, VT t){
       return null( split( par_cir(c,t), true) );
-  }
+    }
 
-    
 
     /*! Point on Circle at angle t*/
-    template<TT DIM>
-    NPnt<DIM> 
-    pointOnCircle(const NCir<DIM>& c, VT t){
-      return null( split( par_cir(c,t), true) );
-   }
+    /* template<TT DIM> */
+    /* NPnt<DIM> */ 
+    /* pointOnCircle(const NCir<DIM>& c, VT t){ */
+    /*   return null( split( par_cir(c,t), true) ); */
+   /* } */
 
     
     /*!

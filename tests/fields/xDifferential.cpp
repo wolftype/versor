@@ -37,11 +37,17 @@ struct MyData {
   void reset(){
     normal = Vec(0,0,0);
     curl = Biv(0,0,0);
+    spur = Vec(0,0,0);
+    kgGrad = Vec(0,0,0);
+    area=kg=mean=0;
   }
   Vec normal = Vec(0,0,0);       //normal (gradient of position)
-  Biv curl = Biv(0,0,0);         //gradient of gradient
+  Vec kgGrad = Vec(0,0,0);       //gradient of gaussian
+  Vec spur = Vec(0,0,0);         //sum of dn
+  Biv curl = Biv(0,0,0);         //curl of dn
   float kg = 0;
   float mean =0;   //gaussian and mean;
+  float area =0;  // area sum;
   
   vector<Simplicial2> simplex;  //simplicial domain
 
@@ -58,13 +64,16 @@ struct MyApp : App {
   HEGraph<MyData> graph;
 
   float amt;
-  float wt;
+  float wt, wt2;
   bool bUseCotan;
   bool bExterior;
-  bool bNormalExterior;
+  bool bUseNextForExterior;
   bool bDivideByArea;
   bool bDrawNormals;
+  bool bDrawMean;
   bool bDrawReciprocals;
+  bool bDrawGaussGrad;
+  bool bDerivOfShape;
 
   //Control
   bool bTrackMouse;
@@ -75,14 +84,18 @@ struct MyApp : App {
     
     gui(amt,"amt",-100,100);               //<-- amt of transform
     gui(wt,"wt",-100,100);                 //<-- wt of diff
+    gui(wt2,"wt2",-100,100);                 //<-- wt of grad of gauss or mean
     gui(bUseCotan,"bUseCotan");            //<-- use TWOPI deficit formula
     gui(bExterior,"bExterior");            //<-- use vector derivatives then exterior
-    gui(bNormalExterior,"bExterior");            //<-- use vector derivatives then exterior
+    gui(bUseNextForExterior,"bNormalExterior");            //<-- use vector derivatives then exterior
+    gui(bDerivOfShape,"bDerivOfShape");            //<-- use deriv of shape biv to calc mean
     gui(bDivideByArea,"bDivideByArea");    //<-- use vector derivatives then exterior
     gui(bDrawNormals,"bDrawNormals");      //<-- draw normals
+    gui(bDrawMean,"bDrawMean");      //<-- draw normals
+    gui(bDrawGaussGrad,"bDrawGaussGrad");      //<-- draw normals
     gui(bDrawReciprocals,"bDrawReciprocals");     //<-- draw normals
 
-    //1. Generate SpaceGroup Tessellate, Hang on lattice, Graph
+    //1. Generate hexagonal SpaceGroup, Tessellate, Hang points on lattice, Graph
     int w=20; int h=w;
     SpaceGroup2D<Vec> sg(3,1,true);
     auto tmp = sg.hang( point(0,0,0), w, h);
@@ -131,49 +144,51 @@ struct MyApp : App {
         auto& c = e[j]->next->a().pnt;
         auto simplex = Simplicial2(a,b,c);
         v.simplex[j] = simplex;
+        v.area += simplex.area;
       }
-      float area =0;
-      Vec ct(0,0,0:
+
+      /*-----------------------------------------------------------------------------
+       *  now we have simplices recorded (local metric, area, reciprocal basis)
+       *-----------------------------------------------------------------------------*/
+      Vec ct(0,0,0);
       for (int j=0;j<e.size();++j){
-        int next = (j<e.size()-1) ? j+1 : 0; 
+
         auto& b = e[j]->a().pnt;
         auto& c = e[j]->next->a().pnt;
+
+        int next = (j<e.size()-1) ? j+1 : 0; 
         auto& nb = e[next]->a().pnt;
         auto& nc = e[next]->next->a().pnt;
         
+        //exterior diff
         auto vd = v.simplex[j].derivative(Vec(a),Vec(b),Vec(c));
         
+        //or invididual
         auto vda = v.simplex[j].derivative0(Vec(a),Vec(b),Vec(c));
         auto vdb = v.simplex[next].derivative0(Vec(a),Vec(nb),Vec(nc));
 
         ct += v.simplex[j].cotan( v.simplex[next] );
         
-      //  v.normal +=  (vda^vdb).duale(); //normal as exterior derivative of position;
-        v.normal += bNormalExterior ? (vda^vdb).duale() : vd.duale();
-        area+=v.simplex[j].area; 
+        v.normal += bUseNextForExterior ? (vda^vdb).duale() : vd.duale();
+       // v.mean += vda.norm();
       }
 
-
-      /*-----------------------------------------------------------------------------
-       *  
-       *-----------------------------------------------------------------------------*/
-      v.mean = v.normal.norm()/area; //divide by area?
+     // v.mean = v.normal.norm() * wt2/v.area; //divide by area?
       v.normal = v.normal.unit();
 
       if (bUseCotan){
-        v.mean = (ct/area).norm();
+        v.mean = (ct/v.area).norm();
         v.normal = ct.unit();
       }
 
     }
 
-    //now calculate second derivative (i.e. riemann curvature)
+    //now calculate second derivative (i.e. riemann curvature, gaussian)
     for (auto& i : graph.node() ){
       auto& v = i->data();
       auto& na = v.normal;
       auto& simplex = i->data().simplex; //simplex is already built
       auto e = i->valence();
-      float area = 0;
       float deficit = TWOPI;
       for (int j=0;j<e.size();++j){
          int next = (j<e.size()-1) ? j+1 : 0;
@@ -183,23 +198,71 @@ struct MyApp : App {
          auto& nnc = e[next]->next->a().normal;
                   
          /*-----------------------------------------------------------------------------
-          *  Use "Exterior Derivative"
+          *  Use internal exterior per simplex or "Next Exterior Derivative"
           *-----------------------------------------------------------------------------*/
          auto vv = simplex[j].derivative(na,nb,nc); 
          
          auto va = simplex[j].derivative0(na,nb,nc); 
          auto vb = simplex[next].derivative0(na,nnb,nnc); 
        
-         //v.curl += va^vb;
          v.curl += bExterior ? va^vb : vv;
-         area += simplex[j].area;
+         v.spur += va;
          deficit -= simplex[j].deficit();
       }
+      
       v.curl *= wt; 
-      deficit *= wt;  
-      if (bDivideByArea){ v.curl /= (2*area); deficit /=area; }
+      deficit *= wt; 
+       
+      if (bDivideByArea){ 
+        v.curl /= (2*v.area); 
+        v.spur /= 2*v.area;
+        deficit /=v.area; 
+     
+     }
+     
+      v.mean = (-v.normal<=v.spur)[0] * wt2;
+
       v.kg= bUseCotan ? deficit : -(v.curl <= !(v.normal.duale()))[0];
     }
+
+      /*-----------------------------------------------------------------------------
+       *  And Average -> mean
+       *-----------------------------------------------------------------------------*/
+    if (bDerivOfShape){
+        for (auto& i : graph.node() ){
+          auto e = i->valence();
+          auto& v = i->data();
+          v.spur = Vec(0,0,0);
+          auto a = v.curl.duale();
+          auto& simplex = v.simplex;
+          for (int j=0;j<e.size();++j){
+            auto b = e[j]->a().curl.duale();
+            auto c = e[j]->next->a().curl.duale();
+            auto sa = simplex[j].derivative(a,b,c);
+            v.spur += sa; 
+          }
+          v.spur /= 2*v.area;
+          v.mean = (-v.normal<=v.spur)[0] * wt2;
+        }
+    }
+
+    /*-----------------------------------------------------------------------------
+     *  Gradient of Gaussian
+     *-----------------------------------------------------------------------------*/
+      for (auto& i : graph.node() ){
+          auto e = i->valence();
+          auto& v = i->data();
+          auto a = v.kg;
+          auto& simplex = v.simplex;
+          float area = 0;
+          for (int j=0;j<e.size();++j){
+            auto& b = e[j]->a().kg;
+            auto& c = e[j]->next->a().kg;
+            auto grad = simplex[j].derivative0(a,b,c);
+            v.kgGrad += grad;//.duale();
+          }
+          v.kgGrad *= (wt2/v.area);
+      }
     
   }
 
@@ -220,6 +283,12 @@ struct MyApp : App {
         DrawAt(v.normal, v.pnt,0,v.kg>0,1);
       }
     }
+    if(bDrawGaussGrad){
+      for (auto& i : graph.node() ){
+        auto& v = i->data();
+        DrawAt(v.kgGrad, v.pnt,0,1,1);
+      }
+    }
 
 
     for (auto& i : graph.edge() ){
@@ -231,13 +300,19 @@ struct MyApp : App {
         auto& a = i->a();
         auto& b = i->b();
         auto& c = i->c();
-        GL::color( fabs(a.kg), a.kg > 0 ,1-fabs(a.kg));
+        float ta = bDrawMean ? fabs(a.mean) : fabs(a.kg);
+        float tb = bDrawMean ? fabs(b.mean) : fabs(b.kg);
+        float tc = bDrawMean ? fabs(c.mean) : fabs(c.kg);
+        bool ba = bDrawMean ? a.mean < 0 : a.kg < 0;
+        bool bb = bDrawMean ? b.mean < 0 : b.kg < 0;
+        bool bc = bDrawMean ? c.mean < 0 : c.kg < 0;
+        GL::color( ta, ba, 1-ta,.8);
         GL::normal( a.normal.begin());
         GL::vertex( a.pnt.begin() );
-        GL::color( fabs(b.kg),  b.kg > 0 ,1-fabs(b.kg));
+        GL::color( tb, bb, 1-tb,.8);
         GL::normal( b.normal.begin());
         GL::vertex( b.pnt.begin() );
-        GL::color( fabs(c.kg),  c.kg > 0,1-fabs(c.kg));
+        GL::color( tc, bc, 1-tc,.8);
         GL::normal( c.normal.begin());
         GL::vertex( c.pnt.begin() );
       }

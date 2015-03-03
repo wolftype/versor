@@ -11,10 +11,11 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "vsr_generic_op.h"
-//#include "vsr_graph.h"
 #include "vsr_field.h"
 
 namespace vsr{ 
+
+  namespace generic{
 	
 	template<class A>
 	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
@@ -213,6 +214,8 @@ namespace vsr{
     glEnd();
   }
  
+  }//generic
+
 } //vsr::
 
 #endif

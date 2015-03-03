@@ -25,6 +25,7 @@
 namespace vsr {
 
 //simplicial variable (2D facets in 3D space)
+//we will generalize this . . .
 struct Simplicial2 {
    
    Vec ea, eb;            ///< edges
@@ -77,8 +78,22 @@ struct Simplicial2 {
      auto wa = dna <= ea;      
      auto wb = dnb <= eb;
      // weighted reciprocals
-     return ((ra*wa)^(rb*wb)) ; //q: divide by area? or after
+     return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
    }
+
+   //exterior derivative / differential
+   Biv derivative(const float& n, const float& na, const float& nb){
+     //diff along edges
+     auto dna = na - n;
+     auto dnb = nb - n; 
+     // coefficients
+     auto wa = dna;// <= ea;      
+     auto wb = dnb;// <= eb;
+     cout << wa << " " << wb << endl;
+     // weighted reciprocals
+     return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
+   }
+   
 
   // sum of weights across recipcrocals
    template<class T>
@@ -122,8 +137,20 @@ struct Simplicial2 {
      auto wa = dna <= ea;      
      auto wb = dnb <= eb;
      // return sum of weighted reciprocals
-     return ( (ra*wa)+(rb*wb)/area ); //q: divid by area? or after sum
+     return ( (ra*wa)+(rb*wb) ); //q: divid by area? or after sum
    }
+
+   Vec derivative0(const float& n, const float& na, const float& nb){
+     //diff along edges
+     auto dna = na - n;
+     auto dnb = nb - n; 
+     // coefficients
+     auto wa = dna;// <= ea;      
+     auto wb = dnb;// <= eb;
+     // return sum of weighted reciprocals
+     return ( (ra*wa)+(rb*wb) ); //q: divid by area? or after sum
+   }
+
 
 
   float deficit(){

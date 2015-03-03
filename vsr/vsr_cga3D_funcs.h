@@ -58,13 +58,13 @@ namespace vsr{
       }
 
        /*!
-        *  \brief spin product in range [0,PI) of some type t and some generator p
+        *  \brief spin product in range [0,RANGE) of some type t and some bivector generator p
         */
       template<class T, class G>
-      vector<T> spin( const T& s, const G& p, int num){
+      vector<T> spin( const T& s, const G& p, int num, float range=PI){
         vector<T> res;
         for (int i=0;i<num;++i){
-          float t=PI*(float)i/num;
+          float t=range*(float)i/num;
           res.push_back( s.spin( gen(p*t) ) ) ;
         }
         return res;
@@ -100,7 +100,12 @@ namespace vsr{
      inline Point pointOnLine( const Line& lin, const V& v){
        return Ro::null( Fl::loc( lin, v, false) );
      }    
+ 
+     auto pointOnCircle = [](const Circle& c, VT t){
+      return Ro::pnt_cir(c,t);
+     };
   
+
      /*!
       *  \brief  DualLine axis of circle c
       */
@@ -225,6 +230,11 @@ namespace vsr{
       /* } */
 
       #pragma mark COINCIDENCE_FUNCTIONS
+
+       ///circle intersection of dual spheres
+       inline Circle meet( const Dls& s, const Dls& d){
+        return (s ^ d).dual();
+      }  
 
       ///circle intersection of dual sphere and direct plane
        inline Circle meet( const Dls& s, const Dlp& d){

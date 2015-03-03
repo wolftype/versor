@@ -248,13 +248,15 @@ namespace vsr{
         f = new Face(); 
 
         //Assign a edge incident to b, b edge incident to c, etc      
-        ea -> node = nb;  
-        eb -> node = nc; 
-        ec -> node = na; 
+        ea -> node = na;//nb;  
+        eb -> node = nb;//nc; 
+        ec -> node = nc;//na; 
         
         f -> edge = ea; //Pick any old edge
 
-        na -> edge = ea; nb -> edge = eb; nc -> edge = ec;
+        na -> edge = eb;//ea; 
+        nb -> edge = ec;//eb; 
+        nc -> edge = ea;//ec;
 
         ea -> next = eb; ea -> face = f;  // assign next edge and face
         eb -> next = ec; eb -> face = f;
@@ -291,7 +293,7 @@ namespace vsr{
     HEGraph& add( T& v ) {  
       int num = mNode.size();      
       if (num < 3 )  addNode( v );
-      if (num == 2 ) seedNodes();
+      if (num == 2 ) seedNodes(); //if num was 2 coming in, it is now 3 so seed
       if (num >= 3 ) addAt ( v, lastEdge() );
       return *this;
    }
@@ -389,7 +391,7 @@ namespace vsr{
 
    }
 
-  ///eb   /ea
+  ///eb   /ea counter clockwise
    void close( HalfEdge& ha, HalfEdge& hb){
 
       //add an edge and a face
@@ -415,6 +417,7 @@ namespace vsr{
       mFace.push_back( f );
    }
 
+   // close edge and node
    void close( HalfEdge& e, Node& n){
 
       //a new face
@@ -622,9 +625,9 @@ namespace vsr{
     vector<Node*> node() const { return mNode; }
 
 
-    //GENERIC GRAPHING UTIL
+    //GENERIC ux, uy GRAPHING UTIL
     template<class S>
-    HEGraph& UV(int w, int h, S& p);
+    HEGraph& UV(int w, int h, S& p, bool bCloseU=false,bCloseV=false);
 
     private:
 
@@ -758,23 +761,23 @@ namespace vsr{
 
     /// class S needs only be indexable by operator[]
     template<class T> template<class S>
-    inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p){
+    inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p, bool bCloseU, bool bCloseV){
       HEGraph<T>& graph = *this;
       //left column
       for (int j = 0; j < h; ++j){
           int idx = j;
           int idxB = j+h;
           //add first two points
-          if (j<2) graph.add( p[idx] );
+          if (j<2) graph.add( p[idx] );//adds a, c
           else graph.addAt( p[idx], graph.edge(-3) );
           //add next row over
-          if (j==0) graph.add( p[idxB] );
-          else if (j<2) graph.addAt( p[idxB], graph.edge(-2) );
-          else  graph.addAt( p[idxB], graph.edge(-1) );
+          if (j==0) graph.add( p[idxB] );//adds b
+          //else if (j<2) graph.addAt( p[idxB], graph.edge(-2) ); 
+          else  graph.addAt( p[idxB], graph.edge(-1) );       //add to last edge
       }
 
       for (int i = 2; i < w; ++i){
-        int idx = ((i-2) * (w-1) + 1)*6 -1;
+        int idx = ((i-2) * (h-1) + 1)*6 -1;
         int pidx = i * h;
         int pidxB = pidx + 1;
         graph.addAt( p[pidx], graph.edge( idx ) );
@@ -785,6 +788,26 @@ namespace vsr{
             graph.add( p[pidxC] );  
         }
       }
+
+      if (bCloseU){
+        for (int j=0;j<h-1;++j){
+          int idxR = ((w-2)*(h-1)+j+1)*6;
+          int idxL = j*6;
+          graph.close( graph.edge(idxR), *graph.edge(idxL).node);
+        }
+      }
+      if (bCloseV){
+        if(!bCloseU){
+          for (int j=0;j<w-1;++j){
+            int idxT = ((w-1)*j+1)*6;
+            int idxB = j*6;
+            graph.close( graph.edge(idxR), *graph.edge(idxL).node);
+          }
+        }else{}
+      }
+
+
+
       return graph;
     }
 
