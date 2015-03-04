@@ -2,8 +2,6 @@
 
 namespace vsr{  
   
-
-                         
 //template class CGAMV<5,   CGA<5>::Sca   >;  
 //template class CGAMV<5,   CGA<5>::Vec   >;  
 //template class CGAMV<5,   CGA<5>::Vec2D >;  

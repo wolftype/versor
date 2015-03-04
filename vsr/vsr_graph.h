@@ -231,7 +231,7 @@ namespace vsr{
 
 
    //METHODS
-   //once three nodes exist, seed them into a facet
+   //once three nodes exist, seed them into a facet (starts with b)
     void seedNodes(){
 
         Node *na, *nb, *nc; 
@@ -254,9 +254,9 @@ namespace vsr{
         
         f -> edge = ea; //Pick any old edge
 
-        na -> edge = eb;//ea; 
-        nb -> edge = ec;//eb; 
-        nc -> edge = ea;//ec;
+        na -> edge = eb; //emanating
+        nb -> edge = ec; 
+        nc -> edge = ea;
 
         ea -> next = eb; ea -> face = f;  // assign next edge and face
         eb -> next = ec; eb -> face = f;
@@ -627,7 +627,7 @@ namespace vsr{
 
     //GENERIC ux, uy GRAPHING UTIL
     template<class S>
-    HEGraph& UV(int w, int h, S& p, bool bCloseU=false,bCloseV=false);
+    HEGraph& UV(int w, int h, S& p, bool bCloseU=false,bool bCloseV=false);
 
     private:
 
@@ -759,6 +759,13 @@ namespace vsr{
     /* } */
 
 
+
+    /*-----------------------------------------------------------------------------
+     *  c <--d
+     *  | \  ^
+     *  |  \ |
+     *  a--->b
+     *-----------------------------------------------------------------------------*/
     /// class S needs only be indexable by operator[]
     template<class T> template<class S>
     inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p, bool bCloseU, bool bCloseV){
@@ -772,7 +779,7 @@ namespace vsr{
           else graph.addAt( p[idx], graph.edge(-3) );
           //add next row over
           if (j==0) graph.add( p[idxB] );//adds b
-          //else if (j<2) graph.addAt( p[idxB], graph.edge(-2) ); 
+          //else if (j<2) graph.addAt( p[idxB], graph.edge(-3) ); 
           else  graph.addAt( p[idxB], graph.edge(-1) );       //add to last edge
       }
 
@@ -798,10 +805,13 @@ namespace vsr{
       }
       if (bCloseV){
         if(!bCloseU){
-          for (int j=0;j<w-1;++j){
-            int idxT = ((w-1)*j+1)*6;
-            int idxB = j*6;
-            graph.close( graph.edge(idxR), *graph.edge(idxL).node);
+          graph.close( graph.edge(6*(h-1)-3), graph.node(0) );
+          graph.close( graph.lastEdge(), *graph.node(0).edge );
+          for (int i=1;i<w-1;++i){
+            int idxB = (i*(h-1))*6+2;
+            int idxT = ((i+1)*(h-1)*6)-3;
+            graph.close( graph.edge(idxT), *graph.edge(idxB).prev().node);
+            graph.close( graph.lastEdge(), graph.edge(idxB) );
           }
         }else{}
       }

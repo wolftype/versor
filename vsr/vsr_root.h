@@ -29,11 +29,12 @@ namespace vsr{
  *-----------------------------------------------------------------------------*/
 struct Root{
 
+
   ///Utility function to compare two vectors (looks at dot product, or norm of diff...)           
   template<class V>
   static bool Compare(const V& a, const V& b, bool ref = true){   
 //    return ( ( a-b ).wt() ) < .000001; 
-    return ( ref ? (a<=b)[0] > .9999999 : fabs ((a<=b)[0]) > .9999999 );// amt; 
+    return ( ref ? (a<=b)[0] > .99999 : fabs ((a<=b)[0]) > .99999 );// amt; 
   }            
     
     //Build a Root System from Simple Root Generators (ANY Dimension!)
@@ -43,18 +44,19 @@ struct Root{
       vector< V > initial;                      //<-- Initial Simple Roots
     
       int n = sizeof...(R) + 1;
+
       V root[] = {x, v... };
     
       for ( int i = 0; i < n; ++i ){
          initial.push_back( root[i].unit() );    
       } 
 
-      return System( initial );
+      return System( initial, false ); //flag for repeating opposite sides
    }
     
    // Build a Root System from A vector of Simple Roots
    template<class V>
-   static vector<V> System( const vector<V>& root, int nMaxIter = 5000){
+   static vector<V> System( const vector<V>& root, bool ref=true, int nMaxIter = 500){
 
     //Copy simple roots into results first
     vector< V > results = root;
@@ -65,21 +67,19 @@ struct Root{
     int iter = 0; 
     while (keepGoing){   
         iter++;
-        bool done = true;
-        
+        bool done = true;        
         int cs = results.size(); 
 
-        for (int i = 0; i < cs; ++i){  
-        
+        for (int i=0; i<cs; ++i){  
           int ns = results.size();
         
-          for (int j = 0; j < ns; ++j ){
+          for (int j=0; j<ns; ++j ){
 
               V nr = results[j].reflect( results[i] ); 
 
               bool exists = 0; 
-              for ( int k = 0; k < ns; ++k){ 
-                exists = ( Compare(nr.unit(),results[k].unit()) );
+              for ( int k=0; k<ns; ++k){ 
+                exists = ( Compare(nr.unit(),results[k].unit(),ref) );
                 if (exists) {  
                   break;
                 }
@@ -89,11 +89,10 @@ struct Root{
                 results.push_back( nr );
                 done = false;  //if even one is new, try them all again
               }   
-
             }
         } 
         
-        if (done || (iter > nMaxIter) ) { keepGoing = false; } // if not, then stop
+        if (done || (results.size() > nMaxIter) ) { keepGoing = false; } // if not, then stop
  
    }
 

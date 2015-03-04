@@ -11,7 +11,8 @@ namespace vsr{
                           
   using namespace gfx;
   
-  
+//  namespace cga3D{
+
   void Immediate (const Vec& s){
     //cout << "vec" << endl; 
       gfx::Glyph::Line(s);
@@ -275,5 +276,7 @@ namespace vsr{
   // template void Draw(const Vec&, float, float, float ,float);  
     
 
-} 
+//  }//cga3D::
+
+} //vsr::
     

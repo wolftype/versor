@@ -21,6 +21,9 @@
 #define  vsr_cga3D_app_INC
 
 #include "vsr_cga3D.h"
+#include "vsr_cga3D_draw.h"
+#include "vsr_cga3D_render.h"
+#include "vsr_cga3D_control.h"
 #include "gfx/util/gfx_glv_app.h"
 
 using namespace vsr;

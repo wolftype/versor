@@ -17,6 +17,7 @@ namespace vsr{
                              
   using namespace gfx;
   
+ //namespace cga3D{
 
   //Draw Routine
   template<class A>
@@ -62,30 +63,29 @@ namespace vsr{
     
 
 
- template< class A, class B>
-  void DrawAll( const A& a, const B& b){
-  Draw( a ^ b, 1, 0 ,0 );
-  Draw( a <= b, 1, .2, 0 );
-  Draw( a.dual() <= b, 0, 1, 0 );
-  Draw( a.dual() ^ b, 0, 1, .2 );
-  Draw( a <= b.dual() , 0, 0, 1);
-  Draw( a ^ b.dual() , .2, 0, 1);
-  Draw( a.dual() ^ b.dual(), .2, .5, .7 );
-  Draw( a.dual() <= b.dual(), .4, .3, .6 );
-  Draw( A( Op::project(a,b) ),1,0,1,.2 );
-  Draw( A( Op::reject(a,b) ),1,1,0,.2 );
+   template< class A, class B>
+    void DrawAll( const A& a, const B& b){
+    Draw( a ^ b, 1, 0 ,0 );
+    Draw( a <= b, 1, .2, 0 );
+    Draw( a.dual() <= b, 0, 1, 0 );
+    Draw( a.dual() ^ b, 0, 1, .2 );
+    Draw( a <= b.dual() , 0, 0, 1);
+    Draw( a ^ b.dual() , .2, 0, 1);
+    Draw( a.dual() ^ b.dual(), .2, .5, .7 );
+    Draw( a.dual() <= b.dual(), .4, .3, .6 );
+    Draw( A( Op::project(a,b) ),1,0,1,.2 );
+    Draw( A( Op::reject(a,b) ),1,1,0,.2 );
 
-}
+  }
 
-template<class A, class B>
-void DrawEvery( const A& a, const B& b){
-  DrawAll(a,b);
-  DrawAll(a^Inf(1),b);
-  DrawAll(a, b^Inf(1) );
- // DrawAll(a, b);
-}
+    template<class A, class B>
+    void DrawEvery( const A& a, const B& b){
+      DrawAll(a,b);
+      DrawAll(a^Inf(1),b);
+      DrawAll(a, b^Inf(1) );
+     // DrawAll(a, b);
+    }
 
- 
 
   
   template<class T>
@@ -141,13 +141,11 @@ void DrawEvery( const A& a, const B& b){
   void TriNormal( const T& a, const T& b, const T& c, bool cc = false ){
     gfx::GL::normal( Ro::dir( a^ ( !cc ? ( b^c ) : (c^b) ) ).template copy<Biv>().duale().unit() );
     gfx::GL::Tri( a, b, c );
-   // glColor3f(0,0,0);
-    //gfx::GL::TriLine(a,b,c);
   }
 
+//  } //cga3D::
   
-  
-} 
+} //vsr::
 
 
 #endif

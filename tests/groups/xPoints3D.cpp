@@ -17,12 +17,12 @@
  * =====================================================================================
  */
 
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"
 #include "vsr_root.h"
 #include "vsr_group.h"
-#include "vsr_generic_draw.h"
 #include "vsr_hull.h"
 
+#include "vsr_generic_draw.h"
 #include "vsr_graph_draw.h"
 
 using namespace vsr;
@@ -39,21 +39,19 @@ struct MyApp : App {
   // 3d convex hull
   ConvexHull<3> hull;
 
-  MyApp(Window * win ) : App(win){
+  void setup(){
     scene.camera.pos( 0,0,10 ); 
     time = 0;
-  }
+      
+    bindGLV();
 
-  void initGui(){
-      gui(amt,"amt",0,100);
-      gui(p,"p",0,10)(q,"q",0,10);
-      gui(bDrawHull,"drawHull");
-      p =4; q = 3;
+    gui(amt,"amt",0,100);
+    gui(p,"p",0,10)(q,"q",0,10);
+    gui(bDrawHull,"drawHull");
+    p =4; q = 3;
   }
   
   virtual void onDraw(){ 
-
-     // (NEVec<3>::x <= -NEVec<3>::x).print();
 
       auto a = NEVec<3>::y;//.rot(NEBiv<3>::xy * PIOVERFOUR/2.0) ;
       auto c = NEVec<3>::x;//.rot(NEBiv<3>::xy * PIOVERFOUR/2.0) ;
@@ -88,33 +86,24 @@ struct MyApp : App {
       //DRAW
      // Draw(a,1,0,0); Draw(b,1,0,0); Draw(c,1,0,0);      
       for (int i=0;i<rs.size();++i){
-        Draw( rs[i],0,1,0 );
+        //rs[i].print();
+        generic::Draw( rs[i],0,1,0 );
       }
 
       hull.initialFace(rs);
       hull.altConvexPass(rs);
       hull.closeHoles(rs,amt);
-      if (bDrawHull) Draw(hull.graph);
+      if (bDrawHull) generic::Draw(hull.graph);
 
   }
    
 };
 
 
-MyApp * app;
-
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  glv << *app;
-
-  Application::run();
-
+  MyApp app;
+  app.start();
   return 0;
 
 }

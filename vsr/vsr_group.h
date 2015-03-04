@@ -18,7 +18,7 @@ using std::vector;
 
 namespace vsr{
 
-/// Simple Reflection Group (no translating spinors)
+/// Simple Reflection Group (no translating or gliding spinors)
 template<class V>
 struct SimpleGroup{
    vector<V> ops;                       ///< Pin Operators (Vec, etc)
@@ -45,11 +45,14 @@ struct SimpleGroup{
 template< class V >
 struct Group {
 
+  int numSimple; ///< number of simple roots used to generate group
+
   /// Trs is the translator type of whatever conformal metric we are in
   typedef typename V::template BType< typename V::Mode::Trs > Trs; 
 
    vector<V> ops;                       ///< Pin Operators (Vec, etc)
    vector<decltype(V()*V())> sops;      ///< Spin Operators (Rot, etc)
+   vector<decltype(V()*V()*V())> tops;  ///< Triple Reflection (abbar 3d group)
    vector<decltype(V()*Trs())> gops;    ///< Glide Operators 
 
    Group() {}
@@ -63,7 +66,7 @@ struct Group {
           for (auto& i : ops ){
               T tp = p.reflect( i.unit() ); 
               res.push_back( tp );
-              //reflect back over first mirror plane to get original ...
+              //reflect EACH back over first mirror plane to get original ...
               res.push_back( tp.reflect( ops[0].unit() ) );
           }
 
@@ -71,6 +74,13 @@ struct Group {
             T tp = p.spin(i);
             res.push_back(tp);
           }
+
+          //unsure about this (abc)..
+          for (auto& i : tops){
+            T tp = p.reflect(i);
+            res.push_back(tp);
+          }
+
 
            //apply glides and reapply pins
            for (auto& i : gops){
@@ -317,24 +327,194 @@ struct PointGroup3D : Group<V> {
 
     //must satisfy dicycle ab^p = bc^q = ac^2
     PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) {
+      
+      //0. a and c are at 90 degrees, must find b...
       a = V::x;
-      Biv biv = Biv::xy * PIOVERTWO / p;
-      Biv biv2 = Biv::yz * PIOVERTWO / q;
-      b = V::x.rot(biv).rot(biv2);
       c = V::y;
-      if (abar == bbar == abbar == false){
+      
+      //1. employ the good old spherical trig cosine rule ...
+      double tb = PIOVERTWO;
+      double ta = PI/(int)p;
+      double tc = PI/(int)q;
+
+      double ca = cos(ta);
+      double sa = sin(ta);
+      double cb = cos(tb);
+      double sb = sin(tb);
+      double cc = cos(tc);
+      double sc = sin(tc);
+
+      double tA = acos( (ca-(cb*cc))/(sb*sc) );
+      //double tB = acos( (cb-(ca*cc))/(sa*sc) );
+      double tC = acos( (cc-(ca*cb))/(sa*sb) );
+
+      //2. ... to rotate the yx plane ...
+      auto bivA = (a ^ c).rot( a.duale() * tC / 2.0 );
+      auto bivC = (a ^ c).rot( c.duale() * tA / 2.0 );
+
+      //3. ... and find b via coincidence of planes ...
+      b = (bivA.duale() ^ bivC.duale()).duale().unit();
+
+      if (abar == bbar == abbar == false){  //only reflection
         this->ops = Root::System(a,b,c);
+        this->numSimple = 3;
       }
-      if (abbar){
-       // this->sops = a * b * c;
+      else if (abbar){          //bar across both
+        this->tops = Root::System(a*b*c);
+        this->numSimple =1;
+      }else if (abar && bbar) { //both are individual bars
+
+        auto rot = a*b;
+        auto trot = rot;
+        for (int i=0;i<p;++i){
+          this->sops.push_back(trot);
+          trot = trot * rot;
+        }
+        rot = b*c;
+        trot = rot;
+        for (int i=0;i<q;++i){
+          this->sops.push_back(trot);
+          trot=trot* rot;
+        }
+        
+      } else { //only one or other are bars
+        if (abar){
+         // cout << "a bar" << endl;
+          auto rot = a*b;
+          auto trot = rot;
+          //vector<V> pin; pin.push_back(c);
+          for (int i=0;i<p;++i){
+            this->sops.push_back(trot);
+            //pin.push_back( pin.back().spin(trot) ); //spin each pin
+            trot = trot * rot;
+          }
+          this->ops = Root::System( c );
+          //now spin pin
+          for (auto& i : this->sops){
+            auto tmp = this->ops[0].spin(i);
+            if ( !Root::Compare( this->ops[0].unit(), tmp.unit(), false ) ){
+              this->ops.push_back(tmp);
+            }
+          }
+          this->numSimple = 1;
+        } 
+        if (bbar){
+          auto rot = b*c;
+          auto trot = rot;
+         // vector<V> pin; pin.push_back(a);
+          for (int i=0;i<q;++i){
+            this->sops.push_back(trot);
+            //pin.push_back( pin.back().spin(trot) ); //spin each pin
+            trot = trot * rot;
+          }
+          this->ops = Root::System( a );
+          //now spin pin
+          for (auto& i : this->sops){
+            auto tmp = this->ops[0].spin(i);
+            if ( !Root::Compare( this->ops[0].unit(), tmp.unit(), false ) ){
+              this->ops.push_back(tmp);
+            }
+          }
+          this->numSimple = 1;
+        }
       }
     }
+
+
+    /// Applies all operators on p motif and returns results
+	  template<class T>
+    vector<T> operator()(const T& p){
+          vector<T> res;
+          res.push_back(p);
+
+          //spin first
+          int n = res.size();
+          for (auto& i : this->sops){
+          //  for (int j=0;j<n;++j){
+              T tp = res[0].spin(i);
+              res.push_back(tp);
+          //  }
+          }
+
+          /* //now reflect all */
+          for (auto& i : this->ops){
+            int n = res.size();
+            for (int j=0;j<n;++j){
+              auto ts = res[j].reflect( i.unit() );
+              res.push_back(ts);
+            }
+          }
+
+          
+          /* for (auto& i : this->ops){ */
+          /*   auto tp =  p.reflect( i.unit() ); */
+          /*   res.push_back(tp); */
+          /*   res.push_back( tp.reflect( this->ops[0].unit() ) ); */
+          /*   if (this->ops.size()>2){ */ 
+            
+          /*   } */
+          /* } */
+          //vector<T> tmp;
+          /* tmp.push_back(p); */ 
+
+          /* auto tp = p; int iter=0; */
+          /* for (auto& i : this->ops){ */
+          /*   tp = p.reflect(i.unit()); */
+          /*   res.push_back(tp); */
+          /*   res.push_back( tp.reflect(this->ops[0].unit()) ); */
+          /*   if (this->ops.size()>2){ */
+          /*     if (iter>2){ */
+          /*      auto ttp = tp.reflect( this->ops[1].unit() ); */
+          /*      res.push_back(ttp); */
+          /*      ttp = tp.reflect(this->ops[2].unit()); */
+          /*      res.push_back(ttp); */
+          /*     } */
+          /*   } */
+          /*   iter++; */
+          /* } */
+
+              //reflect EACH back over first mirror plane to get original ...
+              /* res.push_back( tp.reflect( this->ops[0].unit() ) ); */
+          /* } */
+
+
+          //unsure about this (abc)..
+          for (auto& i : this->tops){
+            T tp = p.reflect(i);
+            res.push_back(tp);
+          }
+
+
+           //apply glides and reapply pins
+           for (auto& i : this->gops){
+              T tg = p.reflect(i);
+              if (this->ops.empty()) {
+                res.push_back(tg);
+                res.push_back( tg.reflect( this->gops[0] ) );
+              }              
+              for (auto& j : this->ops){
+                T tp = tg.reflect( j.unit() );
+                res.push_back(tp);
+                res.push_back( tp.reflect( this->ops[0].unit() ) );
+              }
+           }
+          
+          return res;
+    }
+
+
 
     auto ab() RETURNS ( a * b )
     auto ac() RETURNS ( a * c )
     auto bc() RETURNS ( b * c )
 
 };
+
+      //Biv biv = Biv::xy * PIOVERTWO / p;
+      //Biv biv2 = Biv::yz * PIOVERTWO / q;
+      //b = V::x.rot(biv).rot(biv2);
+      //c = V::y;
+
 
 template<class V>
 struct SpaceGroup3D : PointGroup3D<V> {

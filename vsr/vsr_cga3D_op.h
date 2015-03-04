@@ -18,7 +18,6 @@ namespace vsr{
 using namespace cga3D;
 
 
-
 namespace Op{
   
   Rot AA( const Vec& s);                
@@ -85,7 +84,6 @@ namespace Gen{
       }
    
 };
-
 
 
 /* namespace Ro { */
@@ -298,6 +296,7 @@ CGAMV<DIM,A> CGAMV<DIM,A>::twist( const T& t) const{
 #define EUCLIDEAN_INF INFTY
 #define HLN(x,y,z) (vsr::Ori(1)^PT(x,y,z)^EP) //hyperbolic line (circle)
 #define HDLN(x,y,z) (vsr::Op::dl(HLN(x,y,z)))
+
 
 }    //vsr::                                       
 
