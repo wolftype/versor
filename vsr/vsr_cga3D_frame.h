@@ -75,7 +75,7 @@ namespace vsr {
     
     /// Get Scale
     VT scale() const { return mScale; }
-    /// Get Scale
+    /// Get Scale by Reference
     VT& scale() { return mScale; }
 
 
@@ -89,9 +89,9 @@ namespace vsr {
     /// Get Rotor
     Rotor rotor() const { return mRot; }
 
-    /// Set Rotor by reference 
+    /// Get Rotor by reference 
     Rot& rot() { return mRot; } 
-    // Set Rotor by reference
+    //  Get Rotor by reference
     Rot& rotor() { return mRot; }     
     /// Set rotor with rotor 
     Frame& rot( const Rot& r) { mRot = r; return *this; }  
@@ -99,8 +99,8 @@ namespace vsr {
     Frame& rot( const Biv& B) { mRot = Gen::rot(B); return *this; }      
     /// Transpose rotor to quaternionic representation
     Rot quat() const { return Rot( mRot[0], -mRot[3], mRot[2], mRot[1] ); }
-    /// Orient z axis towards v
-    Frame& orient( const Vec& );
+    /// Orient z axis towards coordinate v, keeping y axis as vertical as possible (uses projection)
+    Frame& orient( const Vec& v);
     
 
     /*-----------------------------------------------------------------------------
@@ -226,9 +226,6 @@ namespace vsr {
     /// Rotate around local xy and return a new frame
     Frame rotXY( VT amt) const;
 
-    //DEPRECATED
-    /// Move by dx, dy, dz and return a new frame
-    //Frame move( VT dx , VT dy, VT dz ) const;
     /// Move by dx, dy, dz and return this
     Frame& move( VT dx , VT dy, VT dz );
     /// Twist by dualLine and return *this
@@ -246,6 +243,9 @@ namespace vsr {
     Frame moveY( VT amt ) const;
     Frame moveZ( VT amt ) const;
 
+    //DEPRECATED
+    /// Move by dx, dy, dz and return a new frame
+    //Frame move( VT dx , VT dy, VT dz ) const;
 
   };
    

@@ -35,7 +35,7 @@ struct MyApp : App {
     auto v = io().viewdata.ray;
     auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
 
-		targetPos = Ro::pointOnLine( line, Ori(1) );  
+		targetPos = pointOnLine( line, Ori(1) );  
 		
 		Frame targetFrame ( targetPos ); 
 

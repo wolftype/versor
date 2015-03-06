@@ -21,6 +21,92 @@ using namespace std;
 
 namespace vsr{
 
+//template<class V>
+//struct SymmetryGroup {
+//
+//  using Pin1 = V;
+//  using Pin2 = decltype(V()*V());
+//  using Pin3 = decltype(V()*V()*V());
+//
+//  vector<Pin1> p1; 
+//  vector<Pin2> p2; 
+//  vector<Pin3> p3; 
+//
+//  ///Utility function to compare two vectors (looks at dot product, or norm of diff...)  
+//  /// if ref=false then 180 degree reflections are considered equal         
+//  static bool Compare(const V& a, const V& b, bool ref = true){   
+//    return ( ref ? (a<=b)[0] > .99999 : fabs ((a<=b)[0]) > .99999 );// amt; 
+//  } 
+//
+//  //seed generators with this until nothing new comes out
+//  //probes will store transformation operator and result
+//  struct VecProbe {
+//
+//    V vec = V(1.2234578,2.838967,.123689).unit();
+//
+//    Pin1 pin1; Pin2 pin2; Pin3 pin3;
+//
+//    enum { PIN1, PIN2, PIN3 };
+//    int xf; ///< type of transformaiton used to make this 
+//
+//    VecProbe(){}
+//
+//    VecProbe( const V& input, const Pin1& versor) : xf(PIN1), pin1(versor), vec( input.reflect(versor)) {}
+//    VecProbe( const V& input, const Pin2& rotor) : xf(PIN2), pin2(rotor), vec( input.spin(rotor)) {}
+//    VecProbe( const V& input, const Pin3& rotvec) : xf(PIN3), pin3(rotvec), vec( input.reflect(rotvec)) {}
+//
+//  };
+//
+//  SymmetryGroup& add(const Pin1& _p1) { p1.push_back(_p1); }
+//  SymmetryGroup& add(const Pin2& _p2) { p2.push_back(_p2); }
+//  SymmetryGroup& add(const Pin3& _p3) { p3.push_back(_p3); }
+
+ /// goal is to use generators to collect all the unique transformations of the group, 
+ /// so we can apply them easily later. multiply all pins by all pins until none left, same for spins,
+ /// and same for pins with spins ( and spins with pins?)
+//  void System() {
+// 
+//     vector<VecProbe> results;
+//     for (auto& j : p1 ){
+//         results.push_back( VecProbe(j,j) );
+//     }    
+//     //pins of pins...
+//     bool keepGoing = true;
+//     while (keepGoing){ 
+//         bool done = true;        
+//         int cs = results.size();        // for all probes, add new probes until none are new
+//                                         // recording transformation sequences along the way
+//         for (int i=0; i<cs; ++i){
+//           int ns = results.size();  
+//          
+//             for (int j=0;j<ns; ++j){
+// 
+//               auto nr = VecProbe(results[i].vec, results[j].versor ); 
+// 
+//               bool exists = 0; 
+//               for ( int k=0; k<cs; ++k){ 
+//                 exists = ( Compare(nr.vec.unit(),results[k].vec.unit(), false) );
+//                 if (exists) {  
+//                   break;
+//                 }
+//               }
+// 
+//               if (!exists)  { 
+//                 results.push_back( nr );
+//                 done = false;  //if even one is new, try them all again
+//               }   
+//             }
+//         } 
+//         // if none are new or results is too big, end loop
+//         if (done || (results.size() > 500) ) { keepGoing = false; } // if not, then stop
+// 
+//     }
+// 
+//   }
+
+
+//};
+
 
 /*!-----------------------------------------------------------------------------
  * CALCULATES POLYTOPES FROM SIMPLE ROOTS IN ND (beware infinite groups . . .)

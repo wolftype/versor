@@ -203,7 +203,7 @@ namespace vsr{
       return *this;
     }
 
-    //orient -z to target, and keep y as vertical as possible
+    /// orient -z to target, and keep y as vertical as possible
     Frame& Frame::orient( const Vec& v ){
       //Vec current = z();
       Rot tRot = Gen::ratio( -Vec::z, (v-vec()).unit() );

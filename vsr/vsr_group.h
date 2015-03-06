@@ -316,14 +316,21 @@ struct Lattice {
 
 
 
-
 template<class V>
 struct PointGroup3D : Group<V> {
+
 
     typedef typename V::template BType< typename V::Mode::Biv > Biv;
     //typedef typename V::template BType< typename V::Mode::Mot > Mot;
 
     V a, b, c;
+
+//    //or this method...
+//    vector<V> opsA;                       ///< A Pin Operators (Vec, etc)
+//    vector<decltype(V()*V())> sopsA;      ///< A Spin Operators (Rot, etc)
+//    vector<V> opsB;                       ///< B Pin Operators (Vec, etc)
+//    vector<decltype(V()*V())> sopsB;      ///< B Spin Operators (Rot, etc)
+
 
     //must satisfy dicycle ab^p = bc^q = ac^2
     PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) {
@@ -355,92 +362,114 @@ struct PointGroup3D : Group<V> {
       //3. ... and find b via coincidence of planes ...
       b = (bivA.duale() ^ bivC.duale()).duale().unit();
 
-      if (abar == bbar == abbar == false){  //only reflection
+
+      if (!abar && !bbar && !abbar ){       //only reflections. easy!
         this->ops = Root::System(a,b,c);
+        //this->ops = Root::System(a,b,c);
         this->numSimple = 3;
-      }
-      else if (abbar){          //bar across both
+      } else if (abbar){                           //bar across both, so transformation is abc
         this->tops = Root::System(a*b*c);
         this->numSimple =1;
-      }else if (abar && bbar) { //both are individual bars
-
+      } else if ( abar && bbar ) {                  //both are individually barred (cyclic not mirrored)
         auto rot = a*b;
         auto trot = rot;
         for (int i=0;i<p;++i){
           this->sops.push_back(trot);
           trot = trot * rot;
         }
-        rot = b*c;
-        trot = rot;
+        auto brot = b*c;
+        auto btrot = brot;
         for (int i=0;i<q;++i){
-          this->sops.push_back(trot);
-          trot=trot* rot;
+          for (int j=0;j<p;++j){
+           this->sops.push_back( btrot * this->sops[j] );
+          }
+          btrot=btrot*brot;
         }
         
-      } else { //only one or other are bars
-        if (abar){
-         // cout << "a bar" << endl;
+      } else if (abar){                                  //now if only one or other are cyclic
           auto rot = a*b;
           auto trot = rot;
-          //vector<V> pin; pin.push_back(c);
-          for (int i=0;i<p;++i){
+          for (int i=0;i<p;++i){                        //make a bunch of rotors
             this->sops.push_back(trot);
-            //pin.push_back( pin.back().spin(trot) ); //spin each pin
             trot = trot * rot;
           }
-          this->ops = Root::System( c );
-          //now spin pin
-          for (auto& i : this->sops){
-            auto tmp = this->ops[0].spin(i);
+          this->ops = Root::System( c );                //instantiate single mirror plane
+
+          //now pin spin and collect any new ones?
+ //         for (auto& i : this->sops){
+ //           auto stmp = i.reflect(c);
+ //           bool bExists=false;
+ //           //check for existence
+ //           for (auto& j : this->sops){
+ //            if ( Root::Compare(stmp, j) ) bExists=true;
+ //           }
+ //           if (!bExists) this->sops.push_back(stmp);
+ //         }
+            //OR spin pin
+
+            auto tmp = this->ops[0].spin( this->sops[0] );
             if ( !Root::Compare( this->ops[0].unit(), tmp.unit(), false ) ){
-              this->ops.push_back(tmp);
+              this->ops.push_back(tmp.unit());
             }
-          }
-          this->numSimple = 1;
-        } 
-        if (bbar){
+ 
+          // and recalculate
+          this->ops = Root::System( this->ops, false );
+        } else if (bbar){
+         cout << "just two" << endl;
           auto rot = b*c;
           auto trot = rot;
-         // vector<V> pin; pin.push_back(a);
           for (int i=0;i<q;++i){
             this->sops.push_back(trot);
-            //pin.push_back( pin.back().spin(trot) ); //spin each pin
             trot = trot * rot;
           }
-          this->ops = Root::System( a );
-          //now spin pin
-          for (auto& i : this->sops){
-            auto tmp = this->ops[0].spin(i);
-            if ( !Root::Compare( this->ops[0].unit(), tmp.unit(), false ) ){
-              this->ops.push_back(tmp);
+          
+          auto rtmp = Root::System( a );
+          //now pin spin and collect any new ones?
+//          for (auto& i : this->sops){
+//            auto stmp = i.reflect(a);
+//            bool bExists=false;
+//            //check for existence
+//            for (auto& j : this->sops){
+//             if ( Root::Compare(stmp.runit(), j.runit()) ) bExists=true;
+//            }
+//            if (!bExists) this->sops.push_back(stmp);
+//          }
+          
+         // for (auto& i : this->sops){
+            auto tmp = a.spin( this->sops[0] );
+            if ( !Root::Compare( a, tmp.unit(), false ) ){
+              rtmp.push_back(tmp.unit());
             }
-          }
-          this->numSimple = 1;
-        }
-      }
+       //    }
+           //and recalculate
+          this->ops = Root::System( rtmp, false );
+
+    }
+
+        //...now inject a motif to collect all transformations?
     }
 
 
-    /// Applies all operators on p motif and returns results
-	  template<class T>
+    /// Applies all operators to p motif and returns results
+    template<class T>
     vector<T> operator()(const T& p){
+
           vector<T> res;
           res.push_back(p);
 
           //spin first
           int n = res.size();
           for (auto& i : this->sops){
-          //  for (int j=0;j<n;++j){
-              T tp = res[0].spin(i);
-              res.push_back(tp);
-          //  }
+            T tp = res[0].spin(i);
+            res.push_back(tp);
           }
 
           /* //now reflect all */
           for (auto& i : this->ops){
-            int n = res.size();
-            for (int j=0;j<n;++j){
-              auto ts = res[j].reflect( i.unit() );
+            int tn = res.size();
+            for (int j=0;j<tn;++j){
+              auto ts = res[j];
+              ts = ts.reflect( i.unit() );
               res.push_back(ts);
             }
           }

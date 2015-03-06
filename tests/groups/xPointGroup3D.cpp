@@ -31,6 +31,9 @@ struct MyApp : App {
   float p,q;
   bool pbar,qbar,pqbar;
 
+  bool bSetMouse=false;
+  Point mouse;
+
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -49,34 +52,37 @@ struct MyApp : App {
     pbar=qbar=pqbar=0;
   }
 
+  void onKeyDown(const gfx::Keyboard& k){
+    if (k.code=='s') bSetMouse = !bSetMouse;
+  }
 
   /*-----------------------------------------------------------------------------
    *  Draw Routines 
    *-----------------------------------------------------------------------------*/
   void onDraw(){
+    if (bSetMouse) mouse = calcMouse3D();
   
     PointGroup3D<Vec> pg(p,q,pbar,qbar,pqbar);
 
-    if (pg.ops.size()>2){
-      for (int i=3;i<pg.ops.size();++i){
+   // if (pg.ops.size()>2){
+      for (int i=0;i<pg.ops.size();++i){
         Draw(pg.ops[i],(float)i/pg.ops.size(),0,1-(float)i/pg.ops.size());
       }
-    }
+   // }
     for (auto& i : pg.sops){
      // Draw(Biv(i));
     }
     Draw(pg.a,1,0,0); Draw(pg.b,0,1,0); Draw(pg.c,0,0,1);
-
     
-    auto mouse = calcMouse3D();
-
     auto res = pg( mouse ^ mouse.trs(.2,0,.1) );
     auto res2 = pg( mouse ^ mouse.trs(0,.5,.2) );
+    //auto res3 = pg( Ro::round( Ro::dls(mouse,.2), Biv(.1,.2,.3).runit() ) ); // mouse.trs(0,.5,.2) );
+
 
    for (int i=0;i<res.size();++i) {
      Draw(res[i],(float)i/res.size(),0,1-(float)i/res.size());
      Draw(res2[i],(float)i/res.size(),1,1-(float)i/res.size());
-     //if (i>11) Draw( Ro::sur(res[i]), 0,1,0,.2);
+    // Draw(res3[i],(float)i/res.size(),1,1-(float)i/res.size());
     }
     cout << pg.ops.size() << " " << pg.sops.size() << endl;
   

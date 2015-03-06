@@ -17,8 +17,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"   
 #include "vsr_linkages.h"
 #include "vsr_chain_draw.h"
 
@@ -45,14 +44,9 @@ struct MyApp : App {
   bool bSubBennett;
   bool bPrintPs,bDrawOutline,bDrawMeet;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
 
-    //colors().back.set(0,0,0);    
-  }
-
-  void initGui(){
+  void setup(){
+      bindGLV();
       gui(numiter,"numiter",1,100);
       gui(numx,"numx",0,100)(numy,"numy",0,100);
       gui(d1,"d1",0,100);
@@ -78,18 +72,10 @@ struct MyApp : App {
       link = 2;
       d1 = 3; d2 = 3; theta = PIOVERFOUR; rot = .5; amtx1=amtx2=amty1=amty2=.5; thetax = -1; thetay = -1;
   }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
-  }
 
     virtual void onDraw(){ 
         
-      getMouse();
+      auto mouse = calcMouse3D();
 
       bool printps = false;
       if(bPrintPs){
@@ -220,20 +206,10 @@ struct MyApp : App {
   
 };
 
-MyApp * app;
 
 int main(){
-                             
-  GLV glv(0,0);  
-
-  Window * win = new Window(600,600,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  glv << *app;
-
-  Application::run();
-
+  MyApp app;
+  app.start();                             
   return 0;
 
 }

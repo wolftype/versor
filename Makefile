@@ -45,15 +45,15 @@ ifeq ($(STDLIB),1)
 CXX += -stdlib=libc++ -nostdinc++ -I../libcxx/include -L../libcxx/lib
 endif
 
-CXX += -O3 -ftemplate-depth-5000  -Wno-switch -Wno-int-to-pointer-cast
+CXX += -O3 -ftemplate-depth-5000  -Wno-deprecated-declarations -Wno-switch -Wno-int-to-pointer-cast
 AR 	= ar crs 
 
 IPATH = -Ivsr/ 
 LDFLAGS +=  
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
-IPATH += -I/usr/include/ 
-LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr 
+IPATH += -I/usr/include/ -I/usr/local/include 
+LDFLAGS += -L/usr/local/lib -Lbuild/lib/ -Lext/glv/build/lib/ -lvsr 
 LDFLAGS += -lm  
 else
 IPATH += -I../gfx/
