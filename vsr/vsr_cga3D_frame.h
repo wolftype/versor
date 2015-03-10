@@ -98,9 +98,21 @@ namespace vsr {
     /// Set rotor with bivector generator 
     Frame& rot( const Biv& B) { mRot = Gen::rot(B); return *this; }      
     /// Transpose rotor to quaternionic representation
-    Rot quat() const { return Rot( mRot[0], -mRot[3], mRot[2], mRot[1] ); }
+    Rot quat() const { return Rot( mRot[0], -(mRot[3]), (mRot[2]), -(mRot[1]) ); }
     /// Orient z axis towards coordinate v, keeping y axis as vertical as possible (uses projection)
-    Frame& orient( const Vec& v);
+    /// boolean parameter uses negative z (i.e. for camera)
+    Frame& orient( const Vec& v, bool neg=false); 
+    /// Rotor to Orient Current Orientation towards v
+    Rotor relOrientRot( const Vec& v,  bool neg=false);
+    /// Get Bivector generator to Orient towards v
+    Biv relOrientBiv( const Vec& v,  bool neg=false);
+    /// Relative Orientation by amt t
+    Frame& relOrient( const Vec& v, float t,  bool neg=false );
+
+    /// Relative Motor to Take this to Frame f
+    Motor relMotor( const Frame& target );
+    /// Relative twist towards frame f by amt t
+    Frame& relTwist( const Frame& target, float t);
     
 
     /*-----------------------------------------------------------------------------

@@ -3,7 +3,7 @@
  *
  *       Filename:  xBots.cpp
  *
- *    Description:  
+ *    Description:  simple swarm behavior using vsr::Frame
  *
  *        Version:  1.0
  *        Created:  06/04/2014 10:25:41
@@ -16,14 +16,29 @@
  * =====================================================================================
  */
 
-#include "vsr_cga3D.h"   
+#include "vsr_cga3D_app.h"
 #include "vsr_cga3D_frame.h"
-#include "vsr_GLVimpl.h"
+
 #include "vsr_stat.h"
 #include "vsr_twist.h"
 
 using namespace vsr;
 using namespace vsr::cga3D;
+
+
+struct Member : Frame {
+
+  struct Neighbor : Frame {
+    Neighbor(const Frame& f, float d) : Frame(f), dist(d) {}
+    float dist=0;
+  };
+
+  vector<Neighbor> nearest;
+  vector<Neighbor> toonear;
+
+  void clear() { nearest.clear(); toonear.clear(); }
+
+};
 
 
 struct MyApp : App {    
@@ -34,153 +49,186 @@ struct MyApp : App {
   float time;
   float amt;
 
-  bool bMove, bSpin;
+  bool bMove, bSpin, bReset, bDrawConnections, bDrawAversions;
+
+  int numAgents = 50;
+
+  float initialspacing;
+  float nearestspacing;
+  float toonearspacing;
+  float sourceweight;
+  float followweight;
+  float aversionweight;
+  float aversionspeed;
+  float acc = .02;
+  float rotAcc = .02; 
+
+  vector<Member> frame;
 
 
-  static const int numAgents = 30;
-  float spacing = 3;
-  vector<Frame> frame;
+  /*-----------------------------------------------------------------------------
+   *  Setup
+   *-----------------------------------------------------------------------------*/
+  virtual void setup(){
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-    
-   // frame = new Frame[numAgents];
-
-    frame = vector<Frame>(numAgents);
-
-    Rand::Seed();
-    for (auto& f : frame ){
-      Vec v( Rand::Num(), Rand::Num(), Rand::Num());
-      f.pos() = Ro::null(v * spacing );
-      f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
-      f.scale() = .5;
-    }
-  }
-
-  void initGui(){
+     initFrames();
+      /// set some parameters in the gui
+      bindGLV();
       gui(amt,"amt",-100,100);
-      gui(bMove,"bMove");
-      gui(bSpin, "bSpin");
+      gui(bReset,"reset");
+      gui(bDrawConnections,"draw connections");
+      gui(bDrawAversions,"draw aversions");
+     // gui(bMove,"bMove");
+     // gui(bSpin, "bSpin");
+      gui(initialspacing, "intitialspacing",0,100);
+      gui(nearestspacing, "nearestspacing",0,100);
+      gui(toonearspacing, "toonearspacing",0,100);
+      gui(sourceweight, "sourceweight",0,100);
+      gui(followweight, "followweight",0,100);
+      gui(aversionweight, "aversionweight,",0,100);
+      gui(aversionspeed, "aversionspeed,",0,100);
+      gui(acc, "acc",0,100);
+      gui(rotAcc, "rotAcc",0,100);
   
       bMove =true; bSpin=true;
-  }
+      toonearspacing = .75;  // anything less than this is unacceptably close, agents fly away
+      initialspacing = 3;    // initial spacing 
+      nearestspacing = 2;    // anything greater than this is ignored
+      sourceweight = .1;     // pull towards middle
+      
+
+   }
+
 
   
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+  /*-----------------------------------------------------------------------------
+   *  Initialize Frame Posiitons
+   *-----------------------------------------------------------------------------*/
+  void initFrames(){
+     Rand::Seed();
+     frame.clear();
+     frame = vector<Member>(numAgents);
+
+     for (auto& f : frame ){
+        Vec v( Rand::Num(), Rand::Num(), Rand::Num());
+        f.pos() = Ro::null(v * initialspacing );
+        f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
+        f.scale() = .5;
+     }
   }
 
-    virtual void onDraw(){ 
+  /*-----------------------------------------------------------------------------
+   *  Draw
+   *-----------------------------------------------------------------------------*/
+    virtual void onDraw(){
+      mouse = calcMouse3D();        ///<-- get mouse position
+
+      for (auto& f : frame){        ///<-- draw all frames
+        Draw((Frame)f);
+
+        for (auto& n : f.nearest){
+          glColor3f(1,1,0);
+          if (bDrawConnections) gfx::Glyph::Line( f.pos(), n.pos() );   
+        }
+
+        for (auto& n : f.toonear){
+          glColor3f(0,1,1);
+          if (bDrawAversions) gfx::Glyph::Line( f.pos(), n.pos() );   
+        }
         
-      getMouse();
+      }
 
-     // Dlp dlp(1,0,0);
+    }
 
-     // ( mouse <= dlp ).print();
 
+    /*-----------------------------------------------------------------------------
+     *  Simulation
+     *-----------------------------------------------------------------------------*/
+    virtual void onAnimate(){ 
+
+      if (bReset) initFrames();
+
+
+        
+      ///frame physics timestep
       for (auto & f : frame ){
-        Draw(f);
+        f.clear();
         f.move();
         f.spin();
       }
+     
+     // float period = 1;
+     // float pitch = 1; 
+     // DualLine dll = Twist::Along( (mouse ^ Vec::z ^ Inf(1)).dual(), period , pitch );
 
 
+      int numNeighbors = 3;                             ///<-- how many neighbors to look for
       
+      //For Each Frame,
+      //find nearest neighbors within view
+      //sum up their influence
+     for (auto& fa : frame){                           
 
+       Biv db; // Amount to rotate
+       Vec dx; // Amount to translate
+       float tacc=0;
+       float racc;
 
-      //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
-      float acc = .02;
-      float rotAcc = .02; 
+       float dist = Ro::sqd(fa.pos(), mouse);          ///<-- distance from frame to mouse
+       float famt = 1.0/(.01 + (dist*dist) );          ///<-- weighting distance
 
-     // Line line = mouse ^ Vec::z ^ Inf(1);
-     //
-      float period = 1;
-      float pitch = 1;
-      
-      DualLine dll = Twist::Along( (mouse ^ Vec::z ^ Inf(1)).dual(), period , pitch );
+       float thresh = nearestspacing;                  ///<-- distance threshold                      
+       float min = toonearspacing;                     ///<-- minimum distance to maintain
 
-      int numNeighbors = 3;
-      for (auto& fa : frame){
-
-        float dist = Ro::sqd(fa.pos(), mouse);
-        float famt = 1.0/(.01 + (dist*dist) );
-
-        vector<Frame> nearest;
-        vector<Frame> toonear;
-        float thresh = spacing;
-        float min = .75;
-        for (auto& fb : frame){
-          float halfplane = (fb.pos() <= fa.dxy())[0];
-          if ( halfplane > 0 ){
-            float dist = Ro::sqd( fa.bound(), fb.bound() );
-            if (dist < thresh) nearest.push_back(fb);
-            if (dist < min) toonear.push_back(fb);
-            if (nearest.size() == numNeighbors) break;
-         }
+       for (auto& fb : frame){
+         float halfplane = (fb.pos() <= fa.dxy())[0];          ///<-- on which side of fa's half-plane is fb?
+         if ( halfplane > 0 ){                                 ///<-- if it is in front of fa, fa can "see it"
+           float dist = Ro::sqd( fa.bound(), fb.bound() );     ///<-- distance between frames
+           if (dist < min) fa.toonear.push_back( Member::Neighbor(fb,dist) );           ///<-- if it is less than min threshhold
+           else if (dist < thresh) fa.nearest.push_back( Member::Neighbor(fb,dist) );        ///<-- if it is within distance threshhold
+           if (fa.nearest.size() > numNeighbors || fa.toonear.size() > numNeighbors ) break;       //<-- stop after # nearest neighbors
         }
-        
-        Biv db; // Amount to orient
-        Vec dx; // Amount to move
+       }
        
-     //   Vec tv = fa.pos().mot( dll ) - fa.pos();;
-      //  Vec tv( fa.pos() - mouse );
-       // tv[2] = 0;
-       // tv *= famt * 10;
-        
-        dx += tv;
-
-        if (!toonear.empty()){
-           db += fa.xz();
-           dx += fa.z(); 
-        } else {
-
-         for (auto& neigh : nearest){
-           gfx::Glyph::Line( fa.pos(), neigh.pos() );          
-           db += Gen::log( neigh.rot() ) / nearest.size();
-           dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
-         }
-
-         if (nearest.empty()){
-           db += fa.xz() * .1;
-           dx += fa.z() * .1;
-         }
+     
+       //orient towards neighbors
+       if (!fa.nearest.empty()){
+        for (auto& n : fa.nearest){
+          if (n.dist>FPERROR) {
+            db += fa.relOrientBiv( n.pos() ) * followweight;//fa.nearest.size(); 
+            tacc += aversionspeed;
+          }
+        } 
+       }
+               
+        //orient away from neighbors that are too close 
+        if (!fa.toonear.empty()){
+        for (auto& n : fa.toonear){
+          if (n.dist>FPERROR) db -= fa.relOrientBiv( n.pos() ) * aversionweight;//fa.toonear.size(); //fa.xz() * (b?1:-1);
+         } 
         }
 
-         dx += -Vec(fa.pos()) * .01;
+        db += fa.relOrientBiv( Vec(0,0,0) ) * sourceweight;
+        dx += fa.z();
+        
+        fa.db() = db * rotAcc; 
+        fa.dx() = dx * (acc+tacc);
 
-         fa.db() = db * rotAcc; 
-         fa.dx() = dx * acc;
 
       }
     
   }
-   
-
+  
   
 };
 
 
-MyApp * app;
-
 
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
+  MyApp app;
+  app.start();
   
-  
-  glv << *app;
-
-  Application::run();
-
   return 0;
 
 }

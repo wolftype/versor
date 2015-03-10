@@ -218,8 +218,8 @@ namespace Euc{
     auto rot ( const A& b ) -> decltype( b + 1 ) {  
       //  printf("me");
       VT  c = sqrt(- ( b.wt() ) );
-          VT sc = -sin(c);
-          if (c != 0) sc /= c;
+      VT sc = -sin(c);
+      if (c != 0) sc /= c;
       return b * sc + cos(c);
     }
     template<class A> auto rotor( const A& b ) RETURNS ( rot(b) )
@@ -238,26 +238,26 @@ namespace Euc{
                  
       using TBIV = CGAMV<DIM, typename CGA<DIM>::Biv>;
 
-          VT t = r.template get<0>();                           //<--- Scalar Value from Rotor
+        VT t = r.template get<0>();                           //<--- Scalar Value from Rotor
 
-          TBIV b = r.template cast<TBIV>();
+        TBIV b = r.template cast<TBIV>();
 
-          VT n = b.rnorm();
+        VT n = b.rnorm();
 
-          if (n <= 0) {
-              if (t < 0) {
-                  printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
-                  return TBIV(PI);
-              } else {
-                  return TBIV(); 
-              }
-          }
+        if (n <= 0) {
+            if (t < 0) {
+        //        printf("Returning identity - ROTOR LOG FOUND SINGULARITY: %f\n", t );
+                return TBIV(PI);
+            } else {
+                return TBIV(); 
+            }
+        }
 
-          VT s = atan2( n, t );
-          return b * ( s / n);
-      }  
+        VT s = atan2( n, t );
+       return b * ( s / n);
+    }  
   
-    /*! Get Bivector Generator from a Rotor  (3d Conformal)
+    /*! Get Bivector Generator from a Rotor  (3d Euclidean)
           @param Rotor r
      */
      template<TT DIM>
@@ -487,7 +487,7 @@ namespace Euc{
 
     
      //feed in vectors!  
-    /*! Rotor Ratio of two Conformal vectors */
+    /*! Rotor Ratio of two Conformal vectors transforming a to b*/
      template<TT DIM> 
      auto ratio( 
       const CGAMV<DIM, typename CGA<DIM>::Vec >& a, 
@@ -498,9 +498,9 @@ namespace Euc{
       using TROT = decltype( (a^b) + 1);
       
       VT s = ( a <= b )[0];              
-  
       //180 degree check
-      if ( a == b.conjugation() ) {
+      if ( a == b.conjugation() ){//fabs ((a<=b)[0]) > .999999) {//a == b.conjugation() ) {
+        //printf("180!\n");
         if ( a == TVEC::y || a == -TVEC::y ) {
           return rot( TBIV::xy * PIOVERTWO );
         }        
@@ -514,11 +514,11 @@ namespace Euc{
           TROT r = ( b * a ) ; //cout << r << endl;
           r[0] += 1;  
           if (!FERROR(n)) r /= n;
-          if ( r == TROT() ) return TROT(1);//else cout << r << endl; //printf("0 in gen::ratio\n");
+          if ( r == TROT() ) {  return TROT(1); }//else cout << r << endl; //printf("0 in gen::ratio\n");
           return r;    
       } 
 
-    /*! Rotor Ratio of two Euclidean vectors */  
+    /*! Rotor Ratio of two Euclidean vectors transforming a to b */  
      template<TT DIM> 
      auto ratio( 
       const EGAMV<DIM, typename EGA<DIM>::Vec >& a, 

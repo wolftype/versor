@@ -39,11 +39,11 @@ namespace vsr {
 	};
     
     inline double Math::sinc(double x) { 
-        if (x==0) return 1; else return sin(x)/(x); 
+        if (FERROR(x)) return 1; else return sin(x)/(x); 
     }
     
     inline double Math::sinhc(double x) { 
-        if (x==0) return 1; else return sinh(x)/x; 
+        if (FERROR(x)) return 1; else return sinh(x)/x; 
     }
     
     inline double Math::clamp(double x, double min, double max){

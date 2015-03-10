@@ -78,7 +78,7 @@ namespace vsr{
 #endif
 
 #ifndef FPERROR
-#define FPERROR .00000001
+#define FPERROR .000001
 #endif
 
 #ifndef ERROR

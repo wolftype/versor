@@ -82,8 +82,14 @@ struct MyApp : App {
    for (int i=0;i<res.size();++i) {
      Draw(res[i],(float)i/res.size(),0,1-(float)i/res.size());
      Draw(res2[i],(float)i/res.size(),1,1-(float)i/res.size());
-    // Draw(res3[i],(float)i/res.size(),1,1-(float)i/res.size());
+     //Draw(res3[i],(float)i/res.size(),1,1-(float)i/res.size());
+     
+     //make a knot?
+     //TorusKnot tk(3,2); tk.HF.cir = res3[i];
+     //distance to original?
+
     }
+
     cout << pg.ops.size() << " " << pg.sops.size() << endl;
   
   }

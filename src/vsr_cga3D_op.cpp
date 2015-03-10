@@ -233,7 +233,7 @@ namespace Gen{
       VT sc = sin(c);
       VT cc = cos(c);
 
-      if ( w == 0 ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
+      if ( ERROR(w,.00000001) ) return Mot(1,0,0,0,b[3],b[4],b[5],0); // translation only!
 
       B = B.unit();
       Vec t(b[3],b[4],b[5]);
@@ -253,6 +253,8 @@ namespace Gen{
   }
 
     /*! Dual Line Generator from a Motor 
+        An implementation of J.Lasenby et al "Applications of Conformal Geometric Algebra in
+Computer Vision and Graphics"
         @param Motor m (a concatenation of rotation and translation)
     */  
      Dll log( const Mot& m){
@@ -267,20 +269,24 @@ namespace Gen{
           VT  den = Math::sinc(ac);
           VT  den2 = ac * ac * den;
 
+          //m.vprint();
+          //printf("den: %f\t%f\t%f\n",ac,den,den2);
           b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );     //bivector part - negative necessary . dll? . . 
           tq = (b * q);                                           //Make motor and extract Grade 2 part
 
-          if (den2 == 0 ) {                                       // Pure Rotation (no slide along screw)
+          if ( FERROR(den2) ) {                                       // Pure translation 
              //  printf("%f, %f, %f\n", ac, den, den2 );
              //  printf("den2 = 0 in motor log\n"); 
               //cperp = b * -1.0;
-              cpara = b * tq * -1.0;// * -1.0; or q
+              cperp = q;//b * tq * -1.0;// * -1.0; or q //note this used to be cpara... (but was inaccurate)
           } else {
               cperp = ( b * Drt(m[7]) ) / ( ( den2 )  * -1.0 );   //perpendicular (along line of axis)
               cpara = ( b * tq ) / ( ( den2 )  * -1.0 );          //parallel      (in plane of rotation)
           }
 
           Drv c = cperp + cpara; 
+          b.print();
+          c.print();
 
           rq += b;
           rq += c;          
@@ -304,8 +310,7 @@ namespace Gen{
           return Gen::mot( log(a,b,t) );//Gen::log( m ) * (t/2.0) );   
       }
 
-      /*! Generate Motor That Twists Dual Line a to Dual Line b;
-
+      /*! Generate Motor That Twists Motor a to motor b by amt t;
       */
      Mot ratio( const Mot& a, const Mot& b, VT t){
           return Gen::mot( Gen::log(b/a) * t );

@@ -1,5 +1,5 @@
 #include "vsr_cga3D.h"  
-#include "vsr_GLVimpl.h"   
+#include "vsr_cga3D_app.h"
 
 #include "vsr_field.h"
 #include "vsr_twist.h" 
@@ -48,7 +48,7 @@ struct MyApp : App {
   
   float traceAmt; 
   
-  MyApp(Window *win ) : App(win), 
+  MyApp() : App(), 
   f(40,50,1), 
   ortho(40,50,1), 
   numPotentials(100), 
@@ -74,7 +74,6 @@ struct MyApp : App {
     
     initDipoles();
     
-    initGui();
   } 
   
   void initDipoles(){
@@ -85,16 +84,18 @@ struct MyApp : App {
     }
   }           
   
-  virtual void initGui(){
-  gui(step,"step",0,10);
-   // gui(pRes, "res",10,1000);   
-  gui(amt, "amt", 0,1000);
-  gui(amtPot, "amtPot", 0, 1000);   
-  gui(amtPos, "amtPos", 0, 1000); 
-  gui(speed, "speed", 0,1000);   
-  gui(pitch, "pitch", 0,1000); 
-  gui(bReset)(bDrawDll,"drawdll")(bSave,"bSave"); 
-  gui(traceAmt, "trace",0,10);
+  virtual void setup(){
+    bindGLV();
+
+    gui(step,"step",0,10);
+    // gui(pRes, "res",10,1000);   
+    gui(amt, "amt", 0,1000);
+    gui(amtPot, "amtPot", 0, 1000);   
+    gui(amtPos, "amtPos", 0, 1000); 
+    gui(speed, "speed", 0,1000);   
+    gui(pitch, "pitch", 0,1000); 
+    gui(bReset)(bDrawDll,"drawdll")(bSave,"bSave"); 
+    gui(traceAmt, "trace",0,10);
   }
 
   virtual void onDraw(){ 
@@ -363,22 +364,11 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
-
-
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(1440,900,"Versor",&glv);    
-  app = new MyApp(win);
-  //app -> stretch(1,1); 
-  glv << *app;
-                         
+  MyApp app;
+  app.start();
   
-  app -> initGL();   
-  Application::run();
-
   return 0;
 
 }

@@ -186,7 +186,7 @@ namespace vsr{
     /// Twist by motor and return this
     Frame& Frame::twist( const Mot& mot ){
       mPos = mPos.spin(mot);
-      mRot = mRot.spin(mot);
+      mRot = Rot(mot).unit() * mRot;//mRot.spin(mot);
       return *this;
     }
 
@@ -203,18 +203,48 @@ namespace vsr{
       return *this;
     }
 
-    /// orient -z to target, and keep y as vertical as possible
-    Frame& Frame::orient( const Vec& v ){
-      //Vec current = z();
-      Rot tRot = Gen::ratio( -Vec::z, (v-vec()).unit() );
+    /// ABSOLUTE orient z to target, and keep y as vertical as possible
+    Frame& Frame::orient( const Vec& v, bool neg ){
+      Rot tRot = Gen::ratio( Vec::z * (neg?-1:1), (v-vec()).unit() );
       mRot = tRot;
       Vec ty = Op::pj( Vec::y, xy() ).unit();
       //auto cs = ty <= y();
       Rot yRot = Gen::ratio( y(), ty );
-      mRot = yRot * tRot; 
+      mRot = (yRot * tRot).runit(); 
       return *this;
     }
 
+    /// RELATIVE Rotor to orient -z to target, and keep y as vertical as possible
+    Rot Frame::relOrientRot( const Vec& v, bool neg){
+      Rot tRot = Gen::ratio( z() * (neg?-1:1) , (v-vec()).unit() );        //Transformation to take CURRENT z to look at v
+      Vec ty = Op::pj( Vec::y, xy().spin(tRot) ).unit();                   //project Absolute y axis onto transformed xy plane
+      Rot yRot = Gen::ratio( y().spin(tRot), ty );                         //transformation to take currnet TRANFORMED y to proj
+      return (yRot*tRot).runit();//yRot * tRot;                          //Rotation sequence
+    }
+
+    /// Generator to orient z to target, and keep y as vertical as possible
+    Biv Frame::relOrientBiv( const Vec& v, bool neg){
+      return -Gen::log( relOrientRot(v,neg) );
+    }
+    
+    /// Releative Orientation towards v by amt t
+    Frame& Frame::relOrient( const Vec& v, float t, bool neg){
+      mRot = Gen::rot( relOrientBiv(v,neg) * t ) * mRot;
+      mRot = mRot.runit();
+      return *this;
+    }
+
+    /// Relative Motor to another Frame f
+    Motor Frame::relMotor( const Frame& target ){
+      return target.mot() / mot();//Gen::ratio( mot(), target.mot() );
+    }
+
+    /// Relative Twist towards target frame by amt t
+    Frame& Frame::relTwist( const Frame& target, float t){
+      //DualLine dll = Gen::log ( target.mot() / mot() ) * t;
+      return twist( Gen::ratio ( mot(), target.mot(), t) );
+    }
+    
     Frame Frame::moveX( VT amt ) const{
       return Frame( mPos.trs( x() * amt) , mRot, mScale );
     }

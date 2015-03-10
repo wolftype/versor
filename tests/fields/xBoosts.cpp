@@ -21,19 +21,18 @@
 #include "vsr_cga2D_types.h"
 #include "vsr_cga2D_draw.h" 
 
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"
 
 using namespace vsr;
 using namespace vsr::cga2D;
-
 
 
 struct MyApp : App {    
    
   Point mouse;
 
-  float time;
-  float amt;
+  float time=0;
+  float amt=0;
 
   const int numPoint = 1000;
   const int numPair = 100;
@@ -42,60 +41,35 @@ struct MyApp : App {
 
   Pair pair;//[numPair];
 
-  MyApp(Window * win ) : App(win),
-  box(8,8)
-  {
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
-
   void initGui(){
+  void setup(){
+      bindGLV():
+
       gui(amt,"amt",-100,100);
       amt = 50;
   }
   
   void getMouse(){
-    auto tm = interface.mouse.projectMid;     
+    auto tm = calcMouse3D();//jinterface.mouse.projectMid;     
     mouse = Round::null( tm[0] * amt, tm[1] * amt  ); 
 
   }
-
-  virtual void update(){
-  
-    
- 
-  }
-
 
    virtual void onDraw(){         
       getMouse();
 
       pair = Ro::null(-5,0) ^ Ro::null(5,0);
 
-
-      
   }
    
   
 };
 
 
-MyApp * app;
-
-
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
-
 }
