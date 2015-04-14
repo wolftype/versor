@@ -3,7 +3,7 @@
  *
  *       Filename:  xBoostExperiments.cpp
  *
- *    Description:  
+ *    Description:  a bunch of points twisting around a knot
  *
  *        Version:  1.0
  *        Created:  03/31/2014 18:59:22
@@ -17,8 +17,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"   
 #include "vsr_knot.h"
 #include "vsr_cga3D_frame.h"
 #include "vsr_stat.h"
@@ -39,16 +38,11 @@ struct MyApp : App {
 
   vector<Pnt> pnt;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
+  void setup(){
+    
+      Rand::Seed();
 
-    Rand::Seed();
-
-    init();
-  }
-
-  void initGui(){
+      bindGLV();
       gui(amt,"amt",-100,100)(amt2,"amt2",-100,100);
       gui(P,"P",0,10);
       gui(Q,"Q",0,10);
@@ -57,24 +51,15 @@ struct MyApp : App {
 
       P=3;Q=2; amt = .01;
 
+      pnt = vector<Pnt>(10);
+      reset();
+
   }
   
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
-  }
 
     Pnt random(){
       Vec v = Vec::x.sp( Gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
       return Ro::null(v);
-    }
-
-    void init(){
-      pnt = vector<Pnt>(10);
-      reset();
     }
 
     void reset(){
@@ -83,18 +68,24 @@ struct MyApp : App {
 
     virtual void onDraw(){ 
         
-      getMouse();
-
+      mouse = calcMouse3D();
       TorusKnot tk(P,Q);
 
+      //Generate Boost
       Par par = tk.par();
       Bst bst = Gen::bst( par * amt );
 
+      //For each seeded point
       for(auto& tp : pnt ){
+         
+         //save temp
          Pnt tmp = tp;
+
+         //Boost
          tp = Ro::loc( tp.spin( bst ) );
          Draw(tp);  
-          
+         
+         //make movement  
          Par tpar = tmp ^ tp; 
          Pnt cpnt = Ro::pnt_cir( tpar.dual(), 0 );
          Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
@@ -113,26 +104,16 @@ struct MyApp : App {
   }
    
 
-  
 };
 
 
-MyApp * app;
 
 
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
+  MyApp app;
+  app.start();
   
-  
-  glv << *app;
-
-  Application::run();
-
   return 0;
 
 }

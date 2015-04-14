@@ -82,7 +82,7 @@ namespace gfx{
               }
               case 't': //TRANSLATE
               {    
-                  Vec3f mdc = i->dragCat(); 
+                  Vec3f mdc = i->dragCat() * 10; 
                   ts = ps.trs(  mdc[0], mdc[1], mdc[2] ); 
                   break;
               }
@@ -135,7 +135,7 @@ namespace gfx{
           }
           case 't': //TRANSLATE
           {   
-              Vec3f mdc = i->dragCat();
+              Vec3f mdc = i->dragCat() * 10;
               ts.pos() = ps.pos().trs( mdc[0], mdc[1], mdc[2] );
               break;
           }

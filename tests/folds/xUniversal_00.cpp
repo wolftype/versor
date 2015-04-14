@@ -16,8 +16,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"   
 #include "vsr_fold.h"
 
 using namespace vsr;
@@ -32,33 +31,19 @@ struct MyApp : App {
   float time;
   float amt,dx,dy;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
-
-  void initGui(){
+  void setup(){
+      bindGLV();
       gui(amt,"amt",-100,100);
       gui(dx,"dx",-10,10)(dy,"dy",-10,10);
-  }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
-  }
 
-    virtual void onDraw(){ 
+  }
+ 
+     virtual void onDraw(){ 
         
-      getMouse();
+      mouse = calcMouse3D();
 
       //CORNER POINTS OF QUADRILATERAL
       static Field<Pnt> corner(2,2,1);
-      for (int i = 0; i < corner.num(); ++i){
-        Touch(interface, corner[i]);
-      }
       static Pnt pnt[4];
 
       pnt[0] = corner[0];
@@ -113,13 +98,13 @@ struct MyApp : App {
       }
 
 
-      Rigid2 ra( node[1], np[3], center[1],true ); 
-      // Rigid2 rd( node[0], center[0], np[0] );
+      Rigid2_ ra( node[1], np[3], center[1],true ); 
+      // Rigid2_ rd( node[0], center[0], np[0] );
       Rigid3 rd(node[0], np[1], center[0], np[0], false);
 
-       Rigid3 rb( np[2], node[1], center[0], center[1], false ); 
+      Rigid3 rb( np[2], node[1], center[0], center[1], false ); 
        //Rigid3 rc( np[1], center[0], center[1], node[0], false );   
-       Rigid3 rc( np[1], np[2], center[0], center[1], false );   
+      Rigid3 rc( np[1], np[2], center[0], center[1], false );   
       // Rigid3 rd( node[0], np[1], center[0], np[0], false ); 
 
 
@@ -137,32 +122,6 @@ struct MyApp : App {
 
        rd.updateA(pc);
        Pnt pd = rd();
-       
-       
-       cout << Ro::sqd( pb, pc) << endl; 
-
-       /* rd.updateA( pc ); */
-       /* Pnt pd = rd(); */
-
-      //FIGURE IT OUT
-       /* Pair par = rd.possible(); */
-       /* float s = Ro::size(par,false); */
-
-
-/*        DrawAt( Vec(rb.dlp()), pb,1,0,0 ); */
-/*        DrawAt( Vec(rc.dlpA()), pc,1,0,0 ); */
-/*        DrawAt( Vec(rd.dlpA()), pd,1,0,0 ); */
-/*        DrawAt( Vec(rd.dlpB()), pd,1,0,0 ); */
-
-
-
-        //DRAW
-        /* Draw( ra.circle() ); */
-        /* Draw( rb.circle() ); */
-        /* Draw( rc.possible() ); */
-
-       // Draw (rd.possible() );
-
 
       node[1] = pa; 
       np[2] = pb;
@@ -206,21 +165,12 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
 
 
 int main(){
-                             
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+          
+  MyApp app;
+  app.start();                   
 
   return 0;
 

@@ -3,7 +3,7 @@
  *
  *       Filename:  xTrajectory.cpp
  *
- *    Description:  elliptical, parabolic, hyperbolic paths by radius adjustment of particle
+ *    Description:  elliptical, parabolic, hyperbolic paths by radius or weight adjustment of particle
  *
  *        Version:  1.0
  *        Created:  02/10/2014 13:19:46
@@ -17,8 +17,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"   
 #include "vsr_cga3D_frame.h"
 #include "vsr_knot.h"
 
@@ -32,19 +31,24 @@ struct MyApp : App {
   Lin ray;
 
   float time;
-  float amt, P, Q, iter,bDraw2;
+  float radius,weight, P, Q, iter,bDraw2;
 
-  vector<Pnt> pnt;
+  vector<Pnt> rpnts;
+  vector<Pnt> wpnts;
 
   bool bReset;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
+  Frame f;
+  
+  Pnt sPnt = Ro::null(0,0,0);
+  Pnt rPnt; 
+  Pnt wPnt = Ro::null(0,0,0).trs(-2,0,0); 
+  
 
-  void initGui(){
-      gui(amt,"amt",-100,100);
+  void setup(){
+      bindGLV();
+      gui(radius,"radius",-100,100);
+      gui(weight,"weight",-100,100);
       
       gui(P,"P",0,10);
       gui(Q,"Q",0,10);
@@ -54,73 +58,62 @@ struct MyApp : App {
       P = 3; Q = 2; iter = 100;
 
       gui(bReset,"reset");
-  }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+
+      objectController.attach(&f);
   }
 
     virtual void onDraw(){ 
         
-      getMouse();
+      mouse = calcMouse3D();
 
-      static Frame f( PT(0,0,0) );
-      Touch(interface, f);
+      time +=1;
 
-      static Pnt sPnt = Ro::null(0,0,0);
+      //Knot A
+      TorusKnot tk(P,Q);
+      tk.HF.cir() = f.cxz().unit();
+      
+      //Knot B (orthogonal to it)
+      TorusKnot tk2(P,Q);
+      tk2.HF.cir() = f.cxz().unit();
+      tk2.HF.vec() = Vec::x;
 
+      //Generate a Compound Boost
+      Bst tbst  = tk.bst();//tk2.bst() * tk.bst();
+
+
+      //Point set by radius
+      rPnt = Ro::dls( radius,0,0,0 ).trs(-2,0,0);
+      //Point set by weight
+      wPnt[3] = weight;
+     
+      
+      //Set Pnt positions  
+      rpnts.clear();
+      wpnts.clear();
+      Pnt rp = rPnt;
+      Pnt wp = wPnt; 
+      for (int i = 0; i < iter; ++ i ){
+         rp = rp.sp(tbst);  
+         wp = wp.sp(tbst);  
+         rpnts.push_back( Ro::loc(rp) );
+         wpnts.push_back( Ro::loc(wp) );
+      }   
+
+      //increment orbit
+      sPnt = Ro::loc( sPnt.sp( tbst ) );
+
+      //Frame
       DrawAt( f.y(), f.pos(), 1,0,0 );
-      Draw(f.cxz() );
-
-      auto par = f.ipy();
-
-      /* int num = iter; */
-      /* for (int j = 1; j <= num; ++j){ */
-
-       // VT col = (float)j/num; 
-        auto cp = Ro::dls( amt,0,0,0 ).trs(-2,0,0);
-        
-        TorusKnot tk(P,Q);
-        tk.HF.cir() = f.cxz().unit();
-
-        TorusKnot tk2(P,Q);
-        tk2.HF.cir() = f.cxz().unit();
-        tk2.HF.vec() = Vec::x;
-        Draw(tk2.HF.fiberA(),0,1,0 );
-        Draw(tk2.HF.fiberB(),0,1,0 );
-
-        Bst tbst  = tk2.bst() * tk.bst();
-
-        pnt.clear();
-        Pnt np = cp; 
-        for (int i = 0; i < iter; ++ i ){
-           np = np.sp( tbst ) ;  
-           pnt.push_back( Ro::loc( np) );
-        }   
-        for (auto& i : pnt) Draw(i);
-
-        sPnt = Ro::loc( sPnt.sp( tbst ) );
-        Draw( Ro::dls(sPnt,.2),0,1,1 );
-
-        /* tk.calc0( cp ); */
-        /* for (auto i : tk.pnt ){ */
-        /*     auto tp = Ro::loc(i); */
-        /*     Draw( tp,col,0,1-col); */
-        /*     if(bDraw2){ */
-        /*       tk2.calc0(tp); */
-        /*       for (auto h : tk2.pnt ){ */
-        /*          auto tp2 = Ro::loc(h); */
-        /*         Draw( tp2,col,0,1-col); */   
-        /*       } */
-        /*     } */
-        /* } */
-    //  }
-
-
+      Draw(f.cxz() );     
+      //Fibers
+    //  Draw(tk2.HF.fiberA(),0,1,0 );
+    //  Draw(tk2.HF.fiberB(),0,1,0 );     
+      //Orbit  
+   //   Draw(Ro::dls(sPnt,.2),0,1,1 );
+      //Orbits
+      for (auto& i : rpnts) Draw(i,1,0,0); //Draw radius-based points in red
+      for (auto& i : wpnts) Draw(i,1,1,0); //Draw weight-based points in yellow
+      Draw( sphere( wpnts[ (int) time % wpnts.size() ], .2) , 1, 0, 1);
 
 
   }
@@ -130,21 +123,11 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
-
 
 int main(){
-                             
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
   
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
 

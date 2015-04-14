@@ -102,6 +102,13 @@ namespace vsr {
     /// Orient z axis towards coordinate v, keeping y axis as vertical as possible (uses projection)
     /// boolean parameter uses negative z (i.e. for camera)
     Frame& orient( const Vec& v, bool neg=false); 
+    /// Orient z axis towards coordinate v, by amt t, keeping y axis as vertical as possible (uses projection)
+    /// boolean parameter uses negative z (i.e. for camera)
+    Frame& orient( const Vec& v, float amt, bool neg=false); 
+    /// Orient X axis towards coordinate v, by amt t, keeping y axis as vertical as possible (uses projection)
+    /// boolean parameter uses negative z (i.e. for camera)
+    Frame& orientX( const Vec& v, float amt, bool neg=false); 
+    /// Rotor to Orient Current Orientation towards v
     /// Rotor to Orient Current Orientation towards v
     Rotor relOrientRot( const Vec& v,  bool neg=false);
     /// Get Bivector generator to Orient towards v
@@ -124,8 +131,10 @@ namespace vsr {
     Point& pos() { return mPos; }  
     /// Get Euclidean Vector of position
     Vec vec() const { return mPos; }   
+    /// Set Postion from Vec v
+    Frame& pos( const Vec& v) { mPos = v.null(); return *this; }
     /// Set Position from Point p
-    Frame& pos( Pnt p ) { mPos = p; return *this; } 
+    Frame& pos( const Pnt& p ) { mPos = p; return *this; } 
     /// Set Position from x,y,z coordinates
     Frame& pos( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; } 
     //Frame& set( VT _x, VT _y, VT _z) { mPos = Ro::null(_x,_y,_z); return *this; }

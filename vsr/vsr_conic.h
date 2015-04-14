@@ -194,6 +194,7 @@ class Conic {
 
 };
 
+
 } //vsr::
 
 #endif   /* ----- #ifndef vsr_conic_INC  ----- */

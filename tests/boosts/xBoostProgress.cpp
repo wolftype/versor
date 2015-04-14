@@ -1,13 +1,16 @@
-#include "vsr_cga3D.h"  
+#include "vsr_cga3D_app.h"  
 #include "vsr_cga3D_draw.h" 
 #include "vsr_cga3D_interface.h"  
-
-#include "vsr_GLVimpl.h"
 
 #include "vsr_field.h"
 
 
 struct MyApp : App {
+
+
+  virtual void setup(){
+
+  }
 	
 	virtual void onDraw(){       
 		
@@ -57,19 +60,16 @@ struct MyApp : App {
 	
 };
 
-MyApp * app;
 
+
+
+/*-----------------------------------------------------------------------------
+ *  start app
+ *-----------------------------------------------------------------------------*/
 int main(){
                              
-	GLV glv(0,0);	
-
-	Window * win = new Window(500,500,"Versor",&glv);    
-	app = new MyApp(); 
-	app -> init( win ); 
-	
-	glv << *app;
-
-	Application::run();
+  MyApp app;
+  app.start();
 
 	return 0;
 

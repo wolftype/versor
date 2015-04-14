@@ -54,7 +54,8 @@ typedef NMot<5> Mot;     //Motor
 typedef NTrv<5> Trv;     //Transversor 
 typedef NBst<5> Bst;     //Boost 
 typedef NDil<5> Dil;     //Dilator 
-typedef NTsd<5> Tsd;     //Translated Dilator      
+typedef NTsd<5> Tsd;     //Translated Dilator  
+typedef decltype(Bst()*Bst()) Con; //General Conformal Transformation    
 
 
 
@@ -89,6 +90,7 @@ typedef NTsd<5> Tsd;     //Translated Dilator
     typedef  Bst Boost;
     typedef  Dil Dilator;
     typedef  Tsd TranslatedDilator;
+    typedef  Con ConformalRotor;
 
   }//cga3D::
 

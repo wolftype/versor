@@ -29,7 +29,10 @@ namespace vsr{
     glBegin( bLoop ? GL_LINE_LOOP : GL_LINE_STRIP);
     for (int i = 0; i<c.num(); ++i){
         float t=(float)i/c.num();
-        gfx::GL::vertex( c[i].pos().begin() );
+        auto cvec = c[i].vec();
+        auto nvec = c.link(i).vec() <= Vec::y; //for chains with R offset
+        gfx::GL::vertex( cvec.begin() );
+        gfx::GL::vertex( (cvec+c[i].y()*nvec).begin() ); 
     }
     glEnd();
   }

@@ -104,6 +104,18 @@ struct TorusKnot  {
     }       
   }
 
+  template<typename T>
+  vector<T> apply0(const T& input){
+    vector<T> output;
+    auto tbst = bst();
+    auto tmp = input;
+    for (int i=0; i<iter();++i){
+      tmp = tmp.spin(tbst);
+      output.push_back( Ro::loc(tmp) );
+    }
+    return output;
+  }
+
   double energy(int idx, int num){
 
       double totalEnergy = 0;     ///< Running sum TOTAL ENERGY OF KNOT 

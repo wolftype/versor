@@ -21,6 +21,7 @@ namespace vsr{
 
     //  template class CubicLattice< NPnt<5> >;
 
+
       template<>
       void CubicLattice< NPnt<5> > :: initPoints(){
          for (int i = 0; i < mWidth; ++i){
@@ -28,6 +29,7 @@ namespace vsr{
                 for (int k = 0; k < mDepth; ++k){
                     int tidx = idx(i,j,k); 
                     mPoint[ tidx ]  = Ro::null( px(i),  py(j),  pz(k) ); 
+                   // mPoint[tidx].print();
                 }
             }
          }

@@ -158,6 +158,7 @@ namespace vsr{
 
   template<class T>
   void Immediate( const Field<T>& f){
+      cout << "field t" << endl;
       for (int i = 0; i < f.num(); ++i){
         Draw(f[i]);
       }

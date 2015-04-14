@@ -33,6 +33,10 @@ namespace Op{
 
 namespace Gen{               
   
+
+  /*-----------------------------------------------------------------------------
+   *  QUAT helpers
+   *-----------------------------------------------------------------------------*/
   /*! Generate a Rotor (i.e quaternion) from spherical coordinates
         @param[in] theta in xz plane from (1,0,0) in range [0,PI]
         @param[in] phi in rotated xy plane in range []
@@ -47,6 +51,10 @@ namespace Gen{
       Rot rot( double yaw, double pitch, double roll);
       
 
+
+   /*-----------------------------------------------------------------------------
+    *  TWISTS (Motors, Plücker, etc)
+    *-----------------------------------------------------------------------------*/
    /*! Generate a Motor from a Dual Line Axis
        @param Dual Line Generator (the axis of rotation, including pitch and period)
    */  
@@ -71,6 +79,12 @@ namespace Gen{
     Mot ratio( const Mot& a, const Mot& b, VT t);
 
 
+
+
+    /*-----------------------------------------------------------------------------
+     *  BOOSTS (Transversions, Conformal Rotors)
+     *-----------------------------------------------------------------------------*/
+ 
       /*! Generate a Translated Transversion 
           @param Tangent Direction
           @param Position in space
@@ -82,7 +96,44 @@ namespace Gen{
        // s.vprint();
           return Gen::bst(s * t);
       }
+ 
+      
+
+    /*! Generate Simple Boost rotor from ratio of two dual spheres
+        calculates SQUARE ROOT (normalizes 1+R)
+    */
+   Bst ratio( const DualSphere& a, const DualSphere& b);
    
+  /*! atanh2 function for logarithm of general rotors*/
+   Pair atanh2( const Pair& p, VT cs);
+       
+  /*! Log of a simple rotor (uses atanh2) */
+   Pair log( const Bst& b);
+
+
+   /*!  Generate Conformal Transformation from circle a to circle b
+        uses square root method of Dorst et Valkenburg, 2011
+   */
+   Con ratio( const Circle& a, const Circle& b);
+   
+   /*!  Generate Conformal Transformation from pair a to pair b
+        uses square root method of Dorst et Valkenburg, 2011
+   */
+   Con ratio( const Pair& a, const Pair& b);//{ return ratio( a.dual(), b.dual() ); }
+   
+  /*! Bivector Split
+        Takes a general bivector and splits  it into commuting pairs
+        will give sinh(B+-)
+   */
+   vector<Pair> split(const Pair& par);   
+   
+   /*! Split Log of General Conformal Rotor */
+   vector<Pair> log( const Con& rot);
+   
+  /*! General Conformal Transformation from a split log*/
+   Con con( const vector<Pair>& log, VT amt);
+
+
 };
 
 

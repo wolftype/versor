@@ -199,11 +199,8 @@ namespace Gen{
     */
     Rot rot(double theta, double phi){
 
-       // double ptheta = (PIOVERTWO * theta);
-       // double pphi = (PIOVERFOUR * phi);
-
-        Rot rt = Gen::rot( Biv::xz * theta );
-        Rot rp = Gen::rot( Biv::xy.sp( rt ) * phi  );
+        Rot rt = Gen::rot( Biv::xz * theta / 2.0 );
+        Rot rp = Gen::rot( Biv::xy.sp( rt ) * phi /2.0 );
 
         return rp * rt;
     }                   
@@ -285,8 +282,6 @@ Computer Vision and Graphics"
           }
 
           Drv c = cperp + cpara; 
-          b.print();
-          c.print();
 
           rq += b;
           rq += c;          
@@ -316,19 +311,172 @@ Computer Vision and Graphics"
           return Gen::mot( Gen::log(b/a) * t );
       }
 
-      // /*! Generate a Translated Transversion 
-      //     @param Tangent Direction
-      //     @param Position in space
-      //     @param scalar amt (typically 0 or 1)
-      // */
-      // template <class A, class T>
-      // Bst bst(const A& tnv, const Vec& drv, T t){
-      //     Par s = tnv.template copy<Tnv>().template cast<Par>().sp( Gen::trs(drv) ); 
-      //          // s.vprint();
-      //     return Gen::bst(s * t);
-      // }   
 
-}
+     /*-----------------------------------------------------------------------------
+      *  BOOSTS
+      *-----------------------------------------------------------------------------*/
+
+    /*! Generate Simple Boost rotor from ratio of two dual spheres
+    */
+   Bst ratio( const DualSphere& a, const DualSphere& b){
+    Bst tbst = (b/a).runit();
+    if (tbst[0]<0) tbst = -tbst; //restrict to positive <R>
+    auto ss = 2 * (1+tbst[0]);     
+    auto n = (ss >= 0 ? sqrt(ss) : -sqrt(-ss) );
+    return FERROR(n) ? Bst() : (tbst+1)/n;
+   }
+
+  /*! atanh2 function for logarithm of general rotors*/
+   Pair atanh2( const Pair& p, VT cs){
+      VT norm=1;
+
+      auto tp = p.wt();
+      auto sq = sqrt( fabs(tp) );
+      if(tp>0) norm = asinh(sq)/sq;
+      else if (tp<0) norm = atan2(sq, cs) / sq;
+      return p * norm;
+   }
+
+    /*! Log of a simple rotor (uses atanh2) */
+   Pair log( const Bst& b){
+     return atanh2( Pair(b), b[0] );
+   }
+
+   /*!  Generate Conformal Transformation from circle a to circle b
+        uses square root method of Dorst et Valkenburg, 2011
+   */
+   Con ratio( const Circle& a, const Circle& b){
+    
+    Con trot = (b/a).runit();
+   // if (trot[0]<0) trot = -trot; //restrict to positive <R>?
+      
+    auto rotone = trot + 1;
+
+    VT sca = 1 + trot[0];
+    VT sca2 = sca*sca;
+
+    Sphere sph(trot);
+    auto sph2 = sph.wt();
+
+    if (sca2 == sph2) {
+      printf("infinity of roots -- need to program this...\n");
+      auto rotneg = -trot + 1;
+      //random tangent vector
+      auto biv = sph.dual() ^ PAO.trs(1);
+
+      printf("f\n");
+      //std::cout << "A" << endl;
+      (biv*biv).print();
+      (biv*sph).print();
+      (sph*biv).print();
+      return (rotone + (biv*rotneg))/2.0;
+    }
+
+    auto sca3 = sca2 - sph2;
+    auto sqsca3 = sqrt(sca3);
+
+    auto v1 = ( -sph + sca ) / (2*sca3);
+    auto v2 = (sph+(sca+sqsca3))/sqrt(sca+sqsca3);
+    
+    return rotone * v1 * v2;      
+   }
+
+   /*!  Generate Conformal Transformation from Pair a to Pair b
+        uses square root method of Dorst et Valkenburg, 2011
+   */
+   Con ratio( const Pair& a, const Pair& b){ return ratio( a.dual(), b.dual() ); }
+   
+   /*! Bivector Split
+            Takes a general bivector and splits  it into commuting pairs
+            will give sinh(B+-)
+            inverse method for ipar below was given by dorst in personal correspondance
+   */
+    vector<Pair> split(const Pair& par){
+   
+      typedef decltype(Sphere()+1) SqDeriv;
+    
+      vector<Pair> res;
+      
+      SqDeriv h2 = par*par;
+      auto hh2 = Sphere(h2).wt();
+      auto ipar = (-Sphere(h2) + h2[0]) /(h2[0]*h2[0] - hh2);  
+    
+      //scalar ||f||^2
+      auto tmp2 = ( (h2*h2) - (h2*2*h2[0]) )[0] ;
+      auto ff4 = pow( -tmp2, 1.0/4);
+      auto wt = ff4 * ff4;
+     
+      if ( FERROR(wt) ) {
+          if ( FERROR(h2[0]) ){
+            printf("no real splitting going on\n");
+            res.push_back(par);
+            res.push_back(Par());
+            return res;
+          } else {
+           printf("bivector split norm implemenation needed\n (add random value and retry)");
+          }
+      }
+      
+      auto iha = ipar * wt;
+      auto fplus = iha + 1;
+      auto fminus = -iha + 1;
+    
+      Pair pa = par * fplus * .5;
+      Pair pb = par * fminus * .5;
+    
+      res.push_back(pa);
+      res.push_back(pb);
+      
+      return res;
+       
+    }
+   
+   
+   /*! Split Log of General Conformal Rotor */
+   vector<Pair> log( const Con& rot){
+      
+     vector<Pair> res;
+      
+     //0. Some Terms for later on
+     //R^2
+     auto sqrot = rot*rot;
+     //<R>2
+     Pair rot2(sqrot);
+    
+     //1. Get Exterior Derivative
+     Sphere quad(rot); //grade 4 part
+
+     auto tmp = quad + (-rot[0]); //scalar + quadvector
+     //half the exterior deriv is sinh(B+/-)
+     auto deriv = Pair( tmp * Pair(rot) ) * 2; //quad parts are zero here.
+     //find commuting split of that
+     auto v = split( deriv );
+  
+     //get cosh (see p96 of ref)
+     auto sp = v[0].wt();//(v[0]<=v[0])[0];
+     auto sm = v[1].wt();//(v[1]<=v[1])[0];
+
+     VT coshp = FERROR(sm) ? sqrot[0] : -(rot2 <= !v[1])[0];
+     VT coshm = FERROR(sp) ? sqrot[0] : -(rot2 <= !v[0])[0];
+
+     //5.27 on p96 of Dorst ref
+     res.push_back( atanh2(v[0],coshp) * -.5 );
+     res.push_back( atanh2(v[1],coshm) * -.5 );
+
+     return res;
+
+   }
+
+  /*! General Conformal Transformation from a split log*/
+   Con con( const vector<Pair>& log, VT amt) {
+     return Gen::bst(log[0]*-amt) * Gen::bst(log[1]*-amt);
+   }
+
+
+    
+
+
+} // Gen::
 
 }   //vsr   
 

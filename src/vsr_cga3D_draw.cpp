@@ -213,16 +213,24 @@ namespace vsr{
       
   /*   } */
   /* } */ 
+
+//  template<class T>
+//  void Immediate(const Field<T>& f){
+//    for (int i = 0; i < f.num(); ++i){  
+//      Draw(f[i]);
+//    }
+//  }
   
-  template<>
+//  template<>
   void Immediate( const Field<Sca>& f){
+//    cout << "field sca" << endl; 
     Pnt p = Pnt();
     for (int i = 0; i < f.num(); ++i){  
       DrawAt(p, f.grid(i), f[i][0], 1, 1 - f[i][0] ); 
     }
   }
 
-  template<>
+//  template<>
   void Immediate( const Field<Vec>& f){
 //    cout << "field vec" << endl; 
     for (int i = 0; i < f.num(); ++i){  
@@ -230,28 +238,36 @@ namespace vsr{
     }
   }
 
-  template<>
+//  template<>
   void ImmediateB( const Field<Vec>& f){
     for (int i = 0; i < f.num(); ++i){  
       DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
     }
   }
 
-  template<>
+//  template<>
   void Immediate( const Field<Tnv>& f){
     for (int i = 0; i < f.num(); ++i){  
       DrawAt( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
     }
   }  
 
-  template<>
+//  template<>
   void Immediate( const Field<Frame>& f){
+//    cout << "field frame" << endl; 
     for (int i = 0; i < f.num(); ++i){  
       glPushMatrix(); 
       Immediate( f[i] ); 
       glPopMatrix(); 
     }
-  }  
+  } 
+  
+  void Immmediate( const Field<Point>& f){
+//      cout << "field point" << endl;
+     for (int i = 0; i < f.num(); ++i){  
+      Draw( f[i] ); 
+    }
+  }
 
   template void Draw(const Vec&, float, float, float ,float);
   template void DrawB(const Vec&, float, float, float ,float);

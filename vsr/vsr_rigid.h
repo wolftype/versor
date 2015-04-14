@@ -141,9 +141,10 @@ struct Constrain {
   
 };
 
-//experimental
+// Holds a pointer to a source, and has a radius t, 
+// operator() generates a dual sphere at source with radius t
 struct DistancePtr {
-  Pnt * src; // center 
+  Point * src; // center 
   float t;
 
   DistancePtr(){};
@@ -161,10 +162,13 @@ struct DistancePtr {
 
 };
 
+/// A Rigid Constraint set by Three Distance Pointers
 struct Rigid{
   //default calc is false until ra parents are set
   bool bCalc, bTriple;
   Pnt result;
+  //mountain or valley
+  bool mtn;
 
   //Has three distances
   DistancePtr da,db,dc;
@@ -175,7 +179,6 @@ struct Rigid{
   //Has n children which depend on it
   vector<Rigid*> child;
 
-  bool mtn;
 
   Rigid() : bCalc(false), bTriple(true), ra(NULL), rb(NULL), rc(NULL) {}
 
@@ -282,92 +285,6 @@ struct Rigid{
 
 
 
-/* ----------------------------------------------------------------------------- */
-/*  *  SIMPLICIAL CONSTRAINT . . . (n+1)-simplices to constrain (n)-chains connected by (n-1)-simplex edges */ 
-/*  *-----------------------------------------------------------------------------*/ 
-/* struct Rigid_{ */
-/*   bool bCalc, bTriple; */
-/*   Pnt result; */
-
-/*   DistancePtr da,db,dc; */
-/*   Rigid_ *ra, *rb, *rc; */
-/*   bool mtn; */
-
-/*   Rigid_() : bCalc(false), bTriple(true), ra(NULL), rb(NULL), rc(NULL) {} */
-
-/*   Rigid_(const Pnt& res ) : bTriple(true),  ra(NULL), rb(NULL), rc(NULL) { */
-/*     set(res); */
-/*   } */
-/*   void set(const Pnt& res){ */
-/*     bCalc = false; */
-/*     result = res; */
-/*   } */
-
-/*   Rigid_( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true) */ 
-/*   { */
-/*     set(target,pa,pb,pc,m); */
-/*   } */
-
-/*   //Counter Clockwise */
-/*   void set( const Pnt& target, Rigid * pa, Rigid * pb, Rigid * pc, bool m){ */
-/*     mtn = m; bCalc=true; */
-/*     ra = pa; rb = pb; rc = pc; */
-/*     result = target; */ 
-/*     da.set(ra->result,target); */
-/*     db.set(rb->result,target); */
-/*     dc.set(rc->result,target); */ 
-/*   } */
-
-/*   //Counter Clockwise */
-/*   void set( Rigid * ra, Rigid * rb, Rigid * rc, bool m){ */
-    
-/*     mtn = m; bCalc=true; */
-/*     da.set(ra->result,result); */
-/*     db.set(rb->result,result); */
-/*     dc.set(rc->result,result); */ 
-
-/*     //fasten cycle */
-/*     ra->set(rb, rc, this, m); */
-/*     rb->set(rc, this, ra, m); */
-/*     rc->set(this, ra, rb, m); */
-    
-/*   } */
-
-/*   /1* void set( Rigid * pa, Rigid * pb, bool m){ *1/ */
-/*   /1*   mtn =m; bCalc=true; bTriple=false; *1/ */
-/*   /1*   ra=pa; rb=pb;rc=this; *1/ */
-/*   /1*   da.set(ra->result,result); *1/ */
-/*   /1*   db.set(rb->result,result); *1/ */
-/*   /1*   dc.set(rc->result,result); *1/ */
-/*   /1* } *1/ */
-
-/*   void reset(){ */ 
-/*     if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; */ 
-/*   } */
-
-/*   Pnt operator()(){ */
-/*     if (bCalc) { */
-/*       bCalc=false; //lock because network graph is looped */
-/*       (*ra)(); (*rb)(); (*rc)(); */
-/*       result = satisfy(); //satisfying requires unlocking */
-/*     } */
-/*     return result; */
-/*   } */
-
-/*   Pair meet(){ */
-/*     return Constrain::Triple( da(), db(), dc() ); */
-/*   } */
-
-/*   //bring three spheres closer together towards center of meet until meet is legit. */
-/*   Pnt satisfy(){ */
-/*     auto meet = Constrain::Triple( da(), db(), dc() ); */
-/*     if ( Ro::size(meet,false) < -.0001 ){ */
-      
-/*     } */
-/*      return bTriple ? Constrain::Triple(da(),db(),dc(),mtn) : Constrain::Planar(da(),db(),dc(),mtn); */
-
-/*   } */
-/* }; */
 
 
 struct Rigid2{
@@ -486,8 +403,6 @@ struct Rigid2{
            }
           }
         }
-
-       // cout << "rigid satisfy iterations " << iter << endl;
       }
   }
 
@@ -759,5 +674,91 @@ struct Rig {
 
 };
 
+/* ----------------------------------------------------------------------------- */
+/*  *  SIMPLICIAL CONSTRAINT . . . (n+1)-simplices to constrain (n)-chains connected by (n-1)-simplex edges */ 
+/*  *-----------------------------------------------------------------------------*/ 
+/* struct Rigid_{ */
+/*   bool bCalc, bTriple; */
+/*   Pnt result; */
+
+/*   DistancePtr da,db,dc; */
+/*   Rigid_ *ra, *rb, *rc; */
+/*   bool mtn; */
+
+/*   Rigid_() : bCalc(false), bTriple(true), ra(NULL), rb(NULL), rc(NULL) {} */
+
+/*   Rigid_(const Pnt& res ) : bTriple(true),  ra(NULL), rb(NULL), rc(NULL) { */
+/*     set(res); */
+/*   } */
+/*   void set(const Pnt& res){ */
+/*     bCalc = false; */
+/*     result = res; */
+/*   } */
+
+/*   Rigid_( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true) */ 
+/*   { */
+/*     set(target,pa,pb,pc,m); */
+/*   } */
+
+/*   //Counter Clockwise */
+/*   void set( const Pnt& target, Rigid * pa, Rigid * pb, Rigid * pc, bool m){ */
+/*     mtn = m; bCalc=true; */
+/*     ra = pa; rb = pb; rc = pc; */
+/*     result = target; */ 
+/*     da.set(ra->result,target); */
+/*     db.set(rb->result,target); */
+/*     dc.set(rc->result,target); */ 
+/*   } */
+
+/*   //Counter Clockwise */
+/*   void set( Rigid * ra, Rigid * rb, Rigid * rc, bool m){ */
+    
+/*     mtn = m; bCalc=true; */
+/*     da.set(ra->result,result); */
+/*     db.set(rb->result,result); */
+/*     dc.set(rc->result,result); */ 
+
+/*     //fasten cycle */
+/*     ra->set(rb, rc, this, m); */
+/*     rb->set(rc, this, ra, m); */
+/*     rc->set(this, ra, rb, m); */
+    
+/*   } */
+
+/*   /1* void set( Rigid * pa, Rigid * pb, bool m){ *1/ */
+/*   /1*   mtn =m; bCalc=true; bTriple=false; *1/ */
+/*   /1*   ra=pa; rb=pb;rc=this; *1/ */
+/*   /1*   da.set(ra->result,result); *1/ */
+/*   /1*   db.set(rb->result,result); *1/ */
+/*   /1*   dc.set(rc->result,result); *1/ */
+/*   /1* } *1/ */
+
+/*   void reset(){ */ 
+/*     if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; */ 
+/*   } */
+
+/*   Pnt operator()(){ */
+/*     if (bCalc) { */
+/*       bCalc=false; //lock because network graph is looped */
+/*       (*ra)(); (*rb)(); (*rc)(); */
+/*       result = satisfy(); //satisfying requires unlocking */
+/*     } */
+/*     return result; */
+/*   } */
+
+/*   Pair meet(){ */
+/*     return Constrain::Triple( da(), db(), dc() ); */
+/*   } */
+
+/*   //bring three spheres closer together towards center of meet until meet is legit. */
+/*   Pnt satisfy(){ */
+/*     auto meet = Constrain::Triple( da(), db(), dc() ); */
+/*     if ( Ro::size(meet,false) < -.0001 ){ */
+      
+/*     } */
+/*      return bTriple ? Constrain::Triple(da(),db(),dc(),mtn) : Constrain::Planar(da(),db(),dc(),mtn); */
+
+/*   } */
+/* }; */
 
 #endif   /* ----- #ifndef vsr_rigid_INC  ----- */

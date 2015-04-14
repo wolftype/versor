@@ -655,7 +655,7 @@ struct CGAMV : public A {
   
   CGAMV unit() const { VT t = sqrt( fabs( (*this <= *this)[0] ) ); if (t == 0) return A(); return *this / t; }
   CGAMV runit() const { VT t = rnorm(); if (t == 0) return  A(); return *this / t; }
-    CGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }  
+  CGAMV tunit() const {    VT t = norm(); if (t == 0) return A(); return *this / t; }  
 
   template<typename B>
   CGAMV sp0( const B& b) const { return (b * (*this) * ~b).template cast<A>(); } 

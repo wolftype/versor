@@ -282,11 +282,50 @@ namespace vsr{
     }
 
     //preliminary
-    HEGraph& addNode( T& v ){
+    Node& addNode( T& v ){
       Node * n = new Node;
       n -> ptr = &v;
       mNode.push_back( n );
+      return *n;
+    }
+
+    //add faces and edges to nodes that already exist
+    HEGraph& fillFace( int a, int b, int c ){
+      
+      Node *na, *nb, *nc; 
+      HalfEdge *ea, *eb, *ec;
+      Face *f;
+
+      na = mNode[a];
+      nb = mNode[b];
+      nc = mNode[c];
+      
+      ea = new HalfEdge; 
+      eb = new HalfEdge; 
+      ec = new HalfEdge;
+      
+      f = new Face(); 
+
+      na -> edge = eb; //emanating
+      nb -> edge = ec; 
+      nc -> edge = ea;
+     
+       //Assign a edge incident to b, b edge incident to c, etc      
+      ea -> node = na;//nb;  
+      eb -> node = nb;//nc; 
+      ec -> node = nc;//na; 
+
+      mHalfEdge.push_back(ea);
+      mHalfEdge.push_back(eb);
+      mHalfEdge.push_back(ec);
+
+      mFace.push_back(f);
+
+
+      facet(ea,eb,ec,f);
+
       return *this;
+       
     }
 
 
@@ -486,7 +525,7 @@ namespace vsr{
     }
 
     //given an edge loop around a node, find next outer edge loop
-    vector<HalfEdge*> edgeLoop( vector<HalfEdge*> loop ){//const Node& n){
+    vector<HalfEdge*> edgeLoop0( vector<HalfEdge*> loop ){//const Node& n){
       
       vector<HalfEdge*> result;
       
@@ -532,6 +571,98 @@ namespace vsr{
 
       return result;
     }
+
+
+  vector<HalfEdge*> emanatingEdges( vector<HalfEdge*> loop ){
+      
+      HalfEdge * first = NULL;
+
+      vector<HalfEdge*> result;
+     
+      for(auto& i : loop){
+        if (i->opp!=NULL){
+          result.push_back(i->opp->next);
+        }
+      }
+      return result;
+  }
+
+    vector<HalfEdge*> edgeLoop( vector<HalfEdge*> loop ){
+
+            int maxNum = 100;
+    
+            vector<HalfEdge*> result;
+            HalfEdge * tmp = NULL;
+    
+            if (!loop.empty()){
+    
+              //does loop close?
+              bool bClosed = loop.back()->node == loop[0]->prev().node;
+    
+              //Get Emanating Edges
+              auto edges = emanatingEdges(loop);
+    
+              //if not closed, connect edge to first emanating edge
+              //(if first emanating edge isn't already on border)
+              if (!bClosed){
+                if (!edges.empty()){
+                  tmp=edges[0];
+                  if (!tmp->isBorder()){
+                    int iter =0;
+                    while (!tmp->isBorder() && iter<maxNum){
+                      tmp=tmp->opp->next;
+                      iter++;
+                    }
+                    result.push_back(tmp);
+                    tmp = tmp->next;
+                    result.push_back(tmp);
+    
+                    iter =0;
+                    while(tmp->node != edges[0]->node && iter<maxNum){
+                      tmp = tmp->next->opp->next;
+                      result.push_back(tmp);
+                      iter++;
+                    }
+                  } else if (edges.size()>2) {
+                    result.push_back(tmp);          
+                  }
+    
+                }
+              }
+    
+              //Connect emanating edges (avoiding original loop's nodes)
+              for (int i=0; i<edges.size();++i){
+                tmp = edges[i];
+                int nxt = i<edges.size()-1 ? i+1 : 0;
+                int iter =0;
+                while ( tmp!=NULL && tmp->node != edges[nxt]->node && iter < maxNum){
+                  iter++;
+                  tmp = tmp->next;
+    
+                  bool bExists=false;
+                  for (auto& j : loop){
+                    if ( (j->node==tmp->node) || (j->next->next->node==tmp->node) ){
+                      bExists=true;
+                      break;
+                    }
+                  }
+    
+                  if (bExists) {
+                    if (tmp->opp==NULL){
+                       result.push_back(tmp);
+                    }
+                    tmp = tmp->opp;
+                   } else {
+                    result.push_back(tmp); 
+                   }        
+               }
+              }
+    
+            }
+    
+            return result;
+    }
+    
 
     //all nodes connected to a node
     /* vector<Node*> nodeLoop( Node& a){ */

@@ -42,7 +42,20 @@ namespace vsr {
         return out;
       }
 
-  }
+     /*!
+     *  \brief  evaluate lambda for each member of input (with optional args)
+     */
+      template<class T, class Lambda, class S, class ... Args>
+      vector<T> fmap(Lambda func, const vector<S>& in, Args ... args){
+        vector<T> out;
+        for(auto& c : in){
+          out.push_back( func(c,args...) );
+        }
+        return out;
+      }
+
+
+  } //functor::
 
 }//vsr::
 #endif   /* ----- #ifndef vsr_map_INC  ----- */

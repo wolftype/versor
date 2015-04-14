@@ -336,7 +336,7 @@ struct MyApp : App {
      
   void save(){ 
     static int fnum = -1; fnum++;  
-    string dire = "/mnt/PC/lablab/output/";
+    string dire = "~/Documents/vsr_output/render/";
     stringstream name; name << "test_" << fnum;
     stringstream os; os << dire << name.str() << ".ppm";   
     string filename = os.str();

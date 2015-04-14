@@ -118,8 +118,11 @@ int main(int argc, char *argv[] ){
     printInfo(argv[i+1]);
   }
 
-  Vec a;
-  prod<GP>( a, a );
+  (Pair() * Con()).print();
+  (Tnv() * Con()).print();
+  //Vec a;
+  //a.print();
+  //Prod<GP>( a, a );
 
 	return 0;
 

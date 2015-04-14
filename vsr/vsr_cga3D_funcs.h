@@ -84,27 +84,69 @@ namespace vsr{
        inline Point point(VT x, VT y, VT z){
         return Round::null(x,y,z);
       }
+      /*!
+       *  \brief  Point at x,y,z
+       */
+     // auto point = ()(VT x, VT y, VT z){
+     //   return Round::null(x,y,z);
+     // }
     
       /*!
        *  \brief  Point on line closest to another point v
        */
-     template<class V>
-     inline Point point( const Line& l, const V& v){
-       return Ro::null( Fl::loc( l, v, false) );
-     }   
+    // template<class V>
+    // inline Point pointOnLine( const Line& l, const V& v){
+   //    return Ro::null( Fl::loc( l, v, false) );
+   //  }   
             
       /*!
        *  \brief  Point on line closest to another point v
        */
-     template<class V>
-     inline Point pointOnLine( const Line& lin, const V& v){
+     auto pointOnLine = []( const Line& lin, const Point& v){
        return Ro::null( Fl::loc( lin, v, false) );
-     }    
+     };    
+
+
+  
+     /*-----------------------------------------------------------------------------
+      *  EVALUATION LAMBDAS
+      *-----------------------------------------------------------------------------*/
  
+     /// a single point on circle c at theta t 
      auto pointOnCircle = [](const Circle& c, VT t){
       return Ro::pnt_cir(c,t);
      };
-  
+     /// n points on circle c
+     auto pointsOnCircle = [](const Circle& c, int num){
+      vector<Point> out;
+      for (int i=0;i<=num;++i){
+        out.push_back(pointOnCircle(c, TWOPI*(float)i/num) );
+      }
+      return out;
+     };
+     /// a pair on dual sphere
+     auto pairOnSphere = [](const DualSphere& s, VT t, VT p){
+      return Ro::round(s, Vec::x.sp( Gen::rot(t,p) ) );
+     };
+     /// a single point on dual sphere s at theta t and phi p
+     auto pointOnSphere = [](const DualSphere& s, VT t, VT p){
+       return Ro::split( pairOnSphere(s,t,p), true ).null(); 
+     };
+     /// many points on sphere (could use map func from gfx::data)
+     auto pointsOnSphere = [](const DualSphere& s, int u, int v){
+       vector<Point> out;
+       for (int i = 0; i < u; ++i){
+        for (int j = 0; j < v; ++j){
+
+         float tu= TWOPI * i/u;//-1 + 2.0 * i/num;
+         float tv = -PIOVERTWO  + PI * j/v;
+
+         out.push_back( pointOnSphere(s,tu,tv) );
+
+       }
+      }
+      return out; 
+     };
 
      /*!
       *  \brief  DualLine axis of circle c
@@ -127,9 +169,16 @@ namespace vsr{
        return Ro::split(pp, false);
      }
 
+
       inline Pair pair( const Point& a, const Point& b){
        return a ^ b;
      }
+
+     auto splitA = [](const Pair& pp){ return Ro::split(pp,true); };
+     auto splitB = [](const Pair& pp){ return Ro::split(pp,false); };
+     auto make_pair = []( const Point& a, const Point& b){
+      return a ^ b;
+     };
 
       /*!
        *  \brief Point Pair at x,y,z with direction vec (default Y) and radius r (default 1)

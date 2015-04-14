@@ -295,8 +295,8 @@ namespace Euc{
           
           VT n;
 
-      TPAR p;
-      p = r; //extract 2-blade part
+          TPAR p;
+          p = r; //extract 2-blade part
           VT td = p.wt(); //get scalar
 
           if (td > 0 ) { VT s2 = sqrt(td);  n = asinh( s2 ) / s2; }
@@ -443,7 +443,8 @@ namespace Euc{
     /*!
           Generate Boost as exponential of a Point Pair
           Implemented from "Square Root and Logarithm of Rotors. . ." by Dorst and Valkenburg, 2011
-          @param Point Pair generator
+          e^B/2 = cosh(B/2) - sinh(B/2)
+          @param Point Pair generator 
       */ 
     template<TT DIM, class A>  
       auto bst(const CGAMV<DIM,A>& tp) -> decltype( tp + 1 ) { //CGAMV<DIM, decltype( sumv( 1,A() ) ) > { 
@@ -452,7 +453,7 @@ namespace Euc{
 
           VT td = tp.wt(); 
 
-          if (td < 0) { norm =  sqrt( - td );  sn = -sin(norm) / norm; cn = cosh(norm); }
+          if (td < 0) { norm =  sqrt( - td );  sn = -sin(norm) / norm; cn = cos(norm); } //note, changed to cos from cosh
           else if (td > 0) { norm = sqrt(td); sn = -sinh(norm) / norm; cn = cosh(norm); }
           else if (td == 0) { norm = 0; sn = -1; cn = 1; }
 
@@ -487,7 +488,9 @@ namespace Euc{
 
     
      //feed in vectors!  
-    /*! Rotor Ratio of two Conformal vectors transforming a to b*/
+    /*! Rotor Ratio of two Conformal vectors transforming a to b
+        see dorst and valkenburg, basically this normalizes 1+R to give sqrt(ba)
+    */
      template<TT DIM> 
      auto ratio( 
       const CGAMV<DIM, typename CGA<DIM>::Vec >& a, 

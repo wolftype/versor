@@ -82,27 +82,27 @@ namespace vsr{
         /// Zero Out All Data
         void zero() { ITER mData[tidx] = T(0); ITEND }
         
-        Field( int w=1, int h=1, int d=1, double spacing = 1.0) :
-        CubicLattice<GridType>(w,h,d,spacing), mData( NULL )
+        Field( int w=1, int h=1, int d=1, double spacingX = 1.0, double spacingY = 1.0, double spacingZ = 1.0) :
+        CubicLattice<GridType>(w,h,d,spacingX,spacingY,spacingZ), mData( NULL )
 
         {
             alloc();
             init();
         }
         
-        Field& resize( int w, int h, int d, double spacing = 1.0){
+        Field& resize( int w, int h, int d, double spacingX = 1.0, double spacingY = 1.0, double spacingZ=1.0){
             
-            CubicLattice<GridType>::resize(w,h,d,spacing);     
+            CubicLattice<GridType>::resize(w,h,d,spacingX,spacingY,spacingZ);     
 
             alloc(); init();  
             return *this;
         }
         
-        Field& respace( double s ){
-            this->spacing(s);
-            init();
-            return *this;
-        }
+      //  Field& respace( double sx,  ){
+      //      this->spacing(s);
+      //      init();
+      //      return *this;
+      //  }
         
         void onDestroy(){
             if (mData) delete[] mData;
@@ -166,7 +166,7 @@ namespace vsr{
 
         /*! Get BILINEAR Interpolated Data at eval u,v [0-1.0] */
         T surf(VT u, VT v){
-            
+
             Patch p = this->surfIdx(u,v);
             
             T a = mData[ p.a ];//at ( iw, ih, 0 ) ;
@@ -177,6 +177,7 @@ namespace vsr{
             return Interp::surface<T> (a,b,c,d, p.rw, p.rh);
         }
         
+        /*! Trilinear interpolation of value*/
         T vol(VT u, VT v, VT w) const {
             VPatch p = this->vidx(u,v,w);
             
@@ -184,6 +185,9 @@ namespace vsr{
             T e = mData[ p.e ]; T f = mData[ p.f ]; T g = mData[ p.g ]; T h = mData[ p.h ];
             return Interp::volume<T> (a,b,c,d,e,f,g,h, p.rw, p.rh, p.rd );
         }
+
+        template<class A>
+        T vol(const A& a){ return vol(a[0],a[1],a[2]); }
         
         //Contour Integral 
     template<class V>

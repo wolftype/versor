@@ -118,14 +118,18 @@ namespace vsr{
   template<class T>
   void Immediate( const Field<T>& f){
     for (int i = 0; i < f.num(); ++i){ 
-      Immediate( f[i] ); 
+      glPushMatrix();
+      Immediate( f[i] );
+      glPopMatrix(); 
     }
   }
 
   template<class T>
   void ImmediateB( const Field<T>& f){
     for (int i = 0; i < f.num(); ++i){  
-      ImmediateB( f[i] ); 
+      glPushMatrix();
+      ImmediateB( f[i] );
+      glPopMatrix(); 
     }
   }
 

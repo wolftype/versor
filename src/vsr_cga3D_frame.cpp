@@ -214,6 +214,30 @@ namespace vsr{
       return *this;
     }
 
+    // Absolute orient z towrads target by amt t
+    Frame& Frame::orient(const Vec& v, float t, bool neg){
+      Rot tRot = Gen::ratio( Vec::z * (neg?-1:1), (v-vec()).unit() );
+      Vec ty = Op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
+      Rot yRot = Gen::ratio( Vec::y.spin(tRot), ty );
+      mRot = Gen::rot( -Gen::log( (yRot * tRot).runit() ) * t ); 
+
+      return *this;
+
+    }
+
+    // Absolute orient x towrads target by amt t
+    Frame& Frame::orientX(const Vec& v, float t, bool neg){
+      Rot tRot = Gen::ratio( Vec::x * (neg?-1:1), (v-vec()).unit() );
+      Vec ty = Op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
+      Rot yRot = Gen::ratio( Vec::y.spin(tRot), ty );
+      mRot = Gen::rot( -Gen::log( (yRot * tRot).runit() ) * t ); 
+
+      return *this;
+
+    }
+
+
+
     /// RELATIVE Rotor to orient -z to target, and keep y as vertical as possible
     Rot Frame::relOrientRot( const Vec& v, bool neg){
       Rot tRot = Gen::ratio( z() * (neg?-1:1) , (v-vec()).unit() );        //Transformation to take CURRENT z to look at v

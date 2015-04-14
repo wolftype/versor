@@ -25,39 +25,39 @@ namespace vsr {
     };
     
    // template <typename T>
-	class Interp {
-		
-		public:
-			
-			/// t from 0 to 1
+  class Interp {
+    
+    public:
+      
+      /// t from 0 to 1
             template<typename T>
-			static T cubic(T _a, T _b, T _c, T _d, double t);
-			/// t from -1 to 1
+      static T cubic(T _a, T _b, T _c, T _d, double t);
+      /// t from -1 to 1
             template<typename T>
-			static T quadric(T _a, T _b, T _c, double t);
-			/// t from 0 to 1
+      static T quadric(T _a, T _b, T _c, double t);
+      /// t from 0 to 1
             template<typename T>
-			static T linear(T _a, T _b, double t);
-			/// t from 0 to 1
+      static T linear(T _a, T _b, double t);
+      /// t from 0 to 1
             template<typename T>
-			static T sqlinear(T _a, T _b, double t);
+      static T sqlinear(T _a, T _b, double t);
             /// arbitrary number of points to pass through
             template<typename T>
             static T linear( T * s, int num, double t);
-			
-			/// arbitrary number of points to pass through
-      template<typename T>
-			static T quadric(T * s, int num, double t, bool closed =0);
       
       /// arbitrary number of points to pass through
       template<typename T>
-			static T cubic(T * s, int num, double t);
+      static T quadric(T * s, int num, double t, bool closed =0);
+      
+      /// arbitrary number of points to pass through
+      template<typename T>
+      static T cubic(T * s, int num, double t);
         
             /*! bilinear eulerian surface interpolation assumes four points 
                 @param array in the order: bl, br, tr, tl
             */
             template<typename T>
-			static T surface(T *s, double u, double v);
+      static T surface(T *s, double u, double v);
             
             /*! bilinear eulerian surface interpolation assumes four points 
                 @param bottom-left
@@ -75,8 +75,8 @@ namespace vsr {
             /// trilinear eulerian volume integration
             template<typename T>
             static T volume( T a, T b, T c, T d, T e, T f, T g, T h, double u, double v, double w);
-			/// trilinear eulerian volume interpolation assumes eight points
-			template<typename T>
+      /// trilinear eulerian volume interpolation assumes eight points
+      template<typename T>
             static T volume(T *s, double x, double y, double z);
 
 //            template<typename T>
@@ -85,12 +85,12 @@ namespace vsr {
 //            template<typename T>
 //            static vector<double> svals(T a, T b, T c, T d, double u, double v);
 
-	};
+  };
     
     template<typename T> 
     inline T Interp :: cubic(T _a, T _b, T _c, T _d, double t) {
         
-        //get three states describing HULL	
+        //get three states describing HULL  
         T a = _b - _a;
         T b = _c - _b;
         T c = _d - _c;
@@ -121,9 +121,9 @@ namespace vsr {
         
         //remap from 0 - 1 to -1 to 1
         double nt = -1.0 + 2.0*t;
-        //	cout << " nt: " << nt << "\n";
+        //  cout << " nt: " << nt << "\n";
         
-        //get three states describing HULL	
+        //get three states describing HULL  
         double p = nt * nt; 
         
         T a = ( ( (_a + _c) * .5 )  - _b ) * p;
@@ -162,21 +162,21 @@ namespace vsr {
         // 
         double n = closed ? num / 2.0 : (num-1)/2.0; 
         
-        int fn = floor(n);		// number of 3 group sections
-        double rem = n - fn;	// remainder ( 0 or .5 )
+        int fn = floor(n);    // number of 3 group sections
+        double rem = n - fn;  // remainder ( 0 or .5 )
         
-        double td = ( t * n ); //fn?	
+        double td = ( t * n ); //fn?  
         int it = floor(td);    //current group
         
         double ct = td - it;   //current position in group (0-1)
         
-        int gt = it * 2;	
+        int gt = it * 2;  
         
         if ( (rem != 0) && (it==fn) ) {
             return closed? linear( cp[gt], cp[0], ct *2 ) : linear( cp[gt], cp[gt+1], ct *2 );
         }
         else{ 
-            return closed ? quadric(cp[gt], cp[gt+1], (it==fn-1)? cp[0] : cp[gt+2], ct) : quadric(cp[gt], cp[gt+1], cp[gt+2], ct); 	
+            return closed ? quadric(cp[gt], cp[gt+1], (it==fn-1)? cp[0] : cp[gt+2], ct) : quadric(cp[gt], cp[gt+1], cp[gt+2], ct);   
         }
         
     }
@@ -218,11 +218,11 @@ namespace vsr {
 //        return Frame( Gen::mot ( bot * (1-v) + top * v );
 //    }
     
-    //d3 c2					h7 g6
-    //a0 b1  <- front		e4 f5  <- back
+    //d3 c2          h7 g6
+    //a0 b1  <- front    e4 f5  <- back
     
-    //2 6					3 7
-    //0 4					1 5
+    //2 6          3 7
+    //0 4          1 5
    template<typename T>
      inline T Interp :: volume(T * cp, double u, double v, double w){
         T fbottom = cp[0] * (1-u) + cp[4] * u;
@@ -231,7 +231,7 @@ namespace vsr {
         
         T bbottom = cp[1] * (1-u) + cp[5] * u;
         T btop = cp[3] * (1-u) + cp[7] * u;
-        T bmid = bbottom * (1-v) + btop * (v);	
+        T bmid = bbottom * (1-v) + btop * (v);  
         
         return fmid * (1-w) + bmid * w;
     }

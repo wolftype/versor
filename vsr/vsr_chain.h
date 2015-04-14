@@ -243,6 +243,7 @@ struct  Spherical : public Joint {
       Frame operator [] (int k) const { return mFrame[k]; }    ///< Get kth Absolute Frame
       
       /* SURROUNDS */
+      
       /// Sphere Centered at Joint K Going Through Joint K+1 
       Dls nextDls(int k) const{
         return Ro::dls(mFrame[k].pos(), mLink[k].vec().norm() );//mFrame[k+1].pos());
@@ -251,25 +252,50 @@ struct  Spherical : public Joint {
       Dls prevDls(int k) const{
         return Ro::dls(mFrame[k].pos(), mLink[k-1].vec().norm());//mFrame[k-1].pos());
       }
-            /// Sphere at Point p through Joint K
-            Dls goalDls(const Pnt& p, int k){
-                return Ro::dls(p, mLink[k].vec().norm());
-            }
+      
+      /// Dual Plane of rotation of kth joint (translated by link rejection from yz)
+      Dlp nextPlane(int k) const {
+        auto rj = Op::rj( link(k).vec(), Biv::xy );
+        return mFrame[k].dxy().translate(rj);
+      }
+
+      /// Dual Plane of rotation of k-1th joint (translated by link rejection from yz)
+      Dlp prevPlane(int k) const {
+        auto rj = Op::rj( link(k-1).vec(), Biv::xy );
+        auto uxy = mFrame[k].dxy().spin( !link(k-1).rot() );//<-- "undo" orientation of current xy plane
+        return uxy.translate(-rj);
+      }
+
+      /// Dual Circle Centered at Joint K Going Through Joint K+1 (in plane of rotation)
+      Circle nextCircle(int k) const {  
+        return (nextDls(k) ^ nextPlane(k)).dual();
+      }
+
+      /// Dual Circle Centered at Joint K Going Through Joint K+1 (in plane of rotation)
+      Circle prevCircle(int k) const {  
+        return (prevDls(k) ^ prevPlane(k)).dual();
+      }
+
+
+      /// Sphere at Point p through Joint K
+      Dls goalDls(const Pnt& p, int k){
+         return Ro::dls(p, mLink[k].vec().norm());
+      }
       /// Sphere at point p through last link (default, or set arbitary link)
       Dls lastDls(const Pnt& p){
         return Ro::dls(p,mLink[mNum-1].vec().norm());
       }
         
-            /* Possible Points */
-            
-            /// Pnt at position t along Link idx
-            Pnt at(int idx, double t = 0.0){
-                return Ro::null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
-            }
-            
-            Frame& base() { return mBaseFrame;} //mFrame[0]; }
-            Frame& first() { return mFrame[0]; }        
-            Frame& last() { return mFrame[mNum -1]; }
+      /* Possible Points */
+      
+      /// Pnt at position t along Link idx
+      Pnt at(int idx, double t = 0.0){
+          return Ro::null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
+      }
+      
+      Frame& base() { return mBaseFrame;} //mFrame[0]; }
+      Frame& first() { return mFrame[0]; }        
+      Frame& last() { return mFrame[mNum -1]; }
       
       /// Vert xy Plane Containing Root Target Point v ( NORMALIZED )
       Dlp xy(const Pnt& p) {

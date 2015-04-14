@@ -58,7 +58,7 @@ struct Distance {
 
 
 /// 2 distances and an origin define a circular ORBIT
-struct Rigid2 {
+struct Rigid2_ {
   
   Distance distA, distB;
 
@@ -66,10 +66,10 @@ struct Rigid2 {
 
   bool mtn;
 
-  Rigid2() : mtn (true) {}
+  Rigid2_() : mtn (true) {}
 
   /// Input target, and two points (COUNTER CLOCKWISE)
-  Rigid2( const Pnt& target, const Pnt& pa, const Pnt& pb, bool m ) :
+  Rigid2_( const Pnt& target, const Pnt& pa, const Pnt& pb, bool m=false ) :
   distA(pa, target), distB(pb, target), origin(target), mtn(m)
   {
       //pa.vprint(); pb.vprint();    
@@ -364,7 +364,7 @@ struct Waterbomb {
      Point * begin() { return &a; }
   } V;
 
-  Rigid2 rg, rc, rb;
+  Rigid2_ rg, rc, rb;
   Rigid3 rf;
 
   Waterbomb( const Point& pa, const Point& pb, const Point& pc, const Point& pd)
@@ -428,7 +428,7 @@ struct RabbitEar{
      Point& operator[](int idx){ return ((&a)[idx]); }
   } V;
 
-  Rigid2 ra;
+  Rigid2_ ra;
   Rigid3 rb;
 
   RabbitEar(const Point& a, const Point& b, const Point& c)

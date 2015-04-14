@@ -21,6 +21,7 @@
 
 
 #include "vsr_cga3D_app.h"   
+#include "vsr_cga3D_log.h"
 
 using namespace vsr;
 using namespace vsr::cga3D;
@@ -31,7 +32,7 @@ struct MyApp : App {
   bool bReset = false;
   float amt = 0;
 
-  float wt, size,dist;
+  float radiusA, radiusB,wt,size,dist;
 
   //Two Spheres
   DualSphere sa,sb;
@@ -44,12 +45,14 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
+    gui(radiusA,"radiusA",-100,100);
+    gui(radiusB,"radiusB",-100,100);
     gui(wt,"wt",-100,100);
     gui(size,"size",-100,100);
     gui(dist,"dist",-100,100);
     
-    sa = sphere(-3,-1,0);
-    sb = sphere(4,0,0);
+    radiusB =1; radiusA=1;
+    wt=1; size=dist=0; amt=-.5;
 
     objectController.attach(&sa);
     objectController.attach(&sb);
@@ -61,20 +64,29 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    Pair par = sa ^ sb;
+    sa = sphere(-10,0,0,radiusA);
+    sb = sphere(1,0,0,radiusB);
 
-    auto dst = (sa<=sb)[0]*dist;
 
-    float w = 1.0/par.rnorm() * wt;
-    float sz = 1.0/Ro::size(par,true) * size;
+    auto rot = Gen::ratio( sa, sb ); //(root)
+    auto par = Gen::log(rot);
 
-    for (int i=0;i<10;++i){
+    for (int i=0;i<=10;++i){
+
       float t = (float)i/10;
-      auto ts = sa.bst(par.runit() * t * (amt+w+sz+dst)/2.0 );
+      
+      auto ts = sa.bst(par * t * amt );
       auto cir = meet(ts,Dlp(0,0,1));
       Draw(cir,t,0,1-t,.5);
+      
+      //if (Ro::size(cir,false)>500) Draw(Line(cir),0,1,0);
+      if(bReset) Draw( Ro::pnt_cir(cir, wt), 0, 1, 0, .2 );
     }
 
+//    Draw( sa.reflect(sb),0,1,0,.3);
+//    Draw( sb.reflect(sa),0,1,0,.3);
+
+    Draw( sa^sb );
     Draw(sa,0,0,1,.5);
     Draw(sb,1,0,0,.5);
   

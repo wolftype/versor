@@ -62,8 +62,8 @@ namespace vsr {
         public:
          
 
-        CubicLattice(int _w = 1, int _h = 1, int _d = 1, double _s = 1.0)
-        :mWidth(_w), mHeight(_h), mDepth(_d), mSpacing(_s), 
+        CubicLattice(int _w = 1, int _h = 1, int _d = 1, double _sx = 1.0,double _sy = 1.0,double _sz = 1.0)
+        :mWidth(_w), mHeight(_h), mDepth(_d), mSpacingX(_sx),mSpacingY(_sy), mSpacingZ(_sz),  
          mNum( mWidth * mHeight * mDepth),
          mNumVxl( (mWidth-1) * (mHeight-1) * (mDepth-1) ),
          mPoint(NULL), mVxl(NULL), mNbr(NULL), mNbrVxl(NULL)
@@ -92,9 +92,9 @@ namespace vsr {
             mWidth = mHeight = mDepth = mNum = mNumVxl = 0;
         }
         
-        CubicLattice& resize( int _w, int _h, int _d, int _s = 1.0){
+        CubicLattice& resize( int _w, int _h, int _d, double _sx = 1.0,double _sy=1.0,double _sz=1.0){
             onDestroy();
-            mWidth = _w; mHeight = _h; mDepth = _d; mSpacing = _s;
+            mWidth = _w; mHeight = _h; mDepth = _d; mSpacingX = _sx; mSpacingY = _sy; mSpacingZ = _sz;
 
             mNum = _w * _h * _d; 
             mNumVxl = (_w-1) * (_h-1) * (_d -1);
@@ -105,8 +105,6 @@ namespace vsr {
         int w() const { return mWidth; }
         int h() const { return mHeight; }
         int d() const { return mDepth; }
-        double spacing() const { return mSpacing; }
-        void spacing( double amt ) { mSpacing = amt; init(); }
         
         int num() const { return mNum; }
         int numVxl() const { return mNumVxl; }    
@@ -134,23 +132,23 @@ namespace vsr {
         
         /* Totals and Offsets From Center */
         /*! Total Width */
-        double tw() const { return (mWidth-1) * mSpacing; }
+        double tw() const { return (mWidth-1) * mSpacingX; }
         /*! Offset Width */
         double ow() const { return tw() / 2.0 ; }
         /*! Total Height */
-        double th() const { return (mHeight-1) * mSpacing; }
+        double th() const { return (mHeight-1) * mSpacingY; }
         /*! Offset Height */
         double oh() const { return th() / 2.0 ; }
         /*! Total Depth */
-        double td() const { return (mDepth-1) * mSpacing; }
+        double td() const { return (mDepth-1) * mSpacingZ; }
         /*! Offset Depth */
         double od() const { return td() / 2.0 ; }//0;}//
         /*! Spatial Positions of ith element in x direction  */
-        double px(int i) const { return -ow() + (mSpacing * i); }
+        double px(int i) const { return -ow() + (mSpacingX * i); }
         /*! Spatial Positions of jth element in y direction  */
-        double py(int j) const { return -oh() + (mSpacing * j); }
+        double py(int j) const { return -oh() + (mSpacingY * j); }
         /*! Spatial Positions of kth element in z direction  */
-        double pz(int k) const { return  od() - (mSpacing * k); }
+        double pz(int k) const { return  od() - (mSpacingZ * k); }
 
         void alloc(){
             mPoint = new LPnt[mNum];
@@ -159,6 +157,7 @@ namespace vsr {
             mNbrVxl = new Nbr[mNumVxl];
         }
 
+        //specialize this if desired
         void initPoints(){
             ITER
                 mPoint[ tidx ]  = LPnt( px(i),  py(j),  pz(k) ); 
@@ -186,8 +185,7 @@ namespace vsr {
             BOUNDITER0
             
                 int ix = i * (mHeight-1) * (mDepth-1) + j * (mDepth-1) + k;
-                gfx::Vec3f v( px(i) + mSpacing/2.0, py(j) + mSpacing/2.0, pz(k) - mSpacing/2.0);
-               
+                gfx::Vec3f v( px(i) + mSpacingX/2.0, py(j) + mSpacingY/2.0, pz(k) - mSpacingZ/2.0); 
                  mVxl[ix] = vxlAt(v);
                 
                 //assign face information
@@ -224,9 +222,9 @@ namespace vsr {
             V v = bound(tv);
             
             //Bottom - Left corner Voxel  
-            int lw = floor( ( v[0] + ow() ) / spacing() );
-            int lh = floor((v[1] + oh() ) / spacing() );
-            int ld = floor((-v[2] + od() ) / spacing() );
+            int lw = floor( ( v[0] + ow() ) / mSpacingX );
+            int lh = floor((v[1] + oh() ) / mSpacingY );
+            int ld = floor((-v[2] + od() ) / mSpacingZ );
             
             if (lw > w()-2) lw = w() -2;
             if (lh > h()-2) lh = h() -2;
@@ -521,7 +519,7 @@ namespace vsr {
         
         int mWidth, mHeight, mDepth;
         int mNum, mNumVxl;
-        double mSpacing;
+        double mSpacingX,mSpacingY,mSpacingZ;
         
         //Points in Space
         LPnt * mPoint;

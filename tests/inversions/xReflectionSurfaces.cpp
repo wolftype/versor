@@ -17,8 +17,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_cga3D_app.h"   
 #include "gfx/gfx_mesh.h"
 #include "vsr_shapes.h"
 
@@ -29,9 +28,8 @@ using namespace gfx;
 
 struct MyApp : App {    
    
-  Pnt mouse;
-  Lin ray;
-
+  Point mouse;
+   
   float time;
   float amtA, amtB;
 
@@ -42,43 +40,29 @@ struct MyApp : App {
 
   bool bDrawSpheres, bDrawRef, bAvg, bUseDist;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-    m = Mesh::Sphere();
-    torus = Shape::Torus();
-  }
+  Frame frame,frame2;
 
-  void initGui(){
+  void setup(){
+
       gui(vmode,"mode",0,5);
       gui(amtA,"amtA",-100,100);
       gui(amtB,"amtB",-100,100);
       gui(bDrawSpheres, "Sphs")(bDrawRef,"refs")(bAvg,"Avg")(bUseDist,"dist");
+
+      m = Mesh::Sphere();
+      torus = Shape::Torus();
+
+      frame2.pos(3,0,0);
+
+      objectController.attach(&frame);
+      objectController.attach(&frame2);
   }
   
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
-  }
 
-    virtual void onDraw(){ 
+  void onDraw(){ 
         
-      getMouse();
 
-      
-      static Frame frame(0,0,0);
-      Touch(interface, frame);
-
-      static Frame frame2(3,0,0);
-      Touch(interface, frame2);
-
-
-      /* static Cir cxz = CXZ(2).trs(0,1,0);; */
-      /* Touch(interface, cxz); */
-      /* Draw(cxz,1,1,0); */
+      mouse = calcMouse3D();
 
       auto pntcontrol = frame.pos();
       auto parcontrol = frame.py();
@@ -167,25 +151,13 @@ struct MyApp : App {
   }
    
 
-  
 };
-
-
-MyApp * app;
 
 
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
 

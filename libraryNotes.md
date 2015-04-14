@@ -1,3 +1,7 @@
+To do:
+extraction of k-grade from a type
+subtraction not just addition of scalar
+
 cga3D
 #Frame
 ipx -> imaginary point pair in local coordinate's x direction
