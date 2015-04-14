@@ -15,7 +15,7 @@
  *
  * =====================================================================================
  */
-#include "vsr_cubicLattice.h"
+#include "group/vsr_cubicLattice.h"
 
 namespace vsr{
 

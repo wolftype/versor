@@ -20,7 +20,7 @@
 
 
 #include "gfx/gfx_matrix.h"
-#include "vsr_cga3D_xf.h" 
+#include "transform/vsr_cga3D_xf.h" 
 
 using namespace gfx;
 namespace vsr {

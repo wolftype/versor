@@ -5,7 +5,7 @@
 
 */                         
 
-#include "vsr_cga3D_draw.h"
+#include "draw/vsr_cga3D_draw.h"
 
 namespace vsr{
                            

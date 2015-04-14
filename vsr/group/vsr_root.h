@@ -14,8 +14,7 @@
 #define ROOT_SYSTEM_INCLUDED
                       
 #include <vector>
-#include "vsr_euclidean.h"   
-#include "vsr_generic_op.h"
+#include "core/vsr_generic_op.h"
 
 using namespace std;
 

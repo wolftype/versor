@@ -1,27 +1,29 @@
-#include "vsr_root.h"  
-#include "vsr_GLVimpl.h" 
-#include "vsr_ega3D_draw.h"
+
+#include "group/vsr_root.h"  
+#include "draw/vsr_ega3D_draw.h"
+#include "gfx/util/gfx_glv_app.h"
 
 using namespace vsr;  
+using namespace vsr::ega3D;  
 
  
-
-typedef EGAMV< 4, Blade1<4>::VEC > V4;
+typedef NEVec<4> V4;
+typedef ga<RMetric<4>,double> Algebra;
+//typedef NEVec<3> Vec;
 
 //idositetrachoron 24 cell                                                                         
 
 auto D4 = Root::System( V4(1,0,0,0), V4(0,1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );
-
 auto F4 = Root::System( V4(0,1,-1,0), V4(1,-1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );  
-
 auto H4 = Root::System( V4(0,-1,0,0), V4(0,1.618,1,-.618) * .5, V4(0,0,-1,0), ( V4(-.618,0,1, 1.618) * .5 ) ); 
 
-struct MyApp : App { 
+struct MyApp : gfx::GFXAppGui { 
 	
 	bool d4, f4, h4, bSpin, bOrtho;
 	 
-	virtual void initGui(){
-		gui(d4,"d4")(f4,"f4")(h4,"h4");
+	void setup(){
+	  bindGLV();
+  	gui(d4,"d4")(f4,"f4")(h4,"h4");
 		gui(bSpin, "spin")(bOrtho, "ortho");  
 		d4 = true;
 	}
@@ -31,41 +33,38 @@ struct MyApp : App {
 	  scene.camera.lens.bOrtho = bOrtho;  
 	  
 	  if (d4){
-	   for (auto &i : D4 ){
-			if (bSpin) i = i.sp( Gen::rot( EGAMV<4, MV<10,12> > (.01,.01) ) );
-			Vec tp = Proj<4>::Call(5.0 , i);
-			Vec to = Proj<4>::Ortho<3>(i);
-			Draw( bOrtho ? to : tp );
-
-		} 
+	   
+     for (auto &i : D4 ){
+			  if (bSpin) i = i.sp( Gen::rot( MV< Algebra, Basis<10,12> > (.01,.01) ) );
+			  Vec tp = Proj<4>::Call(5.0 , i);
+			  Vec to = Proj<4>::Ortho<3>(i);
+			  Draw( bOrtho ? to : tp );
+		  } 
 	  }  
 	
 	  if (f4){
 	   for (auto &i : F4 ){
-			if (bSpin) i = i.sp( Gen::rot( EGAMV<4, MV<10,12> > (.01,.01) ) );
+			if (bSpin) i = i.sp( Gen::rot( MV<Algebra, Basis<10,12> > (.01,.01) ) );
 			Vec tp = Proj<4>::Call(5.0 , i);
 			Vec to = Proj<4>::Ortho<3>(i);
 			Draw( bOrtho ? to : tp );
 
-		} 
+		  } 
 	  } 
 	 
-	if (h4){
+	  if (h4){
 		  for (auto &i : H4 ){
-			if (bSpin) i = i.sp( Gen::rot( EGAMV<4, MV<12> > (.01) ) );
-			Vec tp = Proj<4>::Call(5.0 , i);
-			Vec to = Proj<4>::Ortho<3>(i);
-			Draw( bOrtho ? to : tp );
-		
-		} 
-			  }  
+			  if (bSpin) i = i.sp( Gen::rot( MV<Algebra, Basis<12> > (.01) ) );
+			  Vec tp = Proj<4>::Call(5.0 , i);
+			  Vec to = Proj<4>::Ortho<3>(i);
+			  Draw( bOrtho ? to : tp );
+		  } 
+		}  
 	
-	text("Alt + Mouse to Rotate the Group\nShift + Mouse to Zoom in");
 	} 
 	       
 };
                         
-MyApp * myApp;
 
 int main(){
 
@@ -90,16 +89,8 @@ int main(){
 	
 	}  
 	
-	GLV glv(0,0);	
-    		        
-	Window * win = new Window(500,500,"4D ROOTS",&glv);    
-    myApp = new MyApp;
-	myApp -> init( win ); 
-	myApp -> initGui();
-  
-	glv << *myApp;
-
-	Application::run();
+  MyApp app;
+  app.start();
 	
 	return 0;
 	

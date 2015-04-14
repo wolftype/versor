@@ -16,15 +16,15 @@
  * =====================================================================================
  */
 
-#include "vsr_cga3D_frame.h"
+#include "space/vsr_cga3D_frame.h"
 
 namespace vsr{
 
     Frame::Frame() 
-    : mPos( Ro::null(0,0,0) ), mRot(1,0,0,0), mScale(1), aBiv(.9), aVec(.9) {}
+    : mPos( round::null(0,0,0) ), mRot(1,0,0,0), mScale(1), aBiv(.9), aVec(.9) {}
     
     Frame::Frame(VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) 
-    : mPos( Ro::null(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
+    : mPos( round::null(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
 
     Frame::Frame(const Point& p, const Rotor& r, VSR_PRECISION s ) 
     : mPos( p ), mRot( r ), mScale(s), aBiv(.9), aVec(.9) {} 
@@ -32,7 +32,7 @@ namespace vsr{
     Frame::Frame(const DualLine& d)
     : mScale(1),  aBiv(.9), aVec(.9) 
     {
-      Motor m = Gen::mot( d );
+      Motor m = gen::mot( d );
       mPos = PAO.sp(m);
       mRot = m;
     }  
@@ -62,14 +62,14 @@ namespace vsr{
     Dlp Frame::dyz() const  { return y() <= dlz(); }      ///< yz dual plane  
     
     /* Real Pair */
-    Par Frame::px() const { return  Ro::round( ibound(), x() ); }       ///< x direction point pair around center
-    Par Frame::py() const { return  Ro::round( ibound(), y() );  }      ///< y direction point pair around center
-    Par Frame::pz() const { return Ro::round( ibound(),  z() );  }      ///< z direction point pair around center  
+    Par Frame::px() const { return  round::produce( ibound(), x() ); }       ///< x direction point pair aproduce center
+    Par Frame::py() const { return  round::produce( ibound(), y() );  }      ///< y direction point pair aproduce center
+    Par Frame::pz() const { return round::produce( ibound(),  z() );  }      ///< z direction point pair aproduce center  
 
     /* Imaginary Pair */
-    Par Frame::ipx() const { return  Ro::round( bound(), x() ); }       ///< x direction imaginary point pair around center
-    Par Frame::ipy() const { return  Ro::round( bound(), y() );  }      ///< y direction imaginary point pair around center
-    Par Frame::ipz() const { return Ro::round( bound(),  z() );  }      ///< z direction imaginary point pair around center  
+    Par Frame::ipx() const { return  round::produce( bound(), x() ); }       ///< x direction imaginary point pair aproduce center
+    Par Frame::ipy() const { return  round::produce( bound(), y() );  }      ///< y direction imaginary point pair aproduce center
+    Par Frame::ipz() const { return round::produce( bound(),  z() );  }      ///< z direction imaginary point pair aproduce center  
    
     /* Global Tangent as Null Point Pair*/
     Par Frame::tx() const { return Par( x().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
@@ -77,14 +77,14 @@ namespace vsr{
     Par Frame::tz() const { return Par( z().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
 
     /* Real Circles */
-    Cir Frame::cxy() const { return Ro::round( ibound(), xy() ); }     ///< xy circle (real, direct)
-    Cir Frame::cxz() const { return Ro::round( ibound(), xz() ); }     ///< xz circle (real, direct)
-    Cir Frame::cyz() const { return Ro::round( ibound(), yz() ); }     ///< yz circle (real, direct)
+    Cir Frame::cxy() const { return round::produce( ibound(), xy() ); }     ///< xy circle (real, direct)
+    Cir Frame::cxz() const { return round::produce( ibound(), xz() ); }     ///< xz circle (real, direct)
+    Cir Frame::cyz() const { return round::produce( ibound(), yz() ); }     ///< yz circle (real, direct)
 
     /* Imaginary Circles */
-    Cir Frame::icxy() const { return Ro::round( bound(), xy() ); }     ///< xy circle (imaginary, direct)
-    Cir Frame::icxz() const { return Ro::round( bound(), xz() ); }     ///< xz circle (imaginary, direct)
-    Cir Frame::icyz() const { return Ro::round( bound(), yz() ); }     ///< yz circle (imaginary, direct)
+    Cir Frame::icxy() const { return round::produce( bound(), xy() ); }     ///< xy circle (imaginary, direct)
+    Cir Frame::icxz() const { return round::produce( bound(), xz() ); }     ///< xz circle (imaginary, direct)
+    Cir Frame::icyz() const { return round::produce( bound(), yz() ); }     ///< yz circle (imaginary, direct)
 
 /*     Vec Frame::right() const { return x(); } */
 /*     Vec Frame::up() const { return y(); } */   
@@ -97,7 +97,7 @@ namespace vsr{
       } 
 
     /// Generate Translation versor based on Position
-    Trs Frame::trs() const { return Gen::trs(mPos); }   
+    Trs Frame::trs() const { return gen::trs(mPos); }   
           
     /// Get Absolute Motor Relative to Origin 
      Mot Frame::mot() const { 
@@ -111,21 +111,21 @@ namespace vsr{
     
     /// Dual Sphere Shell
     Dls Frame::bound() const{
-      return Ro::dls( mPos, mScale );
+      return round::dls( mPos, mScale );
     }
 
     /// Dual Imaginary Sphere Shell
     Dls Frame::ibound() const{
-      return Ro::dls( mPos, -mScale );
+      return round::dls( mPos, -mScale );
     }
     
-    Dll Frame::dll() const { return Gen::log( mot() ); }                 ///< DualLine from Motor (for interpolating)  
-    DualLine Frame::dualLine() const { return Gen::log( mot() ); }       ///< DualLine from Motor (for interpolating)  
+    Dll Frame::dll() const { return gen::log( mot() ); }                 ///< DualLine from Motor (for interpolating)  
+    DualLine Frame::dualLine() const { return gen::log( mot() ); }       ///< DualLine from Motor (for interpolating)  
         
-    /// Dilate by t around center
+    /// Dilate by t aproduce center
     Frame& Frame::dilate(double t) { 
       Dls s =  bound().dil( bound(), t ) ;
-      mScale = Ro::rad(s);
+      mScale = round::rad(s);
       return *this;
     }
 
@@ -138,21 +138,21 @@ namespace vsr{
     
     /// Translation Step (translate by velocity vector)
     Frame&  Frame::move() {
-      mPos = (mPos + dVec).null();//.sp( Gen::trs(dVec) );
+      mPos = (mPos + dVec).null();//.sp( gen::trs(dVec) );
       dVec *= aVec; 
       return *this;
     }
     
     /// Spin Step (Local Rotation) */
     Frame&  Frame::spin() {      
-      mRot = Gen::rot(dBiv) * mRot;
+      mRot = gen::rot(dBiv) * mRot;
       dBiv *= aBiv;
       return *this; 
     }
 
-    /// Rotate around local xy and return a new frame
+    /// Rotate aproduce local xy and return a new frame
     Frame Frame::rotXY( VSR_PRECISION amt) const {
-      return Frame ( mPos, Gen::rot( xy() * amt )  * mRot, mScale );
+      return Frame ( mPos, gen::rot( xy() * amt )  * mRot, mScale );
     }
 
     /// Move by dx, dy, dz and return a new frame

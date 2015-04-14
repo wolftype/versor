@@ -32,36 +32,33 @@ minkowskian metric (i.e. diagonalized non-degenerate)
 namespace vsr{
 
 
-
-
-
-template<Bits::Type X, int S>
+template<bits::Type X, int S>
 struct Blade{
-	static const Bits::Type BIT = X;
+	static const bits::Type BIT = X;
 	static const int SIGN = S;  
 	
 	static void print() {
-		printf("%f\t",1.0/S); Bits::bsprint(X); 
+		printf("%f\t",1.0/S); bits::bsprint(X); 
 	}   
 };
 
 
-template< Bits::Type a, Bits::Type dim>
+template< bits::Type a, bits::Type dim>
 struct PushMink{  
-	typedef XList< Blade< ( a ^ Bits::origin<dim>() ) ^ Bits::EP<dim>(), 2 >,  Blade< ( a ^ Bits::origin<dim>() ) ^  Bits::EM<dim>(), 2 > > ORI;
-	typedef XList< Blade< ( a ^ Bits::infinity<dim>() ) ^ Bits::EP<dim>(), -1 >, Blade< ( a ^ Bits::infinity<dim>() ) ^  Bits::EM<dim>(), 1 > > INF;  
-	typedef typename Maybe< (a & Bits::origin<dim>()) == Bits::origin<dim>(), ORI, INF >::Type SWHICH; 
+	typedef XList< Blade< ( a ^ bits::origin<dim>() ) ^ bits::EP<dim>(), 2 >,  Blade< ( a ^ bits::origin<dim>() ) ^  bits::EM<dim>(), 2 > > ORI;
+	typedef XList< Blade< ( a ^ bits::infinity<dim>() ) ^ bits::EP<dim>(), -1 >, Blade< ( a ^ bits::infinity<dim>() ) ^  bits::EM<dim>(), 1 > > INF;  
+	typedef typename Maybe< (a & bits::origin<dim>()) == bits::origin<dim>(), ORI, INF >::Type SWHICH; 
 	typedef  XList< Blade<a, 1> > PASS;
-	typedef typename Maybe< Bits::checkMink<a,dim>(), PASS, SWHICH  >::Type Type;
+	typedef typename Maybe< bits::checkMink<a,dim>(), PASS, SWHICH  >::Type Type;
 };
 
-template< class A, Bits::Type dim>
+template< class A, bits::Type dim>
 struct PopMink{  
-	typedef XList< Blade< ( A::BIT ^ Bits::EP<dim>() ) ^ Bits::origin<dim>(), 1 * A::SIGN >,  Blade< ( A::BIT ^ Bits::EP<dim>() ) ^  Bits::infinity<dim>(), -2 * A::SIGN> > ORI;
-	typedef XList< Blade< ( A::BIT ^ Bits::EM<dim>() ) ^ Bits::origin<dim>(), 1 * A::SIGN >, Blade< ( A::BIT ^ Bits::EM<dim>() ) ^  Bits::infinity<dim>(), 2* A::SIGN > > INF;  
-	typedef typename Maybe< (A::BIT & Bits::origin<dim>()) == Bits::origin<dim>(), ORI, INF >::Type SWHICH; 
+	typedef XList< Blade< ( A::BIT ^ bits::EP<dim>() ) ^ bits::origin<dim>(), 1 * A::SIGN >,  Blade< ( A::BIT ^ bits::EP<dim>() ) ^  bits::infinity<dim>(), -2 * A::SIGN> > ORI;
+	typedef XList< Blade< ( A::BIT ^ bits::EM<dim>() ) ^ bits::origin<dim>(), 1 * A::SIGN >, Blade< ( A::BIT ^ bits::EM<dim>() ) ^  bits::infinity<dim>(), 2* A::SIGN > > INF;  
+	typedef typename Maybe< (A::BIT & bits::origin<dim>()) == bits::origin<dim>(), ORI, INF >::Type SWHICH; 
 	typedef XList< A > PASS;
-	typedef typename Maybe< Bits::checkMink<A::BIT,dim>(), PASS, SWHICH  >::Type Type;
+	typedef typename Maybe< bits::checkMink<A::BIT,dim>(), PASS, SWHICH  >::Type Type;
 };  
                                            
 
@@ -69,7 +66,7 @@ struct PopMink{
 //takes two split blade lists and multiplies them, returns a xlist of Blades 
 template <class A, class B, class M>
 struct SubSplitGP{                                                                      
-	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, Bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;  
+	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;  
 	 	
 	typedef Blade<  A::BIT ^ B::HEAD::BIT, Met * A::SIGN * B::HEAD::SIGN > One;    
 	typedef typename XCat< XList<One> , typename SubSplitGP<A, typename B::TAIL, M>::Type >::Type Type;  
@@ -91,10 +88,10 @@ struct SplitGP< XList<>, B, M>{
 
 template <class A, class B, class M>
 struct SubSplitOP{                                                                      
-	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, Bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;   	
+	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;   	
 	typedef Blade<  A::BIT ^ B::HEAD::BIT, Met * A::SIGN * B::HEAD::SIGN > One;    
 	typedef typename XCat< 
-		 typename Maybe< Bits::outer( A::BIT, B::HEAD::BIT), 
+		 typename Maybe< bits::outer( A::BIT, B::HEAD::BIT), 
 			XList<One> ,
 			XList<> >::Type, 
 		  typename SubSplitOP<A, typename B::TAIL, M>::Type 
@@ -117,10 +114,10 @@ struct SplitOP< XList<>, B, M>{
 
 template <class A, class B, class M>
 struct SubSplitIP{                                                                      
-	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, Bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;   	
+	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;   	
 	typedef Blade<  A::BIT ^ B::HEAD::BIT, Met * A::SIGN * B::HEAD::SIGN > One;    
 	typedef typename XCat< 
-		 typename Maybe< Bits::inner( A::BIT, B::HEAD::BIT), 
+		 typename Maybe< bits::inner( A::BIT, B::HEAD::BIT), 
 			XList<One> ,
 			XList<> >::Type, 
 		  typename SubSplitIP<A, typename B::TAIL, M>::Type 
@@ -142,11 +139,11 @@ struct SplitIP< XList<>, B, M>{
 
 
 
-template<class A, Bits::Type dim>
+template<class A, bits::Type dim>
 struct Pop{
 	typedef typename XCat< typename PopMink< typename A::HEAD, dim >::Type , typename Pop< typename A::TAIL, dim >::Type >::Type Type;
 };
-template<Bits::Type dim>
+template<bits::Type dim>
 struct Pop< XList<>, dim >{
 	typedef XList<> Type;  
 };
@@ -157,7 +154,7 @@ constexpr bool compare(const A& = A(), const B& = B()){
 	return A::BIT == B::BIT;
 }  
 
-constexpr Bits::Type CalcSum( Bits::Type a, Bits::Type b){
+constexpr bits::Type CalcSum( bits::Type a, bits::Type b){
 	return a + b; 
 }   
 
@@ -234,7 +231,7 @@ struct EliminateZeros<XList<>>{
 	typedef XList<> Type;  
 };
 //get split product back
-template <Bits::Type A, Bits::Type B, class M>
+template <bits::Type A, bits::Type B, class M>
 struct SplitProd{ 
 	static const int DIM = M::Num;                   
 	//typedef typename RMetric<DIM-1,1>::Type M;
@@ -246,7 +243,7 @@ struct SplitProd{
 	typedef typename EliminateZeros<C>::Type Type;  
 };        
 
-template <Bits::Type A, Bits::Type B, class M>
+template <bits::Type A, bits::Type B, class M>
 struct SplitIProd{   
 	static const int DIM = M::Num;
     //typedef typename RMetric<DIM-1,1>::Type M; 
@@ -258,7 +255,7 @@ struct SplitIProd{
 	typedef typename EliminateZeros<C>::Type Type;  
 };
 
-template <Bits::Type A, Bits::Type B, class M>
+template <bits::Type A, bits::Type B, class M>
 struct SplitOProd{  
 	static const int DIM = M::Num;
     //typedef typename RMetric<DIM-1,1>::Type M; 

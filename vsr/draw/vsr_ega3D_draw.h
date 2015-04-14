@@ -3,10 +3,12 @@
  
 
 #include "gfx/gfx_glyphs.h" 
-#include "vsr_ega3D_types.h" 
+#include "space/vsr_ega3D_types.h" 
 
 namespace vsr{  
-	
+
+namespace ega3D{
+  	
 	using namespace gfx;
 	
 	template<class A>
@@ -47,7 +49,8 @@ namespace vsr{
 			Glyph::DirCircle( ta, sn );
 		glPopMatrix();
 	}
-	
+}
+
 }
 
 #endif

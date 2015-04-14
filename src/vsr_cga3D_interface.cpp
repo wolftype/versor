@@ -1,4 +1,4 @@
-#include "vsr_cga3D_interface.h"
+#include "interface/vsr_cga3D_interface.h"
 
 namespace vsr{
 	

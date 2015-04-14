@@ -32,10 +32,10 @@ else
 endif 
 	CXX += -arch x86_64
 endif
-CXX += -O3 -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast
+CXX += -O3 -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast -Wno-array-bounds -Wno-deprecated-declarations
 AR 	= ar crs 
 
-IPATH = -Ivsr/ 
+IPATH = -Ivsr/ -Iext/gfx/gfx/
 LDFLAGS =  
 #INCLUDES AND LINKS
 ifeq ($(RPI),0)  
@@ -84,9 +84,9 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o vsr_cga3D_frame.o vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
+OBJ = vsr_cga3D_op.o #vsr_cga3D_frame.o #vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
 ifneq ($(RPI),1)
-OBJ += gl2ps.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
+OBJ += #gl2ps.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
 endif
 
 OBJ_DIR = build/obj/
