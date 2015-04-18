@@ -2,24 +2,24 @@
 #define CGA3D_OPERATIONS_H_INCLUDED  
 
 
-
 // Specialized 3D CONFORMAL OPERATIONS (assumes 3D . . . )
 
 #include <math.h> 
 #include <vector>  
-#include "core/vsr_generic_op.h"
-#include "space/vsr_cga3D_types.h"  
+
+#include "vsr_cga3D_types.h"  
+
+#include "detail/vsr_generic_op.h"
 #include "util/vsr_constants.h" 
 #include "util/vsr_math.h"
 
 namespace vsr{
                      
 
-using namespace cga3D;
-
-
 namespace op{
   
+  using namespace cga;//::types; 
+    
   Rot AA( const Vec& s);                
   Rot AA( const Dlp& s);
   Rot AA( const Cir& s);
@@ -34,6 +34,7 @@ namespace op{
 namespace gen{               
   
 
+   using namespace cga;//::types;  
   /*-----------------------------------------------------------------------------
    *  QUAT helpers
    *-----------------------------------------------------------------------------*/
@@ -63,12 +64,12 @@ namespace gen{
     /*! Dual Line Generator from a Motor 
         @param Motor m (a concatenation of rotation and translation)
     */  
-      Dll log( const Mot& m);
+    Dll log( const Mot& m);
 
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-     Dll log(const Dll& a, const Dll& b, VSR_PRECISION t = 1.0);
+    Dll log(const Dll& a, const Dll& b, VSR_PRECISION t = 1.0);
 
     /*! Generate Motor That Twists Dual Line a to Dual Line b;
     */
@@ -77,8 +78,6 @@ namespace gen{
     /*! Generate Motor That Twists Motor a to Motor b;
     */
     Mot ratio( const Mot& a, const Mot& b, VSR_PRECISION t);
-
-
 
 
     /*-----------------------------------------------------------------------------
@@ -128,6 +127,13 @@ namespace gen{
    
    /*! Split Log of General Conformal Rotor */
    vector<Pair> log( const Con& rot);
+
+   /*! Split Log from a ratio of two Circles */
+   vector<Pair> log( const Circle& ca, const Circle& cb);
+   
+   /*! Split Log from a ratio of two Circles */
+   vector<Pair> log( const Pair& ca, const Pair& cb);
+   
    
   /*! General Conformal Transformation from a split log*/
    Con con( const vector<Pair>& log, VSR_PRECISION amt);
@@ -147,6 +153,7 @@ template<class Algebra, class B> template <class A>
 MV<Algebra,B> MV<Algebra,B>::twist( const MV<Algebra,A>& t) const{
      return this -> sp ( gen::mot(t) );  
 } 
+
 
 /* namespace Ro { */
 
@@ -320,13 +327,13 @@ MV<Algebra,B> MV<Algebra,B>::twist( const MV<Algebra,A>& t) const{
 #define E3 e3(1)
 
 
-#define PT(x,y,z) vsr::round::null(vsr::Vec(x,y,z))
+#define PT(x,y,z) vsr::round::null(vsr::cga::Vec(x,y,z))
 #define DLS(r) vsr::round::dls(0,0,0,r)
 //#define IPT(x,y,z) vsr::round::inull(x,y,z)
 #define PV(v) vsr::round::null(v)
-#define PX(f) vsr::round::null(vsr::Vec(f,0,0))
-#define PY(f) vsr::round::null(vsr::Vec(0,f,0))
-#define PZ(f) vsr::round::null(vsr::Vec(0,0,f))
+#define PX(f) vsr::round::null(vsr::cga::Vec(f,0,0))
+#define PY(f) vsr::round::null(vsr::cga::Vec(0,f,0))
+#define PZ(f) vsr::round::null(vsr::cga::Vec(0,0,f))
 #define PAIR(x,y,z) (PT(x,y,z)^PT(-x,-y,-z))
 //#define IPAIR(x,y,z) (IPT(x,y,z)^IPT(-x,-y,-z))
 #define CXY(f) (PX(f)^PY(f)^PX(-f)).unit()
@@ -334,16 +341,16 @@ MV<Algebra,B> MV<Algebra,B>::twist( const MV<Algebra,A>& t) const{
 #define CYZ(f) (PY(f)^PY(-f)^PZ(f)).unit()
 #define F2S(f) f*1000.0
 #define S2F(f) f/1000.0
-#define LN(x,y,z) ( vsr::Pnt(0,0,0,1,.5)^PT(x,y,z)^vsr::Inf(1) )
+#define LN(x,y,z) ( vsr::cga::Point(0,0,0,1,.5)^PT(x,y,z)^vsr::cga::Inf(1) )
 #define DLN(x,y,z) ( vsr::op::dl(LN(x,y,z)) )
-#define PAO vsr::Pnt(0,0,0,1,0)   /// Point At Origin
-#define EP vsr::Dls(0,0,0,1,-.5)  ///  Dual unit sphere at origin: swap with infinity for hyperbolic space
-#define EM vsr::Dls(0,0,0,1,.5)   ///  Dual imaginary unit sphere at origin: swap with infinity for spherical space
-#define INFTY vsr::Inf(1)
+#define PAO vsr::cga::Point(0,0,0,1,0)   /// Point At Origin
+#define EP vsr::cga::Dls(0,0,0,1,-.5)  ///  Dual unit sphere at origin: swap with infinity for hyperbolic space
+#define EM vsr::cga::Dls(0,0,0,1,.5)   ///  Dual imaginary unit sphere at origin: swap with infinity for spherical space
+#define INFTY vsr::cga::Inf(1)
 #define HYPERBOLIC_INF EP
 #define SPHERICAL_INF EM
 #define EUCLIDEAN_INF INFTY
-#define HLN(x,y,z) (vsr::Ori(1)^PT(x,y,z)^EP) //hyperbolic line (circle)
+#define HLN(x,y,z) (vsr::cga::Ori(1)^PT(x,y,z)^EP) //hyperbolic line (circle)
 #define HDLN(x,y,z) (vsr::op::dl(HLN(x,y,z)))
 
 

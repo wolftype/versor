@@ -1,8 +1,4 @@
 GCC = 0 
-RPI = 0
-PORT = 22
-HOST = pi-la
-NAME = main    
 GFX=1
 PLATFORM=$(shell uname)
 
@@ -10,65 +6,46 @@ ifeq ($(PLATFORM),Linux)
 	GCC = 1
 endif
 
-PIROOT = $(HOME)/code/pi/root/
-
-
 #PASS IN CLANG=path/to/clang++ if default is not working
 CLANG = 0
 
 #COMPILER VERSION  
-
 ifeq ($(GCC),1) 
-ifeq ($(RPI),1)
-   CXX = arm-linux-gnueabihf-g++ -std=c++0x
-else
    CXX = g++ -std=c++0x 
-endif
 else  
 ifneq ($(CLANG),0) 
-	CXX = $(CLANG) -std=c++11  
+	CXX = $(CLANG)  
 else 
-	CXX = clang++ -std=c++11  
+	CXX = clang++ 
 endif 
 	CXX += -arch x86_64
 endif
-CXX += -O3 -ftemplate-depth-1200  -Wno-switch -Wno-int-to-pointer-cast -Wno-array-bounds -Wno-deprecated-declarations
-AR 	= ar crs 
 
-IPATH = -Ivsr/ -Iext/gfx/gfx/
-LDFLAGS =  
-#INCLUDES AND LINKS
-ifeq ($(RPI),0)  
-IPATH += -I/usr/include/ 
-LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ #-lvsr 
-#-lvsr
-LDFLAGS += -lm  
+ifeq ($(C14),1)
+CXX += -std=c++14  $(USRFLAGS) 
 else
-IPATH += -I../gfx/
-IPATH += -I$(PIROOT)usr/include
-IPATH += -I$(PIROOT)usr/local/include
-IPATH += -I$(PIROOT)opt/vc/include
-IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
-IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux  
-LDFLAGS += -L$(PIROOT)lib
-LDFLAGS += -L$(PIROOT)usr/lib
-LDFLAGS += -L$(PIROOT)usr/local/lib
-LDFLAGS += -L$(PIROOT)opt/vc/lib
-LDFLAGS += -lbcm_host
-LDFLAGS += -llo
-LDFLAGS += -lm
-LDFLAGS += -lrt
-LDFLAGS += -lstdc++
-LDFLAGS += -lvchiq_arm
-LDFLAGS += -lvcos
+CXX += -std=c++11  $(USRFLAGS)
 endif
 
+#OPTIMIZATION AND RECURSION
+CXX += -O3 -ftemplate-depth-1200
+#WARNINGS
+CXX += -Wno-switch -Wno-int-to-pointer-cast -Wno-array-bounds -Wno-deprecated-declarations -Wno-c++1y-extensions
+
+#LIB ARCHIVING
+AR 	= ar crs 
+
+#INCLUDES AND LINK PATHS
+IPATH = -Ivsr/ -Iext/gfx/gfx/  -I/usr/include/ -I/usr/local/include 
+LDFLAGS += -Lbuild/lib/ -Lext/glv/build/lib/ -lm  
+
+#LINK TO GRAPHICS LIBRARIES
 ifeq ($(GFX),1) 
-IPATH += -Iext/glv/ -Iext/gfx/ -Iext/ 
+IPATH += -Iext/glv/ -Iext/gfx/ -Iext/gfx/gfx -Iext/ 
 ifeq ($(PLATFORM),Linux)
-	LDFLAGS += -lGLV -lGLEW -lGLU -lGL -lglut 
+	LDFLAGS += -lGLV -lGLEW -lGL -lglut 
 else
-	LDFLAGS += -lglv -framework OpenGL -framework GLUT 
+	LDFLAGS += -lglv -lGLEW -framework OpenGL -framework GLUT 
 endif
 endif
                            
@@ -84,9 +61,12 @@ VPATH = $(SRC_DIR):\
 
 EXEC = tests/%.cpp examples/%.cpp
 
-OBJ = vsr_cga3D_op.o #vsr_cga3D_frame.o #vsr_cga3D_xf.o vsr_cga3D_cubicLattice.o
-ifneq ($(RPI),1)
-OBJ += #gl2ps.o vsr_cga3D_draw.o vsr_cga3D_interface.o 
+#LIBRARY SPACES
+OBJ = vsr_cga3D_op.o vsr_cga3D_funcs.o vsr_cga3D_frame.o vsr_cga3D_cubicLattice.o  
+
+#ADD GRAPHICS FUNCTTONALITY INTO LIBRARY
+ifeq ($(GFX),1) 
+OBJ += gl2ps.o vsr_cga3D_draw.o vsr_cga3D_render.o vsr_cga3D_xf.o 
 endif
 
 OBJ_DIR = build/obj/
@@ -122,7 +102,6 @@ glv:
 	@echo "git submodule update\n\n"
 	$(MAKE) --no-print-directory -C ext/glv
 	#install DESTDIR=../../$(BUILD_DIR)    
-
 
 $(EXEC): dir glv vsr FORCE 
 	@echo Building $@

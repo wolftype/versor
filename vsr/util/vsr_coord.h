@@ -9,7 +9,7 @@
 #ifndef Versor_vsr_coord_h
 #define Versor_vsr_coord_h
 
-#include "vsr_cga3D_op.h"
+#include "space/vsr_cga3D_op.h"
 
 //#include <iostream>
 
@@ -34,7 +34,7 @@ namespace vsr {
     // }   
     
     inline Vec sph2vec(double theta, double phi){
-        Rot r = Gen::rot(theta/2.0, phi/2.0);
+        Rot r = gen::rot(theta/2.0, phi/2.0);
         return Vec::x.sp(r);   
     }
     
@@ -58,6 +58,10 @@ namespace vsr {
      }
   }
 } //vsr::
+
+
+
+
 
 
 #endif

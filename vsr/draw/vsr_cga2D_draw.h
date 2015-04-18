@@ -2,151 +2,158 @@
 #define VSR_CGA2D_DRAW_H_INCLUDED  
 
 #include "gfx/gfx_glyphs.h"
-#include "vsr_cga2D_types.h" 
-#include "vsr_field.h"  
+#include "gfx/gfx_render.h"
+
+#include "space/vsr_cga2D_types.h" 
+#include "form/vsr_field.h"  
+
+
 
 
 namespace vsr{
-	
-	template<class A>
-	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix(); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			Immediate(s);
-		glPopMatrix();
-	} 
-	
-   /*! Draw Some Type A at 2D Position B */
-  typedef void (*GFunc)();
-  template<class B>
-	void DrawAt( GFunc glyph, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix();
-    glTranslatef( p[0], p[1], 0 ); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			glyph();//Immediate(s);
-		glPopMatrix();
-	}          
-	// FEATURE ExTRAcTION (ROTATION AND POSITION)
 
-	Rot AA( const Vec& s){            
-	        Rot r = Gen::ratio(Vec::y, s.unit() ); 
-			//r.vprint();
-	       	//Vec v = Op::dle( Gen::pl( r ) ) ;
-			//v.vprint();
-	        VT deg = Gen::iphi(r) * ( -180 / PI );
-		   // printf("%f\n",deg);
-	        return Rot(deg, Gen::pl( r )[0]);
-	
-	    }  
+//  namespace cga2D{
+   
+ //   using namespace cga2D;//::types;
+    using namespace gfx;
+  
+//  template<class A>
+//  void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
+//    glPushMatrix(); 
+//    glNormal3f(0,0,1);
+//    glColor4f(r,g,b,a);
+//      Immediate(s);
+//    glPopMatrix();
+//  } 
+//  
+//   /*! Draw Some Type A at 2D Position B */
+//  typedef void (*GFunc)();
+//  template<class B>
+//  void DrawAt( GFunc glyph, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+//    glPushMatrix();
+//    glTranslatef( p[0], p[1], 0 ); 
+//    glNormal3f(0,0,1);
+//    glColor4f(r,g,b,a);
+//      glyph();//Immediate(s);
+//    glPopMatrix();
+//  }          
+  // FEATURE ExTRAcTION (ROTATION AND POSITION)
 
-	void Immediate (const Vec& s){   
-		Rot t = AA(s);
-		
-	    gfx::Glyph::Line2D(s);
-		glPushMatrix();	
-			gfx::GL::translate( s[0], s[1], 0 );
-			gfx::GL::rotate(t[0], 0, 0,  t[1] );	
-			Glyph::Tri();
-		glPopMatrix();
-	}
+  Rot AA( const Vec& s){            
+       Rot r = gen::ratio(Vec::y, s.unit() ); 
+        //Vec v = Op::dle( gen::pl( r ) ) ;
+       VSR_PRECISION deg = gen::iphi(r) * ( -180 / PI );
+       return Rot(deg, gen::pl( r )[0]);
+
+   } 
+
+
+  void Immediate (const Vec& s){   
+    Rot t = AA(s);
+    
+    gfx::Glyph::Line2D(s);
+    glPushMatrix();  
+      gfx::GL::translate( s[0], s[1], 0 );
+      gfx::GL::rotate(t[0], 0, 0,  t[1] );  
+      Glyph::Tri();
+    glPopMatrix();
+  }
 
   void Immediate (const Drv& d){
     Immediate( d.copy<Vec>() );
   }
 
-	
-	void Immediate (const Pnt& s){
+  
+  void Immediate (const Point& s){
  
-	    VT ta = Ro::size( s, true );
+      VSR_PRECISION ta = round::size( s, true );
 
-	    //treat as dual circle (if |radius^2| > 0.000001);
-	    if ( fabs(ta) >  FPERROR ) {
+      //treat as dual circle (if |radius^2| > 0.000001);
+      if ( fabs(ta) >  FPERROR ) {
 
-	        bool real = ta > 0 ? 1 : 0;	
+          bool real = ta > 0 ? 1 : 0;  
 
-	        Pnt p = Ro::cen( s );
-	        VT t = sqrt ( fabs ( ta ) );
+          Pnt p = round::cen( s );
+          VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
-	        gfx::GL::translate ( p[0], p[1], 0 );
-	        (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );	
-	    } else {  
+          gfx::GL::translate ( p[0], p[1], 0 );
+          (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );  
+      } else {  
 
-	        gfx::Glyph::Point2D(s);
-	    }
-	} 
+          gfx::Glyph::Point2D(s);
+      }
+  } 
 
-  void Immediate( const Flp& s){
-    //s.vprint();
-        Immediate( (s / s[2]).null() );
+  inline void Immediate( const Flp& s){
+    Immediate( (s / s[2]).null() );
   }
 
-  void Immediate( const Dfp& s){
-    //s.vprint();
-        Immediate( s.dual() );
+  inline void Immediate( const Dfp& s){
+    Immediate( s.dual() );
   }
 
   
-  void Immediate( const Cir& s){
+  inline void Immediate( const Circle& s){
     Immediate(s.dual()); 
   }
-	
-	 void Immediate (const Par& s){
-	        //Is Imaginary?
-	        VT size = Ro::size( s, false );
-		  //  printf("size: %fn", size);
-	        std::vector<Pnt> pp = Ro::split( s );
+  
+  inline void Immediate (const Pair& s){
+    //Is Imaginary?
+     VSR_PRECISION size = round::size( s, false );
+     std::vector<Pnt> pp = round::split( s );
 
-	        VT ta = Ro::size( pp[0], true );   
-	                                     
-	        if ( fabs(ta) >  FPERROR ) {    
-	            Pnt p1 = Ro::cen( pp[0] );
-	            Pnt p2 = Ro::cen( pp[1] );
-	            double t = sqrt ( fabs ( ta ) );
-	            bool real = size > 0 ? 1 : 0;	
+     VSR_PRECISION ta = round::size( pp[0], true );   
+                                  
+     if ( fabs(ta) >  FPERROR ) {    
+         Pnt p1 = round::cen( pp[0] );
+         Pnt p2 = round::cen( pp[1] );
+         double t = sqrt ( fabs ( ta ) );
+         bool real = size > 0 ? 1 : 0;  
 
-	            glPushMatrix();
-	            gfx::GL::translate ( p1[0], p1[1], 0 );//(p1[0], p1[1], p1[2]);
-	            (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
-	            glPopMatrix();
+         glPushMatrix();
+         gfx::GL::translate ( p1[0], p1[1], 0 );//(p1[0], p1[1], p1[2]);
+         (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
+         glPopMatrix();
 
-	            gfx::GL::translate (  p2[0], p2[1], 0  );
-	            (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
+         gfx::GL::translate (  p2[0], p2[1], 0  );
+         (real) ? gfx::Glyph::Circle( t ) : gfx::Glyph::DashedCircle( t );   
 
-	        } else {
-			   // pp[0].vprint(); pp[1].vprint();
-	            gfx::Glyph::Point2D(pp[0]);
-	            gfx::Glyph::Point2D(pp[1]);
-	        }
-	}
-	
-	void Immediate (const Lin& s){
-	    Drv d = Fl::dir( s );
-	    Dls v = Fl::loc( s , PAO, false);
-	    gfx::GL::translate (v[0], v[1],0);
-	    gfx::Glyph::Line2D(d * 10, d * -10);	
-	}
+     } else {
+         gfx::Glyph::Point2D(pp[0]);
+         gfx::Glyph::Point2D(pp[1]);
+     }
+  }
+  
+  inline void Immediate (const Line& s){
+      Drv d = flat::dir( s );
+      Dls v = flat::loc( s , round::point(0,0), false);
+      gfx::GL::translate (v[0], v[1],0);
+      gfx::Glyph::Line2D(d * 10, d * -10);  
+  }
 
-  void Immediate( const Dll& d){
+  inline void Immediate( const DualLine& d){
     Immediate(d.dual() );
   }
-	 
-	template<class T>
-	void Immediate( const Field<T>& f){
-		for (int i = 0; i < f.num(); ++i){
-			Immediate(f[i]);
-		}
-	}
+  
+  
+  /*-----------------------------------------------------------------------------
+   *  FIELDS
+   *-----------------------------------------------------------------------------*/
+  template<class T>
+  inline void Immediate( const Field<T>& f){
+    for (int i = 0; i < f.num(); ++i){
+      Immediate(f[i]);
+    }
+  }
 
-	void Immediate( const Field<Vec>& f){
-		for (int i = 0; i < f.num(); ++i){
-			glPushMatrix();
-			glTranslatef( f.grid(i)[0], f.grid(i)[1],f.grid(i)[2]); 
-			Immediate(f[i]);
-			glPopMatrix();
-		}
-	}
-}
+  inline void Immediate( const Field<Vec>& f){
+    for (int i = 0; i < f.num(); ++i){
+      glPushMatrix();
+      glTranslatef( f.grid(i)[0], f.grid(i)[1],f.grid(i)[2]); 
+      Immediate(f[i]);
+      glPopMatrix();
+    }
+  }
+} //vsr::
 
 #endif

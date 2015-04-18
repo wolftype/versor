@@ -11,73 +11,40 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "vsr_generic_op.h"
-//#include "vsr_graph.h"
 #include "vsr_field.h"
 
 namespace vsr{ 
-	
-//  using namespace gfx;	
-   
-	template<class A>
-	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix(); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			Immediate(s);
-		glPopMatrix();
-	}
 
-	template<class A>
-	void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix(); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			ImmediateB(s);
-		glPopMatrix();
-	}
-
-  /*! Draw Some Type A at 3D Position B */
-  template<class A, class B>
-	void DrawAt( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix();
-    glTranslatef( p[0], p[1], p[2] ); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			Immediate(s);
-		glPopMatrix();
-	}
-
-  //Alt
-  template<class A, class B>
-	void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
-		glPushMatrix();
-    glTranslatef( p[0], p[1], p[2] ); 
-		glNormal3f(0,0,1);
-		glColor4f(r,g,b,a);
-			ImmediateB(s);
-		glPopMatrix();
-	}
-
+  namespace generic{
 	               
-	template<Bits::Type DIM>
+	template<bits::Type DIM>
 	NRot<DIM> AA( const NVec<DIM>& s){
         NRot<DIM> r = Gen::ratio( NVec<DIM>::z, s.unit() ); 
         return Gen::aa(r);
     }                                  
 
-  	template<Bits::Type DIM>
+  	template<bits::Type DIM>
 	  NERot<DIM> AA( const NEVec<DIM>& s){
         NERot<DIM> r = Gen::ratio( NEVec<DIM>::z, s.unit() ); 
         return Gen::aa(r);
     }                                  
 
-  template<Bits::Type DIM>
+  template<bits::Type DIM>
    NERot<DIM> AA( const NEBiv<DIM>& s){   
 		return Gen::aa( Gen::ratio( NEVec<DIM>::z, s.dual().unit() ) ); 
 	}
 
+  template<class T>
+  void Immediate(const T& t){
+    printf("no generic draw function\n");
+  }
+  template<class T>
+  void ImmediateB(const T& t){
+    printf("no generic draw function\n");
+  }
+
   //GENERIC EUCLIDEAN ORTHOGONAL PROJECTION
-  template<Bits::Type DIM>
+  template<bits::Type DIM>
   void Immediate (const NEVec<DIM>& ts){  
       NEVec<3> s = ts;
       gfx::Glyph::Line(s);
@@ -88,7 +55,7 @@ namespace vsr{
       glPopMatrix();
   }
 
-  template<Bits::Type DIM>
+  template<bits::Type DIM>
   void ImmediateB (const NEVec<DIM>& ts){  
       NEVec<3> s = ts;
       gfx::Glyph::Line(s);
@@ -98,7 +65,7 @@ namespace vsr{
       glPopMatrix();
   }
 
-    template<Bits::Type DIM>
+    template<bits::Type DIM>
   void Immediate (const NEBiv<DIM>& s){  
 		double ta = s.norm(); 
 	    bool sn = Op::sn( s , NEBiv<DIM>::xy * (-1));
@@ -111,14 +78,14 @@ namespace vsr{
 
 
 	
-	template<Bits::Type DIM> 
+	template<bits::Type DIM> 
 	NRot<DIM> AA( const NCir<DIM>& s){
 		NBiv<DIM> b = Ro::dir( s ).template copy< NBiv<DIM> >();               
         NRot<DIM> r = Gen::ratio(NVec<DIM>::z, Op::dle( b ).unit() ); 
         return Gen::aa(r);
     }
 	    
-	template<Bits::Type DIM>  
+	template<bits::Type DIM>  
 	void Immediate( const NCir<DIM>& s )	{  
 		VSR_PRECISION rad = Ro::rad( s );
 	    bool im = Ro::size(s, false) > 0 ? 1 : 0;  
@@ -130,7 +97,7 @@ namespace vsr{
 			im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
 	}  
 	                               
-	template<Bits::Type DIM>
+	template<bits::Type DIM>
 	void Immediate (const NLin<DIM>& s){
 	    NDrv<DIM> d = Fl::dir( s );
 	    NDls<DIM> v = Fl::loc( s , Ro::null( NVec<DIM>() ), false);
@@ -138,7 +105,7 @@ namespace vsr{
 	    gfx::Glyph::Line(d * 10, d * -10);	
 	}
                                    
-	template<Bits::Type DIM>
+	template<bits::Type DIM>
 	void Immediate (const NPnt<DIM>& s){
  
 	    VSR_PRECISION ta = Ro::size( s, true );
@@ -159,7 +126,7 @@ namespace vsr{
 	    }
 	}   
 
-     template<Bits::Type DIM> 
+     template<bits::Type DIM> 
      void Immediate (const NPar<DIM>& s){
 	        //Is Imaginary?
 	        VSR_PRECISION size = Ro::size( s, false );
@@ -214,7 +181,51 @@ namespace vsr{
       GL::vertex( c.begin() );
     glEnd();
   }
+
+
+	template<class A>
+	void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix(); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+		 generic::Immediate(s);
+		glPopMatrix();
+	}
+
+	template<class A>
+	void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix(); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			generic::ImmediateB(s);
+		glPopMatrix();
+	}
+
+  /*! Draw Some Type A at 3D Position B */
+  template<class A, class B>
+	void DrawAt( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix();
+    glTranslatef( p[0], p[1], p[2] ); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			generic::Immediate(s);
+		glPopMatrix();
+	}
+
+  //Alt
+  template<class A, class B>
+	void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+		glPushMatrix();
+    glTranslatef( p[0], p[1], p[2] ); 
+		glNormal3f(0,0,1);
+		glColor4f(r,g,b,a);
+			generic::ImmediateB(s);
+		glPopMatrix();
+	}
+  
  
+  }//generic
+
 } //vsr::
 
 #endif

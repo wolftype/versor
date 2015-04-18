@@ -155,9 +155,8 @@ namespace vsr{
 // template VSR_PRECISION flat::wt( const Lin&, bool);
 // template VSR_PRECISION flat::wt( const Dlp&, bool);  
 // template VSR_PRECISION flat::wt( const Pln&, bool);  
-//
-//
-namespace Op{
+
+namespace op{
 
   Rot AA( const Vec& s){
       Rot r = gen::ratio(Vec::z, s.unit() ); 
@@ -191,17 +190,15 @@ namespace Op{
 
 }
 
-namespace Gen{               
+namespace gen{               
 
   /*! Generate a Rotor (i.e quaternion) from spherical coordinates
         @param[in] theta in xz plane from (1,0,0) in range [0,PI]
         @param[in] phi in rotated xy plane in range []
     */
     Rot rot(double theta, double phi){
-
         Rot rt = gen::rot( Biv::xz * theta / 2.0 );
         Rot rp = gen::rot( Biv::xy.sp( rt ) * phi /2.0 );
-
         return rp * rt;
     }                   
 
@@ -266,8 +263,6 @@ Computer Vision and Graphics"
           VSR_PRECISION  den = Math::sinc(ac);
           VSR_PRECISION  den2 = ac * ac * den;
 
-          //m.vprint();
-          //printf("den: %f\t%f\t%f\n",ac,den,den2);
           b =  ( ( Ori(1) <= ( q * Inf(1) ) ) / den * -1.0 );     //bivector part - negative necessary . dll? . . 
           tq = (b * q);                                           //Make motor and extract Grade 2 part
 
@@ -348,7 +343,11 @@ Computer Vision and Graphics"
    Con ratio( const Circle& a, const Circle& b){
     
     Con trot = (b/a).runit();
-   // if (trot[0]<0) trot = -trot; //restrict to positive <R>?
+    //planar?
+    float planarity = (round::carrier(a).dual().unit() ^ round::carrier(b).dual().unit()).wt();
+    if ( fabs(planarity)<=.000009 )  {
+      trot = -trot; //restrict to positive <R> only if coplanar
+    }
       
     auto rotone = trot + 1;
 
@@ -358,26 +357,30 @@ Computer Vision and Graphics"
     Sphere sph(trot);
     auto sph2 = sph.wt();
 
+
     if (sca2 == sph2) {
       printf("infinity of roots -- need to program this...\n");
       auto rotneg = -trot + 1;
       //random tangent vector
       auto biv = sph.dual() ^ PAO.trs(1,0,0);
 
-      printf("f\n");
-      //std::cout << "A" << endl;
-      (biv*biv).print();
-      (biv*sph).print();
-      (sph*biv).print();
+     // printf("f\n");
+     // //std::cout << "A" << endl;
+     // (biv*biv).print();
+     // (biv*sph).print();
+     // (sph*biv).print();
       return (rotone + (biv*rotneg))/2.0;
     }
 
     auto sca3 = sca2 - sph2;
     auto sqsca3 = sqrt(sca3);
 
+ //   cout << sca2 << " " << sph2 << " " << sca << " " << sqsca3 << endl;
+
+ //   sca = fabs(sca);  //<--* added this fabs in
     auto v1 = ( -sph + sca ) / (2*sca3);
-    auto v2 = (sph+(sca+sqsca3))/sqrt(sca+sqsca3);
-    
+    auto v2 = (sph+(sca+sqsca3))/sqrt( sca+sqsca3 ); 
+     
     return rotone * v1 * v2;      
    }
 
@@ -408,7 +411,7 @@ Computer Vision and Graphics"
      
       if ( FERROR(wt) ) {
           if ( FERROR(h2[0]) ){
-            printf("no real splitting going on\n");
+            printf("no real splitting going on\n"); //<-- i.e. interpolation of null point pairs
             res.push_back(par);
             res.push_back(Par());
             return res;
@@ -465,6 +468,15 @@ Computer Vision and Graphics"
 
      return res;
 
+   }
+
+   /*! Split Log from a ratio of two Circles */
+   vector<Pair> log( const Circle& ca, const Circle& cb){
+      return log( ratio(ca,cb) ); 
+   }
+   /*! Split Log from a ratio of two Circles */
+   vector<Pair> log( const Pair& ca, const Pair& cb){
+      return log( ratio(ca,cb) ); 
    }
 
 

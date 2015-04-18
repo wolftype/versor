@@ -1,0 +1,333 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  vsr_cga3D_render.h
+ *
+ *    Description:  advanced graphics pipelin
+ *
+ *        Version:  1.0
+ *        Created:  01/19/2015 18:02:48
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Pablo Colapinto (), gmail -> wolftype
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
+
+
+#ifndef  vsr_cga3D_render_INC
+#define  vsr_cga3D_render_INC
+
+
+#include "gfx/gfx_glyphs.h"
+#include "gfx/gfx_render.h"
+
+#include "space/vsr_cga3D_op.h"
+#include "space/vsr_cga3D_xf.h"
+
+#include "form/vsr_cga3D_frame.h"  
+#include "form/vsr_field.h"
+
+#include "draw/vsr_cga3D_draw.h"
+
+namespace gfx{   
+
+  using namespace vsr;
+  using namespace vsr::cga;
+
+  
+  /*-----------------------------------------------------------------------------
+   *  Template Specializations for Making Meshes for Specfic Types
+   *-----------------------------------------------------------------------------*/
+  template<> MeshBuffer<Frame>::MeshBuffer();
+  template<> MeshBuffer<Circle>::MeshBuffer();
+  template<> MeshBuffer<DualLine>::MeshBuffer();
+  template<> MeshBuffer<Line>::MeshBuffer();
+  template<> MeshBuffer<Plane>::MeshBuffer();
+  template<> MeshBuffer<DualPlane>::MeshBuffer();
+  template<> MeshBuffer<Biv>::MeshBuffer();
+  template<> MeshBuffer<Vec>::MeshBuffer();
+  template<> MeshBuffer<Par>::MeshBuffer();
+  template<> MeshBuffer<Pnt>::MeshBuffer();
+  template<> MeshBuffer<Sph>::MeshBuffer();
+
+  /*-----------------------------------------------------------------------------
+   *  FIELDS (arrays) CAN VARY IN SIZE, SO USER IS RESPONSIBLE TO Add BUFFER ONLY ONCE
+   *  (the GetMeshBuffer uses address of argument to check for existence the mMBOmap) 
+   *-----------------------------------------------------------------------------*/
+
+  template<> MeshBuffer<Field<Vec>>::MeshBuffer();
+  template<> MeshBuffer<Field<Pnt>>::MeshBuffer();
+
+  template<> void MeshBuffer<Field<Vec>>::Add( const Field<Vec>& f );
+  template<> void MeshBuffer<Field<Pnt>>::Add( const Field<Pnt>& f );
+
+  extern template MeshBuffer<Frame>::MeshBuffer();
+  extern template MeshBuffer<Circle>::MeshBuffer();
+  extern template MeshBuffer<DualLine>::MeshBuffer();
+  extern template MeshBuffer<Line>::MeshBuffer();
+  extern template MeshBuffer<Plane>::MeshBuffer();
+  extern template MeshBuffer<DualPlane>::MeshBuffer();
+  extern template MeshBuffer<Biv>::MeshBuffer();
+  extern template MeshBuffer<Vec>::MeshBuffer();
+  extern template MeshBuffer<Par>::MeshBuffer();
+  extern template MeshBuffer<Pnt>::MeshBuffer();
+  extern template MeshBuffer<Sph>::MeshBuffer();
+
+  extern template MeshBuffer<Field<Vec>>::MeshBuffer();
+  extern template MeshBuffer<Field<Pnt>>::MeshBuffer();
+
+  extern template void MeshBuffer<Field<Vec>>::Add( const Field<Vec>& f );
+  extern template void MeshBuffer<Field<Pnt>>::Add( const Field<Pnt>& f );
+ 
+  template<> struct ModelMatrix<Frame>; 
+  extern template struct ModelMatrix<Frame>; 
+  
+  template<> void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
+  template<> void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
+  template<> void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
+  template<> void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
+  template<> void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
+  template<> void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
+  template<> void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
+  template<> void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
+  template<> void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
+  template<> void Renderable<Dlp>::Draw(const Dlp&, GFXSceneNode * s);
+  template<> void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
+  template<> void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
+  template<> void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
+    
+  
+  extern template void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
+  extern template void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
+  extern template void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
+  extern template void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
+  extern template void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
+  extern template void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
+  extern template void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
+  extern template void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
+  extern template void Renderable<Dlp>::Draw(const Dlp&, GFXSceneNode * s);
+  extern template void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
+  extern template void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
+  extern template void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
+  extern template void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
+ 
+
+ 
+
+#ifdef GFX_IMMEDIATE_MODE
+  
+/*   *----------------------------------------------------------------------------- */
+/*    *  IMMEDIATE MODE */
+/*    *-----------------------------------------------------------------------------*/ 
+
+  /*-----------------------------------------------------------------------------
+   *  Specific Strategies
+   *-----------------------------------------------------------------------------*/
+  template<> inline void Renderable<Field<Sca>>::DrawImmediate( const Field<Sca>& f){
+    static Pnt p = Pnt();
+    for (int i = 0; i < f.num(); ++i){ 
+      render::color(f[i][0], 1, 1 - f[i][0]);
+      render::drawAt(p,f.grid(i));  
+    }
+  }
+
+  template<> inline void Renderable<Field<Vec>>::DrawImmediate( const Field<Vec>& f){
+    for (int i = 0; i < f.num(); ++i){  
+      render::drawAt( f[i], f.grid(i) );
+    }
+  }
+
+
+  template<> inline void Renderable<Field<Tnv>>::DrawImmediate( const Field<Tnv>& f){
+    for (int i = 0; i < f.num(); ++i){  
+      render::drawAt( f[i], f.grid(i) );
+    }
+  }  
+
+#endif
+  /* template<> void Drawable<Field<Frame>>::Immediate( const Field<Frame>& f){ */
+  /*   for (int i = 0; i < f.num(); ++i){ */  
+  /*     glPushMatrix(); */ 
+  /*     Immediate( f[i] ); */ 
+  /*     glPopMatrix(); */ 
+  /*   } */
+  /* } */  
+
+  /* template<> void Drawable<Frame>::ImmediateB( const Frame& f){ */
+
+  /*    gfx::GL::translate( f.pos().begin() ); */
+  /*    gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); */ 
+  /*    gfx::GL::scale( f.scale() ); */  
+  /*    Draw( Vec::x,1,0,0); */
+  /*    Draw( Vec::y,0,1,0); */
+  /*    Draw( Vec::z,0,0,1); */
+  /* } */  
+
+  /* template<> */
+  /* template<> void Drawable<ttttt>::ImmediateB( const Field<Vec>& f){ */
+  /*   for (int i = 0; i < f.num(); ++i){ */  
+  /*     DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); */ 
+  /*   } */
+  /* } */   
+  
+  
+  
+  /* template<> void Drawable<Vec>::Immediate (const Vec& s){ */
+  /*     gfx::Glyph::Line(s); */
+  /*     glPushMatrix(); */  
+  /*     gfx::GL::translate( s.begin() ); */
+  /*     gfx::GL::rotate( Op::AA(s).begin() ); */  
+  /*     Glyph::Cone(); */
+  /*     glPopMatrix(); */
+  /* } */  
+
+  
+   /* template<> void Drawable<Vec>::ImmediateB (const Vec& s){ */
+   /*    //cout << "ehl" << endl; */
+   /*    gfx::Glyph::Line(s); */
+   /*    glPushMatrix(); */  
+   /*    gfx::GL::translate( s.begin() ); */
+   /*    gfx::Glyph::SolidSphere(.05,5,5); */
+   /*    glPopMatrix(); */                       
+  /* } */
+  
+  /* template<> void Drawable<Biv>::Immediate(const Biv& s){ */
+		/* double ta = s.norm(); */ 
+	  /* bool sn = Op::sn( s , Biv::xy * (-1)); */
+	
+		/* glPushMatrix(); */	
+			/* gfx::GL::rotate( Op::AA(s).begin() ); */  
+			/* gfx::Glyph::DirCircle( ta, sn ); */
+		/* glPopMatrix(); */
+  /* } */
+  
+  /* template<> void Drawable<Tnv>::Immediate (const Tnv& s){ */
+  /*   Immediate( s.copy<Vec>() ); */
+  /* } */   
+  
+  /*  template<> void Drawable<Drv>::Immediate (const Drv& s){ */ 
+  /*   Immediate( s.copy<Vec>() ); */
+  /* } */
+
+  /* template<> void Drawable<Dlp>::Immediate (const Dlp& s){ */
+  /*     gfx::GL::translate( Op::Pos(s).begin() ); */
+  /*     gfx::GL::rotate( Op::AA(s).begin() ); */ 
+  /*     Glyph::SolidGrid(6,6,5); */
+  /* } */
+  /* template<> void Drawable<Pln>::Immediate (const Pln& s){ */
+  /*   Immediate(s.dual()); */
+  /* } */
+
+  /* template<> void Drawable<Cir>::Immediate( const Cir& s )  { */  
+  /*   VT rad = round::rad( s ); */
+  /*   bool im = round::size(s, false) > 0 ? 1 : 0; */  
+  
+  /*   gfx::GL::translate( Op::Pos(s).begin() ); */
+  /*   gfx::GL::rotate( Op::AA(s).begin() ); */ 
+
+  /*   im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad ); */            
+  /* } */  
+  
+  /* template<> void Drawable<Pnt>::Immediate (const Pnt& s){ */
+ 
+  /*     VT ta = round::size( s, true ); */
+
+  /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
+  /*     if ( fabs(ta) >  FPERROR ) { */
+  /*         bool real = ta > 0 ? 1 : 0; */  
+
+  /*         Pnt p = round::cen( s ); */
+  /*         VT t = sqrt ( fabs ( ta ) ); */
+
+  /*         gfx::GL::translate ( p.begin() ); */
+  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */  
+  /*     } else { */  
+  /*         gfx::Glyph::Point(s); */
+  /*     } */
+  /* } */ 
+  
+  /* template<> void Drawable<Sph>::Immediate (const Sph& s){ */
+ 
+  /*     VT ta = round::size( s, false ); */
+
+  /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
+  /*     if ( fabs(ta) >  FPERROR ) { */
+  /*         bool real = ta > 0 ? 1 : 0; */  
+
+  /*         Pnt p = round::cen( s ); */
+  /*         VT t = sqrt ( fabs ( ta ) ); */
+
+  /*         gfx::GL::translate ( p.begin() ); */
+  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */  
+  /*     } else { */  
+  /*         gfx::Glyph::Point(s); */
+  /*     } */
+  /* } */
+  
+  /* template<> void Drawable<Flp>::Immediate (const Flp& s){ */
+  /*   Immediate( round::null( s[0], s[1], s[2] ) ); */
+  /* } */
+  
+  /*  template<> void Drawable<Par>::Immediate (const Par& s){ */
+  /*        //Is Imaginary? */
+  /*     VT size = round::size( s, false ); */
+
+  /*     //is null? */
+  /*     if ( fabs(size) < FPERROR ){ */
+  /*         GL::translate( round::loc(s).begin() ); */
+  /*         Immediate( -round::dir(s).copy<Vec>() ); */ 
+        
+  /*     }else{ */
+      
+  /*       std::vector<Pnt> pp = round::split( s ); */
+
+  /*       VT ta = round::size( pp[0], true ); */   
+                                     
+  /*       if ( fabs(ta) >  FPERROR ) { */    
+  /*           Pnt p1 = round::cen( pp[0] ); */
+  /*           Pnt p2 = round::cen( pp[1] ); */
+  /*           double t = sqrt ( fabs ( ta ) ); */
+  /*           bool real = size > 0 ? 1 : 0; */  
+
+  /*           glPushMatrix(); */
+  /*           gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]); */
+  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */  
+  /*           glPopMatrix(); */
+
+  /*           gfx::GL::translate ( p2.begin() ); */
+  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */  
+
+  /*       } else { */
+  /*      // pp[0].vprint(); pp[1].vprint(); */
+  /*           gfx::Glyph::Point(pp[0]); */
+  /*           gfx::Glyph::Point(pp[1]); */
+  /*           gfx::Glyph::Line(pp[0],pp[1]); */
+  /*       } */
+  /*     } */
+  /* } */  
+  
+  /* template<> void Drawable<Dll>::Immediate (const Dll& s){ */
+  /*     Drv d = Fl::dir( s.undual() ); */
+  /*     Dls v = Fl::loc( s , PAO, true); */
+  /*     gfx::GL::translate (v.begin()); */
+  /*     gfx::Glyph::DashedLine(d * 10, d * -10); */  
+  /* } */  
+  
+  /* template<> void Drawable<Lin>::Immediate (const Lin& s){ */
+  /*     Drv d = Fl::dir( s ); */
+  /*     Dls v = Fl::loc( s , PAO, false); */
+  /*     gfx::GL::translate (v.begin()); */
+  /*     gfx::Glyph::Line(d * 10, d * -10); */  
+  /* } */
+  
+
+} //vsr::
+
+
+
+
+
+#endif   /* ----- #ifndef vsr_render_INC  ----- */

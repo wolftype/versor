@@ -9,20 +9,56 @@ CSS: style0.css
 <img src = "http://versor.mat.ucsb.edu/resources/images/twist_04_bw.gif" width = 400>
 <img src = "http://versor.mat.ucsb.edu/resources/images/lox_0.jpg" width = 100>
 
-Versor (vsr)
+Versor (libvsr)
 ===
-A (Fast) C++ library for Euclidean and Conformal Geometric Algebra.  
+A (fast, lightweight) Generic C++ library for Euclidean, Projective, and Conformal Geometric Algebra.  Spacetime Algebra too (etc).  
 ---
 ### Currently tested on Linux and Mac OS X ###
 
 [Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu) 
 
-Versor is a C++ Library for Geometric Algebra with built-in draw routines. Version 2.0 generates optimized geometric algebra code at compile-time
-through template meta-programming, and supports arbitrary dimensions and metrics (limited by your compiler...).
+*Versor* is a C++ Library for Geometric Algebra, sometimes called Clifford Algebra, a system for encoding geometric concepts numerically.
+
+The headers generate optimized code at compile-time through template metaprogramming.  The core of the library
+is only 128kb, and supports arbitrary dimensions and metrics (limited by your compiler...).  Optional built-in graphics are included in the repo.
 
 Developer: Pablo Colapinto  
 `gmail: wolftype`  
 
+Use Cases
+---
+
+Versor can be used as a header-only math library: 
+
+	#include "vsr.h"
+
+	using Vec = vsr::euclidean_vec<3,float>;  		//<-- A 3 dimensional euclidean vector defined over floats
+	using Biv = vsr::euclidean_bivector<3,float>;   //<-- A 3 dimensional bivector or "directed area element"
+	
+	int main(){
+		
+		auto v = Vec(1,2,3);		  			//<-- A 3D vector at coordinates 1,2,3;
+		
+		v.rotate( Biv::xy * .25 ).print();		//<-- Rotate the vector in the xy plane and print result
+		
+		return 0;
+	};
+	
+
+The stands for "euclidean" 
+Its optional built-in draw routines can be compiled into a library for creating geometrically advanced graphics. 
+
+While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in functionality for specifically working with Conformal Geometric Algebra of 
+3D space, which is THE way to model all Euclidean transformations.
+
+
+Recent Changes
+---
+
+Some major revisions have been enacted that change the API.
+
+* all namespaces are lowercase, (gen::, round::, flat::, tangent::)
+* the application class for graphics support is now /util/vsr_app.h
 
 ## CONTENTS: ##
                                
@@ -75,35 +111,39 @@ Developer: Pablo Colapinto
 QUICKSTART
 ---
 
-Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For version 2.0 you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
+Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
 
-	git clone git://github.com/wolftype/vsr2.0.git
-	cd vsr2.0
+	git clone git://github.com/wolftype/versor.git 
+ 
+You'll want to initialize the submodules to build any graphics examples:
+
+	cd versor
 	git submodule init
 	git submodule update
-
+	
 To test a graphics example
 
-	make examples/xBasics.cpp 
+	make examples/xBasic.cpp 
      
-which both builds and runs the file.  
+which both compiles and runs the file.  If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below
 
-Not Working?
+TROUBLESHOOTING
 ---                 
 
-- For Versor 2.0 You'll need C++11 support (See makefile notes below). 
-- Alternatively Versor 1.0 is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
+* You'll need C++11 support on your compiler (See makefile notes below). For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).
+* Alternatively an earlier version of Versor is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
+This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
+* It helps to separate the graphics portion out to debug compilation issues.  To do so, try making a non-graphics based example, such as examples/xEGA.cpp, 
+	and pass in GFX=0
+		
+		make examples/xEGA.cpp GFX=0 
 
-For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).  
-NOT CURRENTLY TESTED ON WINDOWS.   
-
-For clang on a snow leopard (with thanks to Karl Yerkes for this tidbit)
+For clang on a mac with snow leopard I recommend you download llvm and build clang from scratch. You can also try
 
 	brew tap home-brew/versions
 	brew install --HEAD llvm34 --rtti, --disable-assertions, --with-libcxx, --with-clang
- 
-If you don't want to or can't compile C++11 code try an [older flavor of vsr](https://github.com/wolftype/versor_1.0.git). 
-This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
+
+though some folk have had issues with the brew method.
 
 ####MAKEFILE FLAGS
 
@@ -113,13 +153,10 @@ This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) 
 2. GCC=1  (default 0)
     If you want to build with GCC instead set GCC=1.
 
-3. RPI=1 (default 0)
-     vsr also builds on the Raspberry Pi ! ( with a cross-compiler ) (GCC=1 RPI=1)
-    (note you cannot build from the pi itself, you must use a cross-compiler)
-
 3. GFX=0 (default 1) 
     if you want to build without graphics support you can set GFX=0
       
+You can also cross-compile for the raspberry pi.
 
 INTRODUCTION
 ---
@@ -168,7 +205,7 @@ operators that spin, twist, dilate, and bend those variables.  Both these elemen
 
 ####What's new?
 
-Version 2.0 compiles much faster than before, and without any silly predetermined list
+Versor compiles much faster than before, and without any silly predetermined list
 of allowable operations or types.  Most notably, arbitrary metrics are now possible.  For example, 
 the xRoots.cpp example calculates all the Euclidean 4D reflections of a couple of point groups
 (F4 and D4, namely). So you can hypercube and polychoron away (8D cubes no problem!).  Number of dimensions
@@ -177,9 +214,9 @@ allowed are somewhat limited by your compiler infrastructure -- let me know if y
 As for CGA, all the Pnt, Vec, Dll notation remains as before, but i've started adding utility functions
 since it helps people out. 
 
-  auto pa = Ro::point( 1,0,0 ); 
-  auto pb = Ro::point( 0,1,0 ); 
-  auto pc = Ro::point(-1,0,0 ); 
+  auto pa = round::point( 1,0,0 ); 
+  auto pb = round::point( 0,1,0 ); 
+  auto pc = round::point(-1,0,0 ); 
   auto circle = pa ^ pb ^ pc;
   
   Draw(c); 
@@ -226,11 +263,11 @@ We can extract the Scalar into a c++ double like so:
 
 Points thought of as Spheres (really, Dual Spheres, more on _Duality_ later): they are Spheres of zero radius.  As such they are a type of _Round_ element.  We can also build points this way:
 
-	Round::null( 1,0,0 );
+	round::null( 1,0,0 );
 
 or you can pass in another element
 
-	Round::null( Vec(1,0,0) );
+	round::null( Vec(1,0,0) );
 
 or use the built-in method
 
@@ -244,15 +281,15 @@ which is just "syntactic sugar" for `Vec(1,0,0).null()`
 
 Speaking of Spheres, we can also make spheres with a radius this way:
 
-	DualSphere dls = Round::dls( Vec( 1,0,0 ).null(), 1 );
+	DualSphere dls = round::dls( Vec( 1,0,0 ).null(), 1 );
 
 or  
 
-	DualSphere dls = Round::dls( Vec( 1,0,0 ), 1 );
+	DualSphere dls = round::dls( Vec( 1,0,0 ), 1 );
 	
 or, specifying the radius first and then the coordinate:  
 
-	DualSphere dls = Round::dls( 1 /* <--radius */ , 1,0,0 )
+	DualSphere dls = round::dls( 1 /* <--radius */ , 1,0,0 )
 	
 all of which give a dual sphere of radius 1 at coordinate 1,0,0; 
 
@@ -304,7 +341,7 @@ That's up to you: Both long-name and nick-name versions are valid in libvsr (the
 You can also generate rotors using `Gen::rot( <some bivector> )`  In fact, all transformations can be generated this way, and then later applied to arbitrary elements.
 For instance, `Motors` can be generated which translate and rotate an element at the same time.  This is also called a _twist_.
 
-	Motor m = Gen::mot(<some dual line>); 	//<-- Makes A Twisting Motor around Some Dual Line
+	Motor m = gen::mot(<some dual line>); 	//<-- Makes A Twisting Motor around Some Dual Line
 	Point p = Vec(0,0,0).null().sp(m);		//<-- Applies above motor to a Point
 		
 You'll notice there are _dual_ versions of elements: as in a `DualLine` (or `Dll` for short).  That's because in the real world of abstract geometry, there are usually
@@ -493,10 +530,10 @@ COMMON CONFORMAL FUNCTIONS
 
 `vsr_generic_op.h` and `vsr_cga3D_op.h` contain the bulk of the functions for generating elements from other elements.  Some guidelines:
 
-* `Gen::` methods **generate** or otherwise operate on versors
-* `Ro::` methods create or otherwise operate on **Round** elements (Points, Point Pairs, Circles, Spheres)
-* `Fl::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
-* `Ta::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
+* `gen::` methods **generate** or otherwise operate on versors
+* `roond::` methods create or otherwise operate on **Round** elements (Points, Point Pairs, Circles, Spheres)
+* `flat::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
+* `tangent::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
 
 
 GENERATORS 
@@ -505,12 +542,12 @@ GENERATORS
 |       |                                     |  
 Returns | Function                            | Description  
 ------- | ----------------------------------- | -------------------------------------------------  
-Rot     | Gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector  
-Trs     | Gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector  
-Mot     | Gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line  
-Dil     | Gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount  
-Trv     | Gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector  
-Bst     | Gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair  
+Rot     | gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector  
+Trs     | gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector  
+Mot     | gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line  
+Dil     | gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount  
+Trv     | gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector  
+Bst     | gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair  
 
    
 REFLECTIONS
@@ -520,10 +557,10 @@ In addition to the above "even" spinors, we can also reflect.  Reflections (in a
 
 	Pnt p = PT(1,0,0);
 	Pnt r = p.re( CXY(1) ); //Reflection of a point in a circle
-	r = r / r[3]; 			//Renormalization of a point
+	r = r / r[3]; 			    //Renormalization of a point
 
-The re() method calculates `v.re(C)` as `C*v.inv()*~C`.  With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the 
-weight of the element (for at Point at x, it will change it by x^2)        
+The re() method calculates `v.re(C)` as `C*v.inv()*~C` where inv() is an involution. With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the 
+weight of the element (for a Point at x, it will change it by x^2)        
 
 
 LINKS

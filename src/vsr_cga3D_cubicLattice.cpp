@@ -15,11 +15,12 @@
  *
  * =====================================================================================
  */
-#include "group/vsr_cubicLattice.h"
+#include "form/vsr_cubicLattice.h"
 
 namespace vsr{
 
     //  template class CubicLattice< NPnt<5> >;
+
 
       template<>
       void CubicLattice< NPnt<5> > :: initPoints(){
@@ -27,7 +28,8 @@ namespace vsr{
             for (int j = 0; j < mHeight; ++j){
                 for (int k = 0; k < mDepth; ++k){
                     int tidx = idx(i,j,k); 
-                    mPoint[ tidx ]  = Ro::null( px(i),  py(j),  pz(k) ); 
+                    mPoint[ tidx ]  = round::point(px(i),  py(j),  pz(k) ); 
+                   // mPoint[tidx].print();
                 }
             }
          }

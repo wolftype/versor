@@ -1,4 +1,4 @@
-local V = require"versor_fix"
+local V = require"versor"
 
 
 local C3 = V{
@@ -30,5 +30,5 @@ local C3 = V{
   conformal = true
 }
 
+return C3
 
-C3:printProduct( "Pnt", "Dlp" )

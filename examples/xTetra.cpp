@@ -23,11 +23,11 @@ auto nrot( const B& b) ->  decltype( B() + 1 ) {
 
 struct MyApp : App {
 	         
-	
 	bool bOrtho;
-	static const int DIM = 6; 
-
+	static const int DIM = 4; 
 	NCube<DIM> tetra;
+  
+  float e14,e24,e34;
    	
 	MyApp(Window * w ) : App(w) {
 		initGui();
@@ -36,56 +36,37 @@ struct MyApp : App {
 	virtual void initGui(){  
 		printf("init gui\n");
 		gui(bOrtho, "ortho"); 
+    gui(e14,"e14",-1,1);
+    gui(e24,"e24",-1,1);
+    gui(e34,"e34",-1,1);
+
+
 	}   
 	
 	virtual void onDraw(){
-	   	// EGAMV< MV<9,12,34,96> > b( .01,.01,.01,.01 );// .01, .01 );   
-		// 
+
+    typedef EGAMV< DIM, MV< blade(1,4), blade(2,4), blade(3,4) > BIV;
+	
+    //EGAMV< DIM, typename EGA<DIM>::Biv > b(0,0,0,e14,e24,e34);// .01, .01 );   
 		
+    BIV(e14,e24,e34);
+
 		scene.camera.lens.bOrtho = bOrtho;
 		
-		EGAMV<DIM, MV<24,12> > b(.01,.01);
-		//typedef EGAMV< DIM,typename EGA<3>::Vec > Vec; 
-		
-		vector<Vec> proj;  
-		vector<VT> col;   	  
-		// 
 		VT dist = scene.camera.pos().len();
+
+    auto proj = tetra.project(dist);
+
+    auto val = tetra.val(dist);
 		
-		//printf("dist: %f\n", dist);  
-		// 		 
-		auto& res = tetra.roots; 
-		// 
-		for (auto& i : res){   
-		
-			i = i.sp( nrot( b ) ); 
-		
-			auto tmp = Proj<DIM>::Call(dist,i);
-			auto tort = Proj<DIM>::Ortho<3>(i); 
-			 
-			auto val = Proj<DIM>::Val(dist,i );
-			proj.push_back( bOrtho ? tort : tmp);
-			col.push_back( val );
-		} 
-		// 
-		int it = 0;    	
-		for (auto i : proj ) { 
-			float t = ( 1.0 * it) / proj.size();
-			it++;
-		   //   glColor4f(t,1,1-t, col[it]);
-			Draw(i, t, 1, 1-t, col[it] ); 
-			//gfx::Glyph::Dir( i ); 
-		 } 
-		// 
-		glColor3f(0,1,0);                             
-		// 
+		glColor3f(1,0,0);                             
+		 
 		for (auto i : tetra.edges ) gfx::Glyph::Line( proj[i.a], proj[i.b] );     
-
 	 
-		text("Alt + Mouse Drag to Rotate View");
-		}
-
+	}
 };
+ 
+ 
   
 
 MyApp * app; 

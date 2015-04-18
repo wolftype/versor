@@ -43,6 +43,10 @@ namespace vsr{
             //gen.seed( time(NULL) );
             
         }
+
+        inline static void Seed(int num){
+          srand( num );
+        }
         
         /// Number Between 0 and 1; 
         inline static double Num() { return 1.0 * rand() / (RAND_MAX); }

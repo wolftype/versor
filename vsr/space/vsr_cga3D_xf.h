@@ -1,18 +1,17 @@
 /*
  * =====================================================================================
- *
+ * @file
+ *       
  *       Filename:  vsr_cga3D_xf.h
  *
- *    Description:  
+ *       Description: Conversions to matrices;
+ *       Todo: generalize matrix . . . add ability to convert to glm matrix, arbitrary
+ *       matrix, etc.  
  *
  *        Version:  1.0
  *        Created:  03/05/2014 20:40:43
- *       Revision:  none
- *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
- *
  * =====================================================================================
  */
 
@@ -21,14 +20,16 @@
 #ifndef  vsr_cga3D_xf_INC
 #define  vsr_cga3D_xf_INC
 
-#include "gfx/gfx_matrix.h"
 #include "vsr_cga3D_op.h" 
+#include "gfx/gfx_matrix.h"
 
-using namespace gfx;
 namespace vsr {
 
-    namespace Xf {
-        
+    
+    namespace xf {
+
+       using namespace vsr::cga;        
+       using namespace gfx;
     /*!
          4x4 Transformation Matrix From Rotor
         */

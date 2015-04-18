@@ -1,6 +1,10 @@
-#include "vsr_cga3D.h"
-#include "vsr_GLVimpl.h" 
-#include "vsr_knot.h"
+
+/*-----------------------------------------------------------------------------
+ *  
+ *-----------------------------------------------------------------------------*/
+
+#include "util/vsr_cga3D_app.h"
+#include "form/vsr_knot.h"
 
 
 using namespace vsr;
@@ -8,55 +12,65 @@ using namespace glv;
 
 struct MyApp : App {
 	
-	float amt;
-	float P, Q;
+	float amt,P, Q;
+
+  Point a = cga::point(2,0,0);
+
+  bool bDrawMode, bAnimate;
 	
-	virtual void initGui(){
-		gui(P,"Q",0,10)(Q,"Q",0,10)(amt,"amt",0,10);
+	virtual void setup(){
+    
+    //bind and setup gui
+    bindGLV();
+
+		gui(P,"P",0,10)(Q,"Q",0,10)(amt,"speed",0,10);
+    gui(bAnimate, "animate")(bDrawMode,"draw mode");
 		
-		amt = .003; 
-		P = 3; 
-		Q = 2;
+    //starting knot parameters
+		amt = .01; 
+		P = 5; 
+		Q = 3;
+
+    bAnimate=true;
+
+    //Attach Point to Controller
+    objectController.attach(&a);
+
 	}
+
+  void onAnimate(){
+    if (bAnimate){
+      TorusKnot tk(0,1,amt);
+      a = round::loc( a.sp( tk.bst() ) );
+    }
+  }
 
 	void onDraw(){
      
-
+    //A p,q torus knot
 		TorusKnot tk(P,Q,amt);  
 		
-		cout << tk.iter() << endl;
-	
-		static auto a = Ro::null(2,0,0);     
+    //Draw the point (with an added radius)
+		draw( round::dls(a,.1), 1, 1, 0 );
 
-		Touch(interface, a);   
-		Draw( Ro::dls(a,.2), 1, 1, 0 );
-
+    //Calculate knot orbit starting at point p
 		tk.calc( a );
 	
-		for (int i = 0; i < tk.iter(); ++i){
-			Draw( tk.cir[i],0,1,0 );
-		}                        
-	
+    //draw the many circles thus generated (tk.cir is a vector<Circle>)  
+    draw(tk.cir,0,1,0);                     
+
+    //Toggle between immediate (fixed function) and programmable pipelines
+    mSceneRenderer.immediate(bDrawMode);
+
 	}
 };
                         
-MyApp * myApp;
 
 int main(){
                           
-	
-	GLV glv(0,0);	
-    		        
-	Window * win = new Window(500,500,"Versor",&glv);    
-                          
-	myApp = new MyApp;
-	myApp -> init(win);
-	myApp -> initGui();
-	
-	glv << *myApp;
+  MyApp app;
+  app.start();
 
-	Application::run();
-	
 	return 0;
 	
 }

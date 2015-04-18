@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  vsr_examples.h
+ *       Filename:  vsr_cga3D_app.h
  *
  *    Description:  utility for demos which binds with gfx and glv
  *
@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  pretty awesome
  *
  * =====================================================================================
  */
@@ -20,14 +20,18 @@
 #ifndef  vsr_cga3D_app_INC
 #define  vsr_cga3D_app_INC
 
-#include "space/vsr_cga3D.h"
-#include "draw/vsr_cga3D_draw.h"
-//#include "vsr_cga3D_render.h"
-#include "interface/vsr_cga3D_control.h"
-#include "gfx/util/gfx_glv_app.h"
+#include "space/vsr_cga3D_op.h"               //<-- conformal 3D types and basic
+#include "space/vsr_cga3D_funcs.h"               //<-- conformal 3D types and helper functions
+
+#include "draw/vsr_cga3D_draw.h"              //<-- fixed pipeline draw routines
+#include "draw/vsr_cga3D_render.h"            //<-- programmable pipeline draw routines
+
+#include "util/vsr_cga3D_control.h"      //<-- interface controls (mouse and keyboard)
+#include "gfx/util/gfx_glv_app.h"             //<-- an app class with built-in gui
 
 using namespace vsr;
-using namespace vsr::cga3D;
+
+
 
 struct App : public gfx::GFXAppGui {  
  
@@ -46,12 +50,12 @@ struct App : public gfx::GFXAppGui {
 
     Vec tz (tv[0], tv[1], tv[2] );
 
-    mMouse2D =  Round::point(p[0],p[1],0);
-    mMouse3D =  Round::point(p[0],p[1],p[2]);
+    mMouse2D =  cga::point(p[0],p[1],0);
+    mMouse3D =  cga::point(p[0],p[1],p[2]);
     mMouseRay = mMouse3D ^ tz ^ Inf(1); 
 
-    //intersection of mouse with plane through origin
-    mMouse3D = meet( mMouseRay, Dlp(tz) );
+    //intersection of ray with plane
+    mMouse3D = cga::meet( mMouseRay, Dlp(tz) );
 
     return mMouse3D;
  
