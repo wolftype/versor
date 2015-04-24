@@ -274,6 +274,10 @@ struct NotType< Basis<>, A >{
   typedef A Type;  
 };
 
+
+/*-----------------------------------------------------------------------------
+ *  METRIC TENSOR SIGN
+ *-----------------------------------------------------------------------------*/
 template<class M, int AB, int SF>  
 struct MSign{ 
   static constexpr int Val =  (AB & 1) ? MSign< typename M::TAIL, (AB>>1) , ( SF * ( M::HEAD ) ) >::Val : MSign<typename M::TAIL, (AB>>1), SF >::Val; 
@@ -350,18 +354,18 @@ struct RMinus<0>{
 };
 
 template<int P, int Q=0, bool bConformal=false>   
-struct Metric{
+struct metric{
   
   using type = typename Cat< typename RPlus<P>::Type, typename RMinus<Q>::Type >::Type;  //metric as list of type T
 
   ///Next Higher (positive)
-  using up = Metric<P+1,Q,bConformal>;
+  using up = metric<P+1,Q,bConformal>;
   ///Next Lower (positive)
-  using down = Metric<P-1,Q,bConformal>;
+  using down = metric<P-1,Q,bConformal>;
   ///Euclidean Subspace
-  using euclidean = Metric<P-1>;
+  using euclidean = metric<P-1>;
   ///Conformal Mapping
-  using conformal = Metric<P+1,1,true>; 
+  using conformal = metric<P+1,1,true>; 
 
 
   static const bool is_euclidean = Q==0;       //whether to use Euclidean Products
@@ -409,7 +413,7 @@ struct XList<X,XS...>{
   
   /// Executes and sums specific blade                          
   template<class A, class B>
-  static constexpr auto Exec(const A& a, const B& b) -> typename A::algebra::valuetype {
+  static constexpr auto Exec(const A& a, const B& b) -> typename A::algebra::value_t {
     return X::Exec(a,b) + TAIL::Exec(a,b);
   }
 
@@ -608,6 +612,9 @@ namespace basis_t{
   template<bits::type DIM> using vec = typename Blade1<DIM>::VEC;
   //template<bits::type DIM> using biv = vec<DIM>, vec<DIM
 } //basis::
+
+
+
 
 /*-----------------------------------------------------------------------------
  *  VALUE PRINT

@@ -345,8 +345,8 @@ Computer Vision and Graphics"
     Con trot = (b/a).runit();
     //planar?
     float planarity = (round::carrier(a).dual().unit() ^ round::carrier(b).dual().unit()).wt();
-    if ( fabs(planarity)<=.000009 )  {
-      trot = -trot; //restrict to positive <R> only if coplanar
+    if ( trot[0] < 0 ) { //fabs(planarity)<=.000009 )  {
+      trot = -trot;      //restrict to positive <R> only if coplanar
     }
       
     auto rotone = trot + 1;

@@ -1,4 +1,4 @@
-#include "util/vsr_cga3D_app.h"
+#include "vsr_app.h"
 #include "util/vsr_stat.h"
 
 #include "form/vsr_chain.h" 
@@ -37,14 +37,14 @@ struct MyApp : App {
       }
     } 
 
-   // objectController.attach(&dls);
+    scene.camera.pos( 0,0,15);
     
     Rand::Seed();
   }
   
   void initGui(){
     gui(bRandom,"random")(bUpdate,"bUpdate")(amt, "amt",0,1); 
-    bRandom = false;
+    bRandom = true;
     amt = .1;
   }
 

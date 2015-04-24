@@ -20,288 +20,280 @@
 #ifndef  vsr_algebra_INC
 #define  vsr_algebra_INC
 
-#include "detail/vsr_products.h"
+#include "vsr_xlists.h"   ///<-- list processing functions
+#include "vsr_products.h" ///<-- compile time processing of instructions ("arrows" or "morphisms")
 
 namespace vsr {
 
-  /*-----------------------------------------------------------------------------
-   *  generates basis blade in dimension dim of grade 
-   *-----------------------------------------------------------------------------*/
-    template<bits::type dim, bits::type grade>
-    struct blade {
-        using vec = typename vsr::Blade1<dim>::VEC; 
-        using sub = typename blade<dim, grade-1>::type;
-        using type = typename EOProd<vec,sub>::basis;
-  
-    };
-  
-    template<bits::type dim>
-    struct blade<dim, 1>{
-        using type = typename vsr::Blade1<dim>::VEC;
-    };
+   
+     // using metric = Metric;
+    /*-----------------------------------------------------------------------------
+     *  generates basis blade in dimension dim of grade 
+    
+        note: to do: guard again negative dimensions and negative grades
+     *-----------------------------------------------------------------------------*/
+      template<bits::type dim, bits::type grade>
+      struct blade {
+          using vec = typename vsr::Blade1<dim>::VEC; 
+          using sub = typename blade<dim, grade-1>::type;
+          using type = typename EOProd<vec,sub>::basis;
+    
+      };
+    
+      template<bits::type dim>
+      struct blade<dim, 0>{
+          using type = Basis<0>;
+      };
+    
+      //all blades in dim upto and including maxgrade
+      template<bits::type dim, bits::type grade=dim>
+      struct all_blades{
+          using sub = typename all_blades<dim, grade-1>::type;
+          using one = typename blade<dim, grade>::type;
+          using type = typename ICat< one, sub >::Type;
+      };
+    
+      template<bits::type dim>
+      struct all_blades<dim,0>{
+          using type = Basis<0>;
+      };  
 
+    //forward declaration of multivector
+    template<class algebra, class basis> struct Multivector;
+    //forward declaration of algebraImpl
+    template<class algebra, bool, bool> struct algebra_impl;
+    //forward declaration of named_types
+    template<class algebraimpl> struct named_types;
 
-  /*-----------------------------------------------------------------------------
-   *  SUMMING WITHIN ANY ALGEBRA
-   *-----------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------
+     *  An algebra instance is templated on: 
+     *
+     *     metric_type: a metric (e.g. Metric<3,0> for euclidean 3 space or Metric<4,1,true> for conformal 5D space )
+     *     value_type:   a field value type (i.e. real, complex, or some other arithmetic element).
+     *       
+     *         The value type can be anything that multiplies and adds in a closed group, 
+     *         including another algebra ,
+     *         allowing for tensor metrics C x C, etc a la Bott periodicity.
+    
+          To Do: enable conversions between algebras!
+     *-----------------------------------------------------------------------------*/
+    template< class metric_type, class value_type >
+    struct algebra {
 
-   //forward
-   template<class Algebra, class B> struct MV;
-       
-   template <typename Algebra>
-   struct AlgebraImplBase{
-
-      template <class B> using TMV = MV<Algebra, B>;
+        using metric = metric_type;                             ///<-- Metric, with signature, whether Euclidean, Projective, Conformal, etc
+          
+        using value_t = value_type;                             ///<-- Field over which Algebra is Defined
+        
+        static const int dim = metric::type::Num;               ///<-- Dimension of Algebra
  
+         /// implementation details for dealing with conformal vs euclidean etc (in vsr_algebra.h)
+        using impl = algebra_impl< algebra<metric, value_t>, metric::is_euclidean, metric::is_conformal >;                
+ 
+        //a multivector is a lift of a quadratic form (the algebra) onto a basis B
+        template <class B> using mv_t = Multivector<algebra<metric, value_t>, B>;
 
-      /// Sum of Similar types
-      template<class B> 
-      static TMV<B> 
-      sum( const TMV<B> & a, const TMV<B>& b) {
-        TMV<B> c;
-        for (int i = 0; i < B::Num; ++i) c[i] = a[i] + b[i];
-        return c;
-      } 
-      /// Difference of Similar types
-      template<class B> 
-      static TMV<B> 
-      diff( const TMV<B> & a, const TMV<B>& b) {
-        TMV<B> c;
-        for (int i = 0; i < B::Num; ++i) c[i] = a[i] - b[i];
-        return c;
-      } 
-     
-      /// Sum of Different types
-      template<class B1, class B2>
-      static TMV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type>
-      sum( const TMV<B1> & a, const TMV<B2>& b) {
-        typedef TMV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type> Ret; 
-        return sum( a.template cast<Ret>() ,  b.template cast<Ret>() );
-      } 
-      /// Difference of Different types
-      template<class B1, class B2>
-      static TMV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type>
-      diff( const TMV<B1> & a, const TMV<B2>& b) {
-        typedef TMV<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type> Ret; 
-        return diff( a.template cast<Ret>() ,  b.template cast<Ret>() );
-      } 
-     
-      /// Sum some scalar value 
-      template<class B>
-      static TMV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type>
-      sumv( VSR_PRECISION a, const  TMV<B>& b) {
-        typedef TMV<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type> Ret;
-        return sum( Ret(a) , b.template cast<Ret>() );
-      }
-  
+
+        template <class A, class B> using sum_basis_t = typename ICat< typename NotType< A, B >::Type, A >::Type;
+        template <class A, class B> using  gp_basis_t = typename impl::template gp_arrow_t<A,B>::basis;
+        template <class A, class B> using  op_basis_t = typename impl::template op_arrow_t<A,B>::basis;
+        template <class A, class B> using  ip_basis_t = typename impl::template ip_arrow_t<A,B>::basis;
+
+
+        template <class A, class B> using sum_lift_t = mv_t< sum_basis_t< A, B>>;
+        template <class A, class B> using gp_lift_t =  mv_t< gp_basis_t<A,B> >;
+        template <class A, class B> using op_lift_t =  mv_t< op_basis_t< A, B> >;
+        template <class A, class B> using ip_lift_t =  mv_t< ip_basis_t< A, B> >;  
+
+        template <class A, class B> using sum_t = sum_lift_t<typename A::basis,typename B::basis>;
+        template <class A, class B> using gp_t = gp_lift_t<typename A::basis,typename B::basis>;
+        template <class A, class B> using op_t = op_lift_t<typename A::basis,typename B::basis>;
+        template <class A, class B> using ip_t = ip_lift_t<typename A::basis,typename B::basis>;           
+
+
+        /*-----------------------------------------------------------------------------
+         *  Sum Functions 
+         *-----------------------------------------------------------------------------*/
+         /// Sum of Similar types
+         template<class B> 
+         static mv_t<B> 
+         sum( const mv_t<B> & a, const mv_t<B>& b) {
+           mv_t<B> c;
+           for (int i = 0; i < B::Num; ++i) c[i] = a[i] + b[i];
+           return c;
+         } 
+         /// Difference of Similar types
+         template<class B> 
+         static mv_t<B> 
+         diff( const mv_t<B> & a, const mv_t<B>& b) {
+           mv_t<B> c;
+           for (int i = 0; i < B::Num; ++i) c[i] = a[i] - b[i];
+           return c;
+         } 
+        
+         /// Sum of Different types
+         template<class B1, class B2>
+         static mv_t<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type>
+         sum( const mv_t<B1> & a, const mv_t<B2>& b) {
+           typedef mv_t<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type> Ret; 
+           return sum( a.template cast<Ret>() ,  b.template cast<Ret>() );
+         } 
+         /// Difference of Different types
+         template<class B1, class B2>
+         static mv_t<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type>
+         diff( const mv_t<B1> & a, const mv_t<B2>& b) {
+           typedef mv_t<typename ICat< typename NotType< B1, B2 >::Type, B1 >::Type> Ret; 
+           return diff( a.template cast<Ret>() ,  b.template cast<Ret>() );
+         } 
+        
+         /// Sum some scalar value 
+         template<class B>
+         static mv_t<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type>
+         sumv( VSR_PRECISION a, const  mv_t<B>& b) {
+           typedef mv_t<typename ICat< typename NotType< Basis<0>, B >::Type, Basis<0> >::Type> Ret;
+           return sum( Ret(a) , b.template cast<Ret>() );
+         }  
+
+        /*-----------------------------------------------------------------------------
+         *  Product Functions (unknown return type)
+         *-----------------------------------------------------------------------------*/
+         template<class A, class B>
+         static constexpr auto gp(const A& a, const B& b) -> gp_t<A,B> {
+           typedef typename impl::template gp_arrow_t<typename A::basis, typename B::basis> x;
+           typedef mv_t<typename x::basis> type;
+           return x::Arrow::template Make<type>(a,b);
+         }
+         template<class A, class B>
+         static constexpr auto op(const A& a, const B& b) -> op_t<A,B>  {
+           typedef typename impl::template op_arrow_t<typename A::basis, typename B::basis> x;
+           typedef mv_t<typename x::basis> type;
+           return x::Arrow::template Make<type>(a,b);
+         }
+         template<class A, class B>
+         static constexpr auto ip(const A& a, const B& b) -> ip_t<A,B> {
+           typedef typename impl::template ip_arrow_t<typename A::basis, typename B::basis> x;
+           typedef mv_t<typename x::basis> type;
+           return x::Arrow::template Make<type>(a,b);
+         }
+ 
+         /// Spin a by b, return type a
+         template<class A, class B>
+         static constexpr A spin(const A& a, const B& b) {
+           typedef gp_basis_t<typename B::basis, typename A::basis > tmp_basis;      
+           //............................................lh...........rh.................return type 
+           using x = typename impl::template rot_arrow_t<tmp_basis, typename B::basis, typename A::basis>;                 
+           return x::Arrow::template Make<A>( gp(b, a), Reverse<typename B::basis>::Type::template Make(b) );
+         }
+    
+         /// Reflect a by b, return type a
+         template<class A, class B>
+         static constexpr A reflect(const A& a, const B& b) {
+          typedef gp_basis_t<typename B::basis, typename A::basis > tmp_basis;
+          using x = typename impl::template rot_arrow_t<tmp_basis, typename B::basis, typename A::basis>;
+          return x::Arrow::template Make<A>( gp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make(b) );
+         } 
+ 
+          /// make a type from sum of basis B1 and B2
+         template<typename B1, typename B2> 
+         using make_sum = sum_lift_t<B1, B2>;
+
+         /// make a type from geometric product of basis B1 and B2
+         template<typename B1, typename B2> 
+         using make_gp =   gp_lift_t<B1, B2>;
+
+         /// make a type from outer product of basis B1 and B2
+         template<typename B1, typename B2> 
+         using make_op =   op_lift_t<B1, B2>;
+
+         /// make a type from inner product of basis B1 and B2
+         template<typename B1, typename B2> 
+         using make_ip =   ip_lift_t<B1, B2>;
+
+         /// make a type from a grade
+         template<bits::type grade>
+         using make_grade =  mv_t< typename blade<dim,grade>::type >;
+
+         using types = named_types<impl>;
+
+         ///Next Higher Algebra over the same field
+         using up = algebra< typename metric::up, value_t>;  
+         
+         
+         using vector = typename blade<dim,1>::type;          ///<-- 1-blade vector element
       
-   };
+
+    };
 
 
+
+       
     /*-----------------------------------------------------------------------------
     *  ALGEBRA SPECIFIC PRODUCTS
     *-----------------------------------------------------------------------------*/
-   template<typename Algebra, bool Euclidean, bool Conformal>
-   struct AlgebraImpl : AlgebraImplBase<Algebra> {};
+    template<typename Algebra, bool Euclidean, bool Conformal>
+    struct algebra_impl {};
 
    /*-----------------------------------------------------------------------------
     *  EUCLIDEAN (NO NEGATIVE METRIC)
     *-----------------------------------------------------------------------------*/
    template<typename Algebra>
-   struct AlgebraImpl<Algebra,true, false> : AlgebraImplBase<Algebra> {
+   struct algebra_impl<Algebra,true, false>  {
 
-       static const bits::type dim = Algebra::dim;
+     //  static const bits::type dim = Algebra::dim;
 
-       template <class A, class B> using sum_t = typename ICat< typename NotType< A, B >::Type, A >::Type;
-       template <class A, class B> using  gp_t = typename EGProd<A,B >::basis;
-       template <class A, class B> using  op_t = typename EOProd<A,B >::basis;
-       template <class A, class B> using  ip_t = typename EIProd<A,B >::basis;
+       template <class A, class B> using  gp_arrow_t = EGProd<A,B>;
+       template <class A, class B> using  op_arrow_t = EOProd<A,B>;
+       template <class A, class B> using  ip_arrow_t = EIProd<A,B>;
 
-       template <class B> using TMV = MV<Algebra, B>;
-      
-       template <class A, class B> using GPBasis = typename EGProd<A,B >::basis;
-       template <class A, class B> using OPBasis = typename EOProd<A,B >::basis;
-       template <class A, class B> using IPBasis = typename EIProd<A,B >::basis;
-       template <class A, class B> using GP = TMV<GPBasis<typename A::basis,typename B::basis>>;
-       template <class A, class B> using OP = TMV<OPBasis<typename A::basis,typename B::basis>>;
-       template <class A, class B> using IP = TMV<IPBasis<typename A::basis,typename B::basis>>;  
+       template< class R, class A, class B> using  rot_arrow_t = REGProd< R, A, B>;
 
-       /*-----------------------------------------------------------------------------
-        *  Euclidean Product Functions (unknown return type)
-        *-----------------------------------------------------------------------------*/
-        template<class A, class B>
-        SCA gp(const A& a, const B& b) -> TMV<typename EGProd<typename A::basis, typename B::basis>::basis> {
-          typedef EGProd<typename A::basis, typename B::basis> X;
-          typedef TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA op(const A& a, const B& b) -> TMV<typename EOProd<typename A::basis, typename B::basis>::basis> {
-          typedef EOProd<typename A::basis, typename B::basis> X;
-          typedef TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA ip(const A& a, const B& b) -> TMV<typename EIProd<typename A::basis, typename B::basis>::basis> {
-          typedef EIProd<typename A::basis, typename B::basis> X;
-          typedef TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        /// Spin a by b, return a
-        template<class A, class B>
-        static constexpr A sp(const A& a, const B& b) {
-          typedef EGProd<typename B::basis, typename A::basis> X;
-          typedef TMV<typename X::basis> Type;
-          return REProd< Type, B, A >::Call( egp(b, a), Reverse<typename B::basis>::Type::template Make(b) );
-        }
-    
-        /// Reflect a by b, return a
-        template<class A, class B>
-        static constexpr A re(const A& a, const B& b) {
-         typedef EGProd<typename B::basis, typename A::basis> X;
-         typedef TMV<typename X::basis> Type;
-         return REProd< Type, B, A>::Call( egp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make(b) );
-        }
-
-        
    };
 
-    
+ 
 
    /*-----------------------------------------------------------------------------
-    *  Metric Product Functions 
-    *-----------------------------------------------------------------------------*/
-   /*-----------------------------------------------------------------------------
-    *  USE METRIC (e.g for spacetime algebra)
+    *  Metric Product Functions (e.g for spacetime algebra)
     *-----------------------------------------------------------------------------*/
    template<typename Algebra>
-   struct AlgebraImpl<Algebra,false, false> : AlgebraImplBase<Algebra> {
+   struct algebra_impl<Algebra,false, false>  {
+       using metric_type = typename Algebra::metric::type;
+      // static const bits::type dim = Algebra::dim;
 
-       using metric = typename Algebra::metric::type;
+       template <class A, class B> using  gp_arrow_t = MGProd<A, B, metric_type>;
+       template <class A, class B> using  op_arrow_t = MOProd<A, B, metric_type>;
+       template <class A, class B> using  ip_arrow_t = MIProd<A, B, metric_type>;
 
-       template <class B> using TMV = MV<Algebra, B>;
-       
-       template<class A, class B> using GPBasis = typename MGProd<A,B,metric>::basis;
-       /*-----------------------------------------------------------------------------
-        *  Metric Product Functions (unknown return type)
-        *-----------------------------------------------------------------------------*/
-        template<class A, class B>
-        SCA gp(const A& a, const B& b) -> TMV<typename MGProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef MGProd<typename A::basis, typename B::basis, metric> X;
-          typedef TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA op(const A& a, const B& b) -> TMV<typename MOProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef MOProd<typename A::basis, typename B::basis, metric> X;
-          typedef  TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA ip(const A& a, const B& b) -> TMV<typename MIProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef MIProd<typename A::basis, typename B::basis, metric> X;
-          typedef  TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-    
-        /// Spin a by b, return a
-        template<class A, class B>
-        static constexpr A sp(const A& a, const B& b) {
-          typedef MGProd<typename B::basis, typename A::basis, metric> X;
-          typedef TMV<typename X::basis> Type;
-          return RMGProd< Type, B, A, metric >::Call( gp(b, a), Reverse<typename B::basis>::Type::template Make(b) );
-        }
-    
-        /// Reflect a by b, return a
-        template<class A, class B>
-        static constexpr A re(const A& a, const B& b) {
-         typedef MGProd<typename B::basis, typename A::basis, metric> X;
-         typedef TMV<typename X::basis> Type;
-         return RMGProd< Type, B, A, metric>::Call( gp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make(b) );
-        } 
+       template< class R, class A, class B> using  rot_arrow_t = RMGProd< R, A, B, metric_type>;
+
   };
  
    /*-----------------------------------------------------------------------------
     *  CONFORMAL
     *-----------------------------------------------------------------------------*/
    template<typename Algebra>
-   struct AlgebraImpl<Algebra,false, true> : AlgebraImplBase<Algebra> {
+   struct algebra_impl<Algebra,false, true>  {
 
-       using metric = typename Algebra::metric::type;
+       using metric_type = typename Algebra::metric::type;
+    //   static const bits::type dim = Algebra::dim;
 
-       //lift basis into algebraic multivector (monad)
-       template <class B> using TMV = MV<Algebra, B>;
-       static const bits::type dim = Algebra::dim;
+       template <class A, class B> using  gp_arrow_t = CGProd<A, B, metric_type>;
+       template <class A, class B> using  op_arrow_t = COProd<A, B, metric_type>;
+       template <class A, class B> using  ip_arrow_t = CIProd<A, B, metric_type>;
 
-       template <class A, class B> using sum_t = typename ICat< typename NotType< A, B >::Type, A >::Type;
-       template <class A, class B> using  gp_t = typename EGProd<A,B >::basis;
-       template <class A, class B> using  op_t = typename EOProd<A,B >::basis;
-       template <class A, class B> using  ip_t = typename EIProd<A,B >::basis;
-
-       
-       template<class A, class B> using GPBasis = typename CGProd<A,B, metric >::basis;
-       template<class A, class B> using OPBasis = typename COProd<A,B, metric >::basis;
-       template<class A, class B> using IPBasis = typename CIProd<A,B, metric >::basis;
-       template<class A, class B> using GP = TMV<GPBasis<typename A::basis,typename B::basis>>;
-       template<class A, class B> using OP = TMV<OPBasis<typename A::basis,typename B::basis>>;
-       template<class A, class B> using IP = TMV<IPBasis<typename A::basis,typename B::basis>>;    
-
-       /*-----------------------------------------------------------------------------
-        *  Conformal Product Functions (unknown return type)
-        *-----------------------------------------------------------------------------*/
-        template<class A, class B>
-        SCA gp(const A& a, const B& b) -> TMV<typename CGProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef CGProd<typename A::basis, typename B::basis, metric> X;
-          typedef TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA op(const A& a, const B& b) -> TMV<typename COProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef COProd<typename A::basis, typename B::basis, metric> X;
-          typedef  TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-        template<class A, class B>
-        SCA ip(const A& a, const B& b) -> TMV<typename CIProd<typename A::basis, typename B::basis, metric>::basis> {
-          typedef CIProd<typename A::basis, typename B::basis, metric> X;
-          typedef  TMV<typename X::basis> Type;
-          return X::Arrow::template Make<Type>(a,b);
-        }
-
-    
-        /*-----------------------------------------------------------------------------
-         *  Known Return Type
-         *-----------------------------------------------------------------------------*/
-        /// Spin a by b, return a
-        template<class A, class B>
-        static constexpr A sp(const A& a, const B& b) {
-          typedef CGProd<typename B::basis, typename A::basis, metric> X;
-          typedef TMV<typename X::basis> Type;
-          return RCGProd< Type, B, A, metric >::Call( gp(b, a), Reverse<typename B::basis>::Type::template Make(b) );
-        }
-    
-        /// Reflect a by b, return a
-        template<class A, class B>
-        static constexpr A re(const A& a, const B& b) {
-         typedef CGProd<typename B::basis, typename A::basis, metric> X;
-         typedef TMV<typename X::basis> Type;
-         return RCGProd< Type, B, A, metric>::Call( gp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make(b) );
-        } 
+       template< class R, class A, class B> using  rot_arrow_t = RCGProd< R, A, B, metric_type>;
+  };
+            
 
 
-   };
- 
 
-
-   template<typename alg> struct basetype{};
+   template<typename alg> struct named_types{};
    
    /*-----------------------------------------------------------------------------
-    *  Default Euclidean Basis Types (specialize basetype to your own needs)
+    *  Default Euclidean Basis Types (specialize named_types to your own needs)
     *-----------------------------------------------------------------------------*/
    template<typename alg> 
-   struct basetype<AlgebraImpl<alg,true,false>>{
+   struct named_types<algebra_impl<alg,true,false>>{
 
-            using algebra = AlgebraImpl<alg,true,false>;
+            using algebra = alg;//AlgebraImpl<alg,true,false>;
             
             //use as e<1,2,3> will return e123 blade
             template<bits::type ... N> using e = Basis< bits::blade((1<<(N-1))...)>;  
@@ -309,18 +301,33 @@ namespace vsr {
             using sca = Basis<0>;  
             using pss = Basis<bits::pss(alg::dim)>;
             using vec = typename Blade1<alg::dim>::VEC;   
-            using biv = typename algebra::template op_t<vec,vec>;
-            using tri = typename algebra::template op_t<vec,biv>;
-            using rot = typename algebra::template sum_t<biv,sca>;
+            using biv = typename algebra::template op_basis_t<vec,vec>;
+            using tri = typename algebra::template op_basis_t<vec,biv>;
+            using rot = typename algebra::template sum_basis_t<biv,sca>;
             using euc = pss; //necessary redundancy to avoid errors when compiling euclidean duale() method
 
-            using Sca = MV<alg,sca >;
-            using Pss = MV<alg,pss >;
-            using Vec = MV<alg,vec >;
-            using Biv = MV<alg,biv >;
-            using Tri = MV<alg,tri >;
-            using Rot = MV<alg,rot >;
-            using Euc = MV<alg,euc >;
+            using Sca = Multivector<alg,sca >;
+            using Pss = Multivector<alg,pss >;
+            using Vec = Multivector<alg,vec >;
+            using Biv = Multivector<alg,biv >;
+            using Tri = Multivector<alg,tri >;
+            using Rot = Multivector<alg,rot >;
+            using Euc = Multivector<alg,euc >;
+
+            using scalar_basis = Basis<0>;
+            using pseudoscalar_basis = Basis<bits::pss(alg::dim)>;
+            using vector_basis = typename blade<alg::dim,1>::type;
+            using bivector_basis = typename blade<alg::dim,2>::type;
+            using trivector_basis = typename blade<alg::dim,3>::type;
+            using rotor_basis = typename algebra::template sum_basis_t<bivector_basis, scalar_basis>;
+            using euclidean_pseudoscalar_basis = pseudoscalar_basis;
+
+            using scalar = Multivector<alg,scalar_basis >;
+            using vector = Multivector<alg, vector_basis >;
+            using bivector = Multivector<alg, bivector_basis >;
+            using trivector = Multivector<alg,trivector_basis >;
+            using rotor = Multivector<alg,rotor_basis>;
+            using pseudoscalar = Multivector<alg, pseudoscalar_basis>;
 
    };
 
@@ -330,9 +337,9 @@ namespace vsr {
     *  Default Conformal Basis Types
     *-----------------------------------------------------------------------------*/
    template<typename alg> 
-   struct basetype<AlgebraImpl<alg,false,true>>{
+   struct named_types<algebra_impl<alg,false,true>>{
             
-            using algebra = AlgebraImpl<alg,false,true>;
+            using algebra = alg;//AlgebraImpl<alg,false,true>;
             //use as e<1,2,3> will return e123 blade
             template<bits::type ... N> using e = Basis< bits::blade((1<<(N-1))...)>;  
             
@@ -345,66 +352,103 @@ namespace vsr {
             using ori = typename basis_t::origin<algebra::dim> ; 
             using inf = typename basis_t::infinity<algebra::dim> ; 
             using mnk = typename basis_t::eplane<algebra::dim> ; 
-            using biv = typename algebra::template op_t<vec,vec>;
-            using tri = typename algebra::template op_t<vec,biv>;
-            using rot = typename algebra::template sum_t<biv,sca>;
-            using tnv = typename algebra::template op_t<vec,ori>;
-            using drv = typename algebra::template op_t<vec,inf>;
-            using tnb = typename algebra::template op_t<biv,ori>;
-            using drb = typename algebra::template op_t<biv,inf>;
-            using tnt = typename algebra::template op_t<tri,ori>;
-            using drt = typename algebra::template op_t<tri,inf>;
-            using par = typename algebra::template op_t<pnt,pnt>;
-            using cir = typename algebra::template op_t<par,pnt>;
-            using sph = typename algebra::template op_t<cir,pnt>;
-            using flp = typename algebra::template op_t<pnt,inf>;
-            using dll = typename algebra::template sum_t<biv,drv>;
-            using lin = typename algebra::template op_t<pnt,flp>;
-            using dlp = typename algebra::template sum_t<vec,inf>;
-            using pln = typename algebra::template op_t<cir,inf>;
-            using trs = typename algebra::template sum_t<drv, sca>;// 1 );
-            using trv = typename algebra::template sum_t<tnv, sca>;// 1 );
-            using dil = typename algebra::template sum_t<mnk, sca>;// 1 );
-            using tsd = typename algebra::template sum_t<flp, sca>;// 1 );
-            using mot = typename algebra::template gp_t<rot, trs>;
-            using bst = typename algebra::template sum_t<par,sca>;
-            using con = typename algebra::template gp_t<par, par>;
+            
+            using biv = typename algebra::template op_basis_t<vec,vec>;
+            using tri = typename algebra::template op_basis_t<vec,biv>;
+            using rot = typename algebra::template sum_basis_t<biv,sca>;
+            using tnv = typename algebra::template op_basis_t<vec,ori>;
+            using drv = typename algebra::template op_basis_t<vec,inf>;
+            using tnb = typename algebra::template op_basis_t<biv,ori>;
+            using drb = typename algebra::template op_basis_t<biv,inf>;
+            using tnt = typename algebra::template op_basis_t<tri,ori>;
+            using drt = typename algebra::template op_basis_t<tri,inf>;
+            using par = typename algebra::template op_basis_t<pnt,pnt>;
+            using cir = typename algebra::template op_basis_t<par,pnt>;
+            using sph = typename algebra::template op_basis_t<cir,pnt>;
+            using flp = typename algebra::template op_basis_t<pnt,inf>;
+            using dll = typename algebra::template sum_basis_t<biv,drv>;
+            using lin = typename algebra::template op_basis_t<pnt,flp>;
+            using dlp = typename algebra::template sum_basis_t<vec,inf>;
+            using pln = typename algebra::template op_basis_t<cir,inf>;
+            using trs = typename algebra::template sum_basis_t<drv, sca>;// 1 );
+            using trv = typename algebra::template sum_basis_t<tnv, sca>;// 1 );
+            using dil = typename algebra::template sum_basis_t<mnk, sca>;// 1 );
+            using tsd = typename algebra::template sum_basis_t<flp, sca>;// 1 );
+            using mot = typename algebra::template gp_basis_t<rot, trs>;
+            using bst = typename algebra::template sum_basis_t<par,sca>;
+            using con = typename algebra::template gp_basis_t<par, par>;
             using dls = pnt;
 
             //MULTIVECTORS
-            using Sca = MV<alg,sca>; 
-            using Pss = MV<alg,pss>;  
-            using Euc = MV<alg,euc>;
-            using Vec = MV<alg,vec>; 
-            using Pnt = MV<alg,pnt>;
-            using Ori = MV<alg,ori>;
-            using Inf = MV<alg,inf>;
-            using Mnk = MV<alg,mnk>;
-            using Biv = MV<alg,biv>;
-            using Tri = MV<alg,tri>;
-            using Rot = MV<alg,rot>;
-            using Tnv = MV<alg,tnv>;
-            using Drv = MV<alg,drv>;
-            using Tnb = MV<alg,tnb>;
-            using Drb = MV<alg,drb>;
-            using Tnt = MV<alg,tnt>;
-            using Drt = MV<alg,drt>;
-            using Par = MV<alg,par>;
-            using Cir = MV<alg,cir>;
-            using Sph = MV<alg,sph>;
-            using Flp = MV<alg,flp>;
-            using Dll = MV<alg,dll>;
-            using Lin = MV<alg,lin>;
-            using Dlp = MV<alg,dlp>;
-            using Pln = MV<alg,pln>;
-            using Trs = MV<alg,trs>;
-            using Trv = MV<alg,trv>;
-            using Dil = MV<alg,dil>;
-            using Tsd = MV<alg,tsd>;
-            using Mot = MV<alg,mot>;
-            using Bst = MV<alg,bst>;
-            using Con = MV<alg,con>;
-            using Dls = MV<alg,dls>;
+            using Sca = Multivector<alg,sca>; 
+            using Pss = Multivector<alg,pss>;  
+            using Euc = Multivector<alg,euc>;
+            using Vec = Multivector<alg,vec>; 
+            using Pnt = Multivector<alg,pnt>;
+            using Ori = Multivector<alg,ori>;
+            using Inf = Multivector<alg,inf>;
+            using Mnk = Multivector<alg,mnk>;
+            using Biv = Multivector<alg,biv>;
+            using Tri = Multivector<alg,tri>;
+            using Rot = Multivector<alg,rot>;
+            using Tnv = Multivector<alg,tnv>;
+            using Drv = Multivector<alg,drv>;
+            using Tnb = Multivector<alg,tnb>;
+            using Drb = Multivector<alg,drb>;
+            using Tnt = Multivector<alg,tnt>;
+            using Drt = Multivector<alg,drt>;
+            using Par = Multivector<alg,par>;
+            using Cir = Multivector<alg,cir>;
+            using Sph = Multivector<alg,sph>;
+            using Flp = Multivector<alg,flp>;
+            using Dll = Multivector<alg,dll>;
+            using Lin = Multivector<alg,lin>;
+            using Dlp = Multivector<alg,dlp>;
+            using Pln = Multivector<alg,pln>;
+            using Trs = Multivector<alg,trs>;
+            using Trv = Multivector<alg,trv>;
+            using Dil = Multivector<alg,dil>;
+            using Tsd = Multivector<alg,tsd>;
+            using Mot = Multivector<alg,mot>;
+            using Bst = Multivector<alg,bst>;
+            using Con = Multivector<alg,con>;
+            using Dls = Multivector<alg,dls>;
+
+
+            using scalar = Multivector<alg,sca>; 
+            using psuedoscalar = Multivector<alg,pss>;  
+            using euclidean_pseudoscalar = Multivector<alg,euc>;
+            using vector = Multivector<alg,vec>; 
+            using point = Multivector<alg,pnt>;
+            using origin = Multivector<alg,ori>;
+            using infinity = Multivector<alg,inf>;
+            using eplane = Multivector<alg,mnk>;
+            using bivector = Multivector<alg,biv>;
+            using trivector = Multivector<alg,tri>;
+            using rotor = Multivector<alg,rot>;
+            using tangent_vector = Multivector<alg,tnv>;
+            using direction_vector = Multivector<alg,drv>;
+            using tangent_bivector = Multivector<alg,tnb>;
+            using direction_bivector = Multivector<alg,drb>;
+            using tangent_trivector = Multivector<alg,tnt>;
+            using direction_trivector = Multivector<alg,drt>;
+            using pair = Multivector<alg,par>;
+            using circle = Multivector<alg,cir>;
+            using sphere = Multivector<alg,sph>;
+            using flat_point = Multivector<alg,flp>;
+            using dual_line = Multivector<alg,dll>;
+            using line = Multivector<alg,lin>;
+            using dual_plane = Multivector<alg,dlp>;
+            using plane = Multivector<alg,pln>;
+            using translator = Multivector<alg,trs>;
+            using transversor = Multivector<alg,trv>;
+            using dilator = Multivector<alg,dil>;
+            using translated_dilator = Multivector<alg,tsd>;
+            using motor = Multivector<alg,mot>;
+            using boost = Multivector<alg,bst>;
+            using conformal_boost = Multivector<alg,con>;
+            using dual_sphere = Multivector<alg,dls>;
+            
 
    };
 

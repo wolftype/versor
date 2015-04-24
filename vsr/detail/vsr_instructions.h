@@ -8,14 +8,46 @@ namespace vsr{
 
 
 /*-----------------------------------------------------------------------------
- *  Rules for when to Flip product, calculate inner, or calculate outer
+ *  Lowest level product for when to Flip product, calculate inner, or calculate outer
  *-----------------------------------------------------------------------------*/
 template<bits::type A, bits::type B>
-struct Rule {
-  static const bits::type Res = A ^ B; 
-  static const int Flip = bits::signFlip(A,B);
-  static const bool IP = bits::inner(A,B);
-  static const bool OP = bits::outer(A,B);  
+struct product {
+  static const bits::type result = A ^ B; 
+  static const bool is_positive = !bits::signFlip(A,B);
+  static const bool has_inner = bits::inner(A,B);
+  static const bool has_outer = bits::outer(A,B);  
+};
+
+/*-----------------------------------------------------------------------------
+ *  use of product to calculate value
+ *-----------------------------------------------------------------------------*/
+template<bool positive, int idxA, int idxB>
+struct binary_function_token {
+  template<class TA, class TB>
+  static constexpr typename TA::value_t Exec(const TA& a, const TB& b){
+    return a[idxA] * b[idxB] * (positive ? 1 : -1);
+  }
+  static void print(){
+    printf(" %s a[%d] * b[%d] \t", positive?"":"-", idxA, idxB );
+  }    
+};
+
+//template<bool positive, int idxA, int idxB> 
+//struct print< binary_function_token<positive, idxA, idxB> >{
+//  static void print(){
+//    printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, bits::estring(product::result).c_str() );
+//  }      
+//};
+
+template<bool positive, int idx>
+struct unary_function_token {
+  template<class TA>
+  static constexpr typename TA::value_t Exec(const TA& a){
+    return a[idx] * (positive ? 1 : -1);
+  }
+   static void print(){
+    printf("%s\ta[%d]\t",(positive ? "" :"-") ,idx);
+  }
 };
 
 
@@ -27,7 +59,7 @@ struct Instruction{
   static const int Sign = Flip ? -1 : 1;
  
   template<class TA, class TB>
-  static constexpr typename TA::algebra::valuetype Exec( const TA& a, const TB& b){
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
     return Sign * a[IDXA] * b[IDXB];
   } 
   
@@ -44,7 +76,7 @@ struct Inst{
   static const bool OP = bits::outer(A,B);  
  
   template<class TA, class TB>
-  static constexpr typename TA::algebra::valuetype Exec( const TA& a, const TB& b){
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
     return a[IDXA] * b[IDXB];
   } 
   
@@ -60,7 +92,7 @@ struct Inst<true, A,B,IDXA,IDXB>{
   static const bool OP = bits::outer(A,B);  
  
   template<class TA, class TB>
-  static constexpr typename TA::algebra::valuetype Exec( const TA& a, const TB& b){
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
     return -a[IDXA] * b[IDXB];
   } 
   
@@ -77,7 +109,7 @@ struct Instruct{
   static const int idxB = IDXB;
 
   template<class TA, class TB>
-  static constexpr typename TA::algebra::valuetype Exec( const TA& a, const TB& b){
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
     return a[idxA] * b[idxB];
   } 
   static void print(){
@@ -91,7 +123,7 @@ struct Instruct<true, R, IDXA, IDXB>{
   static const int idxB = IDXB;
   
   template<class TA, class TB>
-  static constexpr typename TA::algebra::valuetype Exec( const TA& a, const TB& b){
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
     return -a[idxA] * b[idxB];
   } 
   static void print(){
@@ -106,7 +138,7 @@ struct Instruct<true, R, IDXA, IDXB>{
 template<bool F, int IDX>
 struct InstFlip{
   template<class TA>
-  static constexpr typename TA::algebra::valuetype Exec(const TA& a){
+  static constexpr typename TA::algebra::value_t Exec(const TA& a){
     return a[IDX];
   }  
   static void print(){
@@ -117,7 +149,7 @@ struct InstFlip{
 template<int IDX>
 struct InstFlip<true, IDX>{
   template<class TA>
-  static constexpr typename TA::algebra::valuetype Exec(const TA& a){
+  static constexpr typename TA::algebra::value_t Exec(const TA& a){
     return -a[IDX];
   }
   static void print(){
@@ -132,14 +164,14 @@ struct InstFlip<true, IDX>{
 template<int IDX>
 struct InstCast{ 
     template<class TA> 
-     static constexpr typename TA::algebra::valuetype Exec(const TA& a){
+     static constexpr typename TA::algebra::value_t Exec(const TA& a){
     return a[IDX];
   } 
 };
 template<>
 struct InstCast<-1>{       
     template<class TA> 
-    static constexpr typename TA::algebra::valuetype Exec(const TA& a){
+    static constexpr typename TA::algebra::value_t Exec(const TA& a){
     return 0;
   } 
 };

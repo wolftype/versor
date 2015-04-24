@@ -1,4 +1,4 @@
-#include "util/vsr_cga3D_app.h"
+#include "vsr_app.h"
 
 using namespace vsr::cga;
 

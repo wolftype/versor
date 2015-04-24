@@ -18,7 +18,7 @@
 #ifndef VSR_GENERIC_OP_H_INCLUDED
 #define VSR_GENERIC_OP_H_INCLUDED   
 
-#include "detail/vsr_mv.h"
+#include "detail/vsr_multivector.h"
 #include "util/vsr_constants.h" 
 #include <vector>  
 
@@ -314,7 +314,7 @@ namespace euc{
           @param a tangent vector
       */
     template<class A, class B>
-    auto trv ( const MV<A,B>& a ) RETURNS (
+    auto trv ( const Multivector<A,B>& a ) RETURNS (
        a.template copy< GATnv<A> >() + 1
     )
     /*!
@@ -341,7 +341,7 @@ namespace euc{
           @param any multivector (will be copied, not cast, to direction vector)
     */
     template<class A, class B>
-    GATrs<A> trs ( const MV<A,B>& a )  {
+    GATrs<A> trs ( const Multivector<A,B>& a )  {
         return (a.template copy< GADrv<A> > () * -.5 ) + 1;
     }
     /*!
@@ -354,10 +354,10 @@ namespace euc{
           Generate translation  as exponential of a direction vector
           @param some floats etc
       */
-//    template<  typename ... Ts >
-//    auto trs ( Ts ... v ) ->  NTrs<sizeof...(Ts)+2> {      
-//      return ( NDrv<sizeof...(Ts)+2>(v...) * -.5 ) + 1;
-//    } 
+    template<  typename ... Ts >
+    auto trs ( Ts ... v ) ->  NTrs<sizeof...(Ts)+2> {      
+      return ( NDrv<sizeof...(Ts)+2>(v...) * -.5 ) + 1;
+    } 
     /*!
           Generate translation  as exponential of a direction vector
           @param a tangent vector
@@ -422,7 +422,7 @@ namespace euc{
     //           @param Point Pair generator
     //       */ 
     // template<bits::type DIM, class A>  
-    //       auto gen(const CGAMV<DIM,A>& tp) -> decltype( tp + 1 ) { 
+    //       auto gen(const CGAMultivector<DIM,A>& tp) -> decltype( tp + 1 ) { 
     // 
     //   VSR_PRECISION norm; VSR_PRECISION sn; VSR_PRECISION cn;
     // 
@@ -485,7 +485,7 @@ namespace euc{
    /*! Null Point from Arbitrary Multivector */   
   template< class A, class B >
   constexpr GAPnt<A> 
-  null( const MV<A,B>& v ){  
+  null( const Multivector<A,B>& v ){  
        using TVec = GAVec<A>;
        using TOri = GAOri<A>;
        using TInf = GAInf<A>;
@@ -531,12 +531,12 @@ namespace euc{
     template< class ... T > auto dualSphere( VSR_PRECISION r, T ... v ) RETURNS ( dls(r, v...) )
 
     /*! Dual Sphere from Element FIRST and Radius
-        @param Any input MV v (function will take first 3 weights)
+        @param Any input Multivector v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
     template<class A, class B >
     auto 
-    dls( const MV<A,B>& v, VSR_PRECISION r = 1.0 ) -> GAPnt<A> {
+    dls( const Multivector<A,B>& v, VSR_PRECISION r = 1.0 ) -> GAPnt<A> {
         
         auto s = null(v);
         ( r > 0) ? s.template get< bits::infinity< A::dim >() >() -= .5 * (r * r)
@@ -548,7 +548,7 @@ namespace euc{
 
 
     /*! Dual Sphere from Element FIRST and Radius
-        @param Any input MV v (function will take first 3 weights)
+        @param Any input Multivector v (function will take first 3 weights)
         @param Radius (enter a negative radius for an imaginary sphere)
     */
     template< class S >
@@ -576,18 +576,29 @@ namespace euc{
    */
     template<class A, class B>
     constexpr GAPnt<A>
-    cen( const MV<A,B>& s) {
+    center( const Multivector<A,B>& s) {
         return  ( s  / ( GAInf<A>(-1) <= s ) ).template cast< GAPnt<A> >();
     }
+
+    template<class A, class B>
+    constexpr GAPnt<A>
+    cen( const Multivector<A,B>& s) {
+        return center(s);
+    }
+
 
     /*!
       Location of A Round Element (normalized) (Shorthand)
     */  
     template<class A>
-    constexpr typename A::Space::Pnt 
-    loc(const A& s){
+    constexpr typename A::space::point 
+    location(const A& s){
       return null ( cen ( s ) ); 
-    }   
+    }
+    
+    template<class A>
+    constexpr typename A::space::point
+    loc(const A& s){ return location(s); }   
   
 
     /*! Squared Size of a General Round Element (could be negative)
@@ -597,7 +608,7 @@ namespace euc{
     template<class A> 
     VSR_PRECISION 
     size( const A& r, bool dual){
-        auto s = typename A::Space::Inf(1) <= r;
+        auto s = typename A::space::infinity(1) <= r;
         return ( ( r * r.inv() ) / ( s * s ) * ( (dual) ? -1.0 : 1.0 )  )[0];
     } 
     /*! Radius of Round */
@@ -719,7 +730,7 @@ namespace euc{
     template<class A>
     auto 
     direction( const A& s ) RETURNS(
-        ( ( typename A::Space::Inf(-1) <= s ) ^ typename A::Space::Inf(1) )
+        ( ( typename A::space::infinity(-1) <= s ) ^ typename A::space::infinity(1) )
     ) 
     /*! Direction of Round Element (shorthand)
         @param Direct Round
@@ -733,16 +744,16 @@ namespace euc{
     template<class A>
     auto 
     carrier(const A& s) RETURNS(
-        s ^ typename A::Space::Inf(1)
+        s ^ typename A::space::infinity(1)
     ) 
     /*! Carrier Flat of Direct? Round Element (Shorthand) */
     template<class A> auto car( const A&s ) RETURNS( carrier(s) ) 
     
     /*! Dual Surround of a Direct or Dual Round Element */
     template<class A>
-    typename A::Space::Dls
+    typename A::space::dual_sphere
     surround( const A& s) {
-        return typename A::Space::Dls( s / ( s ^ typename A::Space::Inf(1) ));
+        return typename A::space::dual_sphere( s / ( s ^ typename A::space::infinity(1) ));
     } 
     
     /*! Dual Surround of a Direct or Dual Round Element (Shorthand) */
@@ -755,7 +766,7 @@ namespace euc{
      template<class A, class S>
      auto 
      produce(const A& dls, const S& flat) RETURNS (
-         dls ^ ( ( dls <= ( flat.inv() * typename A::Space::Inf(1) ) )  * -1.0 ) 
+         dls ^ ( ( dls <= ( flat.inv() * typename A::space::infinity(1) ) )  * -1.0 ) 
      )
 
     /*!
@@ -766,7 +777,7 @@ namespace euc{
      real(const A& s) RETURNS (
          produce( 
                 round::dls( round::loc( s ), -round::rad( round::sur( s ) ) ), 
-                typename A::Space::Ori(-1) <= round::dir( s ) 
+                typename A::space::origin(-1) <= round::dir( s ) 
               )
      )
 
@@ -779,7 +790,7 @@ namespace euc{
      imag(const A& s) RETURNS (
          produce( 
                 round::dls( round::loc( s ), round::rad( round::sur( s ) ) ), 
-                typename A::Space::Ori(-1) <= round::dir( s ) 
+                typename A::space::origin(-1) <= round::dir( s ) 
               )
      )
      /*!
@@ -798,7 +809,7 @@ namespace euc{
 //  Note: round will be imaginary if dual sphere is real . . .
 //  */  
 //  template<bits::type DIM, class B, class A>
-//  auto round(const CGAMV<DIM, B>& s, const A& flat, VSR_PRECISION radius=1.0) RETURNS (
+//  auto round(const CGAMultivector<DIM, B>& s, const A& flat, VSR_PRECISION radius=1.0) RETURNS (
 //     round( dls(s, radius*-1.0), flat ); 
 //  ) 
   
@@ -893,7 +904,7 @@ namespace euc{
           @param Direct Flat [ Plane (Pln) or Line (Lin) ]
       */
       template<class A,class B> 
-      constexpr auto dir( const MV<A,B>& f) RETURNS(
+      constexpr auto dir( const Multivector<A,B>& f) RETURNS(
           GAInf<A>(-1) <= f
       )  
     
@@ -913,7 +924,7 @@ namespace euc{
      */ 
      template<class A>
      constexpr typename A::VT wt(const A& f, bool dual){
-         using TOri = typename A::Space::Ori;
+         using TOri = typename A::space::origin;
          return dual ? ( TOri(1) <= dir( f.undual() ) ).wt() : ( TOri(1) <= dir(f) ).wt();
      } 
      /*! Dual Plane from Point and Direction */
@@ -951,13 +962,13 @@ namespace euc{
     */
       template <class A>
       constexpr auto dir (const A& a) RETURNS (
-        ( typename A::Space::Inf(-1) <= a ) ^ typename A::Space::Inf(1)
+        ( typename A::space::infinity(-1) <= a ) ^ typename A::space::infinity(1)
       )
 
     /*! Location of Tangent Element (similar formulation to Rounds) */
     template< class A >
-    constexpr typename A::Space::Pnt loc( const A& s){
-        return ( s / typename A::Space::Inf(-1) <= s );
+    constexpr typename A::space::point loc( const A& s){
+        return ( s / typename A::space::infinity(-1) <= s );
     }
 
     /*! Tangent Element of A Direct Round r at Point p
@@ -965,14 +976,14 @@ namespace euc{
         @param Point p
     */
     template< class A >
-    constexpr auto at( const A& r, const typename A::Space::Pnt& p) RETURNS(
+    constexpr auto at( const A& r, const typename A::space::point& p) RETURNS(
        p <= r.inv()
     )
 
     /*! Weight of Tangent Element */
     template<class A>
     typename A::VT wt(const A& s){
-        using TOri = typename A::Space::TOri;
+        using TOri = typename A::space::origin;
         return ( TOri(1) <= dir(s) ).wt();
     }
       
@@ -982,182 +993,75 @@ namespace euc{
   
  //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
  template<class Algebra, class B>
- MV<Algebra, typename Algebra::vector> MV<Algebra,B>::null() const{
+ Multivector<Algebra, typename Algebra::vector> Multivector<Algebra,B>::null() const{
    return round::null(*this);
  } 
   
  template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::rot(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::rot(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::rot(t) );
  } 
  template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::rotate(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::rotate(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::rot(t) );
  } 
 
  template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::trs(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::trs(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::trs(t) );
  } 
  template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::translate(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::translate(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::trs(t) );
  } 
 
 
  template<class Algebra, class B> template<class ... Ts>
- MV<Algebra,B> MV<Algebra,B>::trs(Ts ... v) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::trs(Ts ... v) const{
    return this->sp( gen::trs( GADrv<Algebra>(v...) ) );
  } 
   template<class Algebra, class B> template<class ... Ts>
- MV<Algebra,B> MV<Algebra,B>::translate(Ts ... v) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::translate(Ts ... v) const{
    return this->sp( gen::trs( GADrv<Algebra>(v...) ) );
  } 
 
   template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::trv(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::trv(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::trv(t) );
  } 
    template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::transverse(const MV<Algebra,A>& t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::transverse(const Multivector<Algebra,A>& t) const{
    return this->sp( gen::trv(t) );
  } 
 
  template<class Algebra, class B> template<class ... Ts>
- MV<Algebra,B> MV<Algebra,B>::trv(Ts ... v) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::trv(Ts ... v) const{
    return this->sp( gen::trv( GATrv<Algebra>(v...) ) );
  } 
   template<class Algebra, class B> template<class ... Ts>
- MV<Algebra,B> MV<Algebra,B>::transverse(Ts ... v) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::transverse(Ts ... v) const{
    return this->sp( gen::trv( GATrv<Algebra>(v...) ) );
  } 
      
    template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::dil(const MV<Algebra,A>& s, VSR_PRECISION t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::dil(const Multivector<Algebra,A>& s, VSR_PRECISION t) const{
    return this->sp( gen::dil(s,t) );
  } 
    template<class Algebra, class B> template<class A>
- MV<Algebra,B> MV<Algebra,B>::dilate(const MV<Algebra,A>& s, VSR_PRECISION t) const{
+ Multivector<Algebra,B> Multivector<Algebra,B>::dilate(const Multivector<Algebra,A>& s, VSR_PRECISION t) const{
    return this->sp( gen::dil(s,t) );
  } 
  
  template<class Algebra, class B> template <class A>
-MV<Algebra,B> MV<Algebra,B>::bst( const MV<Algebra,A>& t) const{
+Multivector<Algebra,B> Multivector<Algebra,B>::bst( const Multivector<Algebra,A>& t) const{
      return this -> sp ( gen::bst(t) );  
 } 
 template<class Algebra, class B> template <class A>
-MV<Algebra,B> MV<Algebra,B>::boost( const MV<Algebra,A>& t) const{
+Multivector<Algebra,B> Multivector<Algebra,B>::boost( const Multivector<Algebra,A>& t) const{
      return this -> sp ( gen::bst(t) );  
 } 
 
-               
-// template<bits::type DIM, class A> template<class T>
-// EGAMV<DIM, A> EGAMV<DIM, A>::rot( const T& t) const{
-//   return this->sp( gen::rot(t) );
-// }   
-//  
-//  
-//  //TRANSLATIONS
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::trs( const T& t) const{
-//    return this -> sp ( gen::trs(t) );  
-//  } 
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::translate( const T& t) const{
-//    return this -> trs(t);  
-//  }
-//  template<bits::type DIM, typename A> template< class ... T> 
-//  CGAMV<DIM,A> CGAMV<DIM,A>::trs( T ... v) const{
-//    return this -> sp ( gen::trs(v...) );  
-//  }
-//  template<bits::type DIM, typename A> template< class ... T> 
-//  CGAMV<DIM,A> CGAMV<DIM,A>::translate( T ... v) const{
-//    return this -> sp ( gen::trs(v...) );  
-//  }  
-//  
-//  //TRANSVERSIONS
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::trv( const T& t) const{
-//    return this -> sp ( gen::trv(t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( const T& t) const{
-//    return this -> sp ( gen::trv(t) );  
-//  } 
-// 
-//  template<bits::type DIM, typename A> template< class ... T> 
-//  CGAMV<DIM,A> CGAMV<DIM,A>::trv( T ... v) const{
-//    return this -> sp ( gen::trv(v...) );  
-//  }
-//  template<bits::type DIM, typename A> template< class ... T> 
-//  CGAMV<DIM,A> CGAMV<DIM,A>::transverse( T ... v) const{
-//    return this -> sp ( gen::trv(v...) );  
-//  }
-//
-//  
-//  //ROTATIONS
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::rot( const T& t) const{
-//      return this -> sp ( gen::rot(t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( const T& t) const{
-//      return this -> rot(t);  
-//  } 
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::rot( VSR_PRECISION a, const T& t) const{
-//      return this -> sp ( gen::rot(a,t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::rotate( VSR_PRECISION a, const T& t) const{
-//      return this -> rot(a, t);  
-//  } 
-//
-//
-//   //DILATIONS 
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const T& t) const{
-//        return this -> sp ( gen::dil<DIM>(t) );  
-//  } 
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const T& t) const{
-//        return this -> sp ( gen::dil<DIM>(t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename P, typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::dil( const P& a, const T& t) const{
-//        return this -> sp ( gen::dil(a, t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename P, typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::dilate( const P& a, const T& t) const{
-//        return this -> sp ( gen::dil(a, t) );  
-//  }
-//    template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const T& t) const{
-//        return this -> dilate(t);  
-//  }
-//  template<bits::type DIM, typename A> template<typename P, typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::scale( const P& a, const T& t) const{
-//        return this -> sp ( gen::dil(a, t) );  
-//  }
-//
-//  
-//
-//  //BOOSTS
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::bst( const T& t) const{
-//        return this -> sp ( gen::bst(t) );  
-//  }
-//  template<bits::type DIM, typename A> template<typename T>
-//  CGAMV<DIM,A> CGAMV<DIM,A>::boost( const T& t) const{
-//        return this -> bst(t);  
-//  }
-//
-//  //NULL
-//  template<bits::type DIM, typename A>
-//  CGAMV<DIM, typename CGA<DIM>::Pnt > CGAMV<DIM,A>::null() const{
-//        return round::null(*this);  
-//  }            
-  
-}   //vsr::
+
+}  //vsr::
 
 #endif

@@ -64,13 +64,13 @@ namespace vsr{
     /// Use to Evaluate Neighbors, Tensors, etc.
     
     template < class T >
-    class Field : public CubicLattice < typename T::Space::Pnt > {
+    class Field : public CubicLattice < typename T::space::point > {
               
         protected:
         
         T * mData;
         
-        using GridType = typename T::Space::Pnt;
+        using GridType = typename T::space::point;
 
         public:
 

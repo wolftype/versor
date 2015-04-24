@@ -31,7 +31,13 @@
 namespace gfx{    
    
   using namespace vsr;
+  using vsr::cga::Pnt; 
+  using vsr::cga::Point; 
+  using vsr::cga::Frame; 
   using vsr::cga::Vec; 
+  using vsr::cga::Dll; 
+  using vsr::cga::Drv; 
+  using vsr::cga::Rot; 
 
   //FOR ALL ROUND MULTIVECTOR TYPES:
   template<class A>  

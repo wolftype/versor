@@ -189,7 +189,7 @@ namespace gfx{
   
 
   template<> void Renderable< Field<cga::Sca> >::DrawImmediate( const Field< cga::Sca>& f){
-     cga::Pnt p =  cga::Pnt();
+     static cga::Pnt p =  cga::Pnt();
     for (int i = 0; i < f.num(); ++i){  
       render::drawAt(p, f.grid(i));//, f[i][0], 1, 1 - f[i][0] ); 
     }
@@ -228,6 +228,31 @@ namespace gfx{
       render::draw(f[i]);
     }
   }
+
+//  /*-----------------------------------------------------------------------------
+//   *  Specific Strategies
+//   *-----------------------------------------------------------------------------*/
+//  template<>  void Renderable<Field<cga::Sca>>::DrawImmediate( const Field<cga::Sca>& f){
+//    static Pnt p = Pnt();
+//    for (int i = 0; i < f.num(); ++i){ 
+//      render::color(f[i][0], 1, 1 - f[i][0]);
+//      render::drawAt(p,f.grid(i));  
+//    }
+//  }
+//
+//  template<>  void Renderable<Field<cga::Vec>>::DrawImmediate( const Field<cga::Vec>& f){
+//    for (int i = 0; i < f.num(); ++i){  
+//      render::drawAt( f[i], f.grid(i) );
+//    }
+//  }
+//
+//
+//  template<>  void Renderable<Field<cga::Tnv>>::DrawImmediate( const Field<cga::Tnv>& f){
+//    for (int i = 0; i < f.num(); ++i){  
+//      render::drawAt( f[i], f.grid(i) );
+//    }
+//  }  
+  
 
 
    /* void Immediate( const MFrame& f){ */

@@ -1,9 +1,22 @@
 /*
-  
-  Pablo Colapinto
-  VSR2.0
+ * =====================================================================================
+ *
+ *       Filename:  vsr_cga3D_draw.h
+ *
+ *    Description:  fixed (immediate mode) graphics pipeline draw routines for 3d cga
+ *
+ *        Version:  1.0
+ *        Created:  01/19/2015 18:02:48
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Pablo Colapinto (), gmail -> wolftype
+ *   Organization:  wolftype 
+ *
+ * =====================================================================================
+ */
 
-*/
+
 
 #ifndef VSR_DRAW_H_INCLUDED
 #define VSR_DRAW_H_INCLUDED  
@@ -107,7 +120,7 @@ namespace gfx{
 //  template<> void Renderable<cga::Frame>::DrawImmediateB (const cga::Frame& s);   
   
   template<class T> 
-  struct Renderable<Field<T>> {
+  struct Renderable<Field<T>> : RenderableBase< Field<T> > {
     
     static void DrawImmediate( const Field<T>& f){
       for (int i = 0; i < f.num(); ++i){ 
@@ -126,10 +139,12 @@ namespace gfx{
   template<> void Renderable<Field<cga::Sca>>::DrawImmediate( const Field<cga::Sca>& f);
   template<> void Renderable<Field<cga::Tnv>>::DrawImmediate( const Field<cga::Tnv>& f);
   template<> void Renderable<Field<cga::Frame>>::DrawImmediate( const Field<cga::Frame>& f);
+//   #ifdef GFX_IMMEDIATE_MODE
+  
 
+//#endif
 
   
-} //}//vsr::cga
-
+} //gfx::
 
 #endif

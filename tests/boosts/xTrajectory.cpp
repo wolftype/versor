@@ -17,12 +17,11 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_cga3D_frame.h"
-#include "vsr_knot.h"
+#include "vsr_app.h"   
+#include "form/vsr_knot.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -40,9 +39,9 @@ struct MyApp : App {
 
   Frame f;
   
-  Pnt sPnt = Ro::null(0,0,0);
+  Pnt sPnt = round::null(0,0,0);
   Pnt rPnt; 
-  Pnt wPnt = Ro::null(0,0,0).trs(-2,0,0); 
+  Pnt wPnt = round::null(0,0,0).trs(-2,0,0); 
   
 
   void setup(){
@@ -82,7 +81,7 @@ struct MyApp : App {
 
 
       //Point set by radius
-      rPnt = Ro::dls( radius,0,0,0 ).trs(-2,0,0);
+      rPnt = round::dls( radius,0,0,0 ).trs(-2,0,0);
       //Point set by weight
       wPnt[3] = weight;
      
@@ -95,12 +94,12 @@ struct MyApp : App {
       for (int i = 0; i < iter; ++ i ){
          rp = rp.sp(tbst);  
          wp = wp.sp(tbst);  
-         rpnts.push_back( Ro::loc(rp) );
-         wpnts.push_back( Ro::loc(wp) );
+         rpnts.push_back( round::loc(rp) );
+         wpnts.push_back( round::loc(wp) );
       }   
 
       //increment orbit
-      sPnt = Ro::loc( sPnt.sp( tbst ) );
+      sPnt = round::loc( sPnt.sp( tbst ) );
 
       //Frame
       DrawAt( f.y(), f.pos(), 1,0,0 );
@@ -109,7 +108,7 @@ struct MyApp : App {
     //  Draw(tk2.HF.fiberA(),0,1,0 );
     //  Draw(tk2.HF.fiberB(),0,1,0 );     
       //Orbit  
-   //   Draw(Ro::dls(sPnt,.2),0,1,1 );
+   //   Draw(round::dls(sPnt,.2),0,1,1 );
       //Orbits
       for (auto& i : rpnts) Draw(i,1,0,0); //Draw radius-based points in red
       for (auto& i : wpnts) Draw(i,1,1,0); //Draw weight-based points in yellow

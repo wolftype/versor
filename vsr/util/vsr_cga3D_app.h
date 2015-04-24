@@ -29,19 +29,16 @@
 #include "util/vsr_cga3D_control.h"      //<-- interface controls (mouse and keyboard)
 #include "gfx/util/gfx_glv_app.h"             //<-- an app class with built-in gui
 
-using namespace vsr;
-
-
 
 struct App : public gfx::GFXAppGui {  
  
   App(int w =800, int h=400, string name="cga3D") : gfx::GFXAppGui(w,h,name) {}
   
-  Point mMouse2D;
-  Point mMouse3D;
-  Line mMouseRay;
+  vsr::cga::Point mMouse2D;
+  vsr::cga::Point mMouse3D;
+  vsr::cga::Line mMouseRay;
 
-  Point calcMouse3D(float z=.99){
+  vsr::cga::Point calcMouse3D(float z=.99){
 
     auto& vd = gfx::GFXAppGui::mContext.interface.io.viewdata;
     auto tv = vd.ray;
@@ -50,12 +47,12 @@ struct App : public gfx::GFXAppGui {
 
     Vec tz (tv[0], tv[1], tv[2] );
 
-    mMouse2D =  cga::point(p[0],p[1],0);
-    mMouse3D =  cga::point(p[0],p[1],p[2]);
-    mMouseRay = mMouse3D ^ tz ^ Inf(1); 
+    mMouse2D =  vsr::cga::point(p[0],p[1],0);
+    mMouse3D =  vsr::cga::point(p[0],p[1],p[2]);
+    mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity(1); 
 
     //intersection of ray with plane
-    mMouse3D = cga::meet( mMouseRay, Dlp(tz) );
+    mMouse3D = vsr::cga::meet( mMouseRay, vsr::cga::DualPlane(tz) );
 
     return mMouse3D;
  

@@ -142,15 +142,15 @@ namespace gen{
 };
 
 template<class Algebra, class B> template <class A>
-MV<Algebra,B> MV<Algebra,B>::mot( const MV<Algebra,A>& t) const{
+Multivector<Algebra,B> Multivector<Algebra,B>::mot( const Multivector<Algebra,A>& t) const{
      return this -> sp ( gen::mot(t) );  
 } 
 template<class Algebra, class B> template <class A>
-MV<Algebra,B> MV<Algebra,B>::motor( const MV<Algebra,A>& t) const{
+Multivector<Algebra,B> Multivector<Algebra,B>::motor( const Multivector<Algebra,A>& t) const{
      return this -> sp ( gen::mot(t) );  
 } 
 template<class Algebra, class B> template <class A>
-MV<Algebra,B> MV<Algebra,B>::twist( const MV<Algebra,A>& t) const{
+Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,A>& t) const{
      return this -> sp ( gen::mot(t) );  
 } 
 
@@ -165,85 +165,85 @@ MV<Algebra,B> MV<Algebra,B>::twist( const MV<Algebra,A>& t) const{
 /* }; */
     
 
-//extern template class CGAMV<5,   CGA<5>::Sca   >;  
-//extern template class CGAMV<5,   CGA<5>::Vec   >;  
-//extern template class CGAMV<5,   CGA<5>::Vec2D >;  
-//extern template class CGAMV<5,   CGA<5>::Biv   >;  
-//extern template class CGAMV<5,   CGA<5>::Tri   >;  
-//extern template class CGAMV<5,   CGA<5>::Rot   >;  
-//extern template class CGAMV<5,   CGA<5>::Mnk   >;  
-//extern template class CGAMV<5,   CGA<5>::Pss   >;     
-//extern template class CGAMV<5,   CGA<5>::Pnt   >;  
-//extern template class CGAMV<5,   CGA<5>::Par   >; 
-//extern template class CGAMV<5,   CGA<5>::Cir   >; 
-//extern template class CGAMV<5,   CGA<5>::Sph   >;  
-//extern template class CGAMV<5,   CGA<5>::Dll   >; 
-//extern template class CGAMV<5,   CGA<5>::Lin   >; 
-//extern template class CGAMV<5,   CGA<5>::Flp   >; 
-//extern template class CGAMV<5,   CGA<5>::Pln   >; 
-//extern template class CGAMV<5,   CGA<5>::Dlp   >; 
-//extern template class CGAMV<5,   CGA<5>::Trs   >;   
-//extern template class CGAMV<5,   CGA<5>::Mot   >; 
-//extern template class CGAMV<5,   CGA<5>::Trv   >; 
-//extern template class CGAMV<5,   CGA<5>::Bst   >; 
-//extern template class CGAMV<5,   CGA<5>::Dil   >; 
-//extern template class CGAMV<5,   CGA<5>::Tsd   >;
+//extern template class CGAMultivector<5,   CGA<5>::Sca   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Vec   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Vec2D >;  
+//extern template class CGAMultivector<5,   CGA<5>::Biv   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Tri   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Rot   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Mnk   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Pss   >;     
+//extern template class CGAMultivector<5,   CGA<5>::Pnt   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Par   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Cir   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Sph   >;  
+//extern template class CGAMultivector<5,   CGA<5>::Dll   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Lin   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Flp   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Pln   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Dlp   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Trs   >;   
+//extern template class CGAMultivector<5,   CGA<5>::Mot   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Trv   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Bst   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Dil   >; 
+//extern template class CGAMultivector<5,   CGA<5>::Tsd   >;
 
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                         
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                         
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Mot& )const;                       
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Bst& )const;
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Tsd& )const;
-//extern template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Dil& )const;
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Rot& )const;                         
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Trs& )const;                         
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Mot& )const;                       
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Bst& )const;
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Tsd& )const;
+//extern template Pnt CGAMultivector<5, CGA<5>::Pnt>::sp( const Dil& )const;
 //                                                         
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Rot& )const;
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Trs& )const;
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Mot& )const;
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Bst& )const;
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Tsd& )const;
-//extern template Par CGAMV<5, CGA<5>::Par>::sp( const Dil& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Rot& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Trs& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Mot& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Bst& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Tsd& )const;
+//extern template Par CGAMultivector<5, CGA<5>::Par>::sp( const Dil& )const;
 //                                                       
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Rot& )const;
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Trs& )const;
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Mot& )const;
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Bst& )const;
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Tsd& )const;
-//extern template Cir CGAMV<5, CGA<5>::Cir>::sp( const Dil& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Rot& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Trs& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Mot& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Bst& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Tsd& )const;
+//extern template Cir CGAMultivector<5, CGA<5>::Cir>::sp( const Dil& )const;
 //                                                         
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Rot& )const;
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Trs& )const;
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Mot& )const;
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Bst& )const;
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Tsd& )const;
-//extern template Sph CGAMV<5, CGA<5>::Sph>::sp( const Dil& )const; 
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Rot& )const;
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Trs& )const;
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Mot& )const;
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Bst& )const;
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Tsd& )const;
+//extern template Sph CGAMultivector<5, CGA<5>::Sph>::sp( const Dil& )const; 
 //
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const;                         
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const;                         
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Mot& )const;                       
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Bst& )const;
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Tsd& )const;
-//extern template Dll CGAMV<5, CGA<5>::Dll>::sp( const Dil& )const;
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Rot& )const;                         
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Trs& )const;                         
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Mot& )const;                       
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Bst& )const;
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Tsd& )const;
+//extern template Dll CGAMultivector<5, CGA<5>::Dll>::sp( const Dil& )const;
 //                                                         
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Rot& )const;
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Trs& )const;
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Mot& )const;
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Bst& )const;
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Tsd& )const;
-//extern template Lin CGAMV<5, CGA<5>::Lin>::sp( const Dil& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Rot& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Trs& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Mot& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Bst& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Tsd& )const;
+//extern template Lin CGAMultivector<5, CGA<5>::Lin>::sp( const Dil& )const;
 //                                                       
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Rot& )const;
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Trs& )const;
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Mot& )const;
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Bst& )const;
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Tsd& )const;
-//extern template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Dil& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Rot& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Trs& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Mot& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Bst& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Tsd& )const;
+//extern template Dlp CGAMultivector<5, CGA<5>::Dlp>::sp( const Dil& )const;
 //                                                         
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Rot& )const;
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Trs& )const;
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Mot& )const;
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Bst& )const;
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Tsd& )const;
-//extern template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;  
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Rot& )const;
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Trs& )const;
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Mot& )const;
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Bst& )const;
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Tsd& )const;
+//extern template Pln CGAMultivector<5, CGA<5>::Pln>::sp( const Dil& )const;  
 //                                                           
 //
 //                                                           

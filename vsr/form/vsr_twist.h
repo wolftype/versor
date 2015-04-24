@@ -14,7 +14,7 @@
 #include "space/vsr_cga3D_op.h"
 #include "vsr_interp.h"
 
-namespace vsr {
+namespace vsr { namespace cga {
 
 	/*! Decomposed Dual Line (As a Bivector and Direction Vector  to it ) */
 	class Twist{
@@ -43,8 +43,8 @@ namespace vsr {
 			}
 			
 			//pass in 3d axis
-            template<class T>
-            Twist(const T& axis) : mExt(1) {
+      template<class T>
+      Twist(const T& axis) : mExt(1) {
 				Biv b = op::dl(axis);
 				Drv d = axis * -1 ;
 				mBiv = b;
@@ -290,6 +290,6 @@ namespace vsr {
 
 	};
 
-}//
+} } //vsr::cga:: 
 
 #endif

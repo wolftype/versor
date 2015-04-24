@@ -1,7 +1,7 @@
-#include "util/vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
  

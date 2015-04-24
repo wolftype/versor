@@ -1,7 +1,7 @@
 #ifndef VSR_CGA3D_TYPES_INCLUDED
 #define VSR_CGA3D_TYPES_INCLUDED
 
-#include "detail/vsr_mv.h"
+#include "detail/vsr_multivector.h"
 
 namespace vsr{ namespace cga{ // namespace types{
 

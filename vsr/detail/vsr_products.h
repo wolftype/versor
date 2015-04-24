@@ -34,14 +34,33 @@ namespace vsr {
  *  EUCLIDEAN GEOMETRIC PRODUCT COMPILE-TIME TYPE METAPROGRAMMING ROUTINES
  *-----------------------------------------------------------------------------*/
 
-//tmp
- template<bits::type A, class B, int idxA, int idxB>
- struct SubEuclidean{
-    typedef Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
-    typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type OPELEM;
-    typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type IPELEM;
-    typedef typename XCat< OPELEM, typename SubEuclidean<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
- };
+// template<int TProduct, typename product, int idxA, int idxB> struct sub_impl{};
+//
+// template<typename product, int idxA, int idxB> 
+// struct sub_impl<0,product,idxA,idxB>{
+//   using arrow = binary_function_token< product::is_positive, idxA, idxB>;
+//   using type = XList< arrow >;
+// };
+// template<typename product> 
+// struct sub_impl<1,product,idxA,idxB>{
+//   using arrow = binary_function_token< product::is_positive, idxA, idxB>;
+//   using type = typename Maybe< product::has_outer, XList< arrow >, XList<> >::Type;
+// };
+// template<typename product> 
+// struct sub_impl<2,product,idxA,idxB>{
+//   using arrow = binary_function_token< product::is_positive, idxA, idxB>;
+//   using type = typename Maybe< product::has_inner, XList< arrow >, XList<> >::Type;
+// };
+//
+//
+////tmp (in progress and currently unused)
+// template<int TProduct, bits::type A, class B, int idxA, int idxB>
+// struct sub{
+//    using impl = typename sub_impl<TProduct, product<A, B::HEAD, idxA, idxB>::type;   
+//    typedef typename XCat< impl, typename sub<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type; 
+// };
+
+
 
 /// Geometric Product Type Calculation Sub Loop
 template<bits::type A, class B, int idxA, int idxB>  
@@ -160,15 +179,13 @@ struct EIProd{
 
 
 /*-----------------------------------------------------------------------------
- * EUCLIDEAN Product Type Explicit Control  
+ * EUCLIDEAN Product Type of A and B cast to R (Explicit Return Type Control)  
  *-----------------------------------------------------------------------------*/
 template<class A, class B, class R>
-struct REProd{
-  typedef typename EGP<typename A::basis, typename B::basis>::Type InstList;      
-  typedef typename Index< InstList, R>::Type Arrow;   
-  static constexpr R Call(const A& a, const B& b) {
-    return Arrow::template Make<R>(a, b);
-  } 
+struct REGProd{
+  typedef typename EGP<A,B>::Type List;      
+  typedef typename Index< List, R>::Type Arrow;  
+  typedef R Type; 
 };
 
 
@@ -182,7 +199,7 @@ struct REProd{
  *-----------------------------------------------------------------------------*/
 template<bits::type A, class B, class Metric, int idxA, int idxB>  
 struct SubMGP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;  
+  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;  
   typedef typename XCat< XList< Inst< BFlip, A, B::HEAD, idxA, idxB> >, typename SubMGP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type; 
 };
 template<bits::type A, class Metric, int idxA, int idxB>  
@@ -206,7 +223,7 @@ struct MGP<Basis<>,B, Metric, idxA,idxB> {
 
 template<bits::type A, class B, class Metric, int idxA, int idxB>  
 struct SubMOP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;    
+  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;    
   typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubMOP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type; 
@@ -232,7 +249,7 @@ struct MOP<Basis<>,B, Metric,idxA,idxB> {
 
 template<bits::type A, class B,  class Metric, int idxA, int idxB>  
 struct SubMIP{ 
-  static const bool BFlip = MSign< Metric, A & B::HEAD, signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1; 
+  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1; 
   typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubMIP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type; 
@@ -286,12 +303,12 @@ struct MIProd{
  *-----------------------------------------------------------------------------*/
 template<class A, class B, class R, class M>
 struct RMGProd{
-  typedef typename MGP<typename A::basis, typename B::basis, M>::Type InstList;      
-  typedef typename Index< InstList, R>::Type Arrow;   
-  static constexpr R Call(const A& a, const B& b) {
-    return Arrow::template Make<R>(a, b);
-  } 
+  typedef typename MGP<A,B,M>::Type List;      
+  typedef typename Index< List, R>::Type Arrow;  
+  typedef R Type; 
 };
+
+
 
 
 
@@ -455,14 +472,25 @@ struct CIProd{
 /*-----------------------------------------------------------------------------
  *  Geometric Product Type Explicit Control  
  *-----------------------------------------------------------------------------*/
+//template<class A, class B, class R, class M>
+//struct RCGProd{
+//  typedef typename CGP<typename A::basis, typename B::basis, M>::Type InstList;      
+//  typedef typename Index< InstList, typename R::basis>::Type DO;   
+//  static constexpr R Call(const A& a, const B& b) {
+//    return DO::template Make<R>(a, b);
+//  } 
+//};
+
+/*-----------------------------------------------------------------------------
+ * METRIC Product Explicit Control  
+ *-----------------------------------------------------------------------------*/
 template<class A, class B, class R, class M>
 struct RCGProd{
-  typedef typename CGP<typename A::basis, typename B::basis, M>::Type InstList;      
-  typedef typename Index< InstList, typename R::basis>::Type DO;   
-  static constexpr R Call(const A& a, const B& b) {
-    return DO::template Make<R>(a, b);
-  } 
+  typedef typename CGP<A,B,M>::Type List;      
+  typedef typename Index< List, R>::Type Arrow;  
+  typedef R Type; 
 };
+
 
 
 

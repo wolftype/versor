@@ -180,6 +180,10 @@ namespace vsr{ namespace cga {
       Line line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
         return Ori(1) ^ Vec(x,y,z) ^ Inf(1);
       }
+      ///Direct line through origin
+      Line dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
+        return line(x,y,z).dual();
+      }      
       
       ///Direct line through two points
        Line line( const Point& a, const Point& b){

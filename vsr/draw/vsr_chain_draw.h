@@ -14,6 +14,11 @@
 namespace gfx{
 
   using namespace vsr;
+  using vsr::cga::Chain;
+  using vsr::cga::Frame;
+  using vsr::cga::Prismatic;
+  using vsr::cga::Biv;
+
 
   void Draw(const Chain& c, bool bLoop = false, bool bFrame=true, float r=1.0, float g=1.0, float b=1.0, float a=1.0){
     

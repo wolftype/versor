@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 
-namespace vsr{
+namespace vsr{ namespace cga {
 
   using std::map;
 
@@ -245,12 +245,12 @@ struct  Spherical : public Joint {
       /* SURROUNDS */
       
       /// Sphere Centered at Joint K Going Through Joint K+1 
-      Dls nextDls(int k) const{
-        return round:: dls(mFrame[k].pos(), mLink[k].vec().norm() );//mFrame[k+1].pos());
+      Dls nextSphere(int k) const{
+        return round::dls(mFrame[k].pos(), mLink[k].vec().norm() );//mFrame[k+1].pos());
       }
       /// Sphere Centered at Joint K Going Through Joint K-1
-      Dls prevDls(int k) const{
-        return round:: dls(mFrame[k].pos(), mLink[k-1].vec().norm());//mFrame[k-1].pos());
+      Dls prevSphere(int k) const{
+        return round::dls(mFrame[k].pos(), mLink[k-1].vec().norm());//mFrame[k-1].pos());
       }
       
       /// Dual Plane of rotation of kth joint (translated by link rejection from yz)
@@ -268,22 +268,22 @@ struct  Spherical : public Joint {
 
       /// Dual Circle Centered at Joint K Going Through Joint K+1 (in plane of rotation)
       Circle nextCircle(int k) const {  
-        return (nextDls(k) ^ nextPlane(k)).dual();
+        return (nextSphere(k) ^ nextPlane(k)).dual();
       }
 
-      /// Dual Circle Centered at Joint K Going Through Joint K+1 (in plane of rotation)
+      /// Dual Circle Centered at Joint K Going Through Joint K-1 (in plane of rotation)
       Circle prevCircle(int k) const {  
-        return (prevDls(k) ^ prevPlane(k)).dual();
+        return (prevSphere(k) ^ prevPlane(k)).dual();
       }
 
 
       /// Sphere at Point p through Joint K
-      Dls goalDls(const Pnt& p, int k){
-         return round:: dls(p, mLink[k].vec().norm());
+      Dls goalSphere(const Pnt& p, int k){
+         return round::dls(p, mLink[k].vec().norm());
       }
       /// Sphere at point p through last link (default, or set arbitary link)
-      Dls lastDls(const Pnt& p){
-        return round:: dls(p,mLink[mNum-1].vec().norm());
+      Dls lastSphere(const Pnt& p){
+        return round::dls(p,mLink[mNum-1].vec().norm());
       }
         
       /* Possible Points */
@@ -389,7 +389,7 @@ struct  Spherical : public Joint {
                     //forward reaching
                     for (int i = end; i < begin; ++i){
                         mFrame[i].pos( tmpGoal );          //set position of ith frame
-                        dls = nextDls(i);               //set boundary sphere through i-1 th frame;
+                        dls = nextSphere(i);               //set boundary sphere through i-1 th frame;
                         dll = linf(i);                  //get line from tmp to i-1th frame
                         par = (dll ^ dls).dual();       //get point pair intersection of line and boundary sphere
                         tmpGoal = round:: split(par,true);         //extract point from point pair intersection
@@ -397,7 +397,7 @@ struct  Spherical : public Joint {
                     
                     //backward correction
                     for (int i = begin; i > end; --i){
-                        dls = prevDls(i);                   //set boundary sphere through i+1 th frame
+                        dls = prevSphere(i);                   //set boundary sphere through i+1 th frame
                         dll = linb(i);                      //get line to i+1th frame;
                         par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
                         tmpBase = round:: split(par,true);
@@ -441,7 +441,7 @@ struct  Spherical : public Joint {
                     //backward reaching
                     for (int i = end; i > begin; --i){
                         mFrame[i].pos( tmpGoal );           //set position of ith frame
-                        dls = prevDls(i);                   //set boundary sphere through i-1 th frame;
+                        dls = prevSphere(i);                   //set boundary sphere through i-1 th frame;
                         dll = linb(i);//.sp( !mLink[i].mot() );                      //get line from ith to i-1th frame
                         par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
                         tmpGoal = round:: split(par,true);      //extract point from point pair intersection
@@ -449,7 +449,7 @@ struct  Spherical : public Joint {
                     
                     //forward correction
                     for (int i = begin; i < end; ++i){
-                        dls = nextDls(i);                   //set boundary sphere through i+1 th frame
+                        dls = nextSphere(i);                   //set boundary sphere through i+1 th frame
                         dll = linf(i);                      //get line to i+1th frame;
                         par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
                         tmpBase = round:: split(par,true);
@@ -466,48 +466,104 @@ struct  Spherical : public Joint {
 
             }
         
+//            /// Derive Joint Rotations from Current Positions
+//            void calcJoints(int start = 0, bool bLoop=false){
+//
+//                Rot ry(1);// = mLink[start].rot();
+//                
+//                for (int i = start; i < mNum; ++i){
+//                  
+//                  int next = i < (mNum-1) ? i+1 : 0;    
+//                          
+//                  auto target = (mFrame[next].vec() - mFrame[i].vec() ).unit();         //target direction
+//                  auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+//                 // target = target.spin( !linkRot );
+//                  auto tmpRot = gen::ratio( Vec::y, target );                           //how to get there
+//                  
+//
+//                  tmpRot = !linkRot * !ry  * tmpRot;// * !linkRot;                           //...compensate for that and previous compound
+//                
+//                  Vec correctedTarget = Vec(op::project( Vec::y.spin( tmpRot ), Biv::xy)).unit();  //project onto xy axis of local link
+//
+//                  auto adjustedRot = gen::ratio( Vec::y, correctedTarget );
+//                  mJoint[i].rot() = adjustedRot;
+//
+//                  ry = ry * mJoint[i].rot() * mLink[i].rot();                            //compound: last * current * next
+//                }
+//                
+//            }
+//
             /// Derive Joint Rotations from Current Positions
-            void calcJoints(int start = 0){
+            void calcJoints(int start = 0, bool bLoop=false){
 
-                Vec t = mBaseFrame.y(); // Vec::y;
-                Rot R = mBaseFrame.rot(); // (1,0,0,0);
+                Mot ry(1);// = mLink[start].rot();
                 
-                //Where we are in current rotation scheme
-                for (int i = 0; i < start; ++i){
-                    t = t.sp( mFrame[i].rot() );
-                }
+                for (int i = start; i < mNum; ++i){
+                  
+                  int next = i < (mNum-1) ? i+1 : 0;    
+                          
+                  auto target = mFrame[next].pos();//(mFrame[next].vec() - mFrame[i].vec() ).unit();         //target direction
+                  
+                  //undo
+                  target = target.spin( !ry );
+                 
+                  //auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+                 // target = target.spin( !linkRot );
+                 // auto tmpRot = gen::ratio( Vec::y, target );                           //how to get there
+                  
 
-                //From Here forward, what rotation we need to point where we want to go
-                for (int i=start;i<mNum-1;++i){
-                    Vec q;
-                    Vec b = op::dle( Biv( linf(i) ) );  //0. Goal (Direction of Line to next joint) 
-                    if (i>0) t = t.sp( mLink[i-1].rot() );       //1. Consider Rotary Contribution of Previous Link 
-                    q = t.sp( gen::ratio(Vec::y, mLink[i].vec().unit()) ); // And Translated Contribution of Current Link                
-                    Rot nr = gen::ratio( q, b );        //2. What additional work it takes to turn the current integration towards Goal
-                    R = nr * R;                         //3. Compound into R
-                    mFrame[i].rot( R );                 //4. Apply Rotation to Frame temporarily
-                    t = t.sp( nr );                     //5. Save new integrated angle
-                }
+                 // tmpRot = !linkRot * !ry  * tmpRot;// * !linkRot;                           //...compensate for that and previous compound
                 
-                //Set Base Joint
-                mJoint[0].rot( !mBaseFrame.rot() * mFrame[0].rot() );
-                
-                //Reverse engineer by getting relative transformations
-                for (int i = 1; i < mNum; ++i){   
-                    Rot Rt =  (!mFrame[i-1].rot()) *  mFrame[i].rot()    ;
-                    mJoint[i].rot( Rt ); 
-                }
+                 // Vec correctedTarget = Vec(op::project( Vec::y.spin( tmpRot ), Biv::xy)).unit();  //project onto xy axis of local link
 
-                //Next apply fk() and see if it all worked !. . .
+                  auto adjustedRot = gen::ratio( Vec::y, Vec(target).unit() );
+                  mJoint[i].rot() = adjustedRot;
+
+                  ry = ry * mJoint[i].rot() * mLink[i].mot();                            //compound: last * current * next
+                }
+                
             }
 
+    
+      
+      /// Derive New Relative Link Frames from current Positions 
+      /// @ param bOrientation: whether to consider current orientation of frames when reverse engineering links
+      void calcLinks(bool bOrientation =false){
 
+        if (!bOrientation){
+          for (int i = 0; i < mNum; ++i){
+            int next = (i<mNum-1)?i+1:0;
+            //mLink[i].rot() = gen::ratio( mFrame[i].z(), mFrame[next].z() );
+            //auto ratio = mFrame[next].rot() / mFrame[i].rot();                //relative transform
+            auto yratio = gen::ratio( mFrame[i].y(), mFrame[next].y() );      //relative rotational component
+
+            //auto theta = gen::iphi( gen::ratio( mFrame[i].z(), mFrame[next].z() ) );//acos( (mFrame[i].z()<=mFrame[next].z())[0] );
+            mLink[i].rot() = !mFrame[i].rot() * !yratio * mFrame[next].rot(); //SEQUENCE MATTERS!  first local rot, then undow local ys, then undo source
+
+            auto dv = mFrame[next].vec() - mFrame[i].vec();
+           // Vec project = op::project(dv, mFrame[i].xy());
+           // Vec reject = op::reject(dv, mFrame[i].xy());
+           //under local transformation 
+            mLink[i].pos() = dv.spin( !mFrame[i].rot() ).null(); 
+            ////project + rejectVec(0,ylength,0).null();
+          } 
+        } else{
+          for (int i = 0; i < mNum; ++i){
+            int next = (i<mNum-1)?i+1:0;
+            //mLink[i].rot() = gen::ratio( mFrame[i].z(), mFrame[next].z() );
+            auto theta = acos( (mFrame[i].z()<=mFrame[next].z())[0] );
+            mLink[i].rot() = gen::rotor( Biv::xz * theta * .5 );
+            auto vec = (mFrame[next].vec() - mFrame[i].vec()).spin( !mFrame[i].rot() );
+            mLink[i].pos() = vec.null();
+          }   
+        }
+      } 
+        
         
             ///Satisfy Specific Angle Constraint at frame k
             void angle(int k, double theta){
                 
                 Rot R =  mJoint[k].rot();
-                //double t = gen::iphi ( R );
                                 
                 Biv b = Biv( R ) * -1;
                 // * ( (t > 1) ? ); // note: check Op:lg and gen::log_rot (maybe mult by -1 there as well)
@@ -520,19 +576,69 @@ struct  Spherical : public Joint {
                 fk(k, mNum);
                 
             }
-    
-      
-      /// Derive New Relative Link Frames from current Positions
-      void calcLinks(){
-        for (int i = 0; i < mNum-1; ++i){
-          mLink[i].pos() = round:: null( mFrame[i+1].vec() - mFrame[i].vec() ); 
-                    //mLink[i].mot( mFrame[i+1].mot() / mFrame[i].mot() ); 
-        }
-      } 
         
   
   };
 
-} //vsr::
+} } //vsr::cga
+
+
+
+//OLD TMP
+
+//                 if (bLoop){
+//                  Vec y = Vec::y.spin(ry);
+//                  auto target = Vec(mFrame[0].pos()-mFrame[mNum-1].pos()).unit();
+//                  auto linkRot = gen::ratio( Vec::y, mLink[mNum-1].vec().unit() );
+//                  auto dv = target.spin( !linkRot );    //current status
+//                  
+//                  mJoint[mNum-1].rot() = gen::ratio( y, dv );//gen::rot( Biv::xy * acos( ( dv <= y )[0] )/2.0  ); //set rotation
+//                }
+//
+//                Vec t = mBaseFrame.y(); // Vec::y;
+//                Rot R = mBaseFrame.rot(); // (1,0,0,0);
+                
+//                //Where we are in current rotation scheme
+//                for (int i = 0; i < start; ++i){
+//                    t = t.sp( mFrame[i].rot() );
+//                }
+
+//                //From Here forward, what rotation we need to point where we want to go (note: assumes no offset!)
+//                for (int i=start;i<mNum-1;++i){
+//                    
+//                    Vec target = Vec(mFrame[i+1].pos() - mFrame[i].pos()).unit(); // op::dle( Biv( linf(i) ) );  //0. Goal (Direction of Line to next joint) 
+//                   // if (i>0) t = t.sp( mLink[i-1].rot() );       //1. Consider Rotary Contribution of Previous Link 
+//                    Vec q = t.sp( gen::ratio(Vec::y, mLink[i].vec().unit()) ); // And Translated Contribution of Current Link                
+//                    Rot nr = gen::ratio( q, target );        //2. What additional work it takes to turn the current integration towards Goal
+//                    //R = nr * R;                         //3. Compound into R
+//                   // mFrame[i].rot( R );                 //4. Apply Rotation to Frame temporarily
+//                    mJoint[i].rot( nr ); //new
+//                    t = t.sp( nr );                     //5. Save new integrated angle
+//                }
+//
+//                if (bLoop){
+//                  Vec target = Vec(mFrame[0].pos()-mFrame[mNum-1].pos()).unit();
+//                  Vec q = t.sp( gen::ratio( Vec::y, mLink[mNum-1].vec().unit() ) );
+//                  Rot nr = gen::ratio( q, target );
+//                  mJoint[mNum-1].rot(nr);
+//                }
+
+
+                //new version.  
+                //Current rotation
+               // Vec t = mBaseFrame.y();
+              //  Rot ry = mBaseFrame.rot();
+                
+                //Set Base Joint
+//                mJoint[0].rot( !mBaseFrame.rot() * mFrame[0].rot() );
+//                
+//                //Reverse engineer by getting relative transformations
+//                for (int i = 1; i < mNum; ++i){   
+//                    Rot Rt =  (!mFrame[i-1].rot()) *  mFrame[i].rot()    ;
+//                    mJoint[i].rot( Rt ); 
+//                }
+
+                //Next apply fk() and see if it all worked !. . .
+
 
 #endif

@@ -28,7 +28,7 @@
 
 #include "vsr_chain.h"
 
-namespace vsr{
+namespace vsr{  namespace cga {
 
   /*!
    *  \brief  The bennett 4 bar linkage
@@ -50,6 +50,9 @@ namespace vsr{
      VSR_PRECISION mLengthA; ///< Length of first alternating sides
      VSR_PRECISION mLengthB; ///< Length of second alternating sides
 
+     VSR_PRECISION mOffsetA; ///< offset along z axis of first alternating sides
+     VSR_PRECISION mOffsetB; ///< offset along z axis of second alternating sides
+
      VSR_PRECISION mTheta;  ///< skew of first alternating links
      VSR_PRECISION mPhi;    ///< skew of second alternating links
 
@@ -57,14 +60,19 @@ namespace vsr{
 
      public:
 
-     Bennett( VSR_PRECISION theta=0, VSR_PRECISION lengthA = 1.0, VSR_PRECISION lengthB = 1.0 )
+     Bennett( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB  )
      : Chain("RRRR"), mTheta(theta), mLengthA( lengthA ), mLengthB( lengthB ), mPhase(0) {
-      
         init();    
      }
 
-     void set( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB){
-       mTheta = theta; mLengthA = lengthA, mLengthB = lengthB;
+     Bennett( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB,  VSR_PRECISION offset  )
+     : Chain("RRRR"), mTheta(theta), mLengthA( lengthA ), mLengthB( lengthB ), mOffsetA(offset), mOffsetB(offset), mPhase(0) {
+        init();    
+     }
+     
+
+     void set( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB, VSR_PRECISION offset=0.0){
+       mTheta = theta; mLengthA = lengthA; mLengthB = lengthB; mOffsetA = offset; mOffsetB = offset;
        init();
      }
      
@@ -72,11 +80,11 @@ namespace vsr{
       
         mPhi = asin( sin(mTheta) * mLengthB / mLengthA); 
     
-        mLink[0].pos(0,mLengthA,0); 
-        mLink[2].pos(0,mLengthA,0);
+        mLink[0].pos(0,mLengthA,  0);//mOffsetA); 
+        mLink[2].pos(0,mLengthA,  0);//mOffsetA);
 
-        mLink[1].pos(0,mLengthB,0);
-        mLink[3].pos(0,mLengthB,0);
+        mLink[1].pos(0,mLengthB,  0);//mOffsetB);
+        mLink[3].pos(0,mLengthB,  0);//mOffsetB);
 
         Biv la =  Biv::xz * mTheta/2.0; 
         Biv lb =  Biv::xz * mPhi/2.0;
@@ -94,21 +102,34 @@ namespace vsr{
      VSR_PRECISION& lengthA() { return mLengthA; } 
      VSR_PRECISION& lengthB() { return mLengthB; } 
 
+
+     VSR_PRECISION offsetA() const { return mOffsetA; } 
+     VSR_PRECISION offsetB() const { return mOffsetB; } 
+     VSR_PRECISION& offsetA() { return mOffsetA; } 
+     VSR_PRECISION& offsetB() { return mOffsetB; } 
+
      VSR_PRECISION theta() const { return mTheta; }
      VSR_PRECISION phi() const { return mPhi; } 
 
+    /*!
+      Meet of 1st and 3rd spheres of possibilities
+    */
      Circle circleMeet(){
-       return ( round::dls(mFrame[1].pos(), mLengthB) ^ round::dls(mFrame[3].pos(), mLengthA) ).dual();
+       return ( nextSphere(1) ^ prevSphere(3) ).dual();//round::dls(mFrame[1].pos(), mLengthB) ^ round::dls(mFrame[3].pos(), mLengthA) ).dual();
      }
 
      Pair pairMeet(){
-       return ( mFrame[1].dxy() ^ circleMeet().dual() ).dual();
+       return ( nextPlane(1) ^ circleMeet().dual() ).dual();
      }
 
      Circle orbit(){
-       return ( mFrame[3].dxy() ^ round::dls( mJoint[0].pos(), mLengthB ) ).dual();
+       return ( nextPlane(3) ^ prevSphere(0) ).dual();//( mFrame[3].dxy() ^ round::dls( mJoint[0].pos(), mLengthB ) ).dual();
      }
 
+     
+     /*-----------------------------------------------------------------------------
+      * Eval 
+      *-----------------------------------------------------------------------------*/
      Bennett& operator()( VSR_PRECISION amt ){
 
         mPhase = amt;      
@@ -122,27 +143,39 @@ namespace vsr{
         mFrame[3].mot( mBaseFrame.mot() * !mLink[3].mot() );
         
         //calculate intersection
+        //auto dualMeet = nextSphere(1) ^ prevSphere(3);
         auto dualMeet = round::dls_pnt(mFrame[1].pos(), mLengthB) ^ round::dls_pnt(mFrame[3].pos(), mLengthA);
+        //Pair p = (nextPlane(1)^dualMeet).dual();
         Pair p = ( mFrame[1].dxy() ^ dualMeet).dual();
         
-        mFrame[2].pos() = round::loc( round::split(p,!bSwitch) );           
+        //pick one
+        mFrame[2].pos() = round::location( round::split(p, !bSwitch) );           
         
         Rot ry = mFrame[1].rot(); 
         for (int i = 1; i < 4; ++i){
-         // Vec y = mFrame[i].y();
           Vec y = Vec::y.spin(ry);
           int next = i < 3 ? i + 1 : 0;
-          auto target = mFrame[next].vec();
-          Vec dv = ( target-mFrame[i].vec() ).unit();
+          auto target = mFrame[next].vec(); 
+
+          auto linkRot = gen::ratio( mLink[i].vec().unit(), Vec::y );
+          
+          Vec dv = (target-mFrame[i].vec()).unit().spin( linkRot );
+
+          //mJoint[i].rot() = gen::ratio(y,dv);
           mJoint[i].rot() = gen::rot(  Biv::xy * acos( ( dv <= y )[0] )/2.0 * (bSwitch ?  -1 : 1 ) );
+          
+         // ry = mJoint[i].rot() * ry;
           ry = ry * mJoint[i].rot() * mLink[i].rot();
         }
+
+ //      calcJoints(1,true);
 
         fk();
 
         return *this;
      }
 
+    
     
      /*!
       *  \brief  A linked Bennett mechanism, determined by ratio of original
@@ -257,8 +290,8 @@ namespace vsr{
 
             for (int i = 0; i < mChainA.num(); i+=2 ){
             
-              Dls da = mChainA.nextDls(i);
-              Dls db = mChainB.nextDls(i);
+              Dls da = mChainA.nextSphere(i);
+              Dls db = mChainB.nextSphere(i);
 
               Dls ta = flip ? da : da.dil( mChainA[i].pos(), log(tRatio) );
               Dls tb = !flip ? db : db.dil( mChainB[i].pos(), log(tRatio) );
@@ -301,5 +334,6 @@ namespace vsr{
     };
 
 
-}
+} }
+
 #endif   /* ----- #ifndef vsr_linkages_INC  ----- */

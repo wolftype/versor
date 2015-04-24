@@ -18,12 +18,12 @@
 
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_knot.h"
-#include "vsr_conic.h"
+#include "vsr_app.h"   
+#include "form/vsr_knot.h"
+#include "form/vsr_conic.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -70,10 +70,10 @@ struct MyApp : App {
       Par tb = tk.HF.fiberB().dual();
 
 
-      if (bRealA) pa = Ro::real(ta);
+      if (bRealA) pa = round::real(ta);
       else pa = ta; 
 
-      if (bRealB) pb = Ro::real(tb);
+      if (bRealB) pb = round::real(tb);
       else pb = tb; 
 
 
@@ -89,7 +89,7 @@ struct MyApp : App {
       Draw( ppar,0,1,0 ); 
 
       for(int i=0;i<100;++i){
-        Pnt tcp = Ro::pnt_cir( ppar, PI * (float)i/100);
+        Pnt tcp = round::pnt_cir( ppar, PI * (float)i/100);
         Draw ( Conic::Transform(tcp, Vec::x, -1+wt), 0,0,1 );
       }
 
@@ -99,18 +99,18 @@ struct MyApp : App {
       Cir tcir = tp ^ tpar;
       Draw(tcir);
 
-      cout << Ro::size(tcir,false) << " " << Ro::size(ppar,false) << endl;
+      cout << round::size(tcir,false) << " " << round::size(ppar,false) << endl;
 
       for (int i = 0; i < tk.iter(); ++i){
         tp = tp.bst( tpar * amt2 );
-        Draw( Ro::loc(tp),1,0,0);
+        Draw( round::loc(tp),1,0,0);
       }
 
       Pnt tp2 = p;
       for (int i=0;i<num;++i){
         VT t = -PI + TWOPI*(float)i/num;
         tp2 =  p.bst( tpar * t );
-        Draw (Ro::loc( tp2) );
+        Draw (round::loc( tp2) );
       }
 
     

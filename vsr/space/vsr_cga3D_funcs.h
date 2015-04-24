@@ -164,17 +164,26 @@ namespace vsr{
    
       ///Direct line through points a and b
       Line line( const Vec& a, const Vec& b);
+     
       ///Direct line through origin
       Line line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z );
+      
+      ///Dual line through origin
+      Line dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z );
       
      ///Direct line through two points
       Line line( const Point& a, const Point& b);
      ///Direct line through point a in direction b   
       Line line( const Point& a, const Vec& b);
+     
+     
+     
      ///Hyperbolic line through two points
       Circle hline( const Point& a, const Point& b);
      ///Spherical line through two points
       Circle sline( const Point& a, const Point& b);
+
+
       
       ///Squared Distance between a line and a point
        VSR_PRECISION distance( const Lin& lin, const Pnt& pnt);
@@ -248,7 +257,13 @@ namespace vsr{
        */
       Point hspin(const Pnt& pa, const Pnt& pb, double amt);
      
-     
+    
+      #pragma mark AFFINE combinations
+      
+      template<class A, class B>
+      Point affine( const A& a, const B& b, VSR_PRECISION t){
+        return (a + (b-a)*t).null();
+      }
      
      /*-----------------------------------------------------------------------------
       *  EVALUATION LAMBDAS

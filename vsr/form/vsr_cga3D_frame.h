@@ -52,7 +52,7 @@ namespace vsr { namespace cga {
 
     // these typedefs help Frame play nice with Field class . . .
     //template< class B > using BType = CGAMV<5, B >;
-    using Space = typename conformal<5>::types;
+    using space = typename conformal<5>::types;
     
     /// Default Constructor
     Frame();

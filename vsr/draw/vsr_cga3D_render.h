@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  wolftype 
  *
  * =====================================================================================
  */
@@ -35,119 +35,85 @@
 namespace gfx{   
 
   using namespace vsr;
-  using namespace vsr::cga;
-
   
   /*-----------------------------------------------------------------------------
    *  Template Specializations for Making Meshes for Specfic Types
    *-----------------------------------------------------------------------------*/
-  template<> MeshBuffer<Frame>::MeshBuffer();
-  template<> MeshBuffer<Circle>::MeshBuffer();
-  template<> MeshBuffer<DualLine>::MeshBuffer();
-  template<> MeshBuffer<Line>::MeshBuffer();
-  template<> MeshBuffer<Plane>::MeshBuffer();
-  template<> MeshBuffer<DualPlane>::MeshBuffer();
-  template<> MeshBuffer<Biv>::MeshBuffer();
-  template<> MeshBuffer<Vec>::MeshBuffer();
-  template<> MeshBuffer<Par>::MeshBuffer();
-  template<> MeshBuffer<Pnt>::MeshBuffer();
-  template<> MeshBuffer<Sph>::MeshBuffer();
+  template<> MeshBuffer<cga::Frame>::MeshBuffer();
+  template<> MeshBuffer<cga::Circle>::MeshBuffer();
+  template<> MeshBuffer<cga::DualLine>::MeshBuffer();
+  template<> MeshBuffer<cga::Line>::MeshBuffer();
+  template<> MeshBuffer<cga::Plane>::MeshBuffer();
+  template<> MeshBuffer<cga::DualPlane>::MeshBuffer();
+  template<> MeshBuffer<cga::Biv>::MeshBuffer();
+  template<> MeshBuffer<cga::Vec>::MeshBuffer();
+  template<> MeshBuffer<cga::Par>::MeshBuffer();
+  template<> MeshBuffer<cga::Pnt>::MeshBuffer();
+  template<> MeshBuffer<cga::Sph>::MeshBuffer();
 
   /*-----------------------------------------------------------------------------
    *  FIELDS (arrays) CAN VARY IN SIZE, SO USER IS RESPONSIBLE TO Add BUFFER ONLY ONCE
    *  (the GetMeshBuffer uses address of argument to check for existence the mMBOmap) 
    *-----------------------------------------------------------------------------*/
 
-  template<> MeshBuffer<Field<Vec>>::MeshBuffer();
-  template<> MeshBuffer<Field<Pnt>>::MeshBuffer();
+  template<> MeshBuffer<Field<cga::Vec>>::MeshBuffer();
+  template<> MeshBuffer<Field<cga::Pnt>>::MeshBuffer();
 
-  template<> void MeshBuffer<Field<Vec>>::Add( const Field<Vec>& f );
-  template<> void MeshBuffer<Field<Pnt>>::Add( const Field<Pnt>& f );
+  template<> void MeshBuffer<Field<cga::Vec>>::Add( const Field<cga::Vec>& f );
+  template<> void MeshBuffer<Field<cga::Pnt>>::Add( const Field<cga::Pnt>& f );
 
-  extern template MeshBuffer<Frame>::MeshBuffer();
-  extern template MeshBuffer<Circle>::MeshBuffer();
-  extern template MeshBuffer<DualLine>::MeshBuffer();
-  extern template MeshBuffer<Line>::MeshBuffer();
-  extern template MeshBuffer<Plane>::MeshBuffer();
-  extern template MeshBuffer<DualPlane>::MeshBuffer();
-  extern template MeshBuffer<Biv>::MeshBuffer();
-  extern template MeshBuffer<Vec>::MeshBuffer();
-  extern template MeshBuffer<Par>::MeshBuffer();
-  extern template MeshBuffer<Pnt>::MeshBuffer();
-  extern template MeshBuffer<Sph>::MeshBuffer();
+  extern template MeshBuffer<cga::Frame>::MeshBuffer();
+  extern template MeshBuffer<cga::Circle>::MeshBuffer();
+  extern template MeshBuffer<cga::DualLine>::MeshBuffer();
+  extern template MeshBuffer<cga::Line>::MeshBuffer();
+  extern template MeshBuffer<cga::Plane>::MeshBuffer();
+  extern template MeshBuffer<cga::DualPlane>::MeshBuffer();
+  extern template MeshBuffer<cga::Biv>::MeshBuffer();
+  extern template MeshBuffer<cga::Vec>::MeshBuffer();
+  extern template MeshBuffer<cga::Par>::MeshBuffer();
+  extern template MeshBuffer<cga::Pnt>::MeshBuffer();
+  extern template MeshBuffer<cga::Sph>::MeshBuffer();
 
-  extern template MeshBuffer<Field<Vec>>::MeshBuffer();
-  extern template MeshBuffer<Field<Pnt>>::MeshBuffer();
+  extern template MeshBuffer<Field<cga::Vec>>::MeshBuffer();
+  extern template MeshBuffer<Field<cga::Pnt>>::MeshBuffer();
 
-  extern template void MeshBuffer<Field<Vec>>::Add( const Field<Vec>& f );
-  extern template void MeshBuffer<Field<Pnt>>::Add( const Field<Pnt>& f );
+  extern template void MeshBuffer<Field<cga::Vec>>::Add( const Field<cga::Vec>& f );
+  extern template void MeshBuffer<Field<cga::Pnt>>::Add( const Field<cga::Pnt>& f );
  
-  template<> struct ModelMatrix<Frame>; 
-  extern template struct ModelMatrix<Frame>; 
+  template<> struct ModelMatrix<cga::Frame>; 
+  extern template struct ModelMatrix<cga::Frame>; 
   
-  template<> void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
-  template<> void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
-  template<> void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
-  template<> void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
-  template<> void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
-  template<> void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
-  template<> void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
-  template<> void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
-  template<> void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
-  template<> void Renderable<Dlp>::Draw(const Dlp&, GFXSceneNode * s);
-  template<> void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
-  template<> void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
-  template<> void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
+  template<> void Renderable<cga::Frame>::Draw(const cga::Frame&, GFXSceneNode * s);
+  template<> void Renderable<cga::Cir>::Draw(const cga::Cir&, GFXSceneNode * s);
+  template<> void Renderable<vector<cga::Cir>>::Draw(const vector<cga::Cir>&, GFXSceneNode * s);
+  template<> void Renderable<cga::Pnt>::Draw(const cga::Pnt&, GFXSceneNode * s);
+  template<> void Renderable<cga::Sph>::Draw(const cga::Sph&, GFXSceneNode * s);
+  template<> void Renderable<cga::Par>::Draw(const cga::Par&, GFXSceneNode * s);
+  template<> void Renderable<cga::Dll>::Draw(const cga::Dll&, GFXSceneNode * s);
+  template<> void Renderable<cga::Lin>::Draw(const cga::Lin&, GFXSceneNode * s);
+  template<> void Renderable<cga::Pln>::Draw(const cga::Pln&, GFXSceneNode * s);
+  template<> void Renderable<cga::Dlp>::Draw(const cga::Dlp&, GFXSceneNode * s);
+  template<> void Renderable<cga::Biv>::Draw(const cga::Biv&, GFXSceneNode * s);
+  template<> void Renderable<Field<cga::Vec>>::Draw(const Field<cga::Vec>&, GFXSceneNode * s);
+  template<> void Renderable<Field<cga::Pnt>>::Draw(const Field<cga::Pnt>&, GFXSceneNode * s);
     
   
-  extern template void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
-  extern template void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
-  extern template void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
-  extern template void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
-  extern template void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
-  extern template void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
-  extern template void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
-  extern template void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
-  extern template void Renderable<Dlp>::Draw(const Dlp&, GFXSceneNode * s);
-  extern template void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
-  extern template void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
-  extern template void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
-  extern template void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
+  extern template void Renderable<cga::Frame>::Draw(const cga::Frame&, GFXSceneNode * s);
+  extern template void Renderable<cga::Cir>::Draw(const cga::Cir&, GFXSceneNode * s);
+  extern template void Renderable<vector<cga::Cir>>::Draw(const vector<cga::Cir>&, GFXSceneNode * s);
+  extern template void Renderable<cga::Pnt>::Draw(const cga::Pnt&, GFXSceneNode * s);
+  extern template void Renderable<cga::Sph>::Draw(const cga::Sph&, GFXSceneNode * s);
+  extern template void Renderable<cga::Par>::Draw(const cga::Par&, GFXSceneNode * s);
+  extern template void Renderable<cga::Dll>::Draw(const cga::Dll&, GFXSceneNode * s);
+  extern template void Renderable<cga::Lin>::Draw(const cga::Lin&, GFXSceneNode * s);
+  extern template void Renderable<cga::Dlp>::Draw(const cga::Dlp&, GFXSceneNode * s);
+  extern template void Renderable<cga::Pln>::Draw(const cga::Pln&, GFXSceneNode * s);
+  extern template void Renderable<cga::Biv>::Draw(const cga::Biv&, GFXSceneNode * s);
+  extern template void Renderable<Field<cga::Vec>>::Draw(const Field<cga::Vec>&, GFXSceneNode * s);
+  extern template void Renderable<Field<cga::Pnt>>::Draw(const Field<cga::Pnt>&, GFXSceneNode * s);
  
 
- 
 
-#ifdef GFX_IMMEDIATE_MODE
-  
-/*   *----------------------------------------------------------------------------- */
-/*    *  IMMEDIATE MODE */
-/*    *-----------------------------------------------------------------------------*/ 
-
-  /*-----------------------------------------------------------------------------
-   *  Specific Strategies
-   *-----------------------------------------------------------------------------*/
-  template<> inline void Renderable<Field<Sca>>::DrawImmediate( const Field<Sca>& f){
-    static Pnt p = Pnt();
-    for (int i = 0; i < f.num(); ++i){ 
-      render::color(f[i][0], 1, 1 - f[i][0]);
-      render::drawAt(p,f.grid(i));  
-    }
-  }
-
-  template<> inline void Renderable<Field<Vec>>::DrawImmediate( const Field<Vec>& f){
-    for (int i = 0; i < f.num(); ++i){  
-      render::drawAt( f[i], f.grid(i) );
-    }
-  }
-
-
-  template<> inline void Renderable<Field<Tnv>>::DrawImmediate( const Field<Tnv>& f){
-    for (int i = 0; i < f.num(); ++i){  
-      render::drawAt( f[i], f.grid(i) );
-    }
-  }  
-
-#endif
   /* template<> void Drawable<Field<Frame>>::Immediate( const Field<Frame>& f){ */
   /*   for (int i = 0; i < f.num(); ++i){ */  
   /*     glPushMatrix(); */ 
