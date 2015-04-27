@@ -17,10 +17,8 @@
 
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
-#include "vsr_cga3D_frame.h"
-#include "vsr_functional.h"
+#include "vsr_app.h"
+//#include "vsr_functional.h"
 
 using namespace vsr;
 using namespace vsr::cga3D;

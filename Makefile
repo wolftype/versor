@@ -59,7 +59,7 @@ VPATH = $(SRC_DIR):\
 		$(INCLUDE_DIR):\
 		$(EXT_DIR)gl2ps 
 
-EXEC = tests/%.cpp examples/%.cpp
+EXEC = scratch/%.cpp examples/%.cpp
 
 #LIBRARY SPACES
 OBJ = vsr_cga3D_op.o vsr_cga3D_funcs.o vsr_cga3D_frame.o vsr_cga3D_cubicLattice.o  

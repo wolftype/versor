@@ -1,9 +1,8 @@
-#include "vsr_cga3D.h" 
-#include "vsr_GLVimpl.h"
-#include "vsr_stat.h"
+#include "vsr_app.h" 
+#include "util/vsr_stat.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct Watt{
@@ -28,10 +27,10 @@ struct Watt{
      fitness = 0;
      length = 0;
 
-     Point pa = Ro::point(-distance/2,0,0);
-     Point pb = Ro::point(distance/2,0,0);
-     Dls sa = Ro::dls(pa,distance*ra);
-     Dls sb = Ro::dls(pb,distance*rb);
+     Point pa = round::point(-distance/2,0,0);
+     Point pb = round::point(distance/2,0,0);
+     Dls sa = round::dls(pa,distance*ra);
+     Dls sb = round::dls(pb,distance*rb);
 
      Cir ca = (sa^Dlp(0,0,1)).dual();
      auto cb = (sb^Dlp(0,0,1));
@@ -40,16 +39,16 @@ struct Watt{
      for (int i=0;i<50;++i){
         
         double theta = PI * i/50;
-        auto tp = Ro::pnt_cir(ca, theta);
-        Dls sc = Ro::dls(tp, rc*distance);
+        auto tp = round::pnt_cir(ca, theta);
+        Dls sc = round::dls(tp, rc*distance);
         
         //intersection
         auto meet = (sc ^ sb).dual();
 
         Vec tmid; Vec last;
-        if (Ro::size(meet, false) >= 0){
+        if (round::size(meet, false) >= 0){
           auto par = ( meet.dual() ^ Dlp(0,0,1) ).dual();
-          auto tq = Ro::loc( Ro::split(par,true));
+          auto tq = round::loc( round::split(par,true));
           auto mid = ( tp + ( (tq - tp ) *.5) ).null();
           vp.push_back(mid);
           ap.push_back(tp);
@@ -77,8 +76,8 @@ struct Watt{
    }
 
    void draw( float r, float g, float b, bool bDrawAll=false){
-     Point pa = Ro::point(-distance/2,0,0);
-     Point pb = Ro::point(distance/2,0,0);
+     Point pa = round::point(-distance/2,0,0);
+     Point pb = round::point(distance/2,0,0);
      
 
      for (int i=0;i<vp.size();++i){
@@ -88,8 +87,8 @@ struct Watt{
      }
 
     if(bDrawAll){
-       Draw( (Ro::dls(pa,distance*ra)^Dlp(0,0,1)).dual(),0,0,1);
-      Draw( (Ro::dls(pb,distance*rb)^Dlp(0,0,1)).dual(),0,0,1);
+       Draw( (round::dls(pa,distance*ra)^Dlp(0,0,1)).dual(),0,0,1);
+       Draw( (round::dls(pb,distance*rb)^Dlp(0,0,1)).dual(),0,0,1);
 
      if (!vp.empty() ){
        glColor3f(b,r,b);
@@ -111,20 +110,11 @@ struct MyApp : App {
   float time;
   float maxfit, minlen,  numsamples;
   bool bDraw;
+ 
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-  }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto v= interface.mouse.projectMid; 
-      ray = Ro::point(v[0],v[1],v[2] ) ^ z ^ Inf(1); 
-      mouse = Ro::point( ray,  Ori(1) );  
-   }   
+  void setup(){
+    bindGLV();
 
-  void initGui(){
     gui(maxfit,"maxfit",0,50); 
     gui(minlen,"minlen",0,1000); 
     gui(numsamples,"numsamples",0,1000); 
@@ -132,11 +122,10 @@ struct MyApp : App {
 
   }
 
-    virtual void onDraw(){ 
+  virtual void onDraw(){ 
         
-    getMouse();
+    mouse = calcMouse3D();
 
-   // Rand::Seed(10);
     srand(10);
     
     time += .01;
@@ -176,36 +165,18 @@ struct MyApp : App {
      minwatt().draw(1,0,0,true);
      maxwatt().draw(0,1,1,true);
 
-    // cout << maxlen << endl;
-
-     //Watt watt(distance, radius, radius, ratio);
-     //watt();
-     //watt.draw();
-
-     /* for (auto& i : plot){ */
-     /*   Draw( (Vec(5,5,0)+i).null(), 0,0,1); */
-     /* } */
     }
   
 };
 
 
-MyApp * app;
-
 
 int main(){
                              
-  GLV glv(0,0);  
+   MyApp app;
+   app.start();
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  glv << *app;
-
-  Application::run();
-
-  return 0;
+   return 0;
 
 }
 

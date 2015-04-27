@@ -32,7 +32,7 @@
 
 struct App : public gfx::GFXAppGui {  
  
-  App(int w =800, int h=400, string name="cga3D") : gfx::GFXAppGui(w,h,name) {}
+  App(int w =1920, int h=1080, string name="cga3D") : gfx::GFXAppGui(w,h,name) {}
   
   vsr::cga::Point mMouse2D;
   vsr::cga::Point mMouse3D;

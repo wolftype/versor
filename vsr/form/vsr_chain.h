@@ -496,30 +496,29 @@ struct  Spherical : public Joint {
             /// Derive Joint Rotations from Current Positions
             void calcJoints(int start = 0, bool bLoop=false){
 
-                Mot ry(1);// = mLink[start].rot();
+                Rot ry(1);// = mLink[start].rot();
                 
                 for (int i = start; i < mNum; ++i){
                   
                   int next = i < (mNum-1) ? i+1 : 0;    
-                          
-                  auto target = mFrame[next].pos();//(mFrame[next].vec() - mFrame[i].vec() ).unit();         //target direction
                   
-                  //undo
-                  target = target.spin( !ry );
-                 
-                  //auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
-                 // target = target.spin( !linkRot );
-                 // auto tmpRot = gen::ratio( Vec::y, target );                           //how to get there
+                  auto dir = Vec::y.spin( ry );                                         //current direction
                   
+                  auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();        //global target direction
+                  auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+                                
+                  //target in terms of origin
+                  target = target.spin( !linkRot * !mFrame[i].rot() );
 
-                 // tmpRot = !linkRot * !ry  * tmpRot;// * !linkRot;                           //...compensate for that and previous compound
-                
-                 // Vec correctedTarget = Vec(op::project( Vec::y.spin( tmpRot ), Biv::xy)).unit();  //project onto xy axis of local link
+                  DrawAt( dir, mFrame[i].pos() + mFrame[i].y() );
+                  DrawAt( target.spin(  mFrame[i].rot() ) , mFrame[i].pos() + mFrame[i].y(),1,1,0);
+  
+                  auto adjustedRot = gen::ratio( dir.spin( !mFrame[i].rot() ), target );
 
-                  auto adjustedRot = gen::ratio( Vec::y, Vec(target).unit() );
-                  mJoint[i].rot() = adjustedRot;
+                  mJoint[i].rot() = adjustedRot;// * !mFrame[i].rot();
 
-                  ry = ry * mJoint[i].rot() * mLink[i].mot();                            //compound: last * current * next
+                 // Mot tl = (start>0)?  mLink[i-1].mot() : Mot(1);
+                  ry = ry * mJoint[i].rot() * mLink[i].rot();                            //compound: last * current * next
                 }
                 
             }
