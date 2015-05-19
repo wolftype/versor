@@ -18,16 +18,15 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 
-#include "vsr_group.h"
-#include "vsr_rigid.h"
-#include "vsr_graph.h"
-#include "vsr_differential.h"
+#include "form/vsr_group.h"
+#include "form/vsr_rigid.h"
+#include "form/vsr_graph.h"
+#include "form/vsr_differential.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
-
+using namespace vsr::cga;
 
 
 template<class T>
@@ -123,7 +122,7 @@ vector<typename HEGraph<T>::HalfEdge*> edgeLoop( vector<typename HEGraph<T>::Hal
 
 //construct a point with some extra structure
 struct RigidPoint : public Point {
-  RigidPoint(const Point& p=Ro::null(0,0,0) ) : Point(p){ }
+  RigidPoint(const Point& p=round::null(0,0,0) ) : Point(p){ }
 
   //constraint options
   Rig rig;
@@ -347,7 +346,7 @@ struct MyApp : App {
             iter++;
             auto dist = (nd.result <= i.meet()).wt();
             if (fabs(dist)>.001){
-              draw( Ro::dls(nd.result,.1),0,0,1);
+              draw( round::dls(nd.result,.1),0,0,1);
               glColor3f(.8,.2,0);
             } else {
               glColor3f(0,t,1-t);

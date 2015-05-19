@@ -17,16 +17,14 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_twist.h"
-#include "vsr_cga3D_frame.h"
-#include "vsr_differential.h"
-#include "vsr_graph.h"
-#include "vsr_group.h"
-#include "vsr_cga3D_app.h"
+#include "vsr_app.h"   
+#include "form/vsr_twist.h"
+#include "form/vsr_differential.h"
+#include "form/vsr_graph.h"
+#include "form/vsr_group.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 //Per Vertex Geometric Data 
@@ -124,8 +122,8 @@ struct MyApp : App {
     for(int i=0;i<mesh.num();++i){
       auto& v = mesh[i].pnt; 
       auto& s = mesh.store(i).pnt;
-      double dist = 1.0/(.1+fabs( Ro::sqd(frame.pos(), s ) ) );
-      auto motor = Gen::mot(dll*dist);
+      double dist = 1.0/(.1+fabs( round::sqd(frame.pos(), s ) ) );
+      auto motor = gen::mot(dll*dist);
       v = s.spin(motor);
     }
 

@@ -24,7 +24,7 @@
 #define  vsr_conic_INC
 
 
-#include "vsr_generic_op.h"
+#include "detail/vsr_generic_op.h"
 
 
 namespace vsr{
@@ -38,156 +38,156 @@ namespace vsr{
  */
 class Conic {
 
-  VT ecc;
+  VSR_PRECISION ecc;
 
   public:
 
 
     /// Transform a Euclidean Vec in direction v with eccentricity alpha
-    template<TT DIM>
-    static NPnt<DIM> Transform( const  NVec<DIM> &vec, const NVec<DIM>& v, VT alpha){
-      VT talpha = ( vec <= v)[0] * alpha;
-      NPnt<DIM> p = vec.null();
-      NPnt<DIM>  p2 =  p + NOri< DIM >(1) * talpha; // * beta
-      auto wt = p2 <= NInf< DIM >(1);
-      return Ro::loc( p2 / -wt );
+    template<class A>
+    static GAPnt<A> Transform( const  GAVec<A> &vec, const GAVec<A>& v, VSR_PRECISION alpha){
+      VSR_PRECISION talpha = ( vec <= v)[0] * alpha;
+      GAPnt<A> p = vec.null();
+      GAPnt<A>  p2 =  p + GAOri<A>(1) * talpha; // * beta
+      auto wt = p2 <= GAInf<A>(1);
+      return round::loc( p2 / -wt );
   }
 
     /// Transform a point in direction v with eccentricity alpha
-    template<TT DIM>
-    static NPnt<DIM> Transform( const  NPnt<DIM> & p, const NVec<DIM>& v, VT alpha){
-      VT talpha = ( p <= v)[0] * alpha;
-      NPnt<DIM>  p2 =  p + NOri< DIM >(1) * talpha; // * beta
-      auto wt = p2 <= NInf< DIM >(1);
-      return Ro::loc( p2 / -wt );
+    template<class A>
+    static GAPnt<A> Transform( const  GAPnt<A> & p, const GAVec<A>& v, VSR_PRECISION alpha){
+      VSR_PRECISION talpha = ( p <= v)[0] * alpha;
+      GAPnt<A>  p2 =  p + GAOri<A>(1) * talpha; // * beta
+      auto wt = p2 <= GAInf<A>(1);
+      return round::loc( p2 / -wt );
   }
 
     /// Inverse Transform a point in direction v with eccentricity alpha
-    template<TT DIM>
-    static  NPnt<DIM>  ITransform(const  NPnt<DIM> & p, const NVec<DIM>& v, VT alpha){
-      VT talpha = ( p <= v)[0] * alpha;
-       NPnt<DIM>  p2 = p - NOri<DIM>(1) * talpha; // / beta
-      auto wt = p2 <= NInf<DIM>(1);
-      return Ro::loc( p2 / -wt );
+    template<class A>
+    static  GAPnt<A>  ITransform(const  GAPnt<A> & p, const GAVec<A>& v, VSR_PRECISION alpha){
+      VSR_PRECISION talpha = ( p <= v)[0] * alpha;
+       GAPnt<A>  p2 = p - GAOri<A>(1) * talpha; // / beta
+      auto wt = p2 <= GAInf<A>(1);
+      return round::loc( p2 / -wt );
     }
 
     /// Transform a line in direction v with eccentricity alpha
-    template<TT DIM>
-    static NLin<DIM> Transform( const NLin<DIM>& line, const NVec<DIM>& v, VT alpha){
-      NPnt<DIM> pa = Fl::loc( line, PAO, false ).null();
-      NPnt<DIM> tpa = Transform(pa,v,alpha);
-      NPnt<DIM> pb = pa.trs( -Fl::dir( line ).template copy<NVec<DIM>>().unit() );
-      NPnt<DIM> tpb = Transform(pb,v,alpha);
-      return tpa ^ tpb ^ Inf(1);
+    template<class A>
+    static GALin<A> Transform( const GALin<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
+      GAPnt<A> pa = flat::loc( line, PAO, false ).null();
+      GAPnt<A> tpa = Transform(pa,v,alpha);
+      GAPnt<A> pb = pa.trs( -flat::dir( line ).template copy<GAVec<A>>().unit() );
+      GAPnt<A> tpb = Transform(pb,v,alpha);
+      return tpa ^ tpb ^ GAInf<A>(1);
     }
 
     /// Inverse Transform a line in direction v with eccentricity alpha
-   template<TT DIM>
-   static NLin<DIM> ITransform( const NLin<DIM>& line, const NVec<DIM>& v, VT alpha){
-    NPnt<DIM> pa = Fl::loc( line, PAO, false).null();
-    NPnt<DIM> ipa = ITransform(pa,v,alpha);
-    NPnt<DIM> pb = pa.trs( -Fl::dir( line ).template copy< NVec<DIM> >().unit()  );
-    NPnt<DIM> ipb = ITransform(pb,v,alpha);
-    return ipa ^ ipb ^ Inf(1);
+   template<class A>
+   static GALin<A> ITransform( const GALin<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
+    GAPnt<A> pa = flat::loc( line, PAO, false).null();
+    GAPnt<A> ipa = ITransform(pa,v,alpha);
+    GAPnt<A> pb = pa.trs( -flat::dir( line ).template copy< GAVec<A> >().unit()  );
+    GAPnt<A> ipb = ITransform(pb,v,alpha);
+    return ipa ^ ipb ^ GAInf<A>(1);
   }
 
     /// Transform a dual line in direction v with eccentricity alpha
-      template<TT DIM>
-    static NDll<DIM> Transform( const NDll<DIM>& line, const NVec<DIM>& v, VT alpha){
-      NPnt<DIM> pa = Fl::loc( line, PAO, true ).null();
-      NPnt<DIM> tpa = Transform(pa,v,alpha);
-      NPnt<DIM> pb = pa.trs( -Fl::dir( line.dual() ).template copy<NVec<DIM>>().unit() );
-      NPnt<DIM> tpb = Transform(pb,v,alpha);
-      return (tpa ^ tpb ^ Inf(1)).dual();
+      template<class A>
+    static GADll<A> Transform( const GADll<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
+      GAPnt<A> pa = flat::loc( line, PAO, true ).null();
+      GAPnt<A> tpa = Transform(pa,v,alpha);
+      GAPnt<A> pb = pa.trs( -flat::dir( line.dual() ).template copy<GAVec<A>>().unit() );
+      GAPnt<A> tpb = Transform(pb,v,alpha);
+      return (tpa ^ tpb ^ GAInf<A>(1)).dual();
     }
 
     /// Inverse Transform a dual line in direction v with eccentricity alpha
-   template<TT DIM>
-   static NDll<DIM> ITransform( const NDll<DIM>& line, const NVec<DIM>& v, VT alpha){
-    NPnt<DIM> pa = Fl::loc( line, PAO, true).null();
-    NPnt<DIM> ipa = ITransform(pa,v,alpha);
-    NPnt<DIM> pb = pa.trs( -Fl::dir( line.dual() ).template copy< NVec<DIM> >().unit()  );
-    NPnt<DIM> ipb = ITransform(pb,v,alpha);
-    return (ipa ^ ipb ^ Inf(1)).dual();
+   template<class A>
+   static GADll<A> ITransform( const GADll<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
+    GAPnt<A> pa = flat::loc( line, PAO, true).null();
+    GAPnt<A> ipa = ITransform(pa,v,alpha);
+    GAPnt<A> pb = pa.trs( -flat::dir( line.dual() ).template copy< GAVec<A> >().unit()  );
+    GAPnt<A> ipb = ITransform(pb,v,alpha);
+    return (ipa ^ ipb ^ GAInf<A>(1)).dual();
   }
 
     /// Transform a plane in direction v with eccentricity alpha
-    template<TT DIM>
-    static NPln<DIM> Transform( const NPln<DIM>& plane, const NVec<DIM>& v, VT alpha){
+    template<class A>
+    static GAPln<A> Transform( const GAPln<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){
     //get points to apply aipoint to
-      NPnt<DIM> pa = Fl::loc( plane, PAO, false ).null();
-      auto ca = ( Ro::dls(pa, 1) ^ plane.dual() ).dual();
-      auto pb = Ro::pnt_cir(ca, 0);
-      auto pc = Ro::pnt_cir(ca, PIOVERFOUR);
+      GAPnt<A> pa = flat::loc( plane, PAO, false ).null();
+      auto ca = ( round::dls(pa, 1) ^ plane.dual() ).dual();
+      auto pb = round::pnt_cir(ca, 0);
+      auto pc = round::pnt_cir(ca, PIOVERFOUR);
 
-      NPnt<DIM> tpa = Transform(pa,v,alpha);
-      NPnt<DIM> tpb = Transform(pb,v,alpha); 
-      NPnt<DIM> tpc = Transform(pc,v,alpha);
-      return tpa ^ tpb ^ tpc ^ Inf(1);
+      GAPnt<A> tpa = Transform(pa,v,alpha);
+      GAPnt<A> tpb = Transform(pb,v,alpha); 
+      GAPnt<A> tpc = Transform(pc,v,alpha);
+      return tpa ^ tpb ^ tpc ^ GAInf<A>(1);
     }
 
     /// Inverse Transform a plane in direction v with eccentricity alpha
-    template<TT DIM>
-    static NPln<DIM> ITransform( const NPln<DIM>& plane, const NVec<DIM>& v, VT alpha){
+    template<class A>
+    static GAPln<A> ITransform( const GAPln<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){
     //get points to apply aipoint to
-      NPnt<DIM> pa = Fl::loc( plane, PAO, false ).null();
-      auto ca = ( Ro::dls(pa, 1) ^ plane.dual() ).dual();
-      auto pb = Ro::pnt_cir(ca, 0);
-      auto pc = Ro::pnt_cir(ca, PIOVERFOUR);
+      GAPnt<A> pa = flat::loc( plane, PAO, false ).null();
+      auto ca = ( round::dls(pa, 1) ^ plane.dual() ).dual();
+      auto pb = round::pnt_cir(ca, 0);
+      auto pc = round::pnt_cir(ca, PIOVERFOUR);
 
-      NPnt<DIM> tpa = ITransform(pa,v,alpha);
-      NPnt<DIM> tpb = ITransform(pb,v,alpha); 
-      NPnt<DIM> tpc = ITransform(pc,v,alpha);
-      return tpa ^ tpb ^ tpc ^ Inf(1);
+      GAPnt<A> tpa = ITransform(pa,v,alpha);
+      GAPnt<A> tpb = ITransform(pb,v,alpha); 
+      GAPnt<A> tpc = ITransform(pc,v,alpha);
+      return tpa ^ tpb ^ tpc ^ GAInf<A>(1);
     }
 
   /// Transform a dual plane in direction v with eccentricity alpha
-   template<TT DIM>
-   static NDlp<DIM> Transform( const NDlp<DIM>& plane, const NVec<DIM>& v, VT alpha){
-    NPnt<DIM> pa = Fl::loc( plane, PAO, true).null();
-    auto ca = ( Ro::dls(pa, 1) ^ plane ).dual();
-    auto pb = Ro::pnt_cir(ca, 0);
-    auto pc = Ro::pnt_cir(ca, PIOVERFOUR);
+   template<class A>
+   static GADlp<A> Transform( const GADlp<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){
+    GAPnt<A> pa = flat::loc( plane, PAO, true).null();
+    auto ca = ( round::dls(pa, 1) ^ plane ).dual();
+    auto pb = round::pnt_cir(ca, 0);
+    auto pc = round::pnt_cir(ca, PIOVERFOUR);
 
-    NPnt<DIM> ipa = Transform(pa,v,alpha);
-    NPnt<DIM> ipb = Transform(pb,v,alpha);
-    NPnt<DIM> ipc = Transform(pc,v,alpha);
+    GAPnt<A> ipa = Transform(pa,v,alpha);
+    GAPnt<A> ipb = Transform(pb,v,alpha);
+    GAPnt<A> ipc = Transform(pc,v,alpha);
 
-    return (ipa ^ ipb ^ ipc ^ Inf(1)).dual();
+    return (ipa ^ ipb ^ ipc ^ GAInf<A>(1)).dual();
   }
 
   /// Inverse Transform a dual plane in direction v with eccentricity alpha
-   template<TT DIM>
-   static NDlp<DIM> ITransform( const NDlp<DIM>& plane, const NVec<DIM>& v, VT alpha){
-    NPnt<DIM> pa = Fl::loc( plane, PAO, true).null();
-    auto ca = ( Ro::dls(pa, 1) ^ plane ).dual();
-    auto pb = Ro::pnt_cir(ca, 0);
-    auto pc = Ro::pnt_cir(ca, PIOVERFOUR);
+   template<class A>
+   static GADlp<A> ITransform( const GADlp<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){
+    GAPnt<A> pa = flat::loc( plane, PAO, true).null();
+    auto ca = ( round::dls(pa, 1) ^ plane ).dual();
+    auto pb = round::pnt_cir(ca, 0);
+    auto pc = round::pnt_cir(ca, PIOVERFOUR);
 
-    NPnt<DIM> ipa = ITransform(pa,v,alpha);
-    NPnt<DIM> ipb = ITransform(pb,v,alpha);
-    NPnt<DIM> ipc = ITransform(pc,v,alpha);
+    GAPnt<A> ipa = ITransform(pa,v,alpha);
+    GAPnt<A> ipb = ITransform(pb,v,alpha);
+    GAPnt<A> ipc = ITransform(pc,v,alpha);
 
-    return (ipa ^ ipb ^ ipc ^ Inf(1) ).dual();
+    return (ipa ^ ipb ^ ipc ^ GAInf<A>(1) ).dual();
   }
 
 
-    /* template<TT DIM> */
-    /* static NDlp<DIM> Transform( const NDlp<DIM>& plane, const NVec<DIM>& v, VT alpha){ */
+    /* template<class A> */
+    /* static GADlp<A> Transform( const GADlp<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){ */
     /* //get points to apply aipoint to */
-    /*   NPnt<DIM> pa = Fl::loc( plane, PAO, true ).null(); */
-    /*   NPnt<DIM> tpa = Transform(pa,v,alpha); */
-    /*   NPnt<DIM> pb = pa.trs( -Fl::dir( plane.dual() ).dual().template copy<NVec<DIM>>().unit() );//normal */
-    /*   NPnt<DIM> tpb = Vec( Transform(pb,v,alpha) ).unit(); */
+    /*   GAPnt<A> pa = flat::loc( plane, PAO, true ).null(); */
+    /*   GAPnt<A> tpa = Transform(pa,v,alpha); */
+    /*   GAPnt<A> pb = pa.trs( -flat::dir( plane.dual() ).dual().template copy<GAVec<A>>().unit() );//normal */
+    /*   GAPnt<A> tpb = Vec( Transform(pb,v,alpha) ).unit(); */
     /*   return tpa <= tpb.template copy<NDrv<DIM>>(); */
     /* } */
 
-   /* template<TT DIM> */
-   /* static NDlp<DIM> ITransform( const NDlp<DIM>& plane, const NVec<DIM>& v, VT alpha){ */
-    /* NPnt<DIM> pa = Fl::loc( plane, PAO, true).null(); */
-    /* NPnt<DIM> ipa = ITransform(pa,v,alpha); */
-    /* NPnt<DIM> pb = pa.trs( -Fl::dir( plane.dual() ).dual().template copy< NVec<DIM> >().unit() ); */
-    /* NPnt<DIM> ipb = Vec( ITransform(pb,v,alpha) - ipa ).unit(); */
+   /* template<class A> */
+   /* static GADlp<A> ITransform( const GADlp<A>& plane, const GAVec<A>& v, VSR_PRECISION alpha){ */
+    /* GAPnt<A> pa = flat::loc( plane, PAO, true).null(); */
+    /* GAPnt<A> ipa = ITransform(pa,v,alpha); */
+    /* GAPnt<A> pb = pa.trs( -flat::dir( plane.dual() ).dual().template copy< GAVec<A> >().unit() ); */
+    /* GAPnt<A> ipb = Vec( ITransform(pb,v,alpha) - ipa ).unit(); */
     /* return ipa <= ipb.template copy<NDrv<DIM>>(); */
   /* } */
 

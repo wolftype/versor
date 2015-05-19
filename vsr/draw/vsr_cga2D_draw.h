@@ -4,18 +4,18 @@
 #include "gfx/gfx_glyphs.h"
 #include "gfx/gfx_render.h"
 
+
+#include "draw/vsr_draw.h"
 #include "space/vsr_cga2D_types.h" 
 #include "form/vsr_field.h"  
 
 
+namespace gfx{
 
-
-namespace vsr{
-
-//  namespace cga2D{
+ // namespace cga2D{
    
  //   using namespace cga2D;//::types;
-    using namespace gfx;
+ //   using namespace gfx;
   
 //  template<class A>
 //  void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
@@ -39,17 +39,20 @@ namespace vsr{
 //  }          
   // FEATURE ExTRAcTION (ROTATION AND POSITION)
 
-  Rot AA( const Vec& s){            
-       Rot r = gen::ratio(Vec::y, s.unit() ); 
+  using namespace vsr;
+  
+
+  cga2D::Rot AA( const cga2D::Vec& s){            
+       cga2D::Rot r = gen::ratio(cga2D::Vec::y, s.unit() ); 
         //Vec v = Op::dle( gen::pl( r ) ) ;
        VSR_PRECISION deg = gen::iphi(r) * ( -180 / PI );
-       return Rot(deg, gen::pl( r )[0]);
+       return cga2D::Rot(deg, gen::pl( r )[0]);
 
    } 
 
 
-  void Immediate (const Vec& s){   
-    Rot t = AA(s);
+  template<> void Renderable<cga2D::Vec>::DrawImmediate(const cga2D::Vec& s){
+    cga2D::Rot t = AA(s);
     
     gfx::Glyph::Line2D(s);
     glPushMatrix();  
@@ -59,12 +62,12 @@ namespace vsr{
     glPopMatrix();
   }
 
-  void Immediate (const Drv& d){
-    Immediate( d.copy<Vec>() );
+  template<> void Renderable<cga2D::Drv>::DrawImmediate (const cga2D::Drv& d){
+    Renderable<cga2D::Vec>::DrawImmediate( d.copy<cga2D::Vec>() );
   }
 
   
-  void Immediate (const Point& s){
+  template<> void Renderable<cga2D::Point>::DrawImmediate(const cga2D::Point& s){
  
       VSR_PRECISION ta = round::size( s, true );
 
@@ -73,7 +76,7 @@ namespace vsr{
 
           bool real = ta > 0 ? 1 : 0;  
 
-          Pnt p = round::cen( s );
+          cga2D::Pnt p = round::cen( s );
           VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
           gfx::GL::translate ( p[0], p[1], 0 );
@@ -84,29 +87,29 @@ namespace vsr{
       }
   } 
 
-  inline void Immediate( const Flp& s){
-    Immediate( (s / s[2]).null() );
+  template<> void Renderable<cga2D::Flp>::DrawImmediate(const cga2D::Flp& s){
+    Renderable<cga2D::Point>::DrawImmediate( (s / s[2]).null() );
   }
 
-  inline void Immediate( const Dfp& s){
-    Immediate( s.dual() );
+  template<> void Renderable<cga2D::Dfp>::DrawImmediate(const cga2D::Dfp& s){
+    Renderable<cga2D::Flp>::DrawImmediate( s.dual() );
   }
 
   
-  inline void Immediate( const Circle& s){
-    Immediate(s.dual()); 
+  template<> void Renderable<cga2D::Circle>::DrawImmediate(const cga2D::Circle& s){
+    Renderable<cga2D::Point>::DrawImmediate( s.dual() );
   }
   
-  inline void Immediate (const Pair& s){
+  template<> void Renderable<cga2D::Pair>::DrawImmediate(const cga2D::Pair& s){
     //Is Imaginary?
      VSR_PRECISION size = round::size( s, false );
-     std::vector<Pnt> pp = round::split( s );
+     std::vector<cga2D::Pnt> pp = round::split( s );
 
      VSR_PRECISION ta = round::size( pp[0], true );   
                                   
      if ( fabs(ta) >  FPERROR ) {    
-         Pnt p1 = round::cen( pp[0] );
-         Pnt p2 = round::cen( pp[1] );
+         cga2D::Pnt p1 = round::cen( pp[0] );
+         cga2D::Pnt p2 = round::cen( pp[1] );
          double t = sqrt ( fabs ( ta ) );
          bool real = size > 0 ? 1 : 0;  
 
@@ -124,33 +127,31 @@ namespace vsr{
      }
   }
   
-  inline void Immediate (const Line& s){
-      Drv d = flat::dir( s );
-      Dls v = flat::loc( s , round::point(0,0), false);
+
+  template<> void Renderable<cga2D::Line>::DrawImmediate(const cga2D::Line& s){
+      cga2D::Drv d = flat::dir( s );
+      cga2D::Dls v = flat::loc( s , round::point(0,0), false);
       gfx::GL::translate (v[0], v[1],0);
       gfx::Glyph::Line2D(d * 10, d * -10);  
   }
 
-  inline void Immediate( const DualLine& d){
-    Immediate(d.dual() );
+
+  template<> void Renderable<cga2D::DualLine>::DrawImmediate(const cga2D::DualLine& s){
+    Renderable<cga2D::Line>::DrawImmediate(s.dual() );
   }
   
   
   /*-----------------------------------------------------------------------------
    *  FIELDS
    *-----------------------------------------------------------------------------*/
-  template<class T>
-  inline void Immediate( const Field<T>& f){
-    for (int i = 0; i < f.num(); ++i){
-      Immediate(f[i]);
-    }
-  }
 
-  inline void Immediate( const Field<Vec>& f){
+  template<> void Renderable<Field<cga2D::Vec>>::DrawImmediate( const Field<cga2D::Vec>& f){
     for (int i = 0; i < f.num(); ++i){
       glPushMatrix();
       glTranslatef( f.grid(i)[0], f.grid(i)[1],f.grid(i)[2]); 
-      Immediate(f[i]);
+      
+      Renderable<cga2D::Vec>::DrawImmediate(f[i]);
+
       glPopMatrix();
     }
   }

@@ -19,8 +19,7 @@
 #ifndef  vsr_simplex_INC
 #define  vsr_simplex_INC
 
-#include "vsr_products.h"
-#include "vsr_generic_op.h"
+#include "vsr.h"
 
 namespace vsr{
 
@@ -77,8 +76,8 @@ struct Simplex {
 
   void doRot(){
     //Rotate out of extra dimension
-    auto rot = Gen::ratio(doBary().unit(), vec);
-    using B =  EGAMV<N+1, typename EGA<N+1>::template e<N+1>>;// NE<>::e<N+1>;
+    auto rot = gen::ratio(doBary().unit(), vec);
+    using B =  NE<>::template e<N+1>;// NE<>::e<N+1>;
     using SubRot = decltype( doBary().unit() * B() );
     for(auto& i : roots){
       i = i.sp( SubRot(rot) );
@@ -89,8 +88,8 @@ struct Simplex {
     }
     //Rotate last to last
     Vec tvec; tvec[N-1] = 1;
-    auto nrot = Gen::ratio( verts.back().unit(), tvec );
-    using B2 = EGAMV<N, typename EGA<N>::template e<N>>;// NE<>::e<N>;
+    auto nrot = gen::ratio( verts.back().unit(), tvec );
+    using B2 = NE<>::template e<N>;// NE<>::e<N>;
     using SubRot2 = decltype( verts.back().unit() * B2() );
 
     for(auto& i : verts){
@@ -130,7 +129,7 @@ struct Simplex {
 
   void spin( const Biv& biv){
     for (auto& i : verts){
-       i = i.sp( Gen::rot( biv ) );
+       i = i.sp( gen::rot( biv ) );
      }
   }
 

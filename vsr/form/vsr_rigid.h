@@ -19,15 +19,16 @@
 #ifndef  vsr_rigid_INC
 #define  vsr_rigid_INC
 
+namespace vsr { namespace cga {
 
 struct Constrain {
 
    //unused?
     static Point Crease (const Pnt& a, const Pnt& dls, const Dll d, bool mtn){
-      // Dls dls = Ro::at(b, a);
+      // Dls dls = round::at(b, a);
        Circle cir = a ^ d;
        Pair par = ( dls ^ cir.dual()).dual();
-       return Ro::loc( Ro::split(par,mtn) );
+       return round::loc( round::split(par,mtn) );
     }
 
 
@@ -37,26 +38,26 @@ struct Constrain {
 
     // three distances, counter clockwise (deprecated, use Tetral)
     static Point Triple (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
-       return Ro::loc( Ro::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
+       return round::loc( round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
     }
     // tetral constraint
     static Point Tetral (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
-       return Ro::loc( Ro::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
+       return round::loc( round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
     }
     //planar constraint: two distances and a plane
     static Point Planar( const Dls& da, const Dls& db, const Dls& dc, bool mtn){
        Plane plane = da ^ db ^ dc ^ Inf(1);
-       return Ro::loc( Ro::split( (da ^ dc ^ plane.dual() ).dual(), mtn ) );
+       return round::loc( round::split( (da ^ dc ^ plane.dual() ).dual(), mtn ) );
     }
 
     //Circle tangency constraint, two distances and an original point (closest to original)
     static Point Tangency(const Pnt& p, const Dls& da, const Dls& db){
 
       auto meet = (da ^ db).dual();
-      auto tan =  Ro::loc( Ta::at( meet, p ) );
-      auto sur = Ro::sur( meet );
+      auto tan =  round::loc( tangent::at( meet, p ) );
+      auto sur = round::sur( meet );
       auto line = tan ^ sur ^ Inf(1);
-      auto np = Ro::split ( ( line.dual() ^ sur).dual(), false );
+      auto np = round::split ( ( line.dual() ^ sur).dual(), false );
 
       return np;
       
@@ -65,7 +66,7 @@ struct Constrain {
     //Spherical tangency constrain, one distance and an original point (returns point on sphere closest to p);
      static Point Tangency(const Pnt& p, const Dls& da){
        auto line =  p ^ da ^ Inf(1);
-       auto np = Ro::split( (line.dual() ^ da).dual(), false);
+       auto np = round::split( (line.dual() ^ da).dual(), false);
        return np;
      }
 
@@ -74,7 +75,7 @@ struct Constrain {
      static Point Tension(const Pnt& p, const Dls& da){
        if ( (p<=da)[0] > 0 ) return p;
        auto line =  p ^ da ^ Inf(1);
-       auto np = Ro::split( (line.dual() ^ da).dual(), false);
+       auto np = round::split( (line.dual() ^ da).dual(), false);
        return np;
      }
 
@@ -85,10 +86,10 @@ struct Constrain {
        
        //otherwise, constrain to lie on circle meet
        auto meet = (da ^ db).dual();
-       auto tan =  Ro::loc( Ta::at( meet, p ) );
-       auto sur = Ro::sur( meet );
+       auto tan =  round::loc( tangent::at( meet, p ) );
+       auto sur = round::sur( meet );
        auto line = tan ^ sur ^ Inf(1);
-       auto np = Ro::split ( ( line.dual() ^ sur).dual(), false );
+       auto np = round::split ( ( line.dual() ^ sur).dual(), false );
 
        return np;     
     }
@@ -97,7 +98,7 @@ struct Constrain {
 
     // three distances, center of meet pre-SPLIT (experimental)
     static Point Triple0 (const Dls& da, const Dls& db, const Dls& dc){
-       return Ro::loc( (da ^ db ^ dc).dual()  ) ; 
+       return round::loc( (da ^ db ^ dc).dual()  ) ; 
     }
 
 
@@ -119,7 +120,7 @@ struct Constrain {
     /*               dls = prevDls(i);                   //set boundary sphere through i-1 th frame; */
     /*               dll = linb(i);//.sp( !mLink[i].mot() );                      //get line from ith to i-1th frame */
     /*               par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere */
-    /*               tmpGoal = Ro::split(par,true);      //extract point from point pair intersection */
+    /*               tmpGoal = round::split(par,true);      //extract point from point pair intersection */
     /*           } */
               
     /*           //forward correction */
@@ -127,7 +128,7 @@ struct Constrain {
     /*               dls = nextDls(i);                   //set boundary sphere through i+1 th frame */
     /*               dll = linf(i);                      //get line to i+1th frame; */
     /*               par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere */
-    /*               tmpBase = Ro::split(par,true); */
+    /*               tmpBase = round::split(par,true); */
     /*               mFrame[i+1].pos(tmpBase);           //set position of i+1th frame */
     /*           } */
               
@@ -155,10 +156,10 @@ struct DistancePtr {
   }
 
   void set(Pnt& a, const Pnt& target){
-    src = &a; t = Ro::rad( Ro::at(*src,target) );
+    src = &a; t = round::rad( round::at(*src,target) );
   }
 
-  Dls operator()(){ return Ro::dls( *src, t ); }
+  Dls operator()(){ return round::dls( *src, t ); }
 
 };
 
@@ -270,14 +271,14 @@ struct Rigid{
   //bring three spheres closer together towards mutual center until meet is legit.
   void satisfy(int max=20){
     auto& pa = *da.src; auto& pb = *db.src; auto& pc = *dc.src;
-    auto rs = Ro::size(meet(),false);
+    auto rs = round::size(meet(),false);
     int iter=0;
     while ( rs < -.0001 && iter < max ){
-      auto center = Ro::loc(pa^pb^pc);
-      pa = Ro::null( pa+(Vec(center-pa)*fabs(rs)) );
-      pb = Ro::null( pb+(Vec(center-pb)*fabs(rs)) );
-      pc = Ro::null( pc+(Vec(center-pc)*fabs(rs)) );
-      rs = Ro::size( meet(), false );
+      auto center = round::loc(pa^pb^pc);
+      pa = round::null( pa+(Vec(center-pa)*fabs(rs)) );
+      pb = round::null( pb+(Vec(center-pb)*fabs(rs)) );
+      pc = round::null( pc+(Vec(center-pc)*fabs(rs)) );
+      rs = round::size( meet(), false );
       iter++;
     }
   }
@@ -576,7 +577,7 @@ struct Rigid2{
   Cir circle(int idx =0) { return ( parents[idx].da() ^  parents[idx].db() ).dual(); }
 
   /// get point at theta t around constraint orbit
-  Pnt orbit(VT t, int idx=0) { return Ro::pnt_cir( circle(idx), t * ( bMtn?1:-1) ); }
+  Pnt orbit(VSR_PRECISION t, int idx=0) { return round::pnt_cir( circle(idx), t * ( bMtn?1:-1) ); }
 };
 
 
@@ -753,7 +754,7 @@ struct Rig {
 /*   //bring three spheres closer together towards center of meet until meet is legit. */
 /*   Pnt satisfy(){ */
 /*     auto meet = Constrain::Triple( da(), db(), dc() ); */
-/*     if ( Ro::size(meet,false) < -.0001 ){ */
+/*     if ( round::size(meet,false) < -.0001 ){ */
       
 /*     } */
 /*      return bTriple ? Constrain::Triple(da(),db(),dc(),mtn) : Constrain::Planar(da(),db(),dc(),mtn); */
@@ -761,4 +762,6 @@ struct Rig {
 /*   } */
 /* }; */
 
+
+} } //vsr::cga:;
 #endif   /* ----- #ifndef vsr_rigid_INC  ----- */

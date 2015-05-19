@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "vsr_graph.h"
+#include "form/vsr_graph.h"
 #include "vsr_generic_draw.h"
 
 namespace vsr{

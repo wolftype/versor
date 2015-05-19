@@ -17,7 +17,7 @@
 
 #include "vsr_fiber.h"
 
-namespace vsr {
+namespace vsr { namespace cga {
 
 //A sort of Coupled Boost
 
@@ -322,6 +322,6 @@ struct TorusKnot  {
 //     
 // }; 
 
-} //vsr::
+} }//vsr::cga
 
 #endif

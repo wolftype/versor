@@ -71,17 +71,13 @@ struct MyApp : App {
 
       link = 2;
       d1 = 3; d2 = 3; theta = PIOVERFOUR; rot = .5; amtx1=amtx2=amty1=amty2=.5; thetax = -1; thetay = -1;
+
+      mColor = gfx::Vec3f(1,1,1);
   }
 
     virtual void onDraw(){ 
         
       auto mouse = calcMouse3D();
-
-      bool printps = false;
-      if(bPrintPs){
-        printps=true;
-        bPrintPs = false;
-      }
 
       Bennett b( theta, d1, d2 );
       for (int i=0;i<b.num();++i){
@@ -96,8 +92,11 @@ struct MyApp : App {
       /*   if (printps) cout << tikz::PrintPS((Chain)b) << endl;; */
       /* } */
 
+
       b( rot );
-      Draw((Chain)b,true,false,0,1,0);//t,.2,1-t,1-t);
+
+
+      Draw((Chain)b,true,false,0,0,0);//t,.2,1-t,1-t);
       bDrawOutline ? DrawR_( (Chain)b,0,.5,1) : DrawR( (Chain)b,0,.5,1);
       
       if (bDrawMeet){
@@ -105,17 +104,20 @@ struct MyApp : App {
         auto sphB = round::dls_pnt(b[3].pos(), b.lengthA());
         //intersect xy plane of frame with circle
         auto cir = (sphA^sphB);
-        Draw(cir.dual(),1,1,0);
+        Draw(cir.dual(),1,0,1);
         auto pair = ( b[1].dxy() ^ cir ).dual();
-        Draw(b[1].dxy(),0,1,0);
-        Draw(pair,1,0,0);
+        Draw(b[1].dxy(),0,0,0);
+       // Draw(pair,1,0,0);
+        Draw(cga::pointA(pair),1,0,0);
+        Draw(cga::pointB(pair),1,0,0);
+
         Draw(sphA,1,0,0,.2);
         Draw(sphB,1,0,0,.2);
 
       }
       
       
-      if (printps) cout << tikz::PrintPS((Chain)b) << endl;;
+   //   if (printps) cout << tikz::PrintPS((Chain)b) << endl;;
 
       Bennett b2 = b.linkAt((int)link, thetax, amtx1, amtx2 );
       
@@ -139,9 +141,9 @@ struct MyApp : App {
       for (int i = 0; i<itx; ++i ){
          
            
-          Draw((Chain)b2,true,false,0,1,0 );
+          Draw((Chain)b2,true,false,0,0,0 );
           bDrawOutline ? DrawR_( (Chain)b2,0,.5,1) : DrawR( (Chain)b2,0,.5,1);
-          if (printps) cout << tikz::PrintPS((Chain)b2) << endl;
+     //     if (printps) cout << tikz::PrintPS((Chain)b2) << endl;
 
           b2 = b2.linkAt((int)link%3, thetax, amtx1, amtx2  );
          
@@ -156,13 +158,14 @@ struct MyApp : App {
 
           if (bSubBennett){
             if (bSwitch){
+              
               Bennett b3 = b2.linkAt(((int)link-1)%3,thetay, amty1, amty2);
               bool bSwitchB = true;
               for (int j=0; j<ity; ++j){
               
-                Draw((Chain)b3, true,false,0,1,0);
+                Draw((Chain)b3, true,false,0,0,0);
                 bDrawOutline ? DrawR_( (Chain)b3,0,.5,1) : DrawR( (Chain)b3,0,.5,1);
-                if (printps) cout << tikz::PrintPS((Chain)b3) << endl;
+                //if (printps) cout << tikz::PrintPS((Chain)b3) << endl;
 
                 b3 = b3.linkAt(((int)link)%3, thetay, amty1, amty2 );
             

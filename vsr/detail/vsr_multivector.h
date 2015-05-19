@@ -81,6 +81,12 @@ namespace vsr{
         *this = b.template cast<Multivector<algebra,basis>>(); 
       }
 
+      // Construct from different algebra signature and different basis
+      template<class alg, typename B>
+      constexpr Multivector( const Multivector<alg, B>& b ){
+        *this = b.template cast<Multivector<algebra,basis>>();
+      }
+
       /// Immutable get value of blade type IDX (Note, make user-defined literal?)
       template<bits::type IDX> value_t get() const;
       /// Mutable get value of blade type IDX (Note, make user-defined literal?)
@@ -432,7 +438,7 @@ template<typename algebra> using GAEucPss = Multivector< algebra, typename algeb
 
 template<typename algebra>
 struct GAE{
-    template <bits::type ... NN> using e = Multivector<algebra, typename algebra::types::e::template e<NN...> >; 
+    template <bits::type ... NN> using e = typename algebra::types::template e<NN...>;// Multivector<algebra, typename algebra::types::e_basis::template e<NN...> >; 
 };
 
 template<bits::type N, typename T=VSR_PRECISION> using euclidean = algebra< metric<N>,T>;

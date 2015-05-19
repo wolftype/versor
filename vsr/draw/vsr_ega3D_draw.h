@@ -7,7 +7,7 @@
 
 namespace vsr{  
 
-namespace ega3D{
+//namespace ega3D{
   	
 	using namespace gfx;
 	
@@ -20,18 +20,18 @@ namespace ega3D{
 		glPopMatrix();
 	}  
 	
-	Rot AA( const Vec& s){
+	ega3D::Rot AA( const ega3D::Vec& s){
 		//Biv b = Ro::dir( s ).copy<Biv>();               
-        Rot r = Gen::ratio(Vec::z, s.unit() ); 
-        return Gen::aa(r);
+        ega3D::Rot r = gen::ratio(ega3D::Vec::z, s.unit() ); 
+        return gen::aa(r);
     } 
 
-    Rot AA( const Biv& s){   
-		return Gen::aa( Gen::ratio( Vec::z, s.dual().unit() ) ); 
+  ega3D::Rot AA( const ega3D::Biv& s){   
+		return gen::aa( gen::ratio( ega3D::Vec::z, s.dual().unit() ) ); 
 	}
 
-	void Immediate (const Vec& s){
-	    gfx::Glyph::Line(s);
+	void Immediate (const ega3D::Vec& s){
+	  gfx::Glyph::Line(s);
 		glPushMatrix();	
 			gfx::GL::translate( s.begin() );
 			gfx::GL::rotate( AA(s).begin() );	
@@ -39,17 +39,17 @@ namespace ega3D{
 		glPopMatrix();
 	} 
 	
-	void Immediate (const Biv& s){
+	void Immediate (const ega3D::Biv& s){
 		
 		double ta = s.norm(); 
-	    bool sn = Op::sn( s , Biv::xy * (-1));
+	    bool sn = op::sn( s , ega3D::Biv::xy * (-1));
 	
 		glPushMatrix();	
 			gfx::GL::rotate( AA(s).begin() );  
 			Glyph::DirCircle( ta, sn );
 		glPopMatrix();
 	}
-}
+//}
 
 }
 

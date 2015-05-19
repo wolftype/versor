@@ -23,9 +23,9 @@
 
 #include "gfx/gfx_glyphs.h" 
 #include "gfx/gfx_render.h" 
+#include "draw/vsr_draw.h"
 
 #include "space/vsr_cga3D_op.h"
-
 #include "form/vsr_cga3D_frame.h" 
 #include "form/vsr_field.h"
 
@@ -39,19 +39,7 @@ namespace gfx{
     gfx::GL::Tri( a, b, c );
   }
 
- //Draw Routine (Immediate Mode)
- template<class A>
- void Draw( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-   render::begin(r,g,b,a);
-   render::draw(s);
- }      
 
- //Draw Routine (Immediate Mode)
- template<class A, class B>
- void DrawAt( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
-   render::begin(r,g,b,a);
-   render::drawAt(s,p);
- } 
  
 // //Alternative Draw routine
 // template<class A>
@@ -119,20 +107,6 @@ namespace gfx{
   template<> void Renderable<cga::Frame>::DrawImmediate  (const cga::Frame& f);
 //  template<> void Renderable<cga::Frame>::DrawImmediateB (const cga::Frame& s);   
   
-  template<class T> 
-  struct Renderable<Field<T>> : RenderableBase< Field<T> > {
-    
-    static void DrawImmediate( const Field<T>& f){
-      for (int i = 0; i < f.num(); ++i){ 
-        glPushMatrix();
-        Renderable<T>::DrawImmediate( f[i] );
-        glPopMatrix(); 
-      }
-    }
-
-    static void Draw( const Field<T>& f, GFXSceneNode*){}
-  };
-
 
   template<> void Renderable<Field<cga::Vec>>::DrawImmediate( const Field<cga::Vec>& f);
   //template<> void ImmediateB( const Field<cga::Vec>& f);

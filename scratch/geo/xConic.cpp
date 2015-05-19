@@ -18,14 +18,14 @@
 
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_cga3D_conic.h"
-#include "vsr_map.h"
+#include "vsr_app.h"   
+#include "form/vsr_cga3D_conic.h"
+#include "util/vsr_map.h"
 
 #include "gfx/gfx_mesh.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -52,24 +52,25 @@ struct MyApp : App {
  
   virtual void onAnimate(){
     
-    
+    Vec dir = Vec(1,0,0);
+     
     vp.clear();
 
     //a bunch of points on the surface of a sphere
     vp = pointsOnSphere( sphere(0,0,0), 20, 20);
     //conically transformed points
-    cp = functor::fmap<Point>( conic::transform::point, vp, Vec(mouse).unit(), amt);
+    cp = functor::fmap<Point>( conic::transform::point, vp, dir, amt);
 
     //dualPlane through mouse with normal in x direction
     mousePlane = mouse <= Drv(1,0,0);
     //inverse transform of plane
-    imousePlane = Conic::ITransform( mousePlane, Vec(mouse).unit(), amt );
+    imousePlane = Conic::ITransform( mousePlane, dir, amt );
 
     //meet of inversely transformed plane and preimage of paraboloid
     circleMeet = (imousePlane ^ sphere(0,0,0) ).dual();
     //extract points on the circle from the meet
     np = pointsOnCircle(circleMeet, 100);
-    np = functor::fmap<Point>( conic::transform::point,  np,  Vec(mouse).unit(),  amt );
+    np = functor::fmap<Point>( conic::transform::point,  np, dir,  amt );
     
 
   }
@@ -78,14 +79,18 @@ struct MyApp : App {
         
      mouse = calcMouse3D();
 
-     Draw( Vec::x.sp(  Gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 ); 
+    // Draw( Vec::x.sp(  gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 ); 
 
-        
+    auto p = flat::loc( mousePlane, Ori(1), true );
+    p.print();
+    // Draw( ,1,0,0); 
+    
      Mesh mesh = Mesh::UV( cp.data(), 20, 20 );
      mesh.drawElements();
 
      Draw(mousePlane,0,0,1);
-     Draw(imousePlane);
+     
+    // Draw(imousePlane);
      Draw(circleMeet,0,1,0);
 
      for (auto& i : np) Draw(i,1,0,0);

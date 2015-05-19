@@ -97,6 +97,14 @@ namespace vsr{ namespace cga {
       Point point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
         return round::null(x,y,z);
       }
+      /// Point on line l closest to p
+      Point point(const Line& line, const Point& p){
+        return round::null ( flat::location( line, p, false ) ); 
+      }
+      /// Point on dualline l closest to p
+      Point point(const DualLine& dll, const Point& p){
+        return round::null ( flat::location( dll, p, true ) ); 
+      }
      
       /*-----------------------------------------------------------------------------
        *  CIRCLES
@@ -107,6 +115,13 @@ namespace vsr{ namespace cga {
       Circle circle(const Biv& B){
        return round::produce( round::dls(1,0,0,0), B);//a ^ b ^ c; 
       }         
+
+      /*!
+       *  \brief  Circle at point p with radius r, facing direction biv
+      */
+      Circle circle(const Point& p, VSR_PRECISION r, const Biv& biv){
+       return round::produce( round::dls_pnt(p,r*-1), biv );
+      }   
                        
       /// Circle at origin with normal v and radius r (default r=1.0)
        Circle circle(const Vec& v, VSR_PRECISION r){

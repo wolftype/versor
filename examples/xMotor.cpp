@@ -1,11 +1,10 @@
 
-#include "vsr_cga3D_app.h"
+#include "vsr_app.h"
    
-#include "vsr_twist.h" 
-#include "vsr_cga3D_frame.h"
+#include "form/vsr_twist.h" 
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {    
    
@@ -23,12 +22,12 @@ struct MyApp : App {
 	
     Frame f1(-5,0,0); 
     draw(f1);   
-    Frame f2( mouse, Gen::rot( Biv::xy * time ) ); 
+    Frame f2( mouse, gen::rot( Biv::xy * time ) ); 
     draw(f2); 
 	
     for (int i = 0; i <= 100; ++i){
 	    float t = (float)i/100;
-	    Motor mot = Gen::ratio( f1.mot(), f2.mot(), t);
+	    Motor mot = gen::ratio( f1.mot(), f2.mot(), t);
 	    draw( Frame( mot * f1.mot() ) ); 
     }
     

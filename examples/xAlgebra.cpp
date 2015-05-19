@@ -104,7 +104,6 @@ int main(){
   printf("vector\n");
   sta::make_grade<1>::basis::print();
 
-
   printf("some combinatorics: product of rotors a and b in euclidean algebra: \n");
   ega::impl::gp_arrow_t< ega::types::rotor::basis, ega::types::rotor::basis >::Arrow::print();
   printf("some combinatorics: product of vectors a and b in space time algebra: \n");

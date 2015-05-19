@@ -23,7 +23,7 @@
 #include "form/vsr_twist.h"
 
 using namespace vsr;
-using namespace vsr::cga::types;
+using namespace vsr::cga;
 
 
 struct Member : Frame {
@@ -96,7 +96,7 @@ struct MyApp : App {
       nearestspacing = 2;    // anything greater than this is ignored
       sourceweight = .1;     // pull towards middle
       
-
+      mColor.set(0,0,0);
    }
 
 
@@ -121,6 +121,9 @@ struct MyApp : App {
    *  Draw
    *-----------------------------------------------------------------------------*/
     virtual void onDraw(){
+
+      GL::lightsOff();
+       
       mouse = calcMouse3D();        ///<-- get mouse position
 
       for (auto& f : frame){        ///<-- draw all frames
@@ -174,7 +177,7 @@ struct MyApp : App {
        float tacc=0;
        float racc;
 
-       float dist = round::sqd(fa.pos(), mouse);          ///<-- distance from frame to mouse
+       float dist = round::sqd(fa.pos(), PAO);          ///<-- distance from frame to point at origin
        float famt = 1.0/(.01 + (dist*dist) );          ///<-- weighting distance
 
        float thresh = nearestspacing;                  ///<-- distance threshold                      

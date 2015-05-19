@@ -19,10 +19,10 @@
 #ifndef  vsr_differential_INC
 #define  vsr_differential_INC
 
-#include "vsr_cga3D_op.h" //<-- assume cga3d for now
+#include "space/vsr_cga3D_op.h" //<-- assume cga3d for now
 #include "vsr_graph.h"
 
-namespace vsr {
+namespace vsr { namespace cga {
 
 //simplicial variable (2D facets in 3D space)
 //we will generalize this . . .
@@ -32,7 +32,7 @@ struct Simplicial2 {
    Biv tpss;              ///< tmp
    Biv pss;               ///< Tangent Pseudoscalar
    Vec ra, rb;            ///< reciprocal frames (a suitable basis for FEM)
-   VT area, la, lb;       ///< edge lengths
+   VSR_PRECISION area, la, lb;       ///< edge lengths
    
    Simplicial2(){}
 
@@ -47,6 +47,11 @@ struct Simplicial2 {
       pss = !(tpss);
       ra = eb<=pss;
       rb = -ea<=pss;
+   }
+
+   void print(){
+      ea.print();
+      eb.print();
    }
 
    /// Vector Derivative of some T-valued function defined on points
@@ -81,7 +86,7 @@ struct Simplicial2 {
      return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
    }
 
-   //exterior derivative / differential
+   //wedged derivative / differential
    Biv derivative(const float& n, const float& na, const float& nb){
      //diff along edges
      auto dna = na - n;
@@ -89,7 +94,7 @@ struct Simplicial2 {
      // coefficients
      auto wa = dna;// <= ea;      
      auto wb = dnb;// <= eb;
-     cout << wa << " " << wb << endl;
+    // cout << wa << " " << wb << endl;
      // weighted reciprocals
      return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
    }
@@ -127,13 +132,13 @@ struct Simplicial2 {
    /// Vector Derivative of some T-valued function defined on points
    //  finds difference along edges, dots that with edge vectors, 
    //  uses resultant scalar value to weigh reciprocals
-   //  (sum these together?)
+   //  (sum these together?) 
    template<class T>
    Vec derivative0(const T& n, const T& na, const T& nb){
      //diff along edges
      auto dna = na - n;
      auto dnb = nb - n; 
-     // coefficients
+     // coefficients (amt of change in ea and eb directions)
      auto wa = dna <= ea;      
      auto wb = dnb <= eb;
      // return sum of weighted reciprocals
@@ -152,6 +157,42 @@ struct Simplicial2 {
    }
 
 
+   /// Gradient of some T-valued function defined on points
+   /// ignore ea and eb... 
+   template<class T>
+   Vec gradient(const T& n, const T& na, const T& nb) {
+     //diff along edges
+     auto dna = na - n;
+     auto dnb = nb - n; 
+
+     auto sa = dna <= (ra^(na-n));
+     auto sb = dnb <= (rb^(nb-n));
+     
+     // return sum of weighted reciprocals
+     return ( sa + sb ); //q: divid by area? or after sum
+   }
+
+   Vec gradient(const float& n, const float& na, const float& nb){
+     //diff along edges
+     auto dna = na - n;
+     auto dnb = nb - n; 
+     // return sum of weighted reciprocals
+     return ( (ra*dna)+(rb*dnb) ); //q: divid by area? or after sum
+   }
+
+   /// Vector Derivative of some T-valued function defined on points
+   //  finds direct difference along outer edge, wedges with gradient
+   template<class T>
+   Biv exterior_derivative(const T& n, const T& na, const T& nb){
+     
+     //diff along outer edge
+     auto F = nb - na;
+     auto deriv = derivative0(n,na,nb);
+
+     return ( deriv ^ F );
+    }
+
+
 
   float deficit(){
       return acos( (eb.unit()<=ea.unit())[0] );
@@ -159,7 +200,7 @@ struct Simplicial2 {
 
   
   Point center(){
-    return Ro::loc( Ro::null(0,0,0) ^ Ro::null(ea) ^ Ro::null(eb));
+    return round::loc( round::null(0,0,0) ^ round::null(ea) ^ round::null(eb));
   }
 
   //assumes s is next ccw, with shared edge eb
@@ -211,6 +252,6 @@ struct Simplicial {
 //given a half edge graph, get normals
 
 
-} //vsr::
+} } //vsr::cga::
 
 #endif   /* ----- #ifndef vsr_differential_INC  ----- */

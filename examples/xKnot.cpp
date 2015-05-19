@@ -3,11 +3,13 @@
  *  
  *-----------------------------------------------------------------------------*/
 
-#include "util/vsr_cga3D_app.h"
+#include "vsr_app.h"
 #include "form/vsr_knot.h"
 
 
 using namespace vsr;
+using namespace vsr::cga;
+
 using namespace glv;  
 
 struct MyApp : App {

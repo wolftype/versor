@@ -25,9 +25,9 @@
 
 namespace vsr{
 
-  namespace cga3D { namespace conic { namespace transform {
+  namespace cga { namespace conic { namespace transform {
   
-    auto point = [](const Point& p, Vec& v, VT amt){
+    auto point = [](const Point& p, Vec& v, VSR_PRECISION amt){
       return Conic::Transform(p, v, amt);
     };
 

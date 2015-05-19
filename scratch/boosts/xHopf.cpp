@@ -18,16 +18,15 @@
 
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_app.h"   
 
-#include "vsr_fiber.h"
-#include "vsr_knot.h"
-#include "vsr_shapes.h"
+#include "form/vsr_fiber.h"
+#include "form/vsr_knot.h"
+#include "form/vsr_shapes.h"
 
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {    
    
@@ -42,29 +41,18 @@ struct MyApp : App {
 
   float mP,mQ,theta;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
 
-  void initGui(){
+  void setup(){
+      bindGLV();
+      
       gui(amt,"amt",-100,100);
       gui(mP,"p",1,100);
       gui(mQ,"q",1,100);
       gui(theta,"theta",-PI,PI);
-  }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+
+      scene.camera.pos(0,0,10);
   }
 
-  virtual void update(){
-
-  }
 
   virtual void onDraw(){ 
 
@@ -75,7 +63,7 @@ struct MyApp : App {
     tk.P = mP;
     tk.Q = mQ;  
     tk.HF.vec() = -Vec::y.rot( Biv::xy * theta );
-    tk.calc0( Ro::null(amt,0,0) );
+    tk.calc0( round::null(amt,0,0) );
 
     for (auto& i: tk.pnt ){
        Vec v = Vec(i).unit();
@@ -108,21 +96,11 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
-
 
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
 

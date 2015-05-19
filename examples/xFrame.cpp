@@ -17,11 +17,10 @@
  */
 
 
-#include "util/vsr_cga3D_app.h"   
-#include "form/vsr_cga3D_frame.h"
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga::types;
+using namespace vsr::cga;
 
 struct MyApp : App {
  
@@ -74,7 +73,7 @@ struct MyApp : App {
     for (int i=0;i<10;++i){
       Motor m = frameA.relMotor(frameB);                 //<-- motor transformation taking frameA to frameB
       DualLine dll = gen::log(m) * (float)i/10;          //<-- bivector generator of that
-      Draw( Frame( gen::mot(dll) * frameA.mot() ) );     //<-- new frame from frameA and transformation
+      Draw( Frame( gen::motor(dll) * frameA.mot() ) );     //<-- new frame from frameA and transformation
     }
     
     Draw(frameA);

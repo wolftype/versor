@@ -108,7 +108,10 @@ namespace vsr{
      Point point(const DualSphere& s, const Vec& v);
      /// Point from x,y,z
      Point point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z);
-     
+     /// Point on line l closest to p
+     Point point(const Line&, const Point& );
+     /// Point on dualline l closest to p
+     Point point(const DualLine&, const Point& );
      
       
       /*-----------------------------------------------------------------------------
@@ -119,7 +122,11 @@ namespace vsr{
        *  \brief  Circle through three points
        */
       Circle circle(const Point& a, const Point& b, const Point& c);
-     
+ 
+       /*!
+       *  \brief  Circle at point p with radius r, facing direction biv
+      */
+      Circle circle(const Point& p, VSR_PRECISION r, const Biv& biv = Biv::xy);            
       /*!
        *  \brief  Circle at origin in plane of bivector B
        */
@@ -269,48 +276,48 @@ namespace vsr{
       *  EVALUATION LAMBDAS
       *-----------------------------------------------------------------------------*/
  
-//     /*!
-//      *  \brief  Point on line closest to another point v
-//      */
-//     auto pointOnLine = []( const Line& lin, const Point& v){
-//       return round::null( flat::loc( lin, v, false) );
-//     };    
-//
-//     /// a single point on circle c at theta t 
-//     auto pointOnCircle = [](const Circle& c, VSR_PRECISION t){
-//      return point(c,t);
-//     };
-//     /// n points on circle c
-//     auto pointsOnCircle = [](const Circle& c, int num){
-//      vector<Point> out;
-//      for (int i=0;i<=num;++i){
-//        out.push_back(pointOnCircle(c, TWOPI*(float)i/num) );
-//      }
-//      return out;
-//     };
-//     /// a pair on dual sphere
-//     auto pairOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-//      return pair(s, Vec::x.sp( gen::rot(t,p) ) );
-//     };
-//     /// a single point on dual sphere s at theta t and phi p
-//     auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-//       return pointA( pairOnSphere(s,t,p) ).null(); 
-//     };
-//     /// many points on sphere (could use map func from gfx::data)
-//     auto pointsOnSphere = [](const DualSphere& s, int u, int v){
-//       vector<Point> out;
-//       for (int i = 0; i < u; ++i){
-//        for (int j = 0; j < v; ++j){
-//
-//         float tu= TWOPI * i/u;//-1 + 2.0 * i/num;
-//         float tv = -PIOVERTWO  + PI * j/v;
-//
-//         out.push_back( pointOnSphere(s,tu,tv) );
-//
-//       }
-//      }
-//      return out; 
-//     };
+    /*!
+     *  \brief  Point on line closest to another point v
+     */
+    auto pointOnLine = []( const Line& lin, const Point& v){
+      return round::null( flat::loc( lin, v, false) );
+    };    
+
+    /// a single point on circle c at theta t 
+    auto pointOnCircle = [](const Circle& c, VSR_PRECISION t){
+     return point(c,t);
+    };
+    /// n points on circle c
+    auto pointsOnCircle = [](const Circle& c, int num){
+     vector<Point> out;
+     for (int i=0;i<=num;++i){
+       out.push_back(pointOnCircle(c, TWOPI*(float)i/num) );
+     }
+     return out;
+    };
+    /// a pair on dual sphere
+    auto pairOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
+     return pair(s, Vec::x.sp( gen::rot(t,p) ) );
+    };
+    /// a single point on dual sphere s at theta t and phi p
+    auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
+      return pointA( pairOnSphere(s,t,p) ).null(); 
+    };
+    /// many points on sphere (could use map func from gfx::data)
+    auto pointsOnSphere = [](const DualSphere& s, int u, int v){
+      vector<Point> out;
+      for (int i = 0; i < u; ++i){
+       for (int j = 0; j < v; ++j){
+
+        float tu= TWOPI * i/u;//-1 + 2.0 * i/num;
+        float tv = -PIOVERTWO  + PI * j/v;
+
+        out.push_back( pointOnSphere(s,tu,tv) );
+
+      }
+     }
+     return out; 
+    };
 //
 //
 //     auto splitA = [](const Pair& pp){ return pointA(pp); };

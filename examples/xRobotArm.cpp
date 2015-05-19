@@ -1,9 +1,9 @@
-#include "vsr_cga3D_app.h"
-#include "vsr_chain.h"
+#include "vsr_app.h"
+#include "form/vsr_chain.h"
 
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
 	
@@ -30,12 +30,12 @@ struct MyApp : App {
         
 		Frame baseFrame;
 		
-    auto mouse = calcMouse3D(0);
+    auto mouse = calcMouse3D();
     
     auto v = io().viewdata.ray;
     auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
 
-		targetPos = pointOnLine( line, Ori(1) );  
+		targetPos = cga::point( line, Ori(1) );  
 		
 		Frame targetFrame ( targetPos ); 
 
@@ -43,9 +43,9 @@ struct MyApp : App {
 		
     Frame secondFrame( 0, distA, 0 );
 
-   // Make a sphere from a point and a radius, calls Ro::dls( Pnt, float )
-	 auto firstSphere = Ro::sphere( secondFrame.pos(), distA ); 	
-   auto targetSphere = Ro::sphere( targetPos, distA ); 
+    // Make a sphere from a point and a radius, calls round::dls( Pnt, float )
+	  auto firstSphere = round::sphere( secondFrame.pos(), distA ); 	
+    auto targetSphere = round::sphere( targetPos, distA ); 
         
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
@@ -53,7 +53,7 @@ struct MyApp : App {
 		 draw(rotationPlane,0,1,0);   
           
  		//XZ plane of Target
-		 Dlp targetXZ = targetFrame.dxz();
+		 DualPlane targetXZ = targetFrame.dxz();
 		 draw(targetXZ,0,.5,1);
  
 		 //Line of Target
@@ -65,10 +65,10 @@ struct MyApp : App {
 		 draw(fjoint);  
 		
  	   	 //Pick the one closest to the base frame
-		 Frame finalFrame ( Ro::split(fjoint,false), Rot(1,0,0,0) );
+		 Frame finalFrame ( round::split(fjoint,false), Rot(1,0,0,0) );
 
 		 //Sphere around fframe
-		 auto ffsphere = Ro::sphere( finalFrame.pos(), distA);
+		 auto ffsphere = round::sphere( finalFrame.pos(), distA);
 
 		 //Circle of Possibilities
 		 Circle cir = ( ffsphere ^ firstSphere).dual();
@@ -79,7 +79,7 @@ struct MyApp : App {
 		 draw(fpair, 1,.5,.5);
 
 		 //Pick One and put the middle frame there
-		 Frame middleFrame( Ro::split(fpair,true) );
+		 Frame middleFrame( round::split(fpair,true) );
 
 
 		 //We can store the `positions in a chain class which will sort out relative orientations for us
@@ -90,7 +90,7 @@ struct MyApp : App {
 		 k[4] = targetFrame;
 
 		 //Base Frame will rotate to plane defined by its yaxis and target point
-		 Rot r1 =  Gen::ratio( Vec::z, rotationPlane.dual().runit() );
+		 Rot r1 =  gen::ratio( Vec::z, Vec( rotationPlane.dual().unit() ) );
 		 k[0].rot( r1 );
 
 		 //for all the other frames, calculate joint rotations and link lengths from current positions

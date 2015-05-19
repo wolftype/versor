@@ -17,21 +17,17 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_graph.h"
-
-#include "vsr_cga3D_frame.h"
-#include "vsr_field.h"
-#include "vsr_knot.h"
-#include "vsr_stat.h"
+#include "vsr_app.h"   
+#include "form/vsr_graph.h"
+#include "form/vsr_field.h"
+#include "form/vsr_knot.h"
+#include "util/vsr_stat.h"
 
 #include "gfx_file.h"
 #include "gfx/gfx_map.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
-
-
+using namespace vsr::cga;
 
 //init overloade for Field of Frames (put this in somewhere, maybe in 
 //vsr_cga3D_impl.h
@@ -284,7 +280,7 @@ struct MyApp : App {
      *-----------------------------------------------------------------------------*/
     //general
     
-    mSceneRenderer.immediate(false);  // set renderer to use programmable pipeline...
+    mSceneRenderer.immediate(true);  // set renderer to use programmable pipeline...
     farclip = 300;    
     linewidth=2;
 
@@ -316,8 +312,11 @@ struct MyApp : App {
     //mesh.load( "resources/flowen/arco_dec_01.obj" );
     //mesh.load( "resources/flowen/hexa_dec_01.obj" );
     //mesh.load( "resources/flowen/oxa_tri_01.obj" );
-    mesh.load( "resources/flowen/moxi_dec_025.obj" );
+    //mesh.load( "resources/flowen/moxi_dec_025.obj" );
+    mesh.load("resources/obj/bunny.obj");
     
+    mesh.scale(50); 
+    mesh.store();
     //calc avg center and bounding box
     Vec3f v;  
     for (auto& i : mesh.vertex() ){
@@ -458,7 +457,7 @@ struct MyApp : App {
     scene.camera.lens.far() = farclip;
 
     //general control
-   // frame.db() = Biv(dt,framexz,frameyz);
+    frame.db() = Biv(framexy,framexz,frameyz);
     frame.scale() = framescale;
     //frame.pos() = PAO.trs(Vec::x * framepos * sin(timer));
     frame.step();
@@ -468,7 +467,7 @@ struct MyApp : App {
     for (int i=0;i<numcontrol;++i){
       float t = (float)i/numcontrol;
       auto vec = frame.x().rot( frame.xy() * PI * t);
-      controlpoint[i] =  Ro::split( Ro::round( frame.bound(), vec ), true).null();//frame.x().rot( //Ro::pnt_cir( frame.cxy(), acos((frame.y() <= Vec::y)[0]) + t*TWOPI );
+      controlpoint[i] =  round::split( round::produce( frame.bound(), vec ), true).null();//frame.x().rot( //round::pnt_cir( frame.cxy(), acos((frame.y() <= Vec::y)[0]) + t*TWOPI );
       controltangent[i] = Par(vec.copy<Tnv>()).trs( controlpoint[i] ); 
       controlline[i] = frame.dlz().trs(controlpoint[i]);
     }
@@ -492,7 +491,7 @@ struct MyApp : App {
 
     //Knot
      tk.P = mP; tk.Q=mQ;
-     tk.HF.vec() = Vec::x.spin( Gen::rot( theta,phi) );
+     tk.HF.vec() = Vec::x.spin( gen::rot( theta,phi) );
      tk.HF.cir() = frame.cxz();
 
 
@@ -500,14 +499,14 @@ struct MyApp : App {
     if (bKnot){
       auto bst = tk.bst(knotspeed*dt);
       for(int i=0;i<mesh.num();++i){
-        data[i].point = Ro::loc( data[i].point.spin(bst) );
+        data[i].point = round::loc( data[i].point.spin(bst) );
         mbo->mesh[i].Pos = data[i].point;
       }
     }
 
     if (bTwist){
      for(int i=0;i<mbo->mesh.num();++i){
-       auto twist = Gen::mot( dfield.vol( data[i].pos ) );
+       auto twist = gen::mot( dfield.vol( data[i].pos ) );
        mbo->mesh[i].Pos = PAO.spin(twist);
      }
     }
@@ -518,12 +517,12 @@ struct MyApp : App {
         i.distance = vector<float>(numcontrol);
         i.par = Par();
         for(int j=0;j<numcontrol;++j){
-          i.distance[j] = 1.0 / (falloff + Ro::dist(i.point,controlpoint[j]) ); 
+          i.distance[j] = 1.0 / (falloff + round::dist(i.point,controlpoint[j]) ); 
           i.par += controltangent[j] * i.distance[j];
         }
       }
       for (int i=0; i<tmesh.num();++i){
-        tmesh[i].Pos = data[i].point.spin( Gen::bst(data[i].par*tangentWt) );
+        tmesh[i].Pos = data[i].point.spin( gen::bst(data[i].par*tangentWt) );
       }
     }
 
@@ -533,12 +532,12 @@ struct MyApp : App {
         i.distance = vector<float>(numcontrol);
         i.dll = Dll();
         for(int j=0;j<numcontrol;++j){
-          i.distance[j] = 1.0 / (falloff + Ro::dist(i.point,controlpoint[j]) ); 
+          i.distance[j] = 1.0 / (falloff + round::dist(i.point,controlpoint[j]) ); 
           i.dll += controlline[j] * i.distance[j];
         }
       }
       for (int i=0; i<tmesh.num();++i){
-        tmesh[i].Pos = data[i].point.spin( Gen::mot(data[i].dll*twistWt) );
+        tmesh[i].Pos = data[i].point.spin( gen::mot(data[i].dll*twistWt) );
       }
  
     }
@@ -548,7 +547,7 @@ struct MyApp : App {
     if (bReset){
       mbo->mesh.reset();
       for (int i=0;i<mesh.num();++i){
-        data[i].point = Ro::null(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
+        data[i].point = round::null(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
       }
     }
  
@@ -589,8 +588,8 @@ struct MyApp : App {
     
 
     //MESH OR SOLID RENDER
-    //if (bDrawWire) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (bDrawWire) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     //glLineWidth(linewidth);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -616,7 +615,7 @@ struct MyApp : App {
     //OUTPUT
     if (bRender){
       
-      file.write( windowData().width(), windowData().height(), "/Volumes/Medico/vsr_tmp_output/render/wire/", "wire");
+     // file.write( windowData().width(), windowData().height(), "/Volumes/Medico/vsr_tmp_output/render/wire/", "wire");
      // file.writeAlpha( windowData().width(), windowData().height(), "/Volumes/Medico/vsr_tmp_output/render/wire_alpha/", "wire_alpha");
     
     }

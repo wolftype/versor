@@ -149,9 +149,10 @@ namespace gfx{
 
          } else {
         // pp[0].vprint(); pp[1].vprint();
+             gfx::Glyph::DashedLine(pp[0],pp[1]);
              gfx::Glyph::Point(pp[0]);
              gfx::Glyph::Point(pp[1]);
-             gfx::Glyph::DashedLine(pp[0],pp[1]);
+
          }
        }
   }  

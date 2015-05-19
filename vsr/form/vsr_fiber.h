@@ -16,11 +16,9 @@
 
 
 //Q: Given a Circle, can we find it's associated HopfBundle, and thereby a commuting Circle?
-namespace vsr{
+namespace vsr{ namespace cga {
 
     
-  using namespace cga::types;
-  
   /*!-----------------------------------------------------------------------------
    * Hopf Fibration
    *
@@ -154,5 +152,5 @@ namespace vsr{
         
     };
 
-}//vsr::
+} } //vsr::cga::
 #endif

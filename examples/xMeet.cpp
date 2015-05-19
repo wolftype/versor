@@ -11,16 +11,16 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
 
 
-#include "util/vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga::types;
+using namespace vsr::cga;
 
 struct MyApp : App {
 

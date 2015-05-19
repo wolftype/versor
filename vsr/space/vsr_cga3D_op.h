@@ -18,7 +18,7 @@ namespace vsr{
 
 namespace op{
   
-  using namespace cga;//::types; 
+  using namespace cga;
     
   Rot AA( const Vec& s);                
   Rot AA( const Dlp& s);
@@ -34,7 +34,8 @@ namespace op{
 namespace gen{               
   
 
-   using namespace cga;//::types;  
+   using namespace cga;
+   
   /*-----------------------------------------------------------------------------
    *  QUAT helpers
    *-----------------------------------------------------------------------------*/
@@ -50,8 +51,6 @@ namespace gen{
       @param[in] roll in (transformed) xy plane
    */
       Rot rot( double yaw, double pitch, double roll);
-      
-
 
    /*-----------------------------------------------------------------------------
     *  TWISTS (Motors, Plücker, etc)
@@ -137,6 +136,9 @@ namespace gen{
    
   /*! General Conformal Transformation from a split log*/
    Con con( const vector<Pair>& log, VSR_PRECISION amt);
+
+  /* General Conformal Transformation from two circles */
+   Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt);   
 
 
 };

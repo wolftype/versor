@@ -1,5 +1,5 @@
 
-#include "group/vsr_root.h"  
+#include "form/vsr_root.h"  
 #include "draw/vsr_ega3D_draw.h"
 #include "gfx/util/gfx_glv_app.h"
 
@@ -8,7 +8,7 @@ using namespace vsr::ega3D;
 
  
 typedef NEVec<4> V4;
-typedef ga<RMetric<4>,double> Algebra;
+typedef algebra< metric<4>,double> Algebra;
 //typedef NEVec<3> Vec;
 
 //idositetrachoron 24 cell                                                                         
@@ -35,7 +35,7 @@ struct MyApp : gfx::GFXAppGui {
 	  if (d4){
 	   
      for (auto &i : D4 ){
-			  if (bSpin) i = i.sp( Gen::rot( MV< Algebra, Basis<10,12> > (.01,.01) ) );
+			  if (bSpin) i = i.sp( gen::rot( Multivector< Algebra, Basis<10,12> > (.01,.01) ) );
 			  Vec tp = Proj<4>::Call(5.0 , i);
 			  Vec to = Proj<4>::Ortho<3>(i);
 			  Draw( bOrtho ? to : tp );
@@ -44,7 +44,7 @@ struct MyApp : gfx::GFXAppGui {
 	
 	  if (f4){
 	   for (auto &i : F4 ){
-			if (bSpin) i = i.sp( Gen::rot( MV<Algebra, Basis<10,12> > (.01,.01) ) );
+			if (bSpin) i = i.sp( gen::rot( Multivector<Algebra, Basis<10,12> > (.01,.01) ) );
 			Vec tp = Proj<4>::Call(5.0 , i);
 			Vec to = Proj<4>::Ortho<3>(i);
 			Draw( bOrtho ? to : tp );
@@ -54,7 +54,7 @@ struct MyApp : gfx::GFXAppGui {
 	 
 	  if (h4){
 		  for (auto &i : H4 ){
-			  if (bSpin) i = i.sp( Gen::rot( MV<Algebra, Basis<12> > (.01) ) );
+			  if (bSpin) i = i.sp( gen::rot( Multivector<Algebra, Basis<12> > (.01) ) );
 			  Vec tp = Proj<4>::Call(5.0 , i);
 			  Vec to = Proj<4>::Ortho<3>(i);
 			  Draw( bOrtho ? to : tp );
@@ -71,21 +71,21 @@ int main(){
     cout << "D4: NumRoots =" << D4.size() << endl;
    for (auto i : D4 ){
 
-	 i.vprint();
+	 i.print();
 
 	}
 
 	cout << "\nF4: NumRoots = " << F4.size() << endl;
    for (auto i : F4 ){
 
-	 i.vprint();
+	 i.print();
 
 	} 
 
 	cout << "\nH4: NumRoots = " << H4.size() << endl;
 	   for (auto i : H4 ){
 	
-	 i.vprint();
+	 i.print();
 	
 	}  
 	

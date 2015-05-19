@@ -180,8 +180,9 @@ namespace op{
     } 
 
 
+
   Vec Pos( const Dlp& s){ 
-    return flat::loc(s , Ori(1), true );   
+    return flat::loc(s , PAO, true );   
   }   
      
   Pnt Pos( const Cir& s){
@@ -485,7 +486,10 @@ Computer Vision and Graphics"
      return gen::bst(log[0]*-amt) * gen::bst(log[1]*-amt);
    }
 
-
+  /*! General Conformal Transformation from two circles */
+   Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt){
+      return con ( log(ca,cb), amt ); 
+   }
     
 
 

@@ -18,8 +18,8 @@
 #ifndef VSR_GENERIC_OP_H_INCLUDED
 #define VSR_GENERIC_OP_H_INCLUDED   
 
-#include "detail/vsr_multivector.h"
-#include "util/vsr_constants.h" 
+#include "vsr_multivector.h"
+#include "../util/vsr_constants.h" 
 #include <vector>  
 
 namespace vsr {           
@@ -904,8 +904,15 @@ namespace euc{
           @param Direct Flat [ Plane (Pln) or Line (Lin) ]
       */
       template<class A,class B> 
-      constexpr auto dir( const Multivector<A,B>& f) RETURNS(
+      constexpr auto direction( const Multivector<A,B>& f) RETURNS(
           GAInf<A>(-1) <= f
+      )  
+    /*! Direction of Direct Flat 
+          @param Direct Flat [ Plane (Pln) or Line (Lin) ]
+      */
+      template<class A,class B> 
+      constexpr auto dir( const Multivector<A,B>& f) RETURNS(
+          direction(f)
       )  
     
     /*! Location of Flat A closest to Point p 
@@ -913,10 +920,16 @@ namespace euc{
           @param Conformal Point p
           @param Duality Flag
       */
+      template<class A>
+      constexpr typename A::space::Pnt location(const A& f, const typename A::space::Pnt& p, bool dual){
+          using TPnt = typename A::space::Pnt; 
+          return dual ? TPnt( ( p ^ f ) / f ) :  TPnt ( ( p <= f ) / f );
+      } 
+
       template<class A, class P>
       constexpr P loc(const A& f, const P& p, bool dual){
-          return dual ? P( ( p ^ f ) / f ) : P ( ( p <= f ) / f );
-      } 
+          return location(f,p,dual);
+      }
 
     /*! Weight of Flat 
          @param Dual or Direct Flat

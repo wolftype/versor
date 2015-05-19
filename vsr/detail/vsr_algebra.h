@@ -69,46 +69,43 @@ namespace vsr {
      *  An algebra instance is templated on: 
      *
      *     metric_type: a metric (e.g. Metric<3,0> for euclidean 3 space or Metric<4,1,true> for conformal 5D space )
-     *     value_type:   a field value type (i.e. real, complex, or some other arithmetic element).
+     *     value_type:  a field value type (i.e. real, complex, or some other arithmetic element).
      *       
-     *         The value type can be anything that multiplies and adds in a closed group, 
-     *         including another algebra ,
+     *         The value type can be anything that commutatively multiplies and adds in a closed group, 
      *         allowing for tensor metrics C x C, etc a la Bott periodicity.
-    
-          To Do: enable conversions between algebras!
      *-----------------------------------------------------------------------------*/
+
     template< class metric_type, class value_type >
     struct algebra {
 
         using metric = metric_type;                             ///<-- Metric, with signature, whether Euclidean, Projective, Conformal, etc
           
-        using value_t = value_type;                             ///<-- Field over which Algebra is Defined
+        using value_t = value_type;                             ///<-- Field over which Algebra is Defined (e.g. float, double, complex)
         
-        static const int dim = metric::type::Num;               ///<-- Dimension of Algebra
+        static const int dim = metric::type::Num;               ///<-- Dimension of Algebra (2,3,4,5,etc)
  
-         /// implementation details for dealing with conformal vs euclidean etc (in vsr_algebra.h)
-        using impl = algebra_impl< algebra<metric, value_t>, metric::is_euclidean, metric::is_conformal >;                
- 
-        //a multivector is a lift of a quadratic form (the algebra) onto a basis B
+        /// a multivector is a monadic structure that wraps a basis with a bilinear quadratic form 
         template <class B> using mv_t = Multivector<algebra<metric, value_t>, B>;
-
+ 
+        /// implementation details for dealing with conformal vs euclidean etc (in vsr_algebra.h)
+        using impl = algebra_impl< algebra<metric, value_t>, metric::is_euclidean, metric::is_conformal >;                
 
         template <class A, class B> using sum_basis_t = typename ICat< typename NotType< A, B >::Type, A >::Type;
         template <class A, class B> using  gp_basis_t = typename impl::template gp_arrow_t<A,B>::basis;
         template <class A, class B> using  op_basis_t = typename impl::template op_arrow_t<A,B>::basis;
         template <class A, class B> using  ip_basis_t = typename impl::template ip_arrow_t<A,B>::basis;
 
-
+        // lift functions of A and B into the multivector form
         template <class A, class B> using sum_lift_t = mv_t< sum_basis_t< A, B>>;
         template <class A, class B> using gp_lift_t =  mv_t< gp_basis_t<A,B> >;
         template <class A, class B> using op_lift_t =  mv_t< op_basis_t< A, B> >;
         template <class A, class B> using ip_lift_t =  mv_t< ip_basis_t< A, B> >;  
 
+        // bind the contents of multivectors A and B into the functions
         template <class A, class B> using sum_t = sum_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using gp_t = gp_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using op_t = op_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using ip_t = ip_lift_t<typename A::basis,typename B::basis>;           
-
 
         /*-----------------------------------------------------------------------------
          *  Sum Functions 
@@ -296,7 +293,8 @@ namespace vsr {
             using algebra = alg;//AlgebraImpl<alg,true,false>;
             
             //use as e<1,2,3> will return e123 blade
-            template<bits::type ... N> using e = Basis< bits::blade((1<<(N-1))...)>;  
+            template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;  
+            template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
             
             using sca = Basis<0>;  
             using pss = Basis<bits::pss(alg::dim)>;
@@ -366,8 +364,9 @@ namespace vsr {
             using cir = typename algebra::template op_basis_t<par,pnt>;
             using sph = typename algebra::template op_basis_t<cir,pnt>;
             using flp = typename algebra::template op_basis_t<pnt,inf>;
-            using dll = typename algebra::template sum_basis_t<biv,drv>;
+           // using dll = typename algebra::template sum_basis_t<biv,drv>;
             using lin = typename algebra::template op_basis_t<pnt,flp>;
+            using dll = typename algebra::template gp_basis_t<lin,pss>;
             using dlp = typename algebra::template sum_basis_t<vec,inf>;
             using pln = typename algebra::template op_basis_t<cir,inf>;
             using trs = typename algebra::template sum_basis_t<drv, sca>;// 1 );

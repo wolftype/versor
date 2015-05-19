@@ -10,12 +10,12 @@
 #ifndef VSR_H_FOLD_INCLUDED
 #define VSR_H_FOLD_INCLUDED
 
-#include "vsr_cga3D_op.h"
-#include "vsr_cga3D_funcs.h"
-#include "vsr_set.h"
-#include "vsr_rigid.h"
+#include "space/vsr_cga3D_op.h"
+#include "space/vsr_cga3D_funcs.h"
+#include "form/vsr_set.h"
+#include "form/vsr_rigid.h"
 
-namespace vsr{
+namespace vsr{ namespace cga{
 
 
 
@@ -32,12 +32,12 @@ struct Distance {
 
     /// Construct from two points
     Distance ( const Pnt& a, const Pnt& target) :  
-    p( a ), t( Ro::rad( Ro::at(a, target) ) )
+    p( a ), t( round::rad( round::at(a, target) ) )
     {}
 
     /// Set a new target (change distance)
     void set( const Pnt& target ){
-        t = Ro::rad( Ro::at(p,target) );
+        t = round::rad( round::at(p,target) );
     }
 
     /// Update point location (source)
@@ -50,8 +50,8 @@ struct Distance {
        p = a; set( target);
     }
 
-    Dls operator()(){ return Ro::dls(p,t); }
-    Dls operator()(const Pnt& tp) { return Ro::dls(tp,t); }
+    Dls operator()(){ return round::dls(p,t); }
+    Dls operator()(const Pnt& tp) { return round::dls(tp,t); }
 
 };
 
@@ -95,7 +95,7 @@ struct Rigid2_ {
 
   /// Some THETA along Orbit (from orbit's origin for now . . .);
   Pnt operator() ( float amt ) {
-    return Ro::pnt_cir( circle(), amt );
+    return round::pnt_cir( circle(), amt );
   }
 
   /// Constrain original point to lie on circle (at closest point on possibility circle to starting position)
@@ -113,13 +113,13 @@ struct Rigid2_ {
       return (*this)( pa * (1-t) + pb * t );
   }
 
-  Pnt distanceA(const Pnt& p, bool b ) { return Ro::split( ( distA(p) ^ circle().dual() ).dual(), b ); }
-  Pnt distanceB(const Pnt& p, bool b) { return Ro::split( ( distB(p) ^ circle().dual() ).dual(), b ); }
+  Pnt distanceA(const Pnt& p, bool b ) { return round::split( ( distA(p) ^ circle().dual() ).dual(), b ); }
+  Pnt distanceB(const Pnt& p, bool b) { return round::split( ( distB(p) ^ circle().dual() ).dual(), b ); }
 
   Cir circle() { return ( distA() ^ distB() ).dual(); }
 
   /// get point at theta t around constraint orbit
-  Pnt orbit(VT t) { return Ro::pnt_cir( circle(), t * ( mtn?1:-1) ); }
+  Pnt orbit(VSR_PRECISION t) { return round::pnt_cir( circle(), t * ( mtn?1:-1) ); }
 
   /// Dual Plane Facet (CCW)
   Dlp dlp(){
@@ -323,14 +323,14 @@ struct Fold {
     }
 
     static Point Perpendicular( const Point& c, const Line& line){
-      return Fl::loc(line, c, false).null();
+      return flat::loc(line, c, false).null();
     }
 
     static vector<Point> Perpendiculars( const Point& c, const vector<Line>& lines){
       vector<Point> vp;
 
       for (auto i : lines){
-        vp.push_back( Fl::loc(i, c, false).null() ); //location of point closest to line
+        vp.push_back( flat::loc(i, c, false).null() ); //location of point closest to line
       }
 
       return vp;
@@ -393,7 +393,7 @@ struct Waterbomb {
        
   }
 
-  Waterbomb::Data eval( VT amt){
+  Waterbomb::Data eval( VSR_PRECISION amt){
       Pnt tg = rg(amt*PIOVERTWO);
      // rc.updateB(tg);
       Pnt tc = rc(amt*PIOVERTWO);// V.b, V.d, amt);
@@ -408,7 +408,7 @@ struct Waterbomb {
 
 struct Gusset {
 
-  /* static Gusset Fold(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d, VT amt){ */
+  /* static Gusset Fold(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d, VSR_PRECISION amt){ */
       
   /* } */
 
@@ -480,10 +480,10 @@ struct Petal {
       //Line between them
       Line petalLine = petalNodeA ^ petalNodeB ^ Inf(1); petalLine = petalLine.runit();
       //new point
-      Point dmd = Ro::at(d, a).mot( petalLine.dual() * amt );// Draw(mmb,0,1,0);
+      Point dmd = round::at(d, a).mot( petalLine.dual() * amt );// Draw(mmb,0,1,0);
 
       //Sphere about new point
-      //Dls dmd = Ro::dls_pnt(md);
+      //Dls dmd = round::dls_pnt(md);
       //Circle of rotation
       Circle petalCa = a ^ petalA.dual();// Draw(petalCa);
       Circle petalCb = c ^ petalB.dual();// Draw(petalCb);
@@ -491,14 +491,14 @@ struct Petal {
       Pair petalPairA = ( dmd ^ petalCa.dual() ).dual(); 
       Pair petalPairB = ( dmd ^ petalCb.dual() ).dual(); 
 
-      Point ppa = Ro::loc( Ro::split( petalPairA, true) );
-      Point ppb = Ro::loc( Ro::split( petalPairB, true) );
+      Point ppa = round::loc( round::split( petalPairA, true) );
+      Point ppb = round::loc( round::split( petalPairB, true) );
 
       petal.nodeA = petalNodeA;
       petal.nodeB = petalNodeB;
       petal.flapA = ppa;
       petal.flapB = ppb;
-      petal.tip = Ro::loc(dmd);
+      petal.tip = round::loc(dmd);
       petal.base = d;
       petal.stamen = b;
 
@@ -511,7 +511,7 @@ struct Preliminary {
 
    // Preliminary( const& Pnt a, const& Pnt b, const& Pnt c, const& p
 
-    static Preliminary Fold (const Point& a, const Point& b, const Point& c, const Point& d, VT amt){
+    static Preliminary Fold (const Point& a, const Point& b, const Point& c, const Point& d, VSR_PRECISION amt){
 
 
         Line ab = a ^ b ^ Inf(1); ab = ab.runit(); //Draw(ab);
@@ -538,31 +538,31 @@ struct Preliminary {
         Point mc = c.mot( sa.dual() * amt); 
 
         //Constraints for midpoint bc
-        Dls dmc = Ro::dls_pnt( mc ); 
+        Dls dmc = round::dls_pnt( mc ); 
         Line lmc = a ^ mc ^ Inf(1); lmc = lmc.runit();      // a was e    
         Circle cmc = mdc ^ ( diag.dual() );
         Pair pmc = (cmc.dual() ^ dmc ).dual();
-        Point mbc = Ro::loc(Ro::split(pmc,false));          //  Notice Alternating booleans . . .
+        Point mbc = round::loc(round::split(pmc,false));          //  Notice Alternating booleans . . .
         //Draw( mbc );
 
         //Constraints for point mb
-        Dls dmbc = Ro::dls_pnt( mbc );                       // Take a sphere for Distance edge
+        Dls dmbc = round::dls_pnt( mbc );                       // Take a sphere for Distance edge
         Circle cmb = (b ^ ( ( a ^ c ^ Inf(1) ).dual() ) );   // And  Circle for Rotational crease (a was e)
         Pair pmb = ( cmb.dual() ^ dmbc ).dual();             // And intersect them
-        Point mb = Ro::loc( Ro::split(pmb,true) );
+        Point mb = round::loc( round::split(pmb,true) );
         //Draw(mb); 
         
         //Constraints for midpoint mab
-        Dls dmb = Ro::dls_pnt( mb );                         // Repeat
+        Dls dmb = round::dls_pnt( mb );                         // Repeat
         Circle cmab = ((a+b)/2.0).null() ^ diag.dual();
         Pair pmab = ( cmab.dual() ^ dmb ).dual();
-        Point mab = Ro::loc( Ro::split(pmab, false) );
+        Point mab = round::loc( round::split(pmab, false) );
         //Draw(mab);
 
-        Dls dmab  = Ro::dls_pnt( mab );
+        Dls dmab  = round::dls_pnt( mab );
         Circle cma = a ^ sb.dual();
         Pair pma = ( cma.dual() ^ dmab ).dual();
-        Point ma = Ro::loc( Ro::split(pma,true) );
+        Point ma = round::loc( round::split(pma,true) );
         //Draw(ma);
 
         return { ma, mb, mc, d, e, mab, mbc, mdc, mda };
@@ -571,7 +571,7 @@ struct Preliminary {
 };
 
 
-} //vsr::
+} } //vsr::cga
 
 #endif
 

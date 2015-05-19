@@ -14,7 +14,8 @@ ifeq ($(GCC),1)
    CXX = g++ -std=c++0x 
 else  
 ifneq ($(CLANG),0) 
-	CXX = $(CLANG)  
+	CXX = $(CLANG)/bin/clang++
+  #LDFLAGS = -L$(CLANG)/lib/  
 else 
 	CXX = clang++ 
 endif 

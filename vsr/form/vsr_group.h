@@ -11,7 +11,7 @@ replaces vsr_pointGroup.h
                      
 #include "vsr_set.h" 
 #include "vsr_root.h"
-#include "vsr_generic_op.h"
+#include "detail/vsr_generic_op.h"
 #include <vector>                 
  
 using std::vector;
@@ -48,7 +48,8 @@ struct Group {
   int numSimple; ///< number of simple roots used to generate group
 
   /// Trs is the translator type of whatever conformal metric we are in
-  typedef typename V::template BType< typename V::Mode::Trs > Trs; 
+  //typedef typename V::template BType< typename V::Mode::Trs > Trs; 
+  using Trs = typename V::space::translator;
 
    vector<V> ops;                       ///< Pin Operators (Vec, etc)
    vector<decltype(V()*V())> sops;      ///< Spin Operators (Rot, etc)
@@ -154,10 +155,10 @@ struct PointGroup2D : Group<V> {
 //To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
 template<class V > 
 struct SpaceGroup2D : PointGroup2D<V> {
+  
+  using Trs = typename V::space::translator;
+  using Vec = typename V::space::vector;
 
-  /// Trs is the translator type of whatever conformal metric we are in
-  typedef typename V::template BType< typename V::Mode::Trs > Trs; 
-  typedef typename V::template BType< typename V::Mode::Vec > Vec;
   typedef decltype( V() ^ V() ) Biv;
 
   int mDiv;  //(p)rimitive lattice = 1.0 (default); (c)entered lattice = 2; (h)exagonal lattice = 3
@@ -172,17 +173,25 @@ struct SpaceGroup2D : PointGroup2D<V> {
   // @param gb: whether a glide reflection replaces second mirror generator 
   SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) 
   : PointGroup2D<V>(p,pin), mRatio(ratio), mDiv(div)  {
-   
-    if (p<4){ 
+  
+  
+    if (p==1){
+      //Glide Reflections
+      if (ga) { //replace first mirror
+        this->ops.clear();
+       // this->ops.push_back(this->b);
+        this->gops.push_back( this->a * gen::trs( Vec::y * .5) ); 
+      }        
+    } else if (p<4){ 
       //Glide Reflections
       if (ga) { //replace first mirror
         this->ops.clear();
         this->ops.push_back(this->b);
-        this->gops.push_back( this->a * Gen::trs(this->b * .5) ); 
+        this->gops.push_back( this->a * gen::trs(this->b * .5) ); 
       }    
       if (gb) { //replace second mirror
         this->ops.pop_back();
-        this->gops.push_back( this->b * Gen::trs(this->a * .5) ); 
+        this->gops.push_back( this->b * gen::trs(this->a * .5) ); 
       }
     } else {
       if (p==4){
@@ -191,7 +200,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
           this->ops.clear();
           this->ops.push_back(this->b.unit());
           this->ops.push_back(this->b.reflect(this->a).unit());
-          this->gops.push_back( this->a * Gen::trs((this->b - this->a) * .5) ); 
+          this->gops.push_back( this->a * gen::trs((this->b - this->a) * .5) ); 
         }
       }
       if (p==6){
@@ -201,8 +210,11 @@ struct SpaceGroup2D : PointGroup2D<V> {
   
   }
 
+ // Vec bvec(){ return Vec::x.rotate( Biv::xy * PIOVERFOUR/2.0 ); }
+
     Vec vec(float x, float y){
-      return this->a*x + this->b*y*mRatio; 
+      if (this->mP!=1) return this->a*x + this->b*y*mRatio; 
+      else return this->a*x + Vec::y*y;
     }
 
     template<class T>
@@ -320,7 +332,7 @@ template<class V>
 struct PointGroup3D : Group<V> {
 
 
-    typedef typename V::template BType< typename V::Mode::Biv > Biv;
+    using Biv = typename V::space::Biv;
     //typedef typename V::template BType< typename V::Mode::Mot > Mot;
 
     V a, b, c;
@@ -548,18 +560,19 @@ struct PointGroup3D : Group<V> {
 template<class V>
 struct SpaceGroup3D : PointGroup3D<V> {
 
-    typedef typename V::template BType< typename V::Mode::Trs > Trs; 
+   // typedef typename V::template BType< typename V::Mode::Trs >
+    using Trs = typename V::space::translator; 
 
     Trs ta, tb, tc;
 
     SpaceGroup3D(int p, int q) : PointGroup3D<V>(p,q){
-        ta = Gen::trs( this->a);
-        tb = Gen::trs( this->b);
-        tc = Gen::trs( this->c);
+        ta = gen::trs( this->a);
+        tb = gen::trs( this->b);
+        tc = gen::trs( this->c);
     }
 
     Trs trs( int x, int y, int z ) {
-       return Gen::trs( this->a * x +  this->b * y + this->c*z );
+       return gen::trs( this->a * x +  this->b * y + this->c*z );
     }
 
     Group<V> at(int x, int y, int z){

@@ -16,14 +16,13 @@
  * =====================================================================================
  */
 
-#include "vsr_cga3D_op.h"
+#include "space/vsr_cga3D_op.h"
 //#include "vsr_cga3D_funcs.h"
 
 #include "gfx/gfx_mesh.h"
 
-namespace vsr{
+namespace vsr{ namespace cga {
 
-  using namespace vsr::cga3D;
   using gfx::Mesh;
   using gfx::Vec3f;
 
@@ -37,11 +36,11 @@ namespace vsr{
         Cir cirb = CXZ(1);
 
           for (int j = 0; j < slices; ++j){
-            VT tu = PI * (VT)j/slices;
-            Pnt pa = Ro::pnt_cir(cirb, tu);
+            VSR_PRECISION tu = PI * (VSR_PRECISION)j/slices;
+            Pnt pa = round::pnt_cir(cirb, tu);
             for (int i = 0; i < stacks; ++i){   
-               VT tv = PI * (VT)i/stacks;
-               Pnt pb = Ro::pnt_cir( (pa <= cira).dual(), tv ); 
+               VSR_PRECISION tv = PI * (VSR_PRECISION)i/stacks;
+               Pnt pb = round::pnt_cir( (pa <= cira).dual(), tv ); 
                m.add(pb);      
             }
         }
@@ -82,7 +81,7 @@ namespace vsr{
             double t= 1.0 * i/res;
             
             for (int j = 0; j < num; ++j){
-                Vec v = Ro::pnt_cir( cir[j], TWOPI * t );
+                Vec v = round::pnt_cir( cir[j], TWOPI * t );
                 m.add( v[0], v[1], v[2] );
             }
         }
@@ -134,4 +133,4 @@ namespace vsr{
     }
   
   };
-} //vsr
+} } //vsr::cga::

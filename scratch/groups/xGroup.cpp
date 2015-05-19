@@ -1,15 +1,16 @@
 //Window and Gui
-#include "vsr_GLVimpl.h"
+#include "vsr_app.h"
 
 //Math
-#include "vsr_group.h"
-#include "vsr_graph.h"
-#include "vsr_stat.h"
-#include "vsr_hull.h"
+#include "form/vsr_group.h"
+#include "form/vsr_graph.h"
+#include "form/vsr_hull.h"
+
+#include "util/vsr_stat.h"
 
 //Draw Routines
-#include "vsr_generic_draw.h"
-#include "vsr_graph_draw.h"
+#include "draw/vsr_generic_draw.h"
+#include "draw/vsr_graph_draw.h"
 
 
 using namespace vsr;
@@ -53,9 +54,16 @@ struct MyApp : App {
 
   V tmp;
 
-  MyApp(Window * win ) : App(win)
-    //group(3,2)
-    {
+        
+  void setup(){
+
+        bindGLV();
+        gui(p,"p",0,10)(q,"q",0,10)(r,"r",0,10); p = 2; q = 3, r=3;
+        gui(ra)(rb)(rc)(dist,"dist",0,100);
+        gui(bOrtho,"ortho")(bSwap,"bSwap");
+        gui(faceidx,"faceidx",0,20);
+        gui(amt,"amt",0,10);
+
         scene.camera.pos( 0,0,5 ); 
         time = 0;
 
@@ -77,22 +85,10 @@ struct MyApp : App {
         //hull.calc(group); 
         hull.initialFace(group);
         hull.convexPass(group);
-        hull.closeHoles(group);
+        //hull.closeHoles(group);
 
   }
 
-    
-  /*-----------------------------------------------------------------------------
-   *  INITIALIZE GUI
-   *-----------------------------------------------------------------------------*/
-    void initGui(){
-      gui(p,"p",0,10)(q,"q",0,10)(r,"r",0,10); p = 2; q = 3, r=3;
-      gui(ra)(rb)(rc)(dist,"dist",0,100);
-      gui(bOrtho,"ortho")(bSwap,"bSwap");
-      gui(faceidx,"faceidx",0,20);
-      gui(amt,"amt",0,10);
-    }
-  
 
     /*-----------------------------------------------------------------------------
      *  ON DRAW
@@ -123,26 +119,10 @@ struct MyApp : App {
 };
 
 
-
-
-/*-----------------------------------------------------------------------------
- *  MAIN
- *-----------------------------------------------------------------------------*/
-MyApp * app;
-
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
-
+  MyApp app;
+  app.start();
   return 0;
 
 }

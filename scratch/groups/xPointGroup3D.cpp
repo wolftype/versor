@@ -17,11 +17,11 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_group.h"
+#include "vsr_app.h"   
+#include "form/vsr_group.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
  
