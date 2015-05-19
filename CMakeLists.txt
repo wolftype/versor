@@ -32,6 +32,8 @@ foreach(filename ${tests})
   target_link_libraries(${target} vsr )
 endforeach()
 
+set(vsr_libraries vsr)
+
 if(${BUILD_GRAPHICS})
   
   #OPTIONAL ADD GFX AS SUBDIRECTORY TO BUILD GRAPHICS DEMOS
@@ -54,7 +56,8 @@ if(${BUILD_GRAPHICS})
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES}) 
   endif()
 
-  set(libraries vsr vsrGfx ${GFX_LIBRARIES}  ) 
+  set(vsr_libraries  ${vsr_libraries} vsrGfx)
+  set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  ) 
 
   file(GLOB examples examples/*.cpp)
   foreach(filename ${examples})
@@ -67,14 +70,18 @@ endif()
 
 #PRINT DIRECTORIES
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-message("LINK DIRECTORES")
+message("VERSOR LINK DIRECTORES")
 foreach(d ${dirs})
   message(STATUS "link dir='${d}'")
 endforeach()
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-message("INCLUDE DIRECTORES")
+message("VERSOR INCLUDE DIRECTORES")
 foreach(d ${dirs})
   message(STATUS "include dir='${d}'")
 endforeach()
+
+set_property(GLOBAL PROPERTY VSR_LIBRARIES ${vsr_libraries})
+set_property(GLOBAL PROPERTY VSR_INCLUDE_DIR "${inc_dirs}")
+set_property(GLOBAL PROPERTY VSR_LINK_DIR "${link_dirs}")
 
 
