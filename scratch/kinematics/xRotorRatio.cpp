@@ -1,35 +1,35 @@
 /*
  * =====================================================================================
  *
- *       Filename:  xPointPair.cpp
+ *       Filename:  xRotorRatio.cpp
  *
- *    Description:  a point pair
+ *    Description:  ratio of rotors
  *
  *        Version:  1.0
- *        Created:  02/10/2015 15:27:55
+ *        Created:  04/23/2015 18:17:34
  *       Revision:  none
- *       Compiler:  clang3.2 or above or gcc4.6 or above
+ *       Compiler:  gcc
  *
- *         Author:  Pablo Colapinto (), gmail -> wolftype
+ *         Author:  Pablo Colapinto (), gmail->wolftype
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
-
-  //A pair of points at x=-1 and x=1
-  Pair p = point(-1,0,0) ^ point(1,0,0);
  
   //Some Variables
   bool bReset = false;
-  float amt = 0;
+  float amt,amt2,amt3,amt4= 0;
 
+
+  
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -37,10 +37,8 @@ struct MyApp : App {
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bReset,"bReset");
+    gui(amt,"amt",-100,100)(amt2,"amt2",-10,10)(amt3,"amt3",-10,10)(amt4,"amt4",0,10)(bReset,"bReset");
     
-    //add point pair to objectController
-    objectController.attach(&p);
   }
 
 
@@ -48,9 +46,24 @@ struct MyApp : App {
    *  Draw Routines 
    *-----------------------------------------------------------------------------*/
   void onDraw(){
+  
+    Frame fa(-2,1,0); fa.rot() = cga::gen( Biv::xz * amt) * cga::gen( Biv::xy * amt2);
+    Frame fb(0,2,0); fb.rot() =  fa.rot() * cga::gen( Biv::xz * amt3) * cga::gen( Biv::xy * amt4 );
+    fb.pos() = (fa.pos() + fa.y()).null();
 
-    
-    draw(p,0,1,0);
+    Draw(fa); Draw(fb);
+
+
+    auto yratio = gen::ratio( fa.y(), fb.y() );
+
+    auto ratio = fb.rot() / fa.rot(); // rotor to take 
+
+    auto comp = !fa.rot() * !yratio * fb.rot(); //SEQUENCE MATTERS!//!fa.rot() * 
+
+    Frame f; f.rot() = comp;// * fa.rot();
+    Draw ( f );
+
+
   
   }
   

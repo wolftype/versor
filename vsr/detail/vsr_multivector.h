@@ -75,17 +75,13 @@ namespace vsr{
       constexpr explicit Multivector(Args...v) :
       val{ static_cast<value_t>(v)...} {} 
 
-      /// Construct from different Basis within same Algebra (NOTE: this is a c++1y extension -- provide better fix)
+      /// Construct from different Basis within same Algebra
       template<typename B>
-      constexpr Multivector( const Multivector<algebra,B>& b) { 
-        *this = b.template cast<Multivector<algebra,basis>>(); 
-      }
+      constexpr Multivector( const Multivector<algebra,B>& b) : Multivector(b.template cast<Multivector<algebra,basis>>()) {}
 
       // Construct from different algebra signature and different basis
       template<class alg, typename B>
-      constexpr Multivector( const Multivector<alg, B>& b ){
-        *this = b.template cast<Multivector<algebra,basis>>();
-      }
+      constexpr Multivector( const Multivector<alg, B>& b ) : Multivector( b.template cast<Multivector<algebra,basis>>() ) {}
 
       /// Immutable get value of blade type IDX (Note, make user-defined literal?)
       template<bits::type IDX> value_t get() const;

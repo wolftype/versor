@@ -1,0 +1,27 @@
+#MAKEFILE FOR RASPBERRY PI
+
+
+PORT = 22
+HOST = pi-la
+
+PIROOT = $(HOME)/code/pi/root/
+
+CXX = arm-linux-gnueabihf-g++ -std=c++0x
+
+IPATH += -I../gfx/
+IPATH += -I$(PIROOT)usr/include
+IPATH += -I$(PIROOT)usr/local/include
+IPATH += -I$(PIROOT)opt/vc/include
+IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
+IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux  
+LDFLAGS += -L$(PIROOT)lib
+LDFLAGS += -L$(PIROOT)usr/lib
+LDFLAGS += -L$(PIROOT)usr/local/lib
+LDFLAGS += -L$(PIROOT)opt/vc/lib
+LDFLAGS += -lbcm_host
+LDFLAGS += -llo
+LDFLAGS += -lm
+LDFLAGS += -lrt
+LDFLAGS += -lstdc++
+LDFLAGS += -lvchiq_arm
+LDFLAGS += -lvcos

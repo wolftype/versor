@@ -1,0 +1,80 @@
+#CMAKE FOR The Versor Geometric Algebra Mathematics Library 
+
+#VERSION
+cmake_minimum_required(VERSION 2.8)
+
+#POLICIES
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 OLD)
+endif(COMMAND cmake_policy)
+
+#PROJECT
+project(VERSOR)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
+
+#PROJECT INCLUDE AND LINK
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/vsr/)
+
+file(GLOB core src/space/*.cpp)
+
+add_library(vsr ${core})
+link_directories(${PROJECT_BINARY_DIR})
+
+#CORE TEST TARGETS
+set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
+file(GLOB tests tests/*.cpp)
+foreach(filename ${tests})
+  get_filename_component(target ${filename} NAME_WE)
+  add_executable(${target} ${filename} )
+  target_link_libraries(${target} vsr )
+endforeach()
+
+if(${BUILD_GRAPHICS})
+  
+  #OPTIONAL ADD GFX AS SUBDIRECTORY TO BUILD GRAPHICS DEMOS
+  add_subdirectory(ext/gfx)
+
+  #GET INCLUDE DIRECTORIES, LINK DIRECTORIES, AND LINKED LIBS
+  get_property(GFX_LIBRARIES GLOBAL PROPERTY GFX_LIBRARIES)
+  get_property(GFX_INCLUDE_DIR GLOBAL PROPERTY GFX_INCLUDE_DIR)
+  get_property(GFX_LINK_DIR GLOBAL PROPERTY GFX_LINK_DIR)
+
+  include_directories(${GFX_INCLUDE_DIR})
+  link_directories(${GFX_LINK_DIR})
+
+  file(GLOB graphicsGL src/draw/GL/*.cpp)
+  file(GLOB graphicsGLES src/draw/GLES/*.cpp)
+
+  if(${RASPBERRY})
+    add_library(vsrGfx ${graphicsGLES}) 
+  else()
+    add_library(vsrGfx ${graphicsGL} ${graphicsGLES}) 
+  endif()
+
+  set(libraries vsr vsrGfx ${GFX_LIBRARIES}  ) 
+
+  file(GLOB examples examples/*.cpp)
+  foreach(filename ${examples})
+    get_filename_component(target ${filename} NAME_WE)
+    add_executable(${target} ${filename} )
+    target_link_libraries(${target} ${libraries})
+  endforeach()
+
+endif()
+
+#PRINT DIRECTORIES
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+message("LINK DIRECTORES")
+foreach(d ${dirs})
+  message(STATUS "link dir='${d}'")
+endforeach()
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+message("INCLUDE DIRECTORES")
+foreach(d ${dirs})
+  message(STATUS "include dir='${d}'")
+endforeach()
+
+

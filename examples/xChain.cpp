@@ -4,6 +4,7 @@
 #include "form/vsr_chain.h" 
 
 using namespace vsr;
+using namespace vsr::cga;
 using namespace glv;  
 
 const int numChain = 10;  ///< number of kinematic chains

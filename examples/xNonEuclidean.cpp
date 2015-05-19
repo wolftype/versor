@@ -16,10 +16,10 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {    
    
@@ -50,7 +50,7 @@ struct MyApp : App {
       int num = 20;
       for (int i=0; i<=num; ++i){
         double t=-spacing/2.0 + spacing*(double)i/num;
-        auto tan = Ro::null(t,0,0) ^ Vec::y;
+        auto tan = round::null(t,0,0) ^ Vec::y;
         Line line = tan ^ inf;
         draw(line,0,0,1);
 
@@ -63,7 +63,7 @@ struct MyApp : App {
 
       for (int i=0; i<=num; ++i){
         double t=-spacing/2.0 + spacing*(double)i/num;
-        auto tan = Ro::null(0,t,0) ^ Vec::x;
+        auto tan = round::null(0,t,0) ^ Vec::x;
         
         Line line = tan ^ inf;
         draw(line,0,0,1);
