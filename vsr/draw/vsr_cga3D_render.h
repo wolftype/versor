@@ -21,7 +21,7 @@
 #define  vsr_cga3D_render_INC
 
 
-#include "gfx/gfx_glyphs.h"
+//#include "gfx/gfx_glyphs.h"
 #include "gfx/gfx_render.h"
 
 #include "space/vsr_cga3D_op.h"
@@ -30,7 +30,7 @@
 #include "form/vsr_cga3D_frame.h"  
 #include "form/vsr_field.h"
 
-#include "draw/vsr_cga3D_draw.h"
+//#include "draw/vsr_cga3D_draw.h"
 
 namespace gfx{   
 

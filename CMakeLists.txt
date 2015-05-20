@@ -69,14 +69,14 @@ if(${BUILD_GRAPHICS})
 endif()
 
 #PRINT DIRECTORIES
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
 message("VERSOR LINK DIRECTORES")
-foreach(d ${dirs})
+foreach(d ${link_dirs})
   message(STATUS "link dir='${d}'")
 endforeach()
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+get_property(inc_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 message("VERSOR INCLUDE DIRECTORES")
-foreach(d ${dirs})
+foreach(d ${inc_dirs})
   message(STATUS "include dir='${d}'")
 endforeach()
 
