@@ -1,17 +1,17 @@
 /*
  * =====================================================================================
  *
- *       Filename:  xHopf.cpp
+ *       Filename:  xHopfKnot.cpp
  *
- *    Description:  good fibration
+ *    Description:  hopf fibers determined by knot orbit
  *
  *        Version:  1.0
- *        Created:  03/21/2014 15:30:21
+ *        Created:  05/20/2015 13:07:48
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *         Author:  Pablo Colapinto (), gmail->wolftype
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
@@ -30,8 +30,7 @@ using namespace vsr::cga;
 
 struct MyApp : App {    
    
-  Pnt mouse;
-  Lin ray;
+  Point mouse;
 
   float time;
   float amt;
@@ -56,13 +55,13 @@ struct MyApp : App {
 
   virtual void onDraw(){ 
 
-   glPolygonMode( GL_FRONT, GL_LINE );    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glPolygonMode( GL_FRONT, GL_LINE );  
 
     vector<Cir> cir;
 
-    tk.P = mP;
-    tk.Q = mQ;  
+    tk.P = mP; tk.Q = mQ;  
     tk.HF.vec() = -Vec::y.rot( Biv::xy * theta );
+    
     tk.calc0( round::null(amt,0,0) );
 
     for (auto& i: tk.pnt ){
@@ -71,20 +70,6 @@ struct MyApp : App {
        hf.vec() = v;
        cir.push_back(hf.fiberA());      
     }
-
-    /* for (int i=0; i<100; ++i){ */
-
-    /*   double theta = (double)i/100; */
-    /*   double phi = sin(theta*PI*10) * amt; */
-
-    /*   Vec v = Vec::x.sp( Gen::rot( PI * theta, PIOVERFOUR * phi )  ); */
-    /*   hf.vec() = v; */
-
-    /*   Draw( v.null(),1,0,0 ); */
-      
-    /*   cir.push_back( hf.fiberA() ); */
-    
-    /* } */
 
     auto m = Shape::Skin(cir, cir.size(), 15);
     m.drawElements();

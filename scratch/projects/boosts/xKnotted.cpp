@@ -1,7 +1,5 @@
-#include "vsr_generic_op.h"
-#include "vsr_generic_draw.h"  
-#include "vsr_GLVimpl.h" 
-  
+#include "vsr_app.h"
+ 
 using namespace vsr;
 using namespace glv;  
    

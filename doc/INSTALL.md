@@ -19,15 +19,23 @@ BUILD
 ### Version 2.0 ###
 
 
-	git clone git://github.com/wolftype/vsr2.0.git                              
-	cd vsr2.0
-	git submodule init
-	git submodule update 
+	git clone git://github.com/wolftype/versor.git
+	cd versor
 
-This grabs Versor (vsr), a Graphics Library (gfx) submodule and GLV (a user-interface submodule). 
+to build the core mathematics library only run
+
+	./build.sh
+
+to build the graphics component, fetch the external graphics libraries
+
+	git submodule init
+	git submodule update
+	./buildAll.sh 
+
+This grabs a Graphics Library (gfx) submodule and GLV (a user-interface submodule). 
 
 	
-### Version 1.0 ###
+### Older Version 1.0 ###
 
 	git clone git://github.com/wolftype/vsr.git
 	cd vsr

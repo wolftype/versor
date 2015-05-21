@@ -115,7 +115,12 @@ namespace vsr{
 struct Root{
 
 
-  ///Utility function to compare two vectors (looks at dot product, or norm of diff...)           
+  //indices into a reflection operation group and its results
+  struct ReflectIdx{
+    int opIdx, resIdx;
+  };
+
+  ///Utility function to compare two unit vectors (looks at dot product, or norm of diff...)           
   template<class V>
   static bool Compare(const V& a, const V& b, bool ref = true){   
 //    return ( ( a-b ).wt() ) < .000001; 
@@ -181,7 +186,60 @@ struct Root{
  
    }
    return results;
-}  
+  }
+  
+
+   /*-----------------------------------------------------------------------------
+    *  Calculate number of extra reflections to calculate for a given (unit) seed vector (beyond System results)
+
+       @param vec a random seed vec (must be unit)
+       @param op a vector of vec versors
+    *-----------------------------------------------------------------------------*/
+  template<class V>
+  static vector<ReflectIdx> Reflections(const V& vec, const vector<V>& op){ //<-- vec can be random or specifc axis MUST BE UNIT
+
+    vector<ReflectIdx> rIdx;
+    
+    //FIRST PASS
+    vector<Vec> vvec;
+     
+    for(auto& i : op){
+      auto tvec = vec.reflect(i);
+      vvec.push_back(tvec);
+    }
+
+    //Keep doing it until none new, record results in rIdx
+    bool keepgoing=true;
+    while(keepgoing){
+      
+      keepgoing=false;
+      int tn = vvec.size();
+      for(int i =0; i<op.size(); ++i){
+        for (int j=0;j<tn;++j){
+      
+          auto tvec = vvec[j].reflect( op[i] );
+   
+          bool exists = false;
+          for (auto& k : vvec){
+            exists = Root::Compare(tvec,k);
+            if (exists) {
+              break;
+            }
+           }
+   
+          if (!exists){
+            vvec.push_back(tvec);
+          //  cout <<  i << " " << j << endl;
+            rIdx.push_back( {i,j} );
+            keepgoing=true;
+          }
+        }
+      }
+    }
+
+    return rIdx;
+  }
+
 };
 
             
