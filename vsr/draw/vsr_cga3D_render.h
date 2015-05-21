@@ -81,7 +81,7 @@ namespace gfx{
   extern template void MeshBuffer<Field<cga::Pnt>>::Add( const Field<cga::Pnt>& f );
  
   template<> struct ModelMatrix<cga::Frame>; 
-  extern template struct ModelMatrix<cga::Frame>; 
+  //extern template struct ModelMatrix<cga::Frame>; 
   
   template<> void Renderable<cga::Frame>::Draw(const cga::Frame&, GFXSceneNode * s);
   template<> void Renderable<cga::Cir>::Draw(const cga::Cir&, GFXSceneNode * s);
