@@ -247,6 +247,12 @@ namespace vsr { namespace cga {
 
     /// Move by dx, dy, dz and return this
     Frame& move( VSR_PRECISION dx , VSR_PRECISION dy, VSR_PRECISION dz );
+    /// Move by Vec
+    Frame& move( const Vec& v);
+    // Spin by Biv
+    Frame& rotate( const Biv& b);
+    /// Rotate by Rot
+    Frame& rotate( const Rot& r);
     /// Twist by dualLine and return *this
     Frame& twist( const Dll& );
     /// Twist by Motor and return *this

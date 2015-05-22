@@ -178,6 +178,22 @@ namespace vsr{ namespace cga {
       return *this; 
     }
 
+    Frame& Frame::move( const Vec& v){
+      mPos = (mPos + v ).null();     
+      return *this; 
+    }
+
+    /// Rotate by Bivector xy, xz, yz
+    Frame& Frame::rotate( const Biv& b){
+      return rotate( gen::rot(b) );
+    } 
+
+    /// Rotate by Rotor R
+    Frame& Frame::rotate( const Rot& r){
+      mRot = mRot.spin(r);
+      return *this;
+    }
+
     /// Twist by dualLine and return this
     Frame& Frame::twist( const Dll& d ){
       return twist(gen::mot(d));
