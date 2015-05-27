@@ -16,7 +16,7 @@
 
 using namespace std;
 
-namespace vsr {
+namespace vsr { namespace cga {
   
   namespace Coord{
   
@@ -57,7 +57,7 @@ namespace vsr {
         return sph2deg( vec2sph(v) );
      }
   }
-} //vsr::
+} }//vsr::cga::
 
 
 

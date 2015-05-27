@@ -1,4 +1,4 @@
-#include "vsr_generic_op.h"
+#include "detail/vsr_generic_op.h"
 #include "vsr_set.h"
 
 //assumes conformal

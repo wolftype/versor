@@ -17,13 +17,12 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_knot.h"
-#include "vsr_cga3D_frame.h"
-#include "vsr_stat.h"
+#include "vsr_app.h"   
+#include "form/vsr_knot.h"
+#include "util/vsr_stat.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -58,8 +57,8 @@ struct MyApp : App {
   
 
     Pnt random(){
-      Vec v = Vec::x.sp( Gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
-      return Ro::null(v);
+      Vec v = Vec::x.sp( gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
+      return round::null(v);
     }
 
     void reset(){
@@ -73,7 +72,7 @@ struct MyApp : App {
 
       //Generate Boost
       Par par = tk.par();
-      Bst bst = Gen::bst( par * amt );
+      Bst bst = gen::bst( par * amt );
 
       //For each seeded point
       for(auto& tp : pnt ){
@@ -82,19 +81,19 @@ struct MyApp : App {
          Pnt tmp = tp;
 
          //Boost
-         tp = Ro::loc( tp.spin( bst ) );
+         tp = round::loc( tp.spin( bst ) );
          Draw(tp);  
          
          //make movement  
          Par tpar = tmp ^ tp; 
-         Pnt cpnt = Ro::pnt_cir( tpar.dual(), 0 );
-         Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
-         Pnt p = cpnt;//Ro::loc( cpnt.spin( mot * bst ) ) ;
+         Pnt cpnt = round::pnt_cir( tpar.dual(), 0 );
+         Mot mot = gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
+         Pnt p = cpnt;//round::loc( cpnt.spin( mot * bst ) ) ;
          Draw(p,1,1,0);
          //tp = p;
          for (int i=0;i<iter;++i){
-           VT t = (float)i/iter;
-           p = Ro::loc( p.spin( bst * mot ) );
+           VSR_PRECISION t = (float)i/iter;
+           p = round::loc( p.spin( bst * mot ) );
            Draw(p,0,1,0,1-t);
          }
       }

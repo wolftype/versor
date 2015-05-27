@@ -60,6 +60,8 @@ namespace vsr{  namespace cga {
 
      public:
 
+     Bennett() : Chain() {}
+
      Bennett( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB  )
      : Chain("RRRR"), mTheta(theta), mLengthA( lengthA ), mLengthB( lengthB ), mPhase(0) {
         init();    

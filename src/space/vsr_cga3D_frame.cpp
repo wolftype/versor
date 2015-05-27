@@ -95,9 +95,10 @@ namespace vsr{ namespace cga {
     Cir Frame::icyz() const { return round::produce( bound(), yz() ); }     ///< yz circle (imaginary, direct)
 
     /// Set position and orientation by motor 
-    void Frame::mot(const Mot& m) { 
+    Frame& Frame::mot(const Mot& m) { 
           mPos = PAO.sp(m); 
           mRot = m; 
+          return *this;
       } 
 
     /// Generate Translation versor based on Position
@@ -281,6 +282,12 @@ namespace vsr{ namespace cga {
     Frame& Frame::relTwist( const Frame& target, float t){
       //DualLine dll = gen::log ( target.mot() / mot() ) * t;
       return twist( gen::ratio ( mot(), target.mot(), t) );
+    }
+
+    /// Relative Twist AWAY from target frame by amt t
+    Frame& Frame::relTwistAway( const Frame& target, float t){
+      //DualLine dll = gen::log ( target.mot() / mot() ) * t;
+      return twist( !gen::ratio ( mot(), target.mot(), t) );
     }
     
     Frame Frame::moveX( VSR_PRECISION amt ) const{

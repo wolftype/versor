@@ -118,7 +118,8 @@ namespace vsr { namespace cga {
     Motor relMotor( const Frame& target );
     /// Relative twist towards frame f by amt t
     Frame& relTwist( const Frame& target, float t);
-    
+    /// Relative twist away frome frame f by amt t
+    Frame& relTwistAway( const Frame& target, float t);    
 
     /*-----------------------------------------------------------------------------
      *  POSITION METHODS
@@ -198,7 +199,7 @@ namespace vsr { namespace cga {
     Vec forward() const { return -z(); }  
   
     /// Set position and orientation by motor (absolute) 
-    void mot(const Mot& m);
+    Frame& mot(const Mot& m);
 
     /// Generate Translation versor based on Position
     Trs trs() const;

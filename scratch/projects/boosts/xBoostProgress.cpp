@@ -1,9 +1,5 @@
-#include "vsr_cga3D_app.h"  
-#include "vsr_cga3D_draw.h" 
-#include "vsr_cga3D_interface.h"  
-
-#include "vsr_field.h"
-
+#include "vsr_app.h"  
+#include "form/vsr_field.h"
 
 struct MyApp : App {
 

@@ -17,13 +17,11 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
-#include "vsr_frame.h"
-#include "vsr_twist.h"
+#include "vsr_app.h"   
+#include "form/vsr_twist.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 typedef decltype( Bst() * Mot() ) Mtt; 

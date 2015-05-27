@@ -73,20 +73,22 @@ struct TorusKnot  {
                      
   //Calculate full orbit from point p
   void calc( const Pnt& p){
+    pnt.clear(); cir.clear();
+    
     Pnt np = p; 
     Bst tbst = bst();
-    for (int i = 0; i < iter(); ++ i ){
+    int tnum = iter();
+    
+    for (int i = 0; i < tnum; ++ i ){
       np = round::loc( np.sp( tbst ) );  
       add(np);
     }
-    
               
     //Tube Neighborhood  
-    int tnum = iter();
     for (int i = 0; i < tnum; ++i ){ 
-      double t = -1 + 2.0 * i/ tnum;
-          double tt = 1 + t * t;
-          int idx = i < tnum -1 ? i + 1 : 0;  
+      //double t = -1 + 2.0 * i/ tnum;
+      //double tt = 1 + t * t;
+      int idx = i < tnum -1 ? i + 1 : 0;  
       Par tpar = pnt[i] ^ pnt[idx];
       Cir c = tpar.dual();//.dil(tk.pnt[i], );
       add ( c );
@@ -95,13 +97,26 @@ struct TorusKnot  {
 
   //calculate full orbit from point p without renormalizing at each step (no tube)
   void calc0( const Pnt& p){
-    pnt.clear();
+    pnt.clear(); cir.clear();
     Pnt np = p; 
     Bst tbst = bst();
-    for (int i = 0; i < iter(); ++ i ){
+    int tnum = iter();
+
+    for (int i = 0; i < tnum; ++ i ){
       np = np.sp( tbst ) ;  
       add( round::loc( np) );
-    }       
+    }   
+
+    //Tube Neighborhood  
+    for (int i = 0; i < tnum; ++i ){ 
+      //double t = -1 + 2.0 * i/ tnum;
+      //double tt = 1 + t * t;
+      int idx = i < tnum -1 ? i + 1 : 0;  
+      Par tpar = pnt[i] ^ pnt[idx];
+      Cir c = tpar.dual();//.dil(tk.pnt[i], );
+      add ( c );
+    }    
+        
   }
 
   template<typename T>
@@ -119,7 +134,7 @@ struct TorusKnot  {
   double energy(int idx, int num){
 
       double totalEnergy = 0;     ///< Running sum TOTAL ENERGY OF KNOT 
-    energies.clear();           ///< energies relative to idx
+      energies.clear();           ///< energies relative to idx
       energies.push_back(0);      ///< Initial
   
     //forward and reverse arc measurements

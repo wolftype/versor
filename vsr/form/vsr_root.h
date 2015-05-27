@@ -195,50 +195,50 @@ struct Root{
        @param vec a random seed vec (must be unit)
        @param op a vector of vec versors
     *-----------------------------------------------------------------------------*/
-  template<class V>
-  static vector<ReflectIdx> Reflections(const V& vec, const vector<V>& op){ //<-- vec can be random or specifc axis MUST BE UNIT
-
-    vector<ReflectIdx> rIdx;
-    
-    //FIRST PASS
-    vector<Vec> vvec;
-     
-    for(auto& i : op){
-      auto tvec = vec.reflect(i);
-      vvec.push_back(tvec);
-    }
-
-    //Keep doing it until none new, record results in rIdx
-    bool keepgoing=true;
-    while(keepgoing){
-      
-      keepgoing=false;
-      int tn = vvec.size();
-      for(int i =0; i<op.size(); ++i){
-        for (int j=0;j<tn;++j){
-      
-          auto tvec = vvec[j].reflect( op[i] );
-   
-          bool exists = false;
-          for (auto& k : vvec){
-            exists = Root::Compare(tvec,k);
-            if (exists) {
-              break;
-            }
-           }
-   
-          if (!exists){
-            vvec.push_back(tvec);
-          //  cout <<  i << " " << j << endl;
-            rIdx.push_back( {i,j} );
-            keepgoing=true;
-          }
-        }
-      }
-    }
-
-    return rIdx;
-  }
+//  template<class V>
+//  static vector<ReflectIdx> Reflections(const V& vec, const vector<V>& op){ //<-- vec can be random or specifc axis MUST BE UNIT
+//
+//    vector<ReflectIdx> rIdx;
+//    
+//    //FIRST PASS
+//    vector<Vec> vvec;
+//     
+//    for(auto& i : op){
+//      auto tvec = vec.reflect(i);
+//      vvec.push_back(tvec);
+//    }
+//
+//    //Keep doing it until none new, record results in rIdx
+//    bool keepgoing=true;
+//    while(keepgoing){
+//      
+//      keepgoing=false;
+//      int tn = vvec.size();
+//      for(int i =0; i<op.size(); ++i){
+//        for (int j=0;j<tn;++j){
+//      
+//          auto tvec = vvec[j].reflect( op[i] );
+//   
+//          bool exists = false;
+//          for (auto& k : vvec){
+//            exists = Root::Compare(tvec,k);
+//            if (exists) {
+//              break;
+//            }
+//           }
+//   
+//          if (!exists){
+//            vvec.push_back(tvec);
+//          //  cout <<  i << " " << j << endl;
+//            rIdx.push_back( {i,j} );
+//            keepgoing=true;
+//          }
+//        }
+//      }
+//    }
+//
+//    return rIdx;
+//  }
 
 };
 

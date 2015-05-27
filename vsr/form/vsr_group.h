@@ -42,6 +42,7 @@ struct SimpleGroup{
 
 /// A Group of Operations called with group( sometype t ) or group( vector<sometype> t)
 /// V are  versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
+/// NOTE this is overshadowed by the pointgroup3d, which handles its own operator ()
 template< class V >
 struct Group {
 
@@ -51,15 +52,17 @@ struct Group {
   //typedef typename V::template BType< typename V::Mode::Trs > Trs; 
   using Trs = typename V::space::translator;
 
-   vector<V> ops;                       ///< Pin Operators (Vec, etc)
-   vector<decltype(V()*V())> sops;      ///< Spin Operators (Rot, etc)
-   vector<decltype(V()*V()*V())> tops;  ///< Triple Reflection (abbar 3d group)
-   vector<decltype(V()*Trs())> gops;    ///< Glide Operators 
+   vector<V> ops;                              ///< Pin Operators (Vec, etc)
+   vector<decltype(V()*V())> sops;             ///< Spin Operators (Rot, etc)
+   vector<decltype(V()*V()*V())> tops;         ///< Triple Reflection (abbar 3d group)
+   vector<decltype(V()*Trs())> gops;           ///< Glide Operators 
+   vector<decltype(V()*V()*Trs())> scrops;     ///< Screw Operators (Motor)
 
    Group() {}
    Group( vector<V> v ) : ops(v) {}
 
     /// Applies all operators on p motif and returns results
+    // Note this is overloaded in PointGroups, which use a "seed-based recording" approach
 	  template<class T>
     vector<T> operator()(const T& p){
           vector<T> res;
@@ -219,6 +222,11 @@ struct SpaceGroup2D : PointGroup2D<V> {
       else return this->a*x + Vec::y*y;
     }
 
+
+    
+    /*-----------------------------------------------------------------------------
+     *  Apply translations to a single element
+     *-----------------------------------------------------------------------------*/
     template<class T>
     vector<T> apply(const T& motif, int x, int y){
       
@@ -339,7 +347,7 @@ struct PointGroup3D : Group<V> {
 
     using Biv = typename V::space::Biv;
 
-    V a, b, c;
+    V a, b, c;          //<-- basis generators
 
     vector<OpIdx> opIdx; //<-- given a seed vector, store all reflection operations here.
   //  vector<OpIdx> spinIdx; //<-- "" spin operations
@@ -374,182 +382,26 @@ struct PointGroup3D : Group<V> {
       b = (bivA.duale() ^ bivC.duale()).duale().unit();
 
 
- //     if (!abar && !bbar && !abbar ){              //Case of only reflections. easy!
- //       this->ops = Root::System(a,b,c);
- //       this->numSimple = 3;
- //     } else if (abbar){                           //Case of bar across both, so transformation is abc
- //       this->tops = Root::System(a*b*c);
- //       this->numSimple =1;
- //     } else if ( abar && bbar ) {                 //Case of both are individually barred (cyclic not mirrored)
- //       auto rot = a*b;
- //       auto trot = rot;
- //       for (int i=0;i<p;++i){
- //         this->sops.push_back(trot);
- //         trot = trot * rot;
- //       }
- //       auto brot = b*c;
- //       auto btrot = brot;
- //       for (int i=0;i<q;++i){
- //         for (int j=0;j<p;++j){
- //          this->sops.push_back( btrot * this->sops[j] );
- //         }
- //         btrot=btrot*brot;
- //       }
- //       
- //     } else if (abar){                                 //Case of only one or other are cyclic
- //         auto rot = a*b;
- //         auto trot = rot;
- //         for (int i=0;i<p;++i){                        //make a bunch of rotors
- //           this->sops.push_back(trot);
- //           trot = trot * rot;
- //         }
- //         this->ops = Root::System( c );                //instantiate single mirror plane
-
- //         //add if not 180 degrees apart
- //         auto tmp = this->ops[0].spin( this->sops[0] );
- //         if ( !Root::Compare( this->ops[0].unit(), tmp.unit(), false ) ){
- //           this->ops.push_back(tmp.unit());
- //         }
-
- //         //recalculate
- //         this->ops = Root::System( this->ops, false );
- //       } else if (bbar){
- //         auto rot = b*c;
- //         auto trot = rot;
- //         for (int i=0;i<q;++i){
- //           this->sops.push_back(trot);
- //           trot = trot * rot;
- //         }
- //         
- //         auto rtmp = Root::System( a );
-
- //         auto tmp = a.spin( this->sops[0] );
- //         if ( !Root::Compare( a, tmp.unit(), false ) ){
- //             rtmp.push_back(tmp.unit());
- //           }
- //         this->ops = Root::System( rtmp, false );
-
- //        }
-
       if (!abar && !bbar && !abbar ){              //Case of only reflections. easy!
         this->ops = {a,b,c};
+       } else if (abbar){
+         this->tops.push_back(a*b*c); //<--implications?
        } else if ( abar && bbar ) { 
-         
+         this->sops.push_back(a*b);
+         this->sops.push_back(b*c);
        } else if (abar){                                 //Case of only one or other are cyclic
           this->sops.push_back(a*b);
-          this->ops.push_back(c);// = Root::System( c );                //instantiate single mirror plane
-
+          this->ops.push_back(c);              
        } else if (bbar){
           this->sops.push_back(b*c);
-          this->ops.push_back(a);// = Root::System( a );
+          this->ops.push_back(a);
        }
 
-         // seed a random vector to record all unique reflection operations
+         // seed a random vector to "record" all unique reflection and spin operations
          seed();
 
     }
 
-
-//    /// Applies all operators to p motif and returns results
-///     old version (does not make seeded recording)
-//    template<class T>
-//    vector<T> operator()(const T& p){
-//
-//          vector<T> res;
-//          res.push_back(p);
-//
-//          //spin first
-//          int n = res.size();
-//          for (auto& i : this->sops){
-//            T tp = res[0].spin(i);
-//            res.push_back(tp);
-//          }
-//
-//          /* //now reflect all */
-//          for (auto& i : this->ops){
-//            int tn = res.size();
-//            for (int j=0;j<tn;++j){
-//              auto ts = res[j];
-//              ts = ts.reflect( i.unit() );
-//              res.push_back(ts);
-//            }
-//          }
-//
-//          //unsure about this (abc)..
-//          for (auto& i : this->tops){
-//            T tp = p.reflect(i);
-//            res.push_back(tp);
-//          }
-//
-//
-//           //apply glides and reapply pins
-//           for (auto& i : this->gops){
-//              T tg = p.reflect(i);
-//              if (this->ops.empty()) {
-//                res.push_back(tg);
-//                res.push_back( tg.reflect( this->gops[0] ) );
-//              }              
-//              for (auto& j : this->ops){
-//                T tp = tg.reflect( j.unit() );
-//                res.push_back(tp);
-//                res.push_back( tp.reflect( this->ops[0].unit() ) );
-//              }
-//           }
-//          
-//          return res;
-//    }
-
-//    /// Applies all operators to p motif and returns results
-//    template<class T>
-//    vector<T> operator()(const T& p){
-//
-//         // vector<T> res;
-//         // res.push_back(p);
-//
-//          //Do ALL Reflections
-//          auto res = apply(p);
-//
-//          //spin ALL results
-//          int rn = res.size();
-//          for (auto& i : this->sops){
-//            for (int j=0;j<rn;++j){
-//              auto ts = res[j].spin( i );
-//              res.push_back(ts);
-//            }
-//          }
-//
-//          /* //now reflect all */
-//        int rn = res.size();
-//        for (auto& i : this->ops){
-//          for (int j=0;j<rn;++j){
-//            auto ts = res[j].reflect( i.unit() );
-//            res.push_back(ts);
-//          }
-//        }
-//
-//          //unsure about this (abc)..
-//          for (auto& i : this->tops){
-//            T tp = p.reflect(i);
-//            res.push_back(tp);
-//          }
-//
-//
-//           //apply glides and reapply pins
-//           for (auto& i : this->gops){
-//              T tg = p.reflect(i);
-//              if (this->ops.empty()) {
-//                res.push_back(tg);
-//                res.push_back( tg.reflect( this->gops[0] ) );
-//              }              
-//              for (auto& j : this->ops){
-//                T tp = tg.reflect( j.unit() );
-//                res.push_back(tp);
-//                res.push_back( tp.reflect( this->ops[0].unit() ) );
-//              }
-//           }
-//          
-//          return res;
-//    }
 
     template<class T>
     vector<T> operator() (const T& p){
@@ -559,9 +411,10 @@ struct PointGroup3D : Group<V> {
 
     void seed(const Vec& vec=Vec(.213,.659,1.6967).unit() ){
 
-        //FIRST PASS (ops and sops)
+        opIdx.clear();
         vector<Vec> tv;
 
+        //FIRST PASS (ops and sops)
         for(auto& i : this->ops){
           auto tvec = vec.reflect(i);
           tv.push_back(tvec);
@@ -571,6 +424,8 @@ struct PointGroup3D : Group<V> {
           auto tvec = vec.spin(i);
           tv.push_back(tvec);
         }
+
+        //tops? gops?
                  
         //REFLECTIONS RECORD
         //Keep doing it until none new, record results in reflectIdx
@@ -672,25 +527,278 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
    // typedef typename V::template BType< typename V::Mode::Trs >
     using Trs = typename V::space::translator; 
+    using Vec = typename V::space::Vec;
 
-    Trs ta, tb, tc;
+//    Trs ta, tb, tc;
+                                                    //.5
+    //Primitive, Body, A-Face, C-Face, Hexagonal, Face2, Face3, Rhombo
+    enum LatticeType{
+      Primitive, Body, AFace, CFace, HFace, Face2, Face3, Rhombo
+    };
+    
+    //A axial (a), B axial (b), C axial (c), Diagonal (n), Diamond (d)
+    enum GlideType{
+      None, AxialA, AxialB, AxialC, Diagonal, Diamond
+    };
+    struct GlideParameter{
+      GlideType type; //
+      bool bInvert; //boolean switch for b or a-b, b+c or a-b+c
+    };
 
-    SpaceGroup3D(int p, int q) : PointGroup3D<V>(p,q){
-        ta = gen::trs( this->a);
-        tb = gen::trs( this->b);
-        tc = gen::trs( this->c);
+    struct Glide{
+      Glide( GlideParameter _a = {None,false}, GlideParameter _b = {None,false}, GlideParameter _c = {None,false}) : a(_a), b(_b), c(_c) {}
+      GlideParameter a, b, c;
+    };
+      
+    LatticeType mLatticeType;
+    Glide mGlide;
+
+    Vec mRatio; //<-- ratio of width to height
+    int mScrew;
+
+    SpaceGroup3D(
+      int p, int q, 
+      bool abar=false, bool bbar=false, bool abbar=false,
+      LatticeType lattice = Primitive,
+      Vec ratio= Vec(1,1,1),
+      Glide glide = Glide(),
+      int screw=0
+      ) 
+      : 
+      PointGroup3D<V>(p,q,abar,bbar,abbar),
+      mLatticeType(lattice),
+      mRatio(ratio),
+      mGlide(glide),
+      mScrew(screw)
+      {
+        init();
+      }
+
+
+    //Q: how to seed non-symmorphic space groups
+    void init(){
+
+
+        //GLIDE replacements for non-symmorphic groups
+        vector<int> replace; //keep track of indices into this->ops to replace
+        vector<V> nops;     //new operations list
+        switch(mGlide.a.type){
+          case AxialB: //< replace a reflection with a glide
+          {
+            replace.push_back(0);
+            auto trs = gen::trs( (mGlide.a.bInvert ? (this->a - this->b) : this->b ) * .5 );
+            this->gops.push_back( this->a * trs );
+            break;
+          }
+          case AxialC:
+          {
+            replace.push_back(0);
+            auto trs = gen::trs( (mGlide.a.bInvert ? (this->a - this->c) : this->c ) * .5 );
+            this->gops.push_back( this->a * trs );
+            break;
+          }
+          case Diagonal:
+          {
+            replace.push_back(0); //we will replace 0 idx
+            auto trs = gen::trs(  (mGlide.a.bInvert ? (this->a - (this->b+this->c) : this->b+this->c ) * .5 );
+            this->gops.push_back( this->a * trs ); 
+            break;
+          }
+          
+        }
+
+        switch(mGlide.b.type){
+
+        }
+
+        switch(mGlide.c.type){
+
+        }
+
+        for (int i = 0; i < this->ops.size(); ++i){
+          bool add=true;
+          for (auto& j : replace) if (i==j) add = false;
+          if (bool) nops.push_back(i);
+        }
+
+        //SCREW replacements
+
+        //Reseed opIdx
+        seed();
+
+    }
+    
+    template<class T>
+    vector<T> operator() (const T& p){
+      return apply(p);
     }
 
-    Trs trs( int x, int y, int z ) {
-       return gen::trs( this->a * x +  this->b * y + this->c*z );
+    template<class T>
+    vector<T> apply( const T& p ){
+      auto pg = PointGroup3D<V>::apply(p);
+
+      for (int i=0;i<pg.size();++i){
+        for (auto& j : this->gops ){
+          pg.push_back( pg[i].reflect(j) );
+        }
+        for (auto& j : this->scrops ){
+          pg.push_back( pg[i].spin(j) );
+        }
+      }
+
+      return pg;
     }
 
-    Group<V> at(int x, int y, int z){
-      vector<V> res;
-      for (auto i : this->ops) res.push_back( i.spin( trs(x,y,z) ) );
+    template<class T>
+    vector<T> apply(const vector<T>& p){
+      vector<T> res;
+      for(auto& i : p){
+        auto tmp = apply(i);
+        for (auto& j : tmp){
+          res.push_back(j);
+        }
+      }
       return res;
     }
 
+  
+    /*!-----------------------------------------------------------------------------
+     * Calculate a vector transformation basice on generators and ratio 
+     *-----------------------------------------------------------------------------*/
+    Vec vec(float x, float y, float z){
+      return this->a*x * mRatio[0] + this->b*y * mRatio[1] + this->c*z * mRatio[2]; 
+    }
+
+
+    /*!-----------------------------------------------------------------------------
+     *  Hang a motif on a Lattice of dimensions x,y,z
+     *-----------------------------------------------------------------------------*/
+    template<class T>
+    vector<T> hang(const T& motif, int x, int y, int z){      
+      vector<T> res;
+
+        switch( mLatticeType ){
+          case Primitive: //Primitive 
+          {
+              for (int j=-x/2.0;j<x/2.0;++j){
+                for (int k=-y/2.0;k<y/2.0;++k){
+                  for (int l=-z/2.0;l<z/2.0;++l){
+                    res.push_back( motif.trs( vec(j,k,l) ) );                
+                  }
+                }
+              }
+            break;
+          } 
+          case Body://Body
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                  res.push_back( motif.trs( vec(j,k,l) ) );   
+                  res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,.5) ) );    
+                 }
+               }
+             }
+            break;
+          }
+          case AFace:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   res.push_back( motif.trs( vec(j,k,l) + vec(0,.5,.5) ) );    
+                 }
+               }
+             }
+            break;
+          }
+          case CFace:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,0) ) );    
+                 }
+               }
+             }
+            break;
+          }          
+           case HFace:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,0) ) );    
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,0) ) );   
+                 }
+               }
+             }
+            break;
+          }  
+           case Rhombo:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,.3333333) ) );    
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,.6666666) ) );   
+                 }
+               }
+             }
+            break;
+          }            
+          case Face2:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   for (int m =1;m<2;++m){
+                    float t = (float)m/2;
+                    res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );    
+                    res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );  
+                    res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );  
+                   }
+                 }
+               }
+             }
+            break;
+          }
+          case Face3:
+          {
+             for (int j=-x/2.0;j<x/2.0;++j){
+               for (int k=-y/2.0;k<y/2.0;++k){
+                 for (int l=-z/2.0;l<z/2.0;++l){
+                   res.push_back( motif.trs( vec(j,k,l)  ) );  
+                   for (int m =1;m<3;++m){
+                    float t = (float)m/3;
+                    res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );    
+                    res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );  
+                    res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );  
+                   }
+                 }
+               }
+             }
+            break;
+          }
+
+        }
+      return res;
+    }   
+    
+    template<class T>
+    vector<T> hang(const vector<T>& motif, int x, int y, int z ){
+      vector<T> res;
+      for (auto& i : motif){
+        auto tmp = hang(i,x,y,z);
+        for (auto& j : tmp) res.push_back(j);
+      }
+      return res;
+    }
 
 };
 

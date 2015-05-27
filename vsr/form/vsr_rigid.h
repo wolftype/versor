@@ -163,7 +163,17 @@ struct DistancePtr {
 
 };
 
-/// A Rigid Constraint set by Three Distance Pointers
+struct Rigid3{
+
+  DistancePtr da,db,dc;
+
+  void set(const Pnt& target, Rigid3 * ra, Rigid3 * rb, Rigid3 * rc){
+
+  }
+};
+
+
+/// A Rigid Constraint Node set by Three Distance Pointers
 struct Rigid{
   //default calc is false until ra parents are set
   bool bCalc, bTriple;
@@ -218,6 +228,8 @@ struct Rigid{
     ra->child.push_back(this); rb->child.push_back(this); rc->child.push_back(this);
   }
 
+
+  //hmmm?
   void set( Rigid * pa, Rigid * pb, bool m){
     mtn =m; bCalc=true; bTriple=false;
     ra=pa; rb=pb;rc=this;
@@ -232,6 +244,20 @@ struct Rigid{
   void reset(){ 
     if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; 
   }
+
+  Circle circleA(){
+    return (da()^db()).dual();
+  }
+  Circle circleB(){
+    return (db()^dc()).dual();
+  }  
+  void orbitA(float amt){
+    result = round::pnt_cir( circleA(), amt * ( mtn?1:-1) ); 
+  }
+  void orbitB(float amt){
+    result = round::pnt_cir( circleB(), amt * ( mtn?1:-1) ); 
+  } 
+
 
   Pnt up(){
     if (bCalc) {

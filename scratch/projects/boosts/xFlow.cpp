@@ -17,12 +17,11 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_field.h"
-#include "vsr_cga3D_frame.h"
+#include "vsr_app.h"   
+#include "form/vsr_field.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
  
@@ -73,15 +72,15 @@ struct MyApp : App {
     Draw( ca.re(cb),0,0,1);
     Draw( cb.re(ca),0,0,1);
 
-    auto ratio = Gen::ratio( ca, cb );
-    auto log = Gen::log( ratio );
+    auto ratio = gen::ratio( ca, cb );
+    auto log = gen::log( ratio );
 
     cout << log[0].wt() << " " << log[1].wt() << endl;
     
-    auto rot = Gen::con( log, amt );
+    auto rot = gen::con( log, amt );
   
     for (int i=0; i<field.num(); ++i){
-      field[i] = Ro::loc( field[i].spin(rot) ); 
+      field[i] = round::loc( field[i].spin(rot) ); 
     }
 
     if (bReset) field.reset();
@@ -89,7 +88,7 @@ struct MyApp : App {
      for (int i=0; i<field.num(); ++i){
        for (int j=0;j<20;++j){
         float t = (float)j/20.0;
-        Draw( Ro::loc( field[i].spin(Gen::con(log,t*amtB)) ),t,0,1-t );
+        Draw( round::loc( field[i].spin(gen::con(log,t*amtB)) ),t,0,1-t );
        }
       }
     }
