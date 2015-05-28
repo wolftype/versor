@@ -46,6 +46,7 @@ struct State{
   Point point = round::null(0,0,0);
 
   float xratio,yratio,zratio;
+  int numX, numY, numZ;
 
   SpaceGroup3D<Vec>::LatticeType latticeType;
  
@@ -94,6 +95,8 @@ void drawState(State * state){
      auto res2 = sg( s.point ^ s.point.trs(0,3.5,.2) );
      auto res3 = sg( s.point ^ s.point.trs(0,0,3) );
 
+     cout << "num ref: " <<  res.size() << endl;
+
      auto latticeRes = sg.hang( res , s.numX,s.numY,s.numZ);
      auto latticeRes2 = sg.hang( res2 ,s.numX,s.numY,s.numZ);
      auto latticeRes3 = sg.hang( res3 ,s.numX,s.numY,s.numZ);
@@ -116,7 +119,6 @@ void drawState(State * state){
 
      }
    }
-  }
 
 /*-----------------------------------------------------------------------------
  *  SIMULATION
@@ -160,14 +162,22 @@ struct MyApp : App {
     gui(s.yratio, "yratio",1,100);
     gui(s.zratio, "zratio",1,100);
     gui(latticetype, "latticetype",0,6);
-    gui(s.glideA, "glide a");
-    gui(s.glideB, "glide b");
-    gui(s.glideC, "glide c");
+    gui(s.bGlideA, "glide a");
+    gui(s.bGlideB, "glide b");
+    gui(s.bGlideC, "glide c");
+    gui(s.numX, "num x");
+    gui(s.numY, "num y");
+    gui(s.numZ, "num z");
+
 
     s.xratio = s.yratio = s.zratio =1;
     s.p=3;s.q=2;
     s.pbar=s.qbar=s.pqbar=0;
     s.bGlideA = s.bGlideB = s.bGlideC = 0;
+
+    s.numX = 5;
+    s.numY = 5;
+    s.numZ = 5;
   }
 
   void onKeyDown(const gfx::Keyboard& k){

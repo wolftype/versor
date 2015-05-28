@@ -8,6 +8,9 @@ replaces vsr_pointGroup.h
 
 */
   
+#ifndef  vsr_group_INC
+#define  vsr_group_INC
+
                      
 #include "vsr_set.h" 
 #include "vsr_root.h"
@@ -578,53 +581,52 @@ struct SpaceGroup3D : PointGroup3D<V> {
     //Q: how to seed non-symmorphic space groups
     void init(){
 
+        //GLIDE replacements for non-symmorphic groups
+        vector<int> replace; //keep track of indices into this->ops to replace
+        vector<V> nops;     //new operations list
+        switch(mGlide.a.type){
+          case AxialB: //< replace a reflection with a glide
+          {
+            replace.push_back(0);
+            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->b) : (this->b) ) * .5 );
+            this->gops.push_back( this->a * trs );
+            break;
+          }
+          case AxialC:
+          {
+            replace.push_back(0);
+            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->c) : (this->c) ) * .5 );
+            this->gops.push_back( this->a * trs );
+            break;
+          }
+          case Diagonal:
+          {
+            replace.push_back(0); //we will replace 0 idx
+            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - (this->b+this->c)) : (this->b+this->c) ) * .5 );
+            this->gops.push_back( this->a * trs ); 
+            break;
+          }
+          
+        }
 
- //       //GLIDE replacements for non-symmorphic groups
- //       vector<int> replace; //keep track of indices into this->ops to replace
- //       vector<V> nops;     //new operations list
- //       switch(mGlide.a.type){
- //         case AxialB: //< replace a reflection with a glide
- //         {
- //           replace.push_back(0);
- //           auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->b) : this->b ) * .5 );
- //           this->gops.push_back( this->a * trs );
- //           break;
- //         }
- //         case AxialC:
- //         {
- //           replace.push_back(0);
- //           auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->c) : this->c ) * .5 );
- //           this->gops.push_back( this->a * trs );
- //           break;
- //         }
- //         case Diagonal:
- //         {
- //           replace.push_back(0); //we will replace 0 idx
- //           auto trs = gen::trs( ( (mGlide.a.bInvert) ? ( (this->a - (this->b+this->c)) : this->b+this->c ) * .5 );
- //           this->gops.push_back( this->a * trs ); 
- //           break;
- //         }
- //         
- //       }
+        switch(mGlide.b.type){
 
- //       switch(mGlide.b.type){
+        }
 
- //       }
+        switch(mGlide.c.type){
 
- //       switch(mGlide.c.type){
+        }
 
- //       }
+        for (int i = 0; i < this->ops.size(); ++i){
+          //bool add=true;
+          //for (auto& j : replace) if (i==j) add = false;
+          //if (bool) nops.push_back(i);
+        }
 
- //       for (int i = 0; i < this->ops.size(); ++i){
- //         bool add=true;
- //         for (auto& j : replace) if (i==j) add = false;
- //         if (bool) nops.push_back(i);
- //       }
+        //SCREW replacements
 
- //       //SCREW replacements
-
- //       //Reseed opIdx
- //       seed();
+        //Reseed opIdx
+        this->seed();
 
     }
     
@@ -804,3 +806,4 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
 
 } //vsr::
+#endif   /* ----- #ifndef vsr_group_INC  ----- */
