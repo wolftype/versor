@@ -411,6 +411,17 @@ struct PointGroup3D : Group<V> {
       return apply(p);
     }
 
+    template<class T>
+    vector<T> operator() (const vector<T>& p){
+      vector<T> res;
+      for (auto& i : p){
+        auto tmp = apply(i);
+        for (auto& j : tmp){
+          res.push_back(j);
+        }
+      }
+      return res;
+    }
 
     void seed(const Vec& vec=Vec(.213,.659,1.6967).unit() ){
 
