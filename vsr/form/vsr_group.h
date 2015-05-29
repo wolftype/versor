@@ -349,6 +349,7 @@ struct PointGroup3D : Group<V> {
     };
 
     using Biv = typename V::space::Biv;
+    using Vec = typename V::space::Vec;
 
     V a, b, c;          //<-- basis generators
 
