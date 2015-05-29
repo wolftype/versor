@@ -492,8 +492,6 @@ struct PointGroup3D : Group<V> {
               }
             }
           }
-
-          
         }      
 
 

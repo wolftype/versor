@@ -97,6 +97,11 @@ namespace vsr{ namespace cga {
       Point point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
         return round::null(x,y,z);
       }
+      /// Point from vec
+      Point point(const Vec& v){
+        return v.null();
+      } 
+
       /// Point on line l closest to p
       Point point(const Line& line, const Point& p){
         return round::null ( flat::location( line, p, false ) ); 

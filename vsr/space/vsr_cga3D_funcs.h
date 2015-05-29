@@ -108,6 +108,8 @@ namespace vsr{
      Point point(const DualSphere& s, const Vec& v);
      /// Point from x,y,z
      Point point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z);
+     /// Point from vec
+     Point point(const Vec& v);
      /// Point on line l closest to p
      Point point(const Line&, const Point& );
      /// Point on dualline l closest to p
