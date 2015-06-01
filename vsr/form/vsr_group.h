@@ -170,7 +170,8 @@ struct SpaceGroup2D : PointGroup2D<V> {
   typedef decltype( V() ^ V() ) Biv;
 
   int mDiv;  //(p)rimitive lattice = 1.0 (default); (c)entered lattice = 2; (h)exagonal lattice = 3
-  float mRatio; 
+  float mRatioY=1;
+  float mRatioX=1; 
 
   /// Constructor
   // @param mP: symmetry group (1,2,3,4,6)
@@ -180,7 +181,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
   // @param ga: whether a glide reflection replaces first mirror generator
   // @param gb: whether a glide reflection replaces second mirror generator 
   SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) 
-  : PointGroup2D<V>(p,pin), mRatio(ratio), mDiv(div)  {
+  : PointGroup2D<V>(p,pin), mRatioY(ratio), mDiv(div)  {
   
   
     if (p==1){
@@ -218,15 +219,13 @@ struct SpaceGroup2D : PointGroup2D<V> {
   
   }
 
- // Vec bvec(){ return Vec::x.rotate( Biv::xy * PIOVERFOUR/2.0 ); }
 
     Vec vec(float x, float y){
-      if (this->mP!=1) return this->a*x + this->b*y*mRatio; 
+      if (this->mP!=1) return this->a*x*mRatioX + this->b*y*mRatioY; 
       else return this->a*x + Vec::y*y;
     }
 
 
-    
     /*-----------------------------------------------------------------------------
      *  Apply translations to a single element
      *-----------------------------------------------------------------------------*/
@@ -241,6 +240,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
           for (int k=-y/2.0;k<y/2.0;++k){
             for (int m =0;m<mDiv;++m){
               float t = (float)m/mDiv;
+              //Vec v = vec(j
               res.push_back( i.trs( vec(j,k) + vec(t,t) ) );
             }
           }
