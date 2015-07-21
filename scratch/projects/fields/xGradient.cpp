@@ -3,7 +3,7 @@
  *
  *       Filename:  xGradient.cpp
  *
- *    Description:  Geometric Calculus . . . a gradient 
+ *    Description:  Geometric Calculus . . . an ordinary gradient 
  *
  *        Version:  1.0
  *        Created:  11/22/2013 16:41:36
@@ -17,12 +17,21 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_app.h"  
+#include "form/vsr_differential.h" 
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
+template<class T>
+Vec orthoGradient(const T& a, const T& b, const T& c){
+
+  auto nx = b-a;
+  auto ny = c-a;
+
+  return (Vec::x * nx + Vec::y * ny ); 
+
+}
 
 struct MyApp : App {    
    
@@ -32,81 +41,52 @@ struct MyApp : App {
   float time;
   float amt;
 
-  //A Field
-  Field<Vec> field; 
+  //A Field of scalar values
+  Field<Scalar> scalar_field; 
+  //A Vector Field
+  Field<Vec> vector_field;
 
-
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-
-    
-    field.resize(10,10,1);
-
-  }
-
-  void initGui(){
-      gui(amt,"amt",-100,100);
+  void setup(){
+    bindGLV();
+    gui(amt,"amt",-100,100);
+    scalar_field.resize(10,10,1);
+    vector_field.resize(10,10,1);
   }
   
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
-  }
-
-    virtual void onDraw(){ 
+  void onDraw(){ 
         
-      getMouse();
+     mouse = calcMouse3D();
 
-      Vec deriv(.1,.1,.1);
-            
-      int n = field.num();
-      
-      for ( int i = 0; i < field.w(); i += 1 ) {
-        
-        float tu = (float)i/field.w();
-        float tdu = tu + .001;
-
-        for (int j = 0; j < field.h(); j += 1 ){
-      
-          float tv = (float)j/field.h();
-          float tdv = tv + .001;
-
-          Sca tmp = Vec::x.rot( Biv::xy * PI * tu ) <= Vec::y.rot( Biv::yz * TWOPI * tv );
-          Sca tmp2 = Vec::x.rot( Biv::xy * PI * tdu ) <= Vec::y.rot( Biv::yz * TWOPI * tdv );
+     for ( int i=0; i < scalar_field.w(); i+=1 ) {
+       float tu = amt * (float)i/scalar_field.w();
+       
+       for (int j=0; j < scalar_field.h(); j+=1 ){          
+          float tv = amt * (float)j/scalar_field.h();
           
-          field[i] = Vec(tmp[0], tmp2[1], 0);      
-        
+          scalar_field.at(i,j) = Sca(tu * tv);
+       
+       }
+     }
+
+     for (int i =0;i<vector_field.w(); ++i){
+        for (int j = 0;j<vector_field.h(); ++j){
+            int ni =  (i < vector_field.w()-1) ? i+1 : 0;
+            int nj = (j < vector_field.h()-1) ? j+1 : 0;
+            vector_field.at(i,j) = orthoGradient(scalar_field.at(i,j), scalar_field.at(ni,j), scalar_field.at(i,nj) );
         }
-      
-      }
-      Draw(field);
+     }
+     
+     Draw(vector_field);
     
   }
    
-
-  
 };
-
-
-MyApp * app;
 
 
 int main(){
                              
-  GLV glv(0,0);  
-
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
 

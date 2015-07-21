@@ -14,11 +14,10 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_app.h"   
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -29,72 +28,58 @@ struct MyApp : App {
   float time;
   float amt;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
+  Frame frame;
 
-  void initGui(){
+  void setup(){
       gui(amt,"amt",-100,100);
-  }
   
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+      objectController.attach(&frame);
   }
 
-    virtual void onDraw(){ 
+  void onDraw(){ 
         
-      getMouse();
+      mouse = calcMouse3D();
  
+      Cir cir = frame.cxy();
+      Dls dls = frame.bound();
+
+      auto flatmouse = mouse ^ Inf(1);
+
+      auto tangent = Pair( Tnv(0,1,0) ).trs(mouse);
+
+      auto projCir = op::project(tangent, cir);
+      auto projSph = op::project(tangent, dls.dual());
+
+     // Pair flatPointCircle = projCir;
+      Pair flatPointSphere = projSph;
+      
+      projSph.print();
+      
       Draw(mouse);
 
-      static Cir c1 = CXY(1).trs(2,0,0);
-      static Cir c2 = CXZ(1).trs(-1,-1,0);
+      Draw(flatPointSphere,1,0,0);
 
-      Touch(interface, c1); Touch(interface,c2);
-
-      Draw(c1); Draw(c2);
-
-      auto s = c1.dual() ^ c2.dual();
-
-      Draw(s);
+      Draw(tangent^dls,0,1,0);
       
-      /* Dls c = Ro::dls(1.0, 0,0,0); */
 
-      /* auto a = Point( Op::project( mouse, c  ) ); */
-      /* auto b = Point ( Op::reject( mouse, c ) ); */
-
-      /* Draw(c,1,1,1,.1); */ 
-
-      /* Draw( mouse <= (c ^ Inf(1)) ); */
-    
+//      Draw(projSph,0,1,0);
+//
+      Draw(dls,0,0,1,.2);
+      
   }
-   
 
   
 };
 
 
-MyApp * app;
 
 
 int main(){
                              
-  GLV glv(0,0);  
+  MyApp app;
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
+  app.start();
   
-  
-  glv << *app;
-
-  Application::run();
-
   return 0;
 
 }

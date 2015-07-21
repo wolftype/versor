@@ -19,6 +19,20 @@
  */
 
 
+/*! @file 
+    
+     Compile-time list processing basics (see also vsr_lisp.h)
+
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+ 
+
+
 #ifndef LISTS_H_INCLUDED
 #define LISTS_H_INCLUDED
 
@@ -33,7 +47,7 @@ using namespace std;
 
 namespace vsr{ //detail?
 
-#define VSR_PRECISION double
+
 
 #define CA  constexpr auto
 #define SCA static constexpr auto  

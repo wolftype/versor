@@ -17,15 +17,23 @@
  */
 
 
+/**@file 
+    3D CGA Frame
+*/
+
 #ifndef  vsr_cga3D_frame_INC
 #define  vsr_cga3D_frame_INC
 
 #include "space/vsr_cga3D_op.h"
-//#include "space/vsr_cga3D_xf.h" 
-
  
 namespace vsr { namespace cga {
  
+/** @defgroup forms Forms 
+    @ingroup cga
+
+    Composition of structures 
+*/
+
  
 //   using namespace types;
   /*!
@@ -33,6 +41,8 @@ namespace vsr { namespace cga {
    *
    *  3D position and orientation along with methods for extracting local geometry.
    *  (i.e. a circle on a local xy plane, or a line in the in local y axis) 
+
+      @ingroup forms
    */
   class Frame{
 
@@ -183,6 +193,11 @@ namespace vsr { namespace cga {
     Par tx() const;       ///< Null Point Pair in local x direction
     Par ty() const;       ///< Null Point Pair in local y direction
     Par tz() const;       ///< Null Point Pair in local z direction
+
+    /* Global Weighted Tangent as Null Point Pair*/
+    Par tx( VSR_PRECISION v) const;       ///< Null Point Pair in local x direction
+    Par ty( VSR_PRECISION v) const;       ///< Null Point Pair in local y direction
+    Par tz( VSR_PRECISION v) const;       ///< Null Point Pair in local z direction
 
     /* Real Circles */
     Cir cxy() const;      ///< xy circle (real, direct)

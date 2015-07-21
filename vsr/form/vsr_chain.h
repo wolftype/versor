@@ -99,7 +99,11 @@ struct  Spherical : public Joint {
 //spherical (sph coords)
 //planar
 
-
+  
+  /**
+  * @brief A sequence of spatial Frames
+    @ingroup form
+  */
   class Chain : public Frame {
      
      protected:
@@ -365,54 +369,54 @@ struct  Spherical : public Joint {
                 
             }
         
-            void ifabrik(const Pnt& p, int end, int begin, double err = .01){
-                //squared distance between last frame and goal p
-                Sca s = mFrame[end].pos() <= p * -2.0;
-                
-                //Temporary Goal
-                Pnt goal = p;
-                Pnt base = mFrame[begin].pos();
-                
-                int n = 0;
-                
-                //repeat until distance is decreased below threshold, or give up after 20 iterations
-                while (s[0] > err){
-                    
-                    Pnt tmpGoal = goal;
-                    Pnt tmpBase = base;
-                    
-                    //some objects
-                    static Dls dls; //surround
-                    static Dll dll; //line
-                    static Par par; //intersection of line ^ surround
-                    
-                    //forward reaching
-                    for (int i = end; i < begin; ++i){
-                        mFrame[i].pos( tmpGoal );          //set position of ith frame
-                        dls = nextSphere(i);               //set boundary sphere through i-1 th frame;
-                        dll = linf(i);                  //get line from tmp to i-1th frame
-                        par = (dll ^ dls).dual();       //get point pair intersection of line and boundary sphere
-                        tmpGoal = round:: split(par,true);         //extract point from point pair intersection
-                    }
-                    
-                    //backward correction
-                    for (int i = begin; i > end; --i){
-                        dls = prevSphere(i);                   //set boundary sphere through i+1 th frame
-                        dll = linb(i);                      //get line to i+1th frame;
-                        par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
-                        tmpBase = round:: split(par,true);
-                        mFrame[i-1].pos(tmpBase);             //set position of i+1th frame
-                    }
-                    
-                    //squared distance between end frame and goal p
-                    s = mFrame[ end ].pos() <= p * -2.0;
-                    
-                    n++;  if (n > 20) {  break; }
-                }
-                
-                //calculate joint angles
-                calcJoints();               
-            }
+ //           void ifabrik(const Pnt& p, int end, int begin, double err = .01){
+ //               //squared distance between last frame and goal p
+ //               Sca s = mFrame[end].pos() <= p * -2.0;
+ //               
+ //               //Temporary Goal
+ //               Pnt goal = p;
+ //               Pnt base = mFrame[begin].pos();
+ //               
+ //               int n = 0;
+ //               
+ //               //repeat until distance is decreased below threshold, or give up after 20 iterations
+ //               while (s[0] > err){
+ //                   
+ //                   Pnt tmpGoal = goal;
+ //                   Pnt tmpBase = base;
+ //                   
+ //                   //some objects
+ //                   static Dls dls; //surround
+ //                   static Dll dll; //line
+ //                   static Par par; //intersection of line ^ surround
+ //                   
+ //                   //forward reaching
+ //                   for (int i = end; i < begin; ++i){
+ //                       mFrame[i].pos( tmpGoal );          //set position of ith frame
+ //                       dls = nextSphere(i);               //set boundary sphere through i-1 th frame;
+ //                       dll = linf(i);                  //get line from tmp to i-1th frame
+ //                       par = (dll ^ dls).dual();       //get point pair intersection of line and boundary sphere
+ //                       tmpGoal = round:: split(par,true);         //extract point from point pair intersection
+ //                   }
+ //                   
+ //                   //backward correction
+ //                   for (int i = begin; i > end; --i){
+ //                       dls = prevSphere(i);                   //set boundary sphere through i+1 th frame
+ //                       dll = linb(i);                      //get line to i+1th frame;
+ //                       par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
+ //                       tmpBase = round:: split(par,true);
+ //                       mFrame[i-1].pos(tmpBase);             //set position of i+1th frame
+ //                   }
+ //                   
+ //                   //squared distance between end frame and goal p
+ //                   s = mFrame[ end ].pos() <= p * -2.0;
+ //                   
+ //                   n++;  if (n > 20) {  break; }
+ //               }
+ //               
+ //               //calculate joint angles
+ //               calcJoints();               
+ //           }
 
             /// "FABRIK" Iterative Solver [see paper "Inverse Kinematic Solutions using Conformal Geometric Algebra", 
             ///  by Aristodou and Lasenby] feed target point, end frame and beginning frame,
@@ -440,20 +444,20 @@ struct  Spherical : public Joint {
                     
                     //backward reaching
                     for (int i = end; i > begin; --i){
-                        mFrame[i].pos( tmpGoal );           //set position of ith frame
+                        mFrame[i].pos( tmpGoal );              //set position of ith frame
                         dls = prevSphere(i);                   //set boundary sphere through i-1 th frame;
-                        dll = linb(i);//.sp( !mLink[i].mot() );                      //get line from ith to i-1th frame
-                        par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
-                        tmpGoal = round:: split(par,true);      //extract point from point pair intersection
+                        dll = linb(i);                         //get line from ith to i-1th frame
+                        par = (dll ^ dls).dual();              //get point pair intersection of line and boundary sphere
+                        tmpGoal = round:: split(par,true);     //extract point from point pair intersection
                     }
                     
                     //forward correction
                     for (int i = begin; i < end; ++i){
                         dls = nextSphere(i);                   //set boundary sphere through i+1 th frame
-                        dll = linf(i);                      //get line to i+1th frame;
-                        par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
+                        dll = linf(i);                         //get line to i+1th frame;
+                        par = (dll ^ dls).dual();              //get point pair intersection of line and boundary sphere
                         tmpBase = round:: split(par,true);
-                        mFrame[i+1].pos(tmpBase);           //set position of i+1th frame
+                        mFrame[i+1].pos(tmpBase);              //set position of i+1th frame
                     }
                     
                     s = mFrame[ end ].pos() <= p * -2.0;
@@ -493,37 +497,61 @@ struct  Spherical : public Joint {
 //                
 //            }
 //
-            /// Derive Joint Rotations from Current Positions
+ //           /// Derive Joint Rotations from Current Positions
+ //           void calcJoints(int start = 0, bool bLoop=false){
+
+ //               Rot ry(1);// = mLink[start].rot();
+ //               
+ //               for (int i = start; i < (bLoop ? mNum : mNum-1); ++i){
+ //                 
+ //                 int next = i < (mNum-1) ? i+1 : 0;    
+ //                 
+ //                 auto dir = Vec::y.spin( ry );                                         //current direction
+ //                 
+ //                 auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();        //global target direction
+ //                 auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+ //                   
+ //                 //target in terms of origin
+ //                 target = target.spin( !linkRot * !mFrame[i].rot() );
+
+ //                 //DrawAt( dir, mFrame[i].pos() + mFrame[i].y() );
+ //                // DrawAt( target.spin(  mFrame[i].rot() ) , mFrame[i].pos() + mFrame[i].y(),1,1,0);
+ // 
+ //                 auto adjustedRot = gen::ratio( dir.spin( !mFrame[i].rot() ), target );
+
+ //                 mJoint[i].rot() = adjustedRot;// * !mFrame[i].rot();
+
+ //                // Mot tl = (start>0)?  mLink[i-1].mot() : Mot(1);
+ //                 ry = ry * mJoint[i].rot() * mLink[i].rot();                            //compound: last * current * next
+ //               }
+ //               
+ //           }
+
+             /// Derive Joint Rotations from Current Positions
             void calcJoints(int start = 0, bool bLoop=false){
 
-                Rot ry(1);// = mLink[start].rot();
+                Rot ry(1);
                 
-                for (int i = start; i < mNum; ++i){
+                for (int i = start; i < (bLoop ? mNum : mNum-1); ++i){
                   
                   int next = i < (mNum-1) ? i+1 : 0;    
                   
-                  auto dir = Vec::y.spin( ry );                                         //current direction
+                  //auto dir = Vec::y.spin( ry );                                         //current direction
                   
                   auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();        //global target direction
                   auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
-                                
+                    
                   //target in terms of origin
-                  target = target.spin( !linkRot * !mFrame[i].rot() );
-
-                  DrawAt( dir, mFrame[i].pos() + mFrame[i].y() );
-                  DrawAt( target.spin(  mFrame[i].rot() ) , mFrame[i].pos() + mFrame[i].y(),1,1,0);
+                  target = target.spin( !linkRot * !ry );
   
-                  auto adjustedRot = gen::ratio( dir.spin( !mFrame[i].rot() ), target );
+                  auto adjustedRot = gen::ratio( Vec::y, target );
 
                   mJoint[i].rot() = adjustedRot;// * !mFrame[i].rot();
 
-                 // Mot tl = (start>0)?  mLink[i-1].mot() : Mot(1);
                   ry = ry * mJoint[i].rot() * mLink[i].rot();                            //compound: last * current * next
                 }
                 
-            }
-
-    
+            }   
       
       /// Derive New Relative Link Frames from current Positions 
       /// @ param bOrientation: whether to consider current orientation of frames when reverse engineering links

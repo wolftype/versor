@@ -1,9 +1,11 @@
-CSS: style0.css
+CSS: scripts/style.css
+
 	 
 <script type="text/javascript"
   src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
-		 
+
+
 <img src = "http://versor.mat.ucsb.edu/resources/images/cshape.gif" width = 80>
 <img src = "http://versor.mat.ucsb.edu/resources/images/twine_0.gif" width = 100>
 <img src = "http://versor.mat.ucsb.edu/resources/images/twist_04_bw.gif" width = 400>
@@ -11,45 +13,26 @@ CSS: style0.css
 
 Versor (libvsr)
 ===
+###version 3.0
+
 A (fast, lightweight) Generic C++ library for Euclidean, Projective, and Conformal Geometric Algebra.  Spacetime Algebra too (etc).  
 ---
 ### Currently tested on Linux and Mac OS X ###
 
 [Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu) 
 
-*Versor* is a C++ Library for Geometric Algebra, sometimes called Clifford Algebra, a system for encoding geometric concepts numerically.
+[Bibtex (for referencing this work in your paper)](http://versor.mat.ucsb.edu/bibtex.txt)
+
+**Versor** is a C++ Library for **Geometric Algebra**, sometimes called **Clifford Algebra**, a system for encoding geometric concepts numerically.
 
 The headers generate optimized code at compile-time through template metaprogramming.  The core of the library
-is only 128kb, and supports arbitrary dimensions and metrics (limited by your compiler...).  Optional built-in graphics are included in the repo.
+is under 150kb, and supports arbitrary dimensions and metrics (limited by your compiler...).  
+
+The library can be used as a math-only, or as an application with built-in graphics.  Both OpenGL and OpeGLES draw routines are supported.   
+
 
 Developer: Pablo Colapinto  
 `gmail: wolftype`  
-
-Use Cases
----
-
-Versor can be used as a header-only math library: 
-
-	#include "vsr.h"
-
-	using Vec = vsr::euclidean_vec<3,float>;  		//<-- A 3 dimensional euclidean vector defined over floats
-	using Biv = vsr::euclidean_bivector<3,float>;   //<-- A 3 dimensional bivector or "directed area element"
-	
-	int main(){
-		
-		auto v = Vec(1,2,3);		  			//<-- A 3D vector at coordinates 1,2,3;
-		
-		v.rotate( Biv::xy * .25 ).print();		//<-- Rotate the vector in the xy plane and print result
-		
-		return 0;
-	};
-	
-
-The stands for "euclidean" 
-Its optional built-in draw routines can be compiled into a library for creating geometrically advanced graphics. 
-
-While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in functionality for specifically working with Conformal Geometric Algebra of 
-3D space, which is THE way to model all Euclidean transformations.
 
 
 Recent Changes
@@ -58,7 +41,7 @@ Recent Changes
 Some major revisions have been enacted that change the API.
 
 * all namespaces are lowercase, (gen::, round::, flat::, tangent::)
-* the application class for graphics support is now /util/vsr_app.h
+* header folders **`/detail /space /form /draw`** and **`/util`** organize the various files
 
 ## CONTENTS: ##
                                
@@ -71,19 +54,11 @@ Some major revisions have been enacted that change the API.
 * [Operators](#operators)
 * [Elements](#elements)
 
+## LINKS: ##
 
+[Download and Installation](http://versor.mat.ucsb.edu/INSTALL.html) 	| 	[Cheat Sheet](http://versor.mat.ucsb.edu/masters_appendix.pdf) 	| 	[Mailing List](http://lists.create.ucsb.edu/mailman/listinfo/versor) | [Master's Thesis](http://wolftype.com/versor/colapinto_masters_final_02.pdf) | [Presentation on Implementation Details](https://www.youtube.com/watch?v=W4p-e-g37tg)
 
-[Download and Installation Instructions](http://versor.mat.ucsb.edu/INSTALL.html)           
-
-[Reference Guide to the Elements](http://versor.mat.ucsb.edu/masters_appendix.pdf)
-
-[Mailing List (for update notifications, to ask questions, discuss bugs, etc)](http://lists.create.ucsb.edu/mailman/listinfo/versor)  
-
-[versor.js - a Javascript Port of Versor](http://github.com/weshoke/versor.js)                                                        
-
-[My Master's Thesis on the Subject](http://wolftype.com/versor/colapinto_masters_final_02.pdf) 
-
-[Look at the AlloSphere Research Group](http://www.allosphere.ucsb.edu/)          
+[versor.js](http://github.com/weshoke/versor.js) | [AlloSphere Research Group](http://www.allosphere.ucsb.edu/)          
 
 
 	As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection.  
@@ -121,11 +96,55 @@ You'll want to initialize the submodules to build any graphics examples:
 	git submodule init
 	git submodule update
 	
-To test a graphics example
+To build with graphics capabilities
 
-	make examples/xBasic.cpp 
+	./buildAll.sh
+
+To build math only 
+
+	./build.sh
      
-which both compiles and runs the file.  If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below
+If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below, email me, or post an issue on github.
+
+
+Use Cases
+---
+
+1. A math library: 
+---
+
+	#include "vsr.h"
+
+	using Vec = vsr::euclidean_vec<3,float>;  		//<-- A 3 dimensional euclidean vector defined over floats
+	using Biv = vsr::euclidean_bivector<3,float>;   //<-- A 3 dimensional bivector or "directed area element"
+	
+	int main(){
+		
+		auto v = Vec(1,2,3);		  			//<-- A 3D vector at coordinates 1,2,3;
+		
+		v.rotate( Biv::xy * .25 ).print();		//<-- Rotate the vector in the xy plane and print result
+		
+		return 0;
+	};
+	
+
+2. A stand-alone application (with window and gui)
+---
+
+
+
+While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in functionality for specifically working with Conformal Geometric Algebra of 3D space, which is THE way to model all Euclidean transformations:
+
+.translate(float x, float y, float z)
+.rotate( )
+.dilate
+.twist
+.boost
+
+twisting (translation * rotation)
+
+
+
 
 TROUBLESHOOTING
 ---                 
@@ -133,30 +152,7 @@ TROUBLESHOOTING
 * You'll need C++11 support on your compiler (See makefile notes below). For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).
 * Alternatively an earlier version of Versor is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
-* It helps to separate the graphics portion out to debug compilation issues.  To do so, try making a non-graphics based example, such as examples/xEGA.cpp, 
-	and pass in GFX=0
-		
-		make examples/xEGA.cpp GFX=0 
 
-For clang on a mac with snow leopard I recommend you download llvm and build clang from scratch. You can also try
-
-	brew tap home-brew/versions
-	brew install --HEAD llvm34 --rtti, --disable-assertions, --with-libcxx, --with-clang
-
-though some folk have had issues with the brew method.
-
-####MAKEFILE FLAGS
-
-1. CLANG=path/to/clang++/ (default usr/local/bin/clang++)
-    The makefile assumes clang is at usr/local/bin/clang++ -- if you want to change that set this flag  
-
-2. GCC=1  (default 0)
-    If you want to build with GCC instead set GCC=1.
-
-3. GFX=0 (default 1) 
-    if you want to build without graphics support you can set GFX=0
-      
-You can also cross-compile for the raspberry pi.
 
 INTRODUCTION
 ---
@@ -170,10 +166,12 @@ I am using it for my PhD on bio-inspired engineering.
 I first developed _Versor_ while reading "Geometric Algebra for Computer Science" by Leo Dorst, Daniel Fontijne, and Stephen Mann. 
 It's a fantastic book and if you're reading this you should also consider reading that.  
 
-Built to aid in my modelling of organic forms, the initial development was funded in large part by the Olivia Long Converse Fellowship for Botanic research, 
-courtesy of the Graduate Division at the University of California in Santa Barbara.  Currently supported by the Robert W. Deutsch Foundation,
-this software is under a UC Regents General Public License.  Feel free to use and distribute as long as copyrights and credits
-are maintained.      
+
+License
+---
+Built to aid in my modelling of organic forms, the initial development was partially funded by the Olivia Long Converse Fellowship for Botanic research, courtesy of the Graduate Division at the University of California in Santa Barbara.  Currently it is supported by the Robert W. Deutsch Foundation, and under a UC Regents General Public License.  Feel free to use and distribute for **noncommercial** use as long as copyrights and credits
+are maintained. For commercial use, a licensing agreement will be necessary.
+
 
 ---
 
@@ -190,11 +188,7 @@ _transformations_ were married with a system of _abstraction_.  For more informa
 this page.  For instance, for practical applications in robotics and "Geometric Cybernetics", see Eduardo Bayro-Corrochano's work.  For some
 very helpful algorithms in rigid body dynamics and gravitational physics see the variety of publications by Joan and Anthony Lasenby.  To get at the beginning of it all, read David Hestenes' _New Foundations for Classical Mechanics_. 
 
-####LICENSE
-This software is licensed under a general UC Regents General Public License.  If you're planning on using CGA inside a sellable product you should be aware that 
-there is a vague patent on the use of 5D CGA which _may_ limit its _commercial_ use when encoding robotic control mechanisms, or may just limit your ability to patent
-the model itself.  I hope and imagine it is the latter.  Though powerful, elegant, and brilliant, the heart of CGA is just a quadratic equation and the arguments for 
-the use of 5D CGA are that it is _foundational_ and _universal_, the very two characteristics of a system which would make it un-patentable.  The Clifford Algebras on which it is based are from the 19th century.
+
 
 ####SPEED
 Typical matrix operation libraries have templated inlined functions for Vector and Matrix multiplication.  Versor
@@ -214,18 +208,19 @@ allowed are somewhat limited by your compiler infrastructure -- let me know if y
 As for CGA, all the Pnt, Vec, Dll notation remains as before, but i've started adding utility functions
 since it helps people out. 
 
-  auto pa = round::point( 1,0,0 ); 
-  auto pb = round::point( 0,1,0 ); 
-  auto pc = round::point(-1,0,0 ); 
-  auto circle = pa ^ pb ^ pc;
+
+	auto pa = round::point( 1,0,0 ); 
+	auto pb = round::point( 0,1,0 ); 
+	auto pc = round::point(-1,0,0 ); 
+	auto circle = pa ^ pb ^ pc;
   
-  Draw(c); 
+	Draw(c); 
   
 ####How does it work?
 
-If you like mind-numbing functional template metaprogramming, take a look at the code
-and please let me know what you think.  If you don't, then I wouldn't . . .  But if you have ideas or questions please do not hesitate
-to contact me.   
+If you like functional template metaprogramming, take a look at the code
+and please let me know what you think.  If you don't, then I wouldn't . . .  
+But if you have ideas or questions please do not hesitate to contact me.   
 
 WHAT THE POINT IS 
 ---
@@ -375,6 +370,7 @@ Hit any other key to deselect all elements.
 
 
 [**BUILT-IN INTERFACE**]
+
 |                                 |                                             | 
 Key                                 | Response  
 ------------------------------      | ------------------------------------------  
@@ -447,16 +443,16 @@ which returns \\(\hat{A}\\)
 
 In summary:  
 
-| Versor          | Math                                              |                                         Description                                        |   |  
------------------ | ------------------------------------------------- | :----------------------------------------------------------------------------------------: | -  
-`A * B`           | \\(AB\\)                                          | Multiplies two elements together (and, in the case of A * !B finds ratios between elements).  
-`A ^ B`           | \\(A \wedge B\\)                                  |            Wedges two elements together (builds up higher dimensional elements).  
-`A <= B`          | \\(A \rfloor B\\) or \\(\boldsymbol{a} \cdot B\\) |                 Contracts A out of B (returns the part of B "least like A", sort of).  
-`A % B`           | \\(A \times B\\)                                  |                        Commutator, equal to \\(\frac{1}{2}(AB-BA)\\)  
-`!A`              | \\(A^{-1}\\)                                      |                                       The Inverse of A.  
-`~A`              | \\(\tilde{A}\\)                                   |                                       The Reverse of A.  
-`A.conj()` | \\(\bar{A}\\)                                     |                                         Conjugation.  
-`A.inv()`  | \\(\hat{A}\\)                                     |                                          Involution.  
+| Versor     | Math                                              |                                          Description                                         |   |   |  
+| ---------- | ------------------------------------------------- | :------------------------------------------------------------------------------------------: | - |  
+| `A * B`    | \\(AB\\)                                          | Multiplies two elements together (and, in the case of A * !B finds ratios between elements). |  
+| `A ^ B`    | \\(A \wedge B\\)                                  |             Wedges two elements together (builds up higher dimensional elements).            |  
+| `A <= B`   | \\(A \rfloor B\\) or \\(\boldsymbol{a} \cdot B\\) |             Contracts A out of B (returns the part of B "least like A", sort of).            |  
+| `A % B`    | \\(A \times B\\)                                  |                         Commutator, equal to \\(\frac{1}{2}(AB-BA)\\)                        |  
+| `!A`       | \\(A^{-1}\\)                                      |                                       The Inverse of A.                                      |  
+| `~A`       | \\(\tilde{A}\\)                                   |                                       The Reverse of A.                                      |  
+| `A.conj()` | \\(\bar{A}\\)                                     |                                         Conjugation.                                         |  
+| `A.inv()`  | \\(\hat{A}\\)                                     |                                          Involution.                                         |  
 
 
 ELEMENTS

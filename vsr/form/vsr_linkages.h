@@ -146,7 +146,7 @@ namespace vsr{  namespace cga {
         
         //calculate intersection
         //auto dualMeet = nextSphere(1) ^ prevSphere(3);
-        auto dualMeet = round::dls_pnt(mFrame[1].pos(), mLengthB) ^ round::dls_pnt(mFrame[3].pos(), mLengthA);
+        auto dualMeet = nga::round::dls_pnt(mFrame[1].pos(), mLengthB) ^ nga::round::dls_pnt(mFrame[3].pos(), mLengthA);
         //Pair p = (nextPlane(1)^dualMeet).dual();
         Pair p = ( mFrame[1].dxy() ^ dualMeet).dual();
         
@@ -196,7 +196,7 @@ namespace vsr{  namespace cga {
 
       b3.baseFrame() = Frame( b2[2].mot() * !b2.joint(2).rot() );
       
-      return b3( gen::iphi( b2.joint(2).rot() ) );
+      return b3( nga::gen::iphi( b2.joint(2).rot() ) );
 
      }
 
@@ -222,7 +222,7 @@ namespace vsr{  namespace cga {
       //set baseframe of new linkage to nth frame and undo local in-socket transformation
       b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
       //set phase of new linkage mechanism from nth joint's rotation
-      b2( bSwitch ? -gen::iphi( mJoint[N].rot())  : gen::iphi( mJoint[N].rot() ) );
+      b2( bSwitch ? -nga::gen::iphi( mJoint[N].rot())  : nga::gen::iphi( mJoint[N].rot() ) );
       //use linkAt_ to debug this point
 
       if (la==0) la = mLengthA; //else la = mLengthA;
@@ -234,7 +234,7 @@ namespace vsr{  namespace cga {
       for (int i=0;i<b3.num();++i){
         b3[i].scale() = (*this)[i].scale();
       }
-      return b3( bSwitch ? -gen::iphi( b2.joint(2).rot() ) : gen::iphi( b2.joint(2).rot() )  );
+      return b3( bSwitch ? -nga::gen::iphi( b2.joint(2).rot() ) : nga::gen::iphi( b2.joint(2).rot() )  );
 
      }
 
@@ -247,7 +247,7 @@ namespace vsr{  namespace cga {
       //set baseframe to nth frame and undo local transformation
       b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
       //set phase of new linkage mechanism from nth joint's rotation
-      return b2( bSwitch ? -gen::iphi( mJoint[N].rot())  : gen::iphi( mJoint[N].rot() ) );
+      return b2( bSwitch ? -nga::gen::iphi( mJoint[N].rot())  : nga::gen::iphi( mJoint[N].rot() ) );
       
      }     
 

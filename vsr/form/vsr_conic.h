@@ -18,7 +18,7 @@
  * =====================================================================================
  */
 
-
+/** @file Conic Transforms */
 
 #ifndef  vsr_conic_INC
 #define  vsr_conic_INC
@@ -29,21 +29,37 @@
 
 namespace vsr{
 
-/*!
+/** @defgroup cgatransforms More Transformations 
+    @ingroup cgaops
+
+    Mappings and Inverse Mappings
+*/
+
+/*! 
  *  \brief conic transforms 
  *
  *  conic transforms as described in Applications of Conformal Geometric Algebra
  *  in Computer Vision and Graphics, by wareham, cameron and j.lasenby
  *  see also Recent Applications of Conformal Geometric Algebra by a. lasenby
- */
+
+    @ingroup cgatransforms
+*/
+
 class Conic {
 
   VSR_PRECISION ecc;
 
   public:
 
-
-    /// Transform a Euclidean Vec in direction v with eccentricity alpha
+    /**
+    * @brief Transform a vsr::cga::Vec 
+    *
+    * @param veca  vsr::cga::Vec position to transform
+    * @param vecb  vsr::cga::Vec direction
+    * @param alpha VSR_PRECISION eccentricity
+    *
+    * @return transformed vsr::cga::Point 
+    */
     template<class A>
     static GAPnt<A> Transform( const  GAVec<A> &vec, const GAVec<A>& v, VSR_PRECISION alpha){
       VSR_PRECISION talpha = ( vec <= v)[0] * alpha;
@@ -53,7 +69,15 @@ class Conic {
       return round::loc( p2 / -wt );
   }
 
-    /// Transform a point in direction v with eccentricity alpha
+    /**
+    * @brief Transform a vsr::cga::Point  
+    *
+    * @param veca  vsr::cga::Vec position to transform
+    * @param vecb  vsr::cga::Vec direction
+    * @param alpha VSR_PRECISION eccentricity
+    *
+    * @return a vsr::cga::Point image
+    */
     template<class A>
     static GAPnt<A> Transform( const  GAPnt<A> & p, const GAVec<A>& v, VSR_PRECISION alpha){
       VSR_PRECISION talpha = ( p <= v)[0] * alpha;
@@ -62,7 +86,15 @@ class Conic {
       return round::loc( p2 / -wt );
   }
 
-    /// Inverse Transform a point in direction v with eccentricity alpha
+    /**
+    * @brief Inverse Transform of a vsr::cga::Point  
+    *
+    * @param veca  vsr::cga::Vec position to transform
+    * @param vecb  vsr::cga::Vec direction
+    * @param alpha VSR_PRECISION eccentricity
+    *
+    * @return a vsr::cga::Point pre-image 
+    */
     template<class A>
     static  GAPnt<A>  ITransform(const  GAPnt<A> & p, const GAVec<A>& v, VSR_PRECISION alpha){
       VSR_PRECISION talpha = ( p <= v)[0] * alpha;
@@ -70,8 +102,15 @@ class Conic {
       auto wt = p2 <= GAInf<A>(1);
       return round::loc( p2 / -wt );
     }
-
-    /// Transform a line in direction v with eccentricity alpha
+    /**
+    * @brief Transform a vsr::cga::Point  
+    *
+    * @param line  vsr::cga::Line to transform
+    * @param vecb  vsr::cga::Vec direction
+    * @param alpha VSR_PRECISION eccentricity
+    *
+    * @return a vsr::cga::Circle image
+    */
     template<class A>
     static GALin<A> Transform( const GALin<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
       GAPnt<A> pa = flat::loc( line, PAO, false ).null();
@@ -81,7 +120,15 @@ class Conic {
       return tpa ^ tpb ^ GAInf<A>(1);
     }
 
-    /// Inverse Transform a line in direction v with eccentricity alpha
+    /**
+    * @brief Transform a vsr::cga::Point  
+    *
+    * @param line  vsr::cga::Line to transform
+    * @param vecb  vsr::cga::Vec direction
+    * @param alpha VSR_PRECISION eccentricity
+    *
+    * @return a vsr::cga::Circle pre-image
+    */   
    template<class A>
    static GALin<A> ITransform( const GALin<A>& line, const GAVec<A>& v, VSR_PRECISION alpha){
     GAPnt<A> pa = flat::loc( line, PAO, false).null();

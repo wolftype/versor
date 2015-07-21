@@ -101,7 +101,14 @@ struct MyApp : App {
       vector<Pair> motif;
       motif.push_back(pa^pb); motif.push_back(pa^pc); motif.push_back(pa^pd);// motif.push_back
 
+     // PointGroup2D<Vec> pg(pNum,bPin);
+      
       auto single = sg.apply(motif,3,3); 
+
+     // auto tmp = sg(motif,1,1);
+
+     // cout << tmp.size() << " " << tmp.size()/3 << endl;
+
       if (bSnap){                
         for (auto& i : single){
           auto sa =  round::split(i,true);
@@ -119,6 +126,8 @@ struct MyApp : App {
         }
       }
       auto res = sg.apply(motif,iter,iter);
+      cout << res.size() << " " << res.size()/3 << endl;
+
 
       for (auto& i : res){
         Draw(i,0,0,0);

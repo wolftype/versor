@@ -142,12 +142,12 @@ namespace vsr{ namespace cga {
         }
         
         Pnt phase(double theta, double phi, double phs){
-            return round::pnt_cir( fiber(theta,phi), phs * PI);
+            return round::point( fiber(theta,phi), phs * PI);
         }
        
         
         Pnt pnt(){
-            return round::pnt_cir( fiberA(), mPhase * PI ); 
+            return round::point( fiberA(), mPhase * PI ); 
         }
         
     };

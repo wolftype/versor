@@ -11,7 +11,6 @@
 #define VSR_H_FOLD_INCLUDED
 
 #include "space/vsr_cga3D_op.h"
-#include "space/vsr_cga3D_funcs.h"
 #include "form/vsr_set.h"
 #include "form/vsr_rigid.h"
 
@@ -85,7 +84,7 @@ struct Fold {
     }
 
     static Point Meet ( const vector<Line>& lines) {
-      return meet( lines[0], lines[1] ) ;
+      return construct::meet( lines[0], lines[1] ) ;
     }
 
     static Point Perpendicular( const Point& c, const Line& line){

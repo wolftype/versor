@@ -1,3 +1,17 @@
+/*! @file 
+    
+      template metaprogrammed product logic for Algebras
+      
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+
+
+
 /*
  * =====================================================================================
  *

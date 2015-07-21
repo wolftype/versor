@@ -45,8 +45,8 @@ struct Simplicial2 {
       tpss=ea^eb;
       area = tpss.rnorm() * .5;
       pss = !(tpss);
-      ra = eb<=pss;
-      rb = -ea<=pss;
+      ra = (eb<=pss); ///<-- weight by length ? !
+      rb = (-ea<=pss);
    }
 
    void print(){
@@ -79,11 +79,11 @@ struct Simplicial2 {
      //diff along edges
      auto dna = na - n;
      auto dnb = nb - n; 
-     // coefficients
+     // coefficients (project difference onto tangent space)
      auto wa = dna <= ea;      
      auto wb = dnb <= eb;
      // weighted reciprocals
-     return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
+     return ((ra*wa)^(rb*wb)) * area; //q: divide by area sums after
    }
 
    //wedged derivative / differential
@@ -91,6 +91,7 @@ struct Simplicial2 {
      //diff along edges
      auto dna = na - n;
      auto dnb = nb - n; 
+
      // coefficients
      auto wa = dna;// <= ea;      
      auto wb = dnb;// <= eb;
@@ -99,7 +100,7 @@ struct Simplicial2 {
      return ((ra*wa)^(rb*wb)) ; //q: divide by area sums after
    }
    
-
+  
   // sum of weights across recipcrocals
    template<class T>
    Vec derivative2(const T& n, const T& na, const T& nb){
@@ -132,7 +133,7 @@ struct Simplicial2 {
    /// Vector Derivative of some T-valued function defined on points
    //  finds difference along edges, dots that with edge vectors, 
    //  uses resultant scalar value to weigh reciprocals
-   //  (sum these together?) 
+   //  SUMS these together 
    template<class T>
    Vec derivative0(const T& n, const T& na, const T& nb){
      //diff along edges
@@ -192,6 +193,20 @@ struct Simplicial2 {
      return ( deriv ^ F );
     }
 
+
+   /// Vector Derivative of some T-valued function defined on points
+   //  finds direct difference along outer edge, wedges with gradient
+   template<class T>
+   auto full_derivative(const T& n, const T& na, const T& nb) -> decltype( Vec() * T() ){
+  
+     auto fa = na - n;
+     auto fb = nb - n;
+     
+     auto ta = ra*fa;
+     auto tb = rb*fb;
+
+     return ( ta+tb );
+    }
 
 
   float deficit(){

@@ -30,15 +30,15 @@ struct MyApp : App {
     amt = .01;
     dist = 1;
     
-    ca = cga::circle(-3,0,0);                           //<-- A circle at coordinate -3,0,0
-    cb = cga::circle(3,0,0);                            //<-- A circle at coordinate 3,0,0
+    ca = construct::circle(-3,0,0);                           //<-- A circle at coordinate -3,0,0
+    cb = construct::circle(3,0,0);                            //<-- A circle at coordinate 3,0,0
   }
   
 
   virtual void onDraw(){       
 
-    auto tca = cga::circle(-dist/2.0,0,0).twist(cga::line(1,0,0).dual() * -amt );   //<-- twist circle b around x axis dualline
-    auto tcb = cga::circle(dist/2.0,0,0).twist(cga::line(1,0,0).dual() * amt );     //<-- twist circle b around x axis dualline
+    auto tca = construct::circle(-dist/2.0,0,0).twist(construct::line(1,0,0).dual() * -amt );   //<-- twist circle b around x axis dualline
+    auto tcb = construct::circle(dist/2.0,0,0).twist(construct::line(1,0,0).dual() * amt );     //<-- twist circle b around x axis dualline
   
     //log of transformation from ca to cb
     auto ratio = gen::ratio(tca,tcb);

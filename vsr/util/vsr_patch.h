@@ -66,7 +66,7 @@ class Nbr {
 	public:
 		Nbr(){}
 		Nbr(int _idx, int _xl, int _xr, int _yb, int _yt, int _zf, int _zb) :
-		idx(_idx), xl(_xl), xr(_xr), yt(_yt), yb(_yb), zf(_zf), zb(_zb), type(0) {
+		idx(_idx), xl(_xl), xr(_xr),  yb(_yb), yt(_yt), zf(_zf), zb(_zb), type(0) {
             
             if (xl == -1 ) type |= LEFT;
             if (xr == -1 ) type |= RIGHT;
@@ -81,8 +81,8 @@ class Nbr {
         : idx(_idx), 
         xl( (type & LEFT) ? -1 : _idx - ( h ) * ( d ) ),
         xr( (type & RIGHT) ? -1 : _idx + ( h ) * ( d ) ),
-        yt( (type & TOP) ? - 1 : _idx + d  ),
         yb( (type & BOTTOM) ? - 1 : _idx - d ),
+        yt( (type & TOP) ? - 1 : _idx + d  ),
         zf( (type & FRONT) ? - 1 : _idx - 1 ),
         zb( (type & BACK) ? - 1 : _idx + 1 ),
         type(type)

@@ -23,7 +23,7 @@
 #include "vsr_field.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 

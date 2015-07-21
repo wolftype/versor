@@ -5,10 +5,10 @@ using namespace vsr::cga;
 struct MyApp : App {  
 
   //DualSphere at 2,0,0 with radius .5
-  DualSphere sphere = cga::sphere(2,0,0,.5);;
+  DualSphere sphere = construct::sphere(2,0,0,.5);;
 
   //Circle through 3 Points
-  Circle circle = cga::point(1,0,0) ^ cga::point(0,1,0) ^ cga::point(-1,0,0) ; 
+  Circle circle = construct::point(1,0,0) ^ construct::point(0,1,0) ^ construct::point(-1,0,0) ; 
     
   //Dual plane with Normal in Y direction
   DualPlane dualplane = DualPlane(0,1,0);
@@ -29,8 +29,8 @@ struct MyApp : App {
   void onDraw(){
 
     //Calculate  Intersection (which is the dual of the outer product of duals . . . )
-    auto pair_meet = meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual()
-    auto circle_meet = meet(sphere,dualplane);
+    auto pair_meet = construct::meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual()
+    auto circle_meet = construct::meet(sphere,dualplane);
 
     //Draw 'em with colors
     draw(circle,0,1,0);          //<-- Draw Green Circle

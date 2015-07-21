@@ -1,6 +1,9 @@
-/*
- * =====================================================================================
- *
+/*!
+ * @file 
+ 
+    implementations of algebras (Euclidean, PQ-metric, and conformal)
+    
+
  *       Filename:  vsr_algebra.h
  *
  *    Description:  algebra implementation (euclidean, metric, and conformal)
@@ -32,6 +35,8 @@ namespace vsr {
     
         note: to do: guard again negative dimensions and negative grades
      *-----------------------------------------------------------------------------*/
+      
+      /// metafunction to construct a basis blade type from spatial dimension and subspace grade
       template<bits::type dim, bits::type grade>
       struct blade {
           using vec = typename vsr::Blade1<dim>::VEC; 
@@ -40,12 +45,13 @@ namespace vsr {
     
       };
     
+      /// limiting case of grade 0 (scalar)
       template<bits::type dim>
       struct blade<dim, 0>{
           using type = Basis<0>;
       };
     
-      //all blades in dim upto and including maxgrade
+      /// all blades within a spatial dim upto and including maxgrade
       template<bits::type dim, bits::type grade=dim>
       struct all_blades{
           using sub = typename all_blades<dim, grade-1>::type;
@@ -53,6 +59,7 @@ namespace vsr {
           using type = typename ICat< one, sub >::Type;
       };
     
+      /// limiting case of grade 0 (scalar)
       template<bits::type dim>
       struct all_blades<dim,0>{
           using type = Basis<0>;
@@ -65,22 +72,32 @@ namespace vsr {
     //forward declaration of named_types
     template<class algebraimpl> struct named_types;
 
-    /*-----------------------------------------------------------------------------
-     *  An algebra instance is templated on: 
-     *
-     *     metric_type: a metric (e.g. Metric<3,0> for euclidean 3 space or Metric<4,1,true> for conformal 5D space )
-     *     value_type:  a field value type (i.e. real, complex, or some other arithmetic element).
-     *       
-     *         The value type can be anything that commutatively multiplies and adds in a closed group, 
-     *         allowing for tensor metrics C x C, etc a la Bott periodicity.
-     *-----------------------------------------------------------------------------*/
+    /*!-----------------------------------------------------------------------------
+       An algebra instance is templated on: 
+     
+       metric_type: a metric (e.g. Metric<3,0> for euclidean 3 space or Metric<4,1,true> for conformal 5D space )
+       value_type:  a field value type (i.e. real, complex, or some other arithmetic element).
+           
+       The value type can be anything that commutatively multiplies and adds in a closed group, 
+       allowing for tensor metrics C x C, etc a la Bott periodicity.
 
+
+         algebra is a vsr::algebra< vsr::metric< P, Q, bConformal>, value_t>
+            where: 
+            * P and Q are integers representing the **signature** of a diagonal metric
+            * bConformal is a boolean value specifing whether the metric should be **split**
+
+         For example:
+    
+             using ega = vsr::algebra< metric<3>, float>;
+
+     *-----------------------------------------------------------------------------*/
     template< class metric_type, class value_type >
     struct algebra {
 
         using metric = metric_type;                             ///<-- Metric, with signature, whether Euclidean, Projective, Conformal, etc
           
-        using value_t = value_type;                             ///<-- Field over which Algebra is Defined (e.g. float, double, complex)
+        using value_t = value_type;                             ///<-- %Field over which Algebra is Defined (e.g. float, double, complex)
         
         static const int dim = metric::type::Num;               ///<-- Dimension of Algebra (2,3,4,5,etc)
  
@@ -445,8 +462,44 @@ namespace vsr {
             using translated_dilator = Multivector<alg,tsd>;
             using motor = Multivector<alg,mot>;
             using boost = Multivector<alg,bst>;
-            using conformal_boost = Multivector<alg,con>;
+            using conformal_rotor = Multivector<alg,con>;
             using dual_sphere = Multivector<alg,dls>;
+
+
+            using Scalar = Multivector<alg,sca>; 
+            using Psuedoscalar = Multivector<alg,pss>;  
+            using EuclideanPseudoscalar = Multivector<alg,euc>;
+            using Vector = Multivector<alg,vec>; 
+            using Point = Multivector<alg,pnt>;
+            using Origin = Multivector<alg,ori>;
+            using Infinity = Multivector<alg,inf>;
+            using Eplane = Multivector<alg,mnk>;
+            using Bivector = Multivector<alg,biv>;
+            using Trivector = Multivector<alg,tri>;
+            using Rotor = Multivector<alg,rot>;
+            using TangentVector = Multivector<alg,tnv>;
+            using DirectionVector = Multivector<alg,drv>;
+            using TangentBivector = Multivector<alg,tnb>;
+            using DirectionBivector = Multivector<alg,drb>;
+            using TangentTrivector = Multivector<alg,tnt>;
+            using DirectionTrivector = Multivector<alg,drt>;
+            using Pair = Multivector<alg,par>;
+            using Circle = Multivector<alg,cir>;
+            using Sphere = Multivector<alg,sph>;
+            using FlatPoint = Multivector<alg,flp>;
+            using DualLine = Multivector<alg,dll>;
+            using Line = Multivector<alg,lin>;
+            using DualPlane = Multivector<alg,dlp>;
+            using Plane = Multivector<alg,pln>;
+            using Translator = Multivector<alg,trs>;
+            using Transversor = Multivector<alg,trv>;
+            using Dilator = Multivector<alg,dil>;
+            using TranslatedDilator = Multivector<alg,tsd>;
+            using Motor = Multivector<alg,mot>;
+            using Boost = Multivector<alg,bst>;
+            using ConformalRotor = Multivector<alg,con>;
+            using DualSphere = Multivector<alg,dls>;
+          
             
 
    };

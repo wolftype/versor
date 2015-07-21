@@ -98,7 +98,7 @@ namespace gfx{
    */
   template<> void Renderable<Cir>::Draw(const Cir& cir, GFXSceneNode * re) { 
      MBO& mbo =  Get()[0];
-     bool real = round::size(cir,false) > 0 ? 1 : 0;  
+     bool real = round::size(cir) > 0 ? 1 : 0;  
      real ? mbo.mesh.mode(GL::LL) : mbo.mesh.mode(GL::L);
      Renderable<MBO>::Draw(mbo,vsr::xf::mat(cir), re);
   } 
@@ -144,7 +144,7 @@ namespace gfx{
     MBO& sphere = mbo[0];
     MBO& point = mbo[1];
 
-    double ta = vsr::round::size( pnt, true );
+    double ta = vsr::cga::round::size( pnt );
 
     if ( fabs(ta) >  FPERROR ) {
 

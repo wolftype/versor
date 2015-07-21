@@ -35,6 +35,7 @@ namespace vsr{
 
 /*!-----------------------------------------------------------------------------
  *  convex (and other assorted) hulls assembled into a half edge graph 
+ 
  *-----------------------------------------------------------------------------*/
 template<bits::type DIM>
 struct ConvexHull {

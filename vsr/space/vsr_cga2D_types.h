@@ -92,11 +92,11 @@ namespace vsr{ namespace cga2D {
                      
   template<class V>
   inline Point point(const V& v){
-	  return round::null( v[0], v[1]  );
+	  return nga::round::null( v[0], v[1]  );
   }
   
   Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
-	  return round::dls( Vec(x,y), rad ); 
+	  return nga::round::dls( Vec(x,y), rad ); 
   }
 
   Pair meet( const Line& lin, const Circle& cir){

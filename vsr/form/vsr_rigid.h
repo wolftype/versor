@@ -16,15 +16,32 @@
  * =====================================================================================
  */
 
+
+ /*
+ @file Rigid Body Sphere-based Constraint Networks
+
+ @sa vsr_fold.h
+ 
+ @todo major clean up
+ 
+ */
+
 #ifndef  vsr_rigid_INC
 #define  vsr_rigid_INC
 
 namespace vsr { namespace cga {
 
+
+/// Methods for Evaluating Constrained Points using Intersections of Sphere-based Distances
 struct Constrain {
 
+    /// Construct a Distance Constraint from a source and target
+    static DualSphere Distance( const Point& src, const Point& target){
+      return target <= (src ^ Inf(1));
+    }
+
    //unused?
-    static Point Crease (const Pnt& a, const Pnt& dls, const Dll d, bool mtn){
+    static Point Crease (const Point& a, const Point& dls, const DualLine d, bool mtn){
       // Dls dls = round::at(b, a);
        Circle cir = a ^ d;
        Pair par = ( dls ^ cir.dual()).dual();
@@ -32,25 +49,26 @@ struct Constrain {
     }
 
 
-    /* static Pair Triple(const Dls& da, const Dls& db, const Dls & dc){ */
-    /*   return (da ^ db ^ dc).dual(); */
-    /* } */
+    /// two distances and a theta around their meet
+    static Point Double( const Dls& da, const Dls& db, double amt){
+      return round::point( (da^db).dual(), amt );
+    }
 
-    // three distances, counter clockwise (deprecated, use Tetral)
+    /// three distances, counter clockwise (deprecated, use Tetral)
     static Point Triple (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
        return round::loc( round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
     }
-    // tetral constraint
+    /// tetral constraint
     static Point Tetral (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
        return round::loc( round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
     }
-    //planar constraint: two distances and a plane
+    /// planar constraint: two distances and a plane
     static Point Planar( const Dls& da, const Dls& db, const Dls& dc, bool mtn){
        Plane plane = da ^ db ^ dc ^ Inf(1);
        return round::loc( round::split( (da ^ dc ^ plane.dual() ).dual(), mtn ) );
     }
 
-    //Circle tangency constraint, two distances and an original point (closest to original)
+    /// circle tangency constraint, two distances and an original point (closest to original)
     static Point Tangency(const Pnt& p, const Dls& da, const Dls& db){
 
       auto meet = (da ^ db).dual();
@@ -63,15 +81,15 @@ struct Constrain {
       
     }
 
-    //Spherical tangency constrain, one distance and an original point (returns point on sphere closest to p);
+     /// spherical tangency constrain, one distance and an original point (returns point on sphere closest to p);
      static Point Tangency(const Pnt& p, const Dls& da){
        auto line =  p ^ da ^ Inf(1);
        auto np = round::split( (line.dual() ^ da).dual(), false);
        return np;
      }
 
-    //Tension tangency constrain, one distance and an original point 
-    //(returns point on sphere closest to p if p is outside da, otherwise just p);
+     /// Tension tangency constrain, one distance and an original point 
+     /// (returns point on sphere closest to p if p is outside da, otherwise just p);
      static Point Tension(const Pnt& p, const Dls& da){
        if ( (p<=da)[0] > 0 ) return p;
        auto line =  p ^ da ^ Inf(1);
@@ -79,7 +97,7 @@ struct Constrain {
        return np;
      }
 
-    //tension constraint from two distances
+    /// tension constraint from two distances
     static Point Tension(const Pnt& p, const Dls& da, const Dls& db){
        
        if ( ( (p<=da)[0] > 0 ) && ( (p<=db)[0] > 0 ) ) return p; // returns input point if it lies within both spheres 
@@ -142,11 +160,13 @@ struct Constrain {
   
 };
 
-// Holds a pointer to a source, and has a radius t, 
-// operator() generates a dual sphere at source with radius t
+
+/// Holds a pointer to a source, and has a radius t, 
+/// the operator() generates a dual sphere at source with radius t
 struct DistancePtr {
-  Point * src; // center 
-  float t;
+  
+  Point * src = NULL;      ///< Pointer to Point Source 
+  double t;          ///< Distance t from Source
 
   DistancePtr(){};
 
@@ -155,47 +175,136 @@ struct DistancePtr {
     set(a,target);  
   }
 
+  /// Set constraint from source and target
   void set(Pnt& a, const Pnt& target){
     src = &a; t = round::rad( round::at(*src,target) );
   }
 
-  Dls operator()(){ return round::dls( *src, t ); }
+  /// Evaluate Distance Constraint as a Dual Sphere
+  Dls operator()(){ 
+    if (src==NULL) return Dls();  
+    return round::dls( *src, t ); 
+  }
 
 };
 
-struct Rigid3{
+/// Generic Rigid Constraint Node
+struct RigidNode{
+
+  Point result = Point();                             ///< stored evaluated result
+  
+  bool bCalc = true;                        ///< whether to Evaluate
+  
+  virtual void onEval(double amt) = 0;     ///< evaluation implementation to be implemented by subclass
+ 
+  vector <RigidNode*> mParent;              ///< parents which might need to be evaluated before this one
+
+  Point eval(double amt=0){
+    if (bCalc) onEval(amt);
+    return  result;
+  }
+
+  void setResult(const Point& p){
+    result = p;
+  }
+
+};
+
+/// A Rigid Contraint Node set by Two Distance Pointers
+struct Rig2 : RigidNode {
+  
+
+  DistancePtr da,db;
+
+  Rig2() : RigidNode() {}
+  
+  Rig2(const Point& target, RigidNode * ra, RigidNode * rb) : RigidNode() {
+    set(target,ra,rb); 
+  }
+
+  void set(const Point& target, RigidNode * ra, RigidNode * rb){
+    mParent.push_back(ra); mParent.push_back(rb);
+    da.set(ra->result,target);
+    db.set(rb->result,target);
+
+    bCalc=true;
+    result = target;
+  }
+
+  virtual void onEval(double amt){
+    result = round::point( (da() ^ db()).dual(), amt); 
+  }
+
+
+};
+
+struct Rig3 : RigidNode {
+
 
   DistancePtr da,db,dc;
+  
+  bool bMtn;      ///< fold is a mountain fold
+  bool bCoplanar = false; ///< result is coplanar with three constraints
 
-  void set(const Pnt& target, Rigid3 * ra, Rigid3 * rb, Rigid3 * rc){
+  Rig3() : RigidNode() {}
+
+  Rig3( const Pnt& target, RigidNode * ra, RigidNode * rb, RigidNode * rc, bool m) : RigidNode() {
+    set(target,ra,rb,rc,m);
+  }
+
+  /// set from target and constraints Counter Clockwise
+  void set( const Point& target, RigidNode * ra, RigidNode *rb, RigidNode *rc, bool m){
+    mParent.push_back(ra); mParent.push_back(rb); mParent.push_back(rc);
+    bMtn = m;
+    
+    da.set(ra->result,target);
+    db.set(rb->result,target);
+    dc.set(rc->result,target); 
+
+    bCalc=true;
+    result = target;
 
   }
+
+  virtual void onEval(double amt){
+    result = bCoplanar ? Constrain::Planar(da(),db(),dc(),bMtn) : Constrain::Triple(da(),db(),dc(),bMtn);
+  }
+
+
 };
 
 
 /// A Rigid Constraint Node set by Three Distance Pointers
 struct Rigid{
-  //default calc is false until ra parents are set
-  bool bCalc, bTriple;
+  
+  /// default calc is false until ra parents are set
+  bool bCalc;
+  
+  /// coplanar or not
+  bool bTriple;
+
+  /// stored evaluated result of (*this)()
   Pnt result;
-  //mountain or valley
+  
+  /// mountain or valley
   bool mtn;
 
-  //Has three distances
+  /// three dual sphere distances
   DistancePtr da,db,dc;
   
-  //Is Dependent on three parents
+  /// linked to three parents
   Rigid *ra, *rb, *rc;
 
-  //Has n children which depend on it
+  /// Has n children which depend on it
   vector<Rigid*> child;
-
 
   Rigid() : bCalc(false), bTriple(true), ra(NULL), rb(NULL), rc(NULL) {}
 
   Rigid(const Pnt& res ) : bTriple(true),  ra(NULL), rb(NULL), rc(NULL) {
     set(res);
   }
+
+  /// set result
   void set(const Pnt& res){
     bCalc = false;
     result = res;
@@ -206,7 +315,7 @@ struct Rigid{
     set(target,pa,pb,pc,m);
   }
 
-  //Counter Clockwise
+  /// set from target and constraints Counter Clockwise
   void set( const Pnt& target, Rigid * pa, Rigid * pb, Rigid * pc, bool m){
     mtn = m; bCalc=true;
     ra = pa; rb = pb; rc = pc;
@@ -216,7 +325,7 @@ struct Rigid{
     dc.set(rc->result,target); 
   }
 
-  //Counter Clockwise
+  /// set from constraints Counter Clockwise
   void set( Rigid * pa, Rigid * pb, Rigid * pc, bool m){
     mtn = m; bCalc=true;
     ra = pa; rb = pb; rc = pc;
@@ -252,10 +361,10 @@ struct Rigid{
     return (db()^dc()).dual();
   }  
   void orbitA(float amt){
-    result = round::pnt_cir( circleA(), amt * ( mtn?1:-1) ); 
+    result = round::point( circleA(), amt * ( mtn?1:-1) ); 
   }
   void orbitB(float amt){
-    result = round::pnt_cir( circleB(), amt * ( mtn?1:-1) ); 
+    result = round::point( circleB(), amt * ( mtn?1:-1) ); 
   } 
 
 
@@ -603,7 +712,7 @@ struct Rigid2{
   Cir circle(int idx =0) { return ( parents[idx].da() ^  parents[idx].db() ).dual(); }
 
   /// get point at theta t around constraint orbit
-  Pnt orbit(VSR_PRECISION t, int idx=0) { return round::pnt_cir( circle(idx), t * ( bMtn?1:-1) ); }
+  Pnt orbit(VSR_PRECISION t, int idx=0) { return round::point( circle(idx), t * ( bMtn?1:-1) ); }
 };
 
 

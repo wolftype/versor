@@ -5,7 +5,21 @@
  *
  *    Description:  example use of dorst's logarithm with bivector splits
                     from "square roots" paper (dorst and valkenburg)
- *
+
+                    The conformal transformation between two (orthogonal) Circles
+                    is split using exterior derivative dx ^ RxR 
+                    into two orthogonal independent rotors
+                    around which we wind.
+
+                    the surface carved out by taking circle a to circle b
+                    represents the lattice of area 1 -- one page in the book
+                    of all harmonic relations 
+                    
+                    seg gets from one circle to another at 1 for every four periods
+                    "                      "  back to itself at 2 for every two periods
+                    "                      "  through itself and back to other circle
+                    "                      " loops at 4
+                    
  *        Version:  1.0
  *        Created:  03/18/2015 16:48:57
  *       Revision:  none
@@ -17,30 +31,42 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
+#include "form/vsr_csg.h"   
 
 using namespace vsr;
 using namespace vsr::cga;
 
+namespace vsr{ namespace gen{
 
-//how to interpolate between two split pairs...?
-Con conTest2(const vector<Pair>& a, const vector<Pair>& b, float t){
-  return gen::bst( a[0] * t + b[0]*(1-t) ) * gen::bst( a[1] * t + b[1]*(1-t) );
+Boost con_( const vector<Pair>& log, float amtA){
+    Par par = log[0] * amtA;
+    if (log.size() > 1){
+      par += log[1] * amtA;
+    }
+    return gen::bst(par);
 }
 
-Con conTest(const vector<Pair>& a, const vector<Pair>& b, float t){
-  auto ra = gen::split( (a[0]+a[1])*(1-t) + (b[0]+b[1])*t );
-  return gen::con(ra, 1 );
+
+Boost con_( const vector<Pair>& log, float amtA, float amtB){
+    Par par = log[0] * amtA;
+    if (log.size() > 1){
+      par += log[1] * amtB;
+    }
+    return gen::bst(par);
 }
+
+} }
 
 struct MyApp : App {
  
   //Some Variables
-  bool bReset, bDrawXf, bDrawPair, bDrawInterp = false;
-  float amt, amtB, wt = 0;
-  float bivA,bivB,exponent,offset;
+  bool bReset, bDrawXf, bDrawPair, bDrawInterp,bDrawCoordinateGrid = false;
+  float amt, P, Q, P2,Q2,wt,seg,seg2 = 0;
+  float bivA,bivB,theta,phi,hopftheta,twistAmt,offset,iter;
 
-  bool bRealA, bRealB;
+  bool bRealA, bRealB, bTangentA, bTangentB, bAxis, bPoint;
+  float numStart;
   Frame fa,fb;
 
   /*-----------------------------------------------------------------------------
@@ -50,23 +76,50 @@ struct MyApp : App {
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bReset,"bReset")(bDrawXf,"bDrawXf")(bDrawInterp,"bDrawInterp")(bDrawPair,"bDrawPair");
+    gui(amt,"amt",-100,100);
+
+    gui(P,"P",-100,100);
+    gui(Q,"Q",-100,100);
+
+    gui(P2,"P2",-100,100);
+    gui(Q2,"Q2",-100,100);
+    
+    gui(bReset,"bReset")(bDrawXf,"bDrawXf")(bDrawInterp,"bDrawInterp")(bDrawPair,"bDrawPair");
     gui(wt,"wt",-100,100);
-    gui(exponent,"exponent",0,100);
-    gui(offset,"offset",-100,100);
-    gui(amtB,"amtB",-100,100);
+   
+    gui(seg,"seg",-100,100);           //<-- number of segments along "template"
+    gui(seg2,"seg2",-100,100);           //<-- number of segments along "template"
+    gui(theta,"theta",0,TWOPI);        //<-- theta position of starting orbit around circle ca 
+    gui(phi,"phi",0,TWOPI);            //<-- phi spread of positions on 
+    gui(hopftheta,"hopftheta",0,TWOPI);            //<-- phi spread of positions on 
+    gui(twistAmt,"twistAmt",0,TWOPI);  //<-- twist around axis
+    gui(numStart,"numStart",0,1000);   //<-- number of points around circle generator
+    gui(iter,"iter",0,1000);           //<-- number of circles
+  
+    gui(bDrawCoordinateGrid,"bDrawCoordinateGrid");
     gui(bRealA,"realA");
     gui(bRealB,"realB");
+    gui(bTangentA, "tangentA");
+    gui(bTangentB, "tangentB");
+    gui(bAxis, "bAxis")(bPoint, "bPoint");;
     gui(bivA, "bivA",-100,100)(bivB,"bivB",-100,100);
+
     
     fa.pos(-2,0,0);
-    fb.pos(2,0,0);
+    fa.rot() = gen::rot(0,PIOVERFOUR/2.0);
+    
+    //fb.pos() = fa.pos().reflect( Dlp(1,0,0) );
+    fb.mot( fa.mot().reflect( Dlp(1,0,0) ) );
+    //fb.pos(2,0,0);
 
     objectController.attach(&fa);
     objectController.attach(&fb);
 
+    bRealA = bRealB = true;
     //defaults
-    wt = 1; amt = 1;
+    wt = 1; seg=4; amt = .01;
+
+    P=3; Q=2;
   }
 
 
@@ -75,92 +128,130 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    auto base = CXZ(1);
+    //Circles A and B On Frames
+    auto ca = bTangentA ? fa.tz().dual() : (bRealA ? fa.cxy() : fa.icxy());
+    auto cb = bTangentB ? fb.tz().dual() : (bRealB ? fb.cxy() : fb.icxy());
 
-    //Circles A and B
-    auto ca = fa.cxz();// : fa.icxz();
-    auto cb = fb.cxz();// : fb.icxy();
+    //tangents (null point pairs) in y direction
+    auto ta = fa.ty();
+    auto tb = fb.ty();
 
-    //line thrugh centers
-    auto line = fa.pos() ^ fb.pos() ^ Infinity(1);
-    
-
-    //Transformation from circle a to circle b, and log    
-    auto xf =  gen::ratio( ca, cb ); 
-    auto log = gen::log( xf );
-    auto con = gen::con(log, amtB);
-
-    int num = 20;
-    //starting positions
-    static vector<Point> pnt(num);
-    if (bReset){
-      for(int j=0;j<num;++j){
-        pnt[j] = cga::affine(fa.pos(), fb.pos(),(float)j/num);
-      }
-    }
-
-    //points along orbit
-    for (auto& i : pnt ){
-      i = round::location( i.spin(con) );
-   //   Draw(i,1,0,0);
-    }
-
-
-
-    for (int i=0;i<=num;++i){
-      float t=(float)i/num * amt;
-      
-      auto txf = gen::con( log, t );
-      auto nc = ca.spin(txf);
-      auto pair = cga::point( nc, 0) ^ cga::point(nc,PI);
-
-      Draw( nc, t, 1, 1-t);  
+    //Orthogonal circle through frame fb
+    auto caorth = fb.pos() ^ ca.dual();
   
+    //use axis of circle a, orthogonal circle to it, or frame circle cb itself 
+    auto cc = bAxis ? Cir(fa.lz().unit()) : bPoint ? caorth : cb; 
 
-      float tneg = 2*(t-.5);  //-1 to 1
-      float tmp = tneg;
-      for (int i=0;i<exponent;++i){
-        tneg *= tmp;
-      }
+    //Transformation from circle a to circle b, and log
+    //.................................flip?  theta  
+    auto fullxf =  gen::ratio( ca, cc, false, hopftheta); 
 
-      float ta = t * .5;
+    auto log = gen::log( fullxf );
+
+    //conformal motion (small differential)
+    float amtP = (P==0) ? 0 : seg*amt/P;
+    float amtQ = (Q==0) ? 0 : seg*amt/Q;
+
+    auto conf =  gen::con(log, amtP, amtQ);
+
+    //Just the Split (for drawing purposes)
+    auto split = gen::split( fullxf );
+    
+    //numStart Points around a circle starting at theta with spread of phi,
+    auto pnt = points(ca, (int)numStart, theta, phi);
+
+    for (auto& i : pnt){
+      i = i.twist( (round::par_cir(ca,0)^Inf(1)).dual() * twistAmt );
+    }
+ 
+    //common product
+    float harmonic = ((P==0) || (Q==0)) ? 1 : P*Q;  
+    float harmonic2 = ((P2==0) || (Q2==0)) ? 1 : P2*Q2;  
+
+    int numIter = harmonic / amt;
+ 
+
+    //Relative, recursive, Transformations (dconf)
+    for (int j=0;j<numStart;++j){
+     float t = (float)(j/numStart);
+     auto start = pnt[j];
+     for (int i=0;i<numIter;++i){
       
-      
-      auto pa =  round::location( cga::point(ca,PIOVERTWO).spin(txf) ); 
-      auto tbst = gen::bst( pair * amtB * (tneg + ((tneg>0?1:-1) *offset) ) );
-      auto tpa = round::location( pa.spin( tbst ) ) ;
-   //   
-      Draw(pa,1,0,0);
+       vector<Circle> coord;
 
-      //auto pb=  cga::point(cb, PI*tt); //< starting point    
-      //auto tpa = round::location( pa.spin(txf) );
-      //auto tpb = round::location( pb.spin(!txf) );
-            
-      Draw(tpa,0,1,0);     
-      //Draw(line,0,1,0);   
-    //  Draw(tpb,1,0,0);        
+       start = start.spin(conf);
+       auto tp = round::loc(start);
+       Draw(tp , t, 1, 1-t);
 
-      //POINTS
-//      for(int j=0;j<20;++j){
-//        auto tpnt = round::pnt_cir(ca, .25 + TWOPI*j/20);
-//        tpnt = tpnt.spin(txf);                          //xf of a point
-//        Draw( round::loc( tpnt ),0,1,1);
-//      }
-      
-      //LINEAR (For comparison)
-//      if (bReset) Draw( ca * (1-t) + (cb * t), 1,0,0);
+       float titer =0;
+        if (bDrawCoordinateGrid){
+           for (auto& s : split){
+            auto cir = tp^s;
+            coord.push_back(cir);
+            Draw(cir,t,titer,1-t);
+            Draw( tangent::at(cir,tp),t,1-titer,1-t);
+            titer+=1;
+           }
+
+           for (int k=0;k<iter;++k){
+
+              float tk = seg2 * harmonic2 * (float)k/iter;
+              auto conf2 = gen::con( coord[0].dual(), split[1].dual(), tk/P2, tk/Q2 );
+              Draw( round::location( tp.spin(conf2) ), 0, 1, 0 );
+
+           }
+           
+         }
+     }
 
 
-//      if (bDrawPair) {
-//        auto pair = ca.spin(txf).dual();
-//        Draw ( cga::pointA(pair).null() , 1,t,1-t);
-//        Draw ( cga::pointB(pair).null() , 1,t,1-t);
-//      }
 
     }
-    
+
+ 
+   //Absolute
+   for (int i=0;i<=(int)iter;++i){
+     
+       float t = (float)i/iter ;
+
+       //Absolute Circles      
+       auto fxf = gen::con( log, t);
+       auto nc = ca.spin(fxf);
+     //  Draw(nc);
+
+
+       //Absolute points along orbit
+   //    float tamt = seg * harmonic * t;
+   //    auto txf = gen::con( log, tamt/P, tamt/Q );
+
+    //  for (auto& j : pnt ){
+    //     auto tmp = round::location( j.spin(txf) );
+    //     Draw(tmp,1,0,0);
+    //   }
+ 
+   }
+   
+    //Draw Original Circle 
     Draw(ca);
-    Draw(cb);
+    if (bPoint) Draw(caorth,1,0,1);
+    
+    
+    //Draw Transformed Circle
+    if (!bAxis) Draw( ca.spin(fullxf),0,1,1);
+    else Draw( Line( ca.spin(fullxf) ),0,1,1);
+ 
+
+    //Draw frames    
+   // Draw(fa);
+  //  Draw(fb);
+
+    // Draw Split
+    bool bBlue = false;
+    for (auto& i : split){
+     Draw(i.dual(),0,1,bBlue ? 1 : 0);
+     bBlue = !bBlue;
+    }
+ 
   
   }
   

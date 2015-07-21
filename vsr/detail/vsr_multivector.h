@@ -1,4 +1,9 @@
-/*
+/*! @file
+    generic multivector class, templated on a geometric algebra and a field
+      
+    using Vec = vsr::algebra< metric<3>, float>::types::Vec;
+    Vec v(1,0,0);
+     
  * =====================================================================================
  *
  *       Filename:  vsr_multivector.h
@@ -21,51 +26,59 @@
 #define MV_H_INCLUDED  
 
 
-#include "vsr_algebra.h"  ///<-- algebra implementation details (EGA, MGA, CGA)
+#include "vsr_algebra.h"  //<-- algebra implementation details (EGA, MGA, CGA)
 
 #include <math.h>   
 #include <iostream>  
 
+
+
+/*!-----------------------------------------------------------------------------
+ *  the **versor** library namespace
+ 
+ *-----------------------------------------------------------------------------*/
 namespace vsr{ 
  
  
-     /*!-----------------------------------------------------------------------------
-     *  THE UNIVERSAL MULTIVECTOR CLASS (built from an algbera TALGEBRA on a sub basis A )
+     /*!
+     *  Generic Geometric Number Types (templated on an algebra and a basis )
 
+          Multivector is the main value-storing class.  All Geometric Algebra Types
+          are template instantiations of this class.  
+          
+          The types of **values** contained here (float, double, etc) are 
+          deterimined by the algebra.  The way in which the data is combined with other 
+          methods is determined by their respective basis, in coordination with the algebra.
 
-          algebra is a vsr::algebra< vsr::metric< iP, iQ, bConformal>, value_t>
-            where: 
-            * iP and iQ are integers representing the SIGNATURE of a diagonal metric
-            * bConformal is a boolean value specifing whether the metric should be split
-
-     *-----------------------------------------------------------------------------*/
+     */
     template<typename algebra_type, typename basis_type>
     struct Multivector{
       
-      using algebra = algebra_type;                       ///<-- mother algebra, itself templated on a metric
-      using basis = basis_type;                           ///<-- basis (part of a ring) 
+      using algebra = algebra_type;                       ///< \ref algebra (a metric and field)
+      using basis = basis_type;                           ///< basis is an algebraic data type created with compile-time list processing  
       
-      static const int Num = basis::Num;                  ///<-- number of bases
+      static const int Num = basis::Num;                  ///< number of bases
 
-      using value_t = typename algebra::value_t;
-      using space =   typename algebra::types;            ///<-- call ::space:: to get to another Type in same Algebra
+      using value_t = typename algebra::value_t;          ///< the field over which the algebra is defined (e.g. float or double)
+      using space =   typename algebra::types;            ///< @ingroup typesystem call <MultivectorType>::space::<MultivectorName> to declare another named Type within the same algebra 
 
-      template<class B> using MultivectorB = Multivector<algebra,B>;       ///<-- another basis within same algebra
+      template<class B> using MultivectorB = Multivector<algebra,B>;       ///< another Type within same algebra
 
+      /// the Dual Type (product of this and algebra::types::pseudoscalar)
       using Dual = typename algebra::template make_gp< typename blade<algebra::dim,algebra::dim>::type, basis>; 
+      /// the Euclidan subspace Dual Type (product of this and algebra::types::euclidean_pseudoscalar)
       using DualE = typename algebra::template make_gp< Basis<bits::pss(algebra::dim-2)>, basis>; 
     
-      /// Data Array
-      value_t val[Num];
-      /// Data Access
-      typedef const value_t array_type[Num]; 
-      array_type& begin() const { return val; } 
+      value_t val[Num];                                   ///< %Data Array
+      typedef const value_t array_type[Num];              ///< %Data Array Type
 
-      //Get value at idx
+      array_type& begin() const { return val; }           ///< Pointer to first data
+
+      /// %Get value at idx
       constexpr value_t operator[] (int idx) const{
         return val[idx]; 
       }
-      //Set value at idx
+      /// %Set value at idx
       value_t& operator[] (int idx){
         return val[idx]; 
       }
@@ -79,15 +92,15 @@ namespace vsr{
       template<typename B>
       constexpr Multivector( const Multivector<algebra,B>& b) : Multivector(b.template cast<Multivector<algebra,basis>>()) {}
 
-      // Construct from different algebra signature and different basis
+      /// Construct from different algebra signature and different basis
       template<class alg, typename B>
       constexpr Multivector( const Multivector<alg, B>& b ) : Multivector( b.template cast<Multivector<algebra,basis>>() ) {}
 
-      /// Immutable get value of blade type IDX (Note, make user-defined literal?)
+      /// Immutable get value of blade type IDX (\todo make blades user-defined literals?)
       template<bits::type IDX> value_t get() const;
-      /// Mutable get value of blade type IDX (Note, make user-defined literal?)
+      /// Mutable get value of blade type IDX 
       template<bits::type IDX> value_t& get(); 
-      /// Set value of blade type IDX
+      /// %Set value of blade type IDX
       template<bits::type IDX> Multivector& set(value_t v); 
     
       /// Reset
@@ -96,13 +109,13 @@ namespace vsr{
         return *this;
       }
     
-      /// Unary Operation Conjugation
+      /// Conjugation Unary Operation
       Multivector conjugation() const;
-      /// Unary Operation Conjugation Shorthand
+      /// Conjugation Unary Operation Shorthand
       Multivector conj() const { return conjugation(); }
-      /// Unary Operation Involution
+      /// Involution Unary Operation 
       Multivector involution() const; 
-      /// Unary Operation Involution Shorthand
+      /// Involution Unary Operation Shorthand
       Multivector inv() const { return involution(); }
     
       /// Casting to type B
@@ -110,7 +123,7 @@ namespace vsr{
       /// Copying to type B
       template<class B> B copy() const; 
     
-      /// Comparison
+      /// Comparison \todo use dot product, see \ref Group
       bool operator == (const Multivector& mv) const{
         for (int i = 0; i < Num; ++i) {
           if (val[i] != mv[i]) return false;
@@ -128,46 +141,61 @@ namespace vsr{
       /*-----------------------------------------------------------------------------
        *  Dispatched functions (called by AlgebraImpl see core/vsr_algebra.h)
        *-----------------------------------------------------------------------------*/
-      /// Geometric Product
+      /// Geometric Product \\(a*b\\)
       template<class B>
       auto operator * ( const MultivectorB<B>& b) const -> decltype( algebra::gp(*this,b)) {
         return algebra::gp(*this, b);
       }
 
-      /// Outer Product
+      /// Geometric Product in place Transformation
+      template<class B>
+      Multivector& operator *= ( const MultivectorB<B>& b) {
+        *this = *this * b;
+        return *this;
+      }
+
+      /// Outer Product \\(a \\wedge b\\)
       template<class B>
       auto operator ^ ( const MultivectorB<B>&  b) const-> decltype( algebra::op(*this,b)) {
         return algebra::op(*this, b);
       }
 
-      /// Inner Product
+      /// Inner Product \\(a \\cdot b \\)
+      /// Uses Hestenes Inner Contraction (a must be of lower grade than b)
       template<class B>
       auto operator <= ( const MultivectorB<B>&  b) const-> decltype( algebra::ip(*this,b)) {
         return algebra::ip(*this, b);
       }
-      /// Rotor (even) transformation
+
+      /// Commutator Product  \\(a \\times b\\)
+      template<class B>
+      auto operator % (const MultivectorB<B>& b ) const -> decltype( algebra::gp(*this,b) ){
+        return ( (*this * b) - (b * (*this) ) ) * .5;
+      }
+
+      /// Rotor (even) transformation \\(RA\\tilde{R}\\)
       template<typename B>
       Multivector spin( const MultivectorB<B>& b ) const { return algebra::spin(*this,b); }
-      /// Versor (Odd) Transformation
+      /// Versor (Odd) Transformation \\(R\\hat{A}\\tilde{R}\\)
       template<typename B>
       Multivector reflect( const MultivectorB<B>& b ) const { return algebra::reflect(*this,b); }
 
       template<typename B> Multivector sp( const MultivectorB<B>& b) const { return spin(b); }
       template<typename B> Multivector re( const MultivectorB<B>& b) const { return reflect(b); }
 
-      /// Reversion  
+      /// Reversion \\(\\tilde{A}\\) 
       Multivector operator ~() const {
         return Reverse< basis >::Type::template Make(*this) ;
       }
       
-      /// Inversion
+      /// Inversion \\(\\tilde{A}/A\\tilde{A}\\) 
       Multivector operator !() const {    
         Multivector tmp = ~(*this); 
         value_t v = ((*this) * tmp)[0];    
         return (v==0) ? tmp : tmp / v;
       }
      
-      // Division 
+      // Division \\(A/B\\)
       template<class B>
       auto operator / (const MultivectorB<B>& b) const RETURNS(
         (  *this * !b )
@@ -178,18 +206,23 @@ namespace vsr{
        *  for instance null() only works in conformal metric (returns identity in others)
        *  these are all defined in vsr_generic_op.h or in vsr_cga3D_op.h
        *-----------------------------------------------------------------------------*/
+       
+       /// Conformal Mapping \\(\\boldsymbol(x)\\to n_o + \\boldsymbol{x} + \\boldsymbol{x}^2n_\\infty \\)
        Multivector<algebra, typename algebra::vector > null() const; 
         
-
+       ///@{ 
+       /// rotate in b plane
        template<class B>
        Multivector rot ( const MultivectorB<B>& b ) const; 
        template<class B>
        Multivector rotate ( const MultivectorB<B>& b ) const; 
+       ///@}
 
-       template<class B>
-       Multivector trs ( const MultivectorB<B>& b ) const; 
-       template<class B>
-       Multivector translate ( const MultivectorB<B>& b ) const; 
+      template<class B>
+      Multivector trs ( const MultivectorB<B>& b ) const; 
+      template<class B>
+      Multivector translate ( const MultivectorB<B>& b ) const; 
+
 
        template<class ... Ts>
        Multivector trs ( Ts ... v ) const; 
@@ -444,6 +477,7 @@ template<bits::type N, typename T=VSR_PRECISION> using conformal = algebra< metr
  *  EUCLIDEAN TEMPLATE ALIAS UTILITY
  *-----------------------------------------------------------------------------*/
 
+template<bits::type N, typename T=VSR_PRECISION> using NESca = GASca< euclidean<N,T> >; 
 template<bits::type N, typename T=VSR_PRECISION> using NEVec = GAVec< euclidean<N,T> >; 
 template<bits::type N, typename T=VSR_PRECISION> using NEBiv = GABiv< euclidean<N,T> >; 
 template<bits::type N, typename T=VSR_PRECISION> using NETri = GATri< euclidean<N,T> >; 
@@ -535,3 +569,7 @@ template<bits::type N, typename T=VSR_PRECISION> using conformal_Con = GACon<con
 } //vsr::   
 
 #endif
+
+
+
+

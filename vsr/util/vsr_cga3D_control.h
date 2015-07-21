@@ -38,11 +38,12 @@ namespace gfx{
   using vsr::cga::Dll; 
   using vsr::cga::Drv; 
   using vsr::cga::Rot; 
+  using vsr::cga::gen;
 
   //FOR ALL ROUND MULTIVECTOR TYPES:
   template<class A>  
   Vec3f ObjectController :: ObjectPtr<A> :: worldPosition(){
-    auto p = round::loc(*mAddress);
+    auto p = cga::round::loc(*mAddress);
     return Vec3f(p[0],p[1],p[2]);
   }
 
@@ -64,7 +65,7 @@ namespace gfx{
       A& ps = tObject;
 
       //Center of Defining Sphere   
-      Pnt pnt = round::loc(ts); //was pos
+      Pnt pnt = cga::round::loc(ts); //was pos
               
       //2D coordinates of Defining Sphere
       Vec3f sc = i->mScene->project(pos);  

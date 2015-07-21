@@ -43,10 +43,10 @@ namespace gfx{
   
 
   cga2D::Rot AA( const cga2D::Vec& s){            
-       cga2D::Rot r = gen::ratio(cga2D::Vec::y, s.unit() ); 
+       cga2D::Rot r = nga::gen::ratio(cga2D::Vec::y, s.unit() ); 
         //Vec v = Op::dle( gen::pl( r ) ) ;
-       VSR_PRECISION deg = gen::iphi(r) * ( -180 / PI );
-       return cga2D::Rot(deg, gen::pl( r )[0]);
+       VSR_PRECISION deg = nga::gen::iphi(r) * ( -180 / PI );
+       return cga2D::Rot(deg, nga::gen::pl( r )[0]);
 
    } 
 
@@ -69,14 +69,14 @@ namespace gfx{
   
   template<> void Renderable<cga2D::Point>::DrawImmediate(const cga2D::Point& s){
  
-      VSR_PRECISION ta = round::size( s, true );
+      VSR_PRECISION ta = nga::round::size( s, true );
 
       //treat as dual circle (if |radius^2| > 0.000001);
       if ( fabs(ta) >  FPERROR ) {
 
           bool real = ta > 0 ? 1 : 0;  
 
-          cga2D::Pnt p = round::cen( s );
+          cga2D::Pnt p = nga::round::cen( s );
           VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
           gfx::GL::translate ( p[0], p[1], 0 );
@@ -102,14 +102,14 @@ namespace gfx{
   
   template<> void Renderable<cga2D::Pair>::DrawImmediate(const cga2D::Pair& s){
     //Is Imaginary?
-     VSR_PRECISION size = round::size( s, false );
-     std::vector<cga2D::Pnt> pp = round::split( s );
+     VSR_PRECISION size = nga::round::size( s, false );
+     std::vector<cga2D::Pnt> pp = nga::round::split( s );
 
-     VSR_PRECISION ta = round::size( pp[0], true );   
+     VSR_PRECISION ta = nga::round::size( pp[0], true );   
                                   
      if ( fabs(ta) >  FPERROR ) {    
-         cga2D::Pnt p1 = round::cen( pp[0] );
-         cga2D::Pnt p2 = round::cen( pp[1] );
+         cga2D::Pnt p1 = nga::round::cen( pp[0] );
+         cga2D::Pnt p2 = nga::round::cen( pp[1] );
          double t = sqrt ( fabs ( ta ) );
          bool real = size > 0 ? 1 : 0;  
 
@@ -129,8 +129,8 @@ namespace gfx{
   
 
   template<> void Renderable<cga2D::Line>::DrawImmediate(const cga2D::Line& s){
-      cga2D::Drv d = flat::dir( s );
-      cga2D::Dls v = flat::loc( s , round::point(0,0), false);
+      cga2D::Drv d = nga::flat::dir( s );
+      cga2D::Dls v = nga::flat::loc( s , nga::round::point(0,0), false);
       gfx::GL::translate (v[0], v[1],0);
       gfx::Glyph::Line2D(d * 10, d * -10);  
   }

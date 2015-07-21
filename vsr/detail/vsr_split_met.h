@@ -12,7 +12,7 @@
 
 @file 
 
-CONFORMAL SPLIT METRIC 
+conformal split metric
 
 in order to template the operations,
 this code uses ints 1 and -1 to 

@@ -16,11 +16,12 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_fold.h"
+#include "vsr_app.h"   
+#include "form/vsr_fold.h"
+#include "form/vsr_fold_molecules.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
@@ -69,22 +70,22 @@ struct MyApp : App {
       for (int i = 0; i < bisect.size(); i+=2){
         int prev = i > 0 ? i - 1 : bisect.size() -1;
         int next = i < bisect.size() - 1 ? i + 1 : 0;
-        auto pa = meet( bisect[i], bisect[next]);
-        VT da = Vec( pa - pnt[i] ).wt();
-        auto pb = meet( bisect[prev], bisect[i]);
-        VT db = Vec( pb - pnt[i] ).wt();
+        auto pa = construct::meet( bisect[i], bisect[next]);
+        VSR_PRECISION da = Vec( pa - pnt[i] ).wt();
+        auto pb = construct::meet( bisect[prev], bisect[i]);
+        VSR_PRECISION db = Vec( pb - pnt[i] ).wt();
         
         Pnt nodeA, nodeB;
         Pnt nodeC, nodeD;
 
         if (da < db ){
           nodeA = pa;
-          nodeB = Fl::loc( perim[i], pa, false ).null();
+          nodeB = flat::loc( perim[i], pa, false ).null();
           nodeC = pnt[next];
           nodeD = pnt[i];
        } else {
           nodeA = pb;
-          nodeB = Fl::loc( perim[prev], pb, false ).null();
+          nodeB = flat::loc( perim[prev], pb, false ).null();
           nodeC = pnt[i];
           nodeD = pnt[prev];
        }
@@ -106,8 +107,6 @@ struct MyApp : App {
        //Rigid3 rc( np[1], center[0], center[1], node[0], false );   
       Rigid3 rc( np[1], np[2], center[0], center[1], false );   
       // Rigid3 rd( node[0], np[1], center[0], np[0], false ); 
-
-
        
        //MOTION
        Pnt pa = ra.orbit( amt * PIOVERTWO );
@@ -129,6 +128,9 @@ struct MyApp : App {
       node[0] = pd;
 
 
+      /*-----------------------------------------------------------------------------
+       *  DRAW
+       *-----------------------------------------------------------------------------*/
       glColor3f(0,1,0);
       glBegin(GL_TRIANGLES);
       
@@ -154,8 +156,6 @@ struct MyApp : App {
         GL::Tri( np[3], np[0], center[1]);
         GL::Tri( np[0], center[0], center[1] );
       glEnd();
-
-
 
     
   }

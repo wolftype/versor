@@ -8,13 +8,10 @@ using namespace vsr::cga;
 struct MyApp : App {
 	
 	float amt,linewidth;
-	Chain k;
+	Chain k = Chain(5);
 	Pnt targetPos;
 	float distA;
-	
-	MyApp(int w=900, int h=500, string name="Robot") : App(w,h,name),
-	k(5){}
-	
+		
 	void setup(){
       bindGLV();
       gui(distA, "LinkLength", 1,10);
@@ -35,7 +32,7 @@ struct MyApp : App {
     auto v = io().viewdata.ray;
     auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
 
-		targetPos = cga::point( line, Ori(1) );  
+		targetPos = construct::point( line, Ori(1) );  
 		
 		Frame targetFrame ( targetPos ); 
 

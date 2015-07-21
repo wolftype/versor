@@ -1,210 +1,76 @@
   #include "space/vsr_cga3D_op.h"
 
 namespace vsr{  
-  
-//template class CGAMV<5,   CGA<5>::Sca   >;  
-//template class CGAMV<5,   CGA<5>::Vec   >;  
-//template class CGAMV<5,   CGA<5>::Vec2D >;  
-//template class CGAMV<5,   CGA<5>::Biv   >;  
-//template class CGAMV<5,   CGA<5>::Tri   >;  
-//template class CGAMV<5,   CGA<5>::Rot   >;  
-//template class CGAMV<5,   CGA<5>::Mnk   >;  
-//template class CGAMV<5,   CGA<5>::Pss   >;     
-//template class CGAMV<5,   CGA<5>::Pnt   >;  
-//template class CGAMV<5,   CGA<5>::Par   >; 
-//template class CGAMV<5,   CGA<5>::Cir   >; 
-//template class CGAMV<5,   CGA<5>::Sph   >;  
-//template class CGAMV<5,   CGA<5>::Dll   >; 
-//template class CGAMV<5,   CGA<5>::Lin   >; 
-//template class CGAMV<5,   CGA<5>::Flp   >; 
-//template class CGAMV<5,   CGA<5>::Pln   >; 
-//template class CGAMV<5,   CGA<5>::Dlp   >; 
-//template class CGAMV<5,   CGA<5>::Trs   >;   
-//template class CGAMV<5,   CGA<5>::Mot   >; 
-//template class CGAMV<5,   CGA<5>::Trv   >; 
-//template class CGAMV<5,   CGA<5>::Bst   >; 
-//template class CGAMV<5,   CGA<5>::Dil   >; 
-//template class CGAMV<5,   CGA<5>::Tsd   >;
+namespace cga {
 
 
-                                                
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Rot& )const;                        
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Trs& )const;                        
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Mot& )const;                      
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Bst& )const;
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Tsd& )const;
-//template Pnt CGAMV<5, CGA<5>::Pnt>::sp( const Dil& )const;
-//                                                          
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Rot& )const;
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Trs& )const;
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Mot& )const;
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Bst& )const;
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Tsd& )const;
-//template Par CGAMV<5, CGA<5>::Par>::sp( const Dil& )const;
-//                                                          
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Rot& )const;
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Trs& )const;
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Mot& )const;
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Bst& )const;
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Tsd& )const;
-//template Cir CGAMV<5, CGA<5>::Cir>::sp( const Dil& )const;
-//                                                          
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Rot& )const;
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Trs& )const;
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Mot& )const;
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Bst& )const;
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Tsd& )const;
-//template Sph CGAMV<5, CGA<5>::Sph>::sp( const Dil& )const;
-//
-//
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Rot& )const; 
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Trs& )const; 
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Mot& )const; 
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Bst& )const;
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Tsd& )const;
-//template Dll CGAMV<5, CGA<5>::Dll>::sp( const Dil& )const;
-//                                                  
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Rot& )const;
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Trs& )const;
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Mot& )const;
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Bst& )const;
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Tsd& )const;
-//template Lin CGAMV<5, CGA<5>::Lin>::sp( const Dil& )const;
-//                                                
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Rot& )const;
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Trs& )const;
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Mot& )const;
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Bst& )const;
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Tsd& )const;
-//template Dlp CGAMV<5, CGA<5>::Dlp>::sp( const Dil& )const;
-//                                                  
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Rot& )const;
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Trs& )const;
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Mot& )const;
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Bst& )const;
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Tsd& )const;
-//template Pln CGAMV<5, CGA<5>::Pln>::sp( const Dil& )const;     
-//
-//
-//template Rot gen::ratio( const Vec&, const Vec& );                                                     
-//template Rot gen::rot( const Biv& );                         
-////template Rot gen::rot( VSR_PRECISION, const Biv& ); 
-//template Biv gen::log( const Rot& );
-//template Par gen::log( const Bst& ); 
-//template Trv gen::trv( const Vec& );
-//template Trv gen::trv( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); 
-//template Trv gen::trv( const Drv& );
-//template Trv gen::trv( const Tnv& ); 
-//template Trs gen::trs( const Vec& );
-//template Trs gen::trs( const Drv& ); 
-//template Trs gen::trs( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ); 
-//template Dil gen::dil( VSR_PRECISION ); 
-//template Tsd gen::dil( const Pnt&, VSR_PRECISION ); 
-//template Bst gen::bst( const Par& ); 
-//
-//template Rot gen::aa( const Rot& r);
-//
-//template Par round::round( const Dls&, const Vec& ); 
-//template Cir round::round( const Dls&, const Biv& );  
-//
-//template Pnt round::null( const Vec& );
-//template Pnt round::null( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z); 
-//
-//template VSR_PRECISION round::size( const Pnt&, bool); 
-//template VSR_PRECISION round::size( const Par&, bool); 
-//template VSR_PRECISION round::size( const Cir&, bool); 
-//template VSR_PRECISION round::size( const Sph&, bool); 
-//
-//template VSR_PRECISION round::rad( const Pnt&); 
-//template VSR_PRECISION round::rad( const Par&); 
-//template VSR_PRECISION round::rad( const Cir&); 
-//template VSR_PRECISION round::rad( const Sph&);
-//
-//template Pnt round::cen( const Pnt&); 
-//template Pnt round::cen( const Par&); 
-//template Pnt round::cen( const Cir&); 
-//template Pnt round::cen( const Sph&); 
-//         
-//template Pnt round::loc( const Pnt&); 
-//template Pnt round::loc( const Par&); 
-//template Pnt round::loc( const Cir&); 
-//template Pnt round::loc( const Sph&);  
-//
-//
-//template Drv round::dir( const Par&); 
-//template Drb round::dir( const Cir&); 
-//
-//template Lin round::car( const Par&); 
-//template Pln round::car( const Cir&); 
-//
-//template Pnt round::sur( const Par&);
-//template Pnt round::sur( const Cir&);
-//
-//template std::vector<Pnt> round::split( const Par&); 
-//template Pnt round::dls_pnt( const Pnt&, VSR_PRECISION r); 
-//
-//template Pnt flat::loc( const Dll&, const Pnt&, bool);
-//template Pnt flat::loc( const Lin&, const Pnt&, bool);
-//template Pnt flat::loc( const Dlp&, const Pnt&, bool);  
-//template Pnt flat::loc( const Pln&, const Pnt&, bool); 
-//
-//template Drv flat::dir( const Lin&);
-//template Drb flat::dir( const Pln&);  
+      
+  /*-----------------------------------------------------------------------------
+   *  OP
+   *-----------------------------------------------------------------------------*/
+      Rot op::AA( const Vec& s){
+          Rot r = nga::gen::ratio(Vec::z, s.unit() ); 
+          return nga::gen::aa(r);
+      }  
+      
+      Rot op::AA( const Biv& s){
+         Rot r = nga::gen::ratio(Vec::z, s.duale().unit() ); 
+         return nga::gen::aa(r);
+      }     
+    
+      Rot op::AA( const Dlp& s){
+          Rot r = nga::gen::ratio(Vec::z, Vec(s).unit() ); 
+          return nga::gen::aa(r);
+        } 
+         
+      Rot op::AA( const Cir& s){
+          Biv b = round::dir( s ).copy<Biv>();               
+          Rot r = nga::gen::ratio(Vec::z, op::dle( b ).unit() ); 
+          return nga::gen::aa(r);
+        } 
+    
+      Vec op::Pos( const Dlp& s){ 
+        return flat::loc(s , PAO, true );   
+      }   
+         
+      Pnt op::Pos( const Cir& s){
+        return round::loc( s );
+      }  
 
-// template VSR_PRECISION flat::wt( const Dll&, bool);
-// template VSR_PRECISION flat::wt( const Lin&, bool);
-// template VSR_PRECISION flat::wt( const Dlp&, bool);  
-// template VSR_PRECISION flat::wt( const Pln&, bool);  
 
-namespace op{
+    
+      /*-----------------------------------------------------------------------------
+       *  GEN
+       *-----------------------------------------------------------------------------*/
 
-  Rot AA( const Vec& s){
-      Rot r = gen::ratio(Vec::z, s.unit() ); 
-      return gen::aa(r);
-  }  
-  
-  Rot AA( const Biv& s){
-     Rot r = gen::ratio(Vec::z, s.duale().unit() ); 
-     return gen::aa(r);
-  }     
-
-  Rot AA( const Dlp& s){
-      Rot r = gen::ratio(Vec::z, Vec(s).unit() ); 
-      return gen::aa(r);
-    } 
-     
-  Rot AA( const Cir& s){
-      Biv b = round::dir( s ).copy<Biv>();               
-      Rot r = gen::ratio(Vec::z, op::dle( b ).unit() ); 
-      return gen::aa(r);
-    } 
+      Rot gen::rot( const Biv& b) { return nga::gen::rot(b); } 
+      Rot gen::rotor( const Biv& b) { return nga::gen::rot(b); } 
 
 
 
-  Vec Pos( const Dlp& s){ 
-    return flat::loc(s , PAO, true );   
-  }   
-     
-  Pnt Pos( const Cir& s){
-    return round::loc( s );
-  }  
+      Bst gen::bst(const Pair& p) { return nga::gen::bst(p); }
+      Bst gen::boost(const Pair& p) { return nga::gen::bst(p); }    
+      
+      Tsd gen::dil(const Pnt& p, VSR_PRECISION t) { return nga::gen::dil(p,t); }
+      Tsd gen::dilator(const Pnt& p, VSR_PRECISION t) { return nga::gen::dil(p,t); }
 
-}
 
-namespace gen{               
+      Rot gen::ratio(const Vec& v, const Vec& v2) { return nga::gen::ratio(v,v2); }
 
-  /*! Generate a Rotor (i.e quaternion) from spherical coordinates
+      Biv gen::log(const Rot& r) { return nga::gen::log(r); }
+
+   /*! Generate a Rotor (i.e quaternion) from spherical coordinates
         @param[in] theta in xz plane from (1,0,0) in range [0,PI]
         @param[in] phi in rotated xy plane in range []
     */
-    Rot rot(double theta, double phi){
+    Rot gen::rot(double theta, double phi){
         Rot rt = gen::rot( Biv::xz * theta / 2.0 );
         Rot rp = gen::rot( Biv::xy.sp( rt ) * phi /2.0 );
         return rp * rt;
     }                   
 
     /*! Generate a rotor from euler angles */
-    Rot rot( double y, double p, double r){
+    Rot gen::rot( double y, double p, double r){
       Rot yaw = gen::rot( Biv::xz * y/2.0 );
       Rot pitch = gen::rot( Biv::yz.spin(yaw) * p/2.0);
       Rot tmp = pitch * yaw;
@@ -217,7 +83,7 @@ namespace gen{
    /*! Generate a Motor from a Dual Line Axis
        @param Dual Line Generator (the axis of rotation, including pitch and period)
    */  
-   Mot mot( const Dll& dll){
+   Mot gen::mot( const Dll& dll){
 
       Dll b = dll;
       Biv B(b[0],b[1],b[2]); //Biv B(dll);  
@@ -247,12 +113,14 @@ namespace gen{
       return Mot(cc, B[0] * sc, B[1] * sc, B[2] * sc, tt[0], tt[1], tt[2], ts[3] * sc);
   }
 
+  Mot gen::motor(const Dll& dll){ return mot(dll); }
+
     /*! Dual Line Generator from a Motor 
         An implementation of J.Lasenby et al "Applications of Conformal Geometric Algebra in
-Computer Vision and Graphics"
+        Computer Vision and Graphics"
         @param Motor m (a concatenation of rotation and translation)
     */  
-     Dll log( const Mot& m){
+     Dll gen::log( const Mot& m){
 
           Drv cperp, cpara;
           Dll rq, q, tq;
@@ -288,7 +156,7 @@ Computer Vision and Graphics"
     /*! Dual Line Generator of Motor That Twists Dual Line a to Dual Line b;
 
     */ 
-    Dll log(const Dll& a, const Dll& b, VSR_PRECISION t ){
+    Dll gen::log(const Dll& a, const Dll& b, VSR_PRECISION t ){
           Mot m = b/a; VSR_PRECISION n = m.rnorm(); if (n!=0) m /= n;
           return gen::log( m ) * (t/2.0) ;
       }
@@ -296,14 +164,14 @@ Computer Vision and Graphics"
       /*! Generate Motor That Twists Dual Line a to Dual Line b;
 
       */
-     Mot  ratio( const Dll& a, const Dll& b, VSR_PRECISION t){
+     Mot  gen::ratio( const Dll& a, const Dll& b, VSR_PRECISION t){
           //Mot m = b/a; VSR_PRECISION n = m.rnorm(); if (n!=0) m /= n; else cout << "zero mot" << endl; 
           return gen::mot( log(a,b,t) );//gen::log( m ) * (t/2.0) );   
       }
 
       /*! Generate Motor That Twists Motor a to motor b by amt t;
       */
-     Mot ratio( const Mot& a, const Mot& b, VSR_PRECISION t){
+     Mot gen::ratio( const Mot& a, const Mot& b, VSR_PRECISION t){
           return gen::mot( gen::log(b/a) * t );
       }
 
@@ -314,39 +182,43 @@ Computer Vision and Graphics"
 
     /*! Generate Simple Boost rotor from ratio of two dual spheres
     */
-   Bst ratio( const DualSphere& a, const DualSphere& b){
+   Bst gen::ratio( const DualSphere& a, const DualSphere& b, bool bFlip){
     Bst tbst = (b/a).runit();
-    if (tbst[0]<0) tbst = -tbst; //restrict to positive <R>
+    //if (tbst[0]<0) 
+    if (bFlip) tbst = -tbst; //restrict to positive <R>
     auto ss = 2 * (1+tbst[0]);     
     auto n = (ss >= 0 ? sqrt(ss) : -sqrt(-ss) );
     return FERROR(n) ? Bst() : (tbst+1)/n;
    }
 
   /*! atanh2 function for logarithm of general rotors*/
-   Pair atanh2( const Pair& p, VSR_PRECISION cs){
+   Pair gen::atanh2( const Pair& p, VSR_PRECISION cs, bool bCW){
       VSR_PRECISION norm=1;
 
       auto tp = p.wt();
       auto sq = sqrt( fabs(tp) );
       if(tp>0) norm = asinh(sq)/sq;
-      else if (tp<0) norm = atan2(sq, cs) / sq;
+      else if (tp<0) {
+        if (bCW) norm = - (PI - atan2(sq,cs))/sq; //alt direction
+        else norm = atan2(sq, cs) / sq;
+      }
       return p * norm;
    }
 
-    /*! Log of a simple rotor (uses atanh2) */
-   Pair log( const Bst& b){
-     return atanh2( Pair(b), b[0] );
+    /*! Log of a simple rotor (uses atanh2, passes in boolean for direction of interpolation) */
+   Pair gen::log( const Bst& b, bool bCW){
+     return atanh2( Pair(b), b[0], bCW );
    }
 
    /*!  Generate Conformal Transformation from circle a to circle b
         uses square root method of Dorst et Valkenburg, 2011
    */
-   Con ratio( const Circle& a, const Circle& b){
+   Con gen::ratio( const Circle& a, const Circle& b, bool bFlip, float theta){
     
     Con trot = (b/a).runit();
     //planar?
-    float planarity = (round::carrier(a).dual().unit() ^ round::carrier(b).dual().unit()).wt();
-    if ( trot[0] < 0 ) { //fabs(planarity)<=.000009 )  {
+  //  float planarity = (round::carrier(a).dual().unit() ^ round::carrier(b).dual().unit()).wt();
+    if ( bFlip && trot[0] < 0 ) { //fabs(planarity)<=.000009 )  {
       trot = -trot;      //restrict to positive <R> only if coplanar
     }
       
@@ -359,25 +231,36 @@ Computer Vision and Graphics"
     auto sph2 = sph.wt();
 
 
-    if (sca2 == sph2) {
-      printf("infinity of roots -- need to program this...\n");
-      auto rotneg = -trot + 1;
-      //random tangent vector
-      auto biv = sph.dual() ^ PAO.trs(1,0,0);
+    if ( FERROR( sca2 - sph2) ) {
+     // printf("infinity of roots . . .  \n");
+      auto rotneg = (-trot) + 1;
 
-     // printf("f\n");
-     // //std::cout << "A" << endl;
-     // (biv*biv).print();
-     // (biv*sph).print();
-     // (sph*biv).print();
-      return (rotone + (biv*rotneg))/2.0;
+      Vec vec;
+
+      auto sizeB = nga::round::size(b,false);
+      if ( sizeB < 1000 && !FERROR(sizeB) ) vec = Vec( round::location(b) - round::location(a) ).unit();
+      else vec = round::vec(a,theta).unit();    
+
+      auto dls = sph.dual();
+      
+      auto biv = ( Pair( vec.copy<Tnv>() ).trs( round::location(a) ) ^ dls ).undual();//.trs(1,0,0);
+
+      biv = biv.runit();
+        
+      auto test = (biv*sph - sph*biv).wt();
+
+      if ( !FERROR( (biv<=biv)[0] +1 ) || (!FERROR(test) ) ) {
+        printf("HEY NOW NOT COMMUTING\n");
+      }
+
+      auto ret = rotone/2.0 + (biv*(rotneg/2.0));
+      return ret;
     }
 
     auto sca3 = sca2 - sph2;
     auto sqsca3 = sqrt(sca3);
 
  //   cout << sca2 << " " << sph2 << " " << sca << " " << sqsca3 << endl;
-
  //   sca = fabs(sca);  //<--* added this fabs in
     auto v1 = ( -sph + sca ) / (2*sca3);
     auto v2 = (sph+(sca+sqsca3))/sqrt( sca+sqsca3 ); 
@@ -388,14 +271,16 @@ Computer Vision and Graphics"
    /*!  Generate Conformal Transformation from Pair a to Pair b
         uses square root method of Dorst et Valkenburg, 2011
    */
-   Con ratio( const Pair& a, const Pair& b){ return ratio( a.dual(), b.dual() ); }
+   Con gen::ratio( const Pair& a, const Pair& b, bool bFlip, float theta){ 
+     return ratio( a.dual(), b.dual(), bFlip, theta ); 
+   }
    
    /*! Bivector Split
             Takes a general bivector and splits  it into commuting pairs
             will give sinh(B+-)
             inverse method for ipar below was given by dorst in personal correspondance
    */
-    vector<Pair> split(const Pair& par){
+    vector<Pair> gen::split(const Pair& par){
    
       typedef decltype(Sphere()+1) SqDeriv;
     
@@ -407,17 +292,22 @@ Computer Vision and Graphics"
     
       //scalar ||f||^2
       auto tmp2 = ( (h2*h2) - (h2*2*h2[0]) )[0] ;
-      auto ff4 = pow( -tmp2, 1.0/4);
+      auto ff4 = FERROR(tmp2) ? 0 : pow( -tmp2, 1.0/4);
       auto wt = ff4 * ff4;
-     
+    //  cout << par << endl;
+    //  cout << h2 << endl;
+    //  cout << "SPLIT WEIGHT: " << -tmp2 << " " << h2[0] << " " << wt << endl;
       if ( FERROR(wt) ) {
           if ( FERROR(h2[0]) ){
-            printf("no real splitting going on\n"); //<-- i.e. interpolation of null point pairs
+           // cout << h2 << endl;
+          //  printf("no real splitting going on\n"); //<-- i.e. interpolation of null point pairs
             res.push_back(par);
-            res.push_back(Par());
+           // res.push_back(Par());
             return res;
           } else {
-           printf("bivector split norm implemenation needed\n (add random value and retry)");
+          //  printf("(adding random value and retrying)");
+            static Pair dp(.0001,.0006,.0004,.0002,.0008,.0006,.0003,.0007,.0001,.0001);
+            return split( par + dp);
           }
       }
       
@@ -434,10 +324,24 @@ Computer Vision and Graphics"
       return res;
        
     }
+
+
+   vector<Pair> gen::split(const Con& rot){
+    
+     //1. Get Exterior Derivative
+     Sphere quad(rot); //grade 4 part
+
+     auto tmp = quad + (-rot[0]); //scalar + quadvector
+     //half the exterior deriv is sinh(B+/-)
+     auto deriv = Pair( tmp * Pair(rot) ) * 2; //quad parts are zero here.
+     //find commuting split of that
+     return split( deriv );
+      
+   }
    
    
    /*! Split Log of General Conformal Rotor */
-   vector<Pair> log( const Con& rot){
+   vector<Pair> gen::log( const Con& rot){
       
      vector<Pair> res;
       
@@ -464,38 +368,406 @@ Computer Vision and Graphics"
      VSR_PRECISION coshm = FERROR(sp) ? sqrot[0] : -(rot2 <= !v[0])[0];
 
      //5.27 on p96 of Dorst ref
-     res.push_back( atanh2(v[0],coshp) * -.5 );
-     res.push_back( atanh2(v[1],coshm) * -.5 );
+     res.push_back( atanh2(v[0],coshp,false) * -.5 );
+     res.push_back( atanh2(v[1],coshm,false) * -.5 );
 
      return res;
 
    }
 
    /*! Split Log from a ratio of two Circles */
-   vector<Pair> log( const Circle& ca, const Circle& cb){
-      return log( ratio(ca,cb) ); 
+   vector<Pair> gen::log( const Circle& ca, const Circle& cb, bool bFlip, VSR_PRECISION theta){
+      return log( ratio(ca,cb,bFlip,theta) ); 
    }
    /*! Split Log from a ratio of two Circles */
-   vector<Pair> log( const Pair& ca, const Pair& cb){
-      return log( ratio(ca,cb) ); 
+   vector<Pair> gen::log( const Pair& ca, const Pair& cb, bool bFlip, VSR_PRECISION theta){
+      return log( ratio(ca,cb,bFlip,theta) ); 
    }
 
 
   /*! General Conformal Transformation from a split log*/
-   Con con( const vector<Pair>& log, VSR_PRECISION amt) {
-     return gen::bst(log[0]*-amt) * gen::bst(log[1]*-amt);
+   Con gen::con( const vector<Pair>& log, VSR_PRECISION amt) {
+     Con con(1);
+     for (auto& i : log){
+        con *= gen::bst( i * -amt);
+     }
+     return con;
    }
+
+  /*! General Conformal Transformation from a split log*/
+   Con gen::con( const vector<Pair>& log, VSR_PRECISION amtA, VSR_PRECISION amtB) {
+     Con tmp = gen::bst(log[0]*-amtA);
+     if (log.size()>1) tmp *= gen::bst(log[1]*-amtB);
+     return tmp;
+   }
+
+
 
   /*! General Conformal Transformation from two circles */
-   Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt){
+   Con gen::con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt){
       return con ( log(ca,cb), amt ); 
    }
+ 
+   /* General Conformal Transformation from two circles and two weights */
+   Con gen::con(  const Circle& ca, const Circle& cb, VSR_PRECISION amtA, VSR_PRECISION amtB){
+      return con(log(ca,cb), amtA, amtB);
+   }
+
+
+
+  /*-----------------------------------------------------------------------------
+   *  ROTORS
+   *-----------------------------------------------------------------------------*/
+      /*!
+     *  \brief  generate a rotor transformation from a euclidean bivector
+     */
+     Rotor gen::xf(const Biv& b){
+      return gen::rot(b);
+    }
+    /*!
+     *  \brief  generate a motor transformation from a dual line
+     */
+     Motor gen::xf(const DualLine& dll){
+       return gen::mot(dll);
+     }
+    /*!
+     *  \brief  generate a dilation transformation from a flat point
+     */
+     Dilator gen::xf(const FlatPoint& flp){
+       return gen::dil(Pnt(flp),flp[3]);
+     }
+
+     /*!
+      *  \brief  generate a boost transformation from a point pair
+      */
+     Bst gen::xf(const Pair& p){
+       return gen::bst(p);
+     }
+
+
+     /*-----------------------------------------------------------------------------
+      *  PAIRS
+      *-----------------------------------------------------------------------------*/
+      /// Pair on Sphere in v direction
+      Pair construct::pair(const DualSphere& s, const Vec& v){
+        return round::produce(s,v);
+      }
+      
+      /*!
+       *  \brief Point Pair at x,y,z with direction vec (default Y) and radius r (default 1)
+       */
+      Pair construct::pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec , VSR_PRECISION r){ 
+       return round::produce( round::dls(r*-1,x,y,z), vec );//a ^ b ^ c; 
+      }
+      
+
+
+      /*-----------------------------------------------------------------------------
+       *  POINTS
+       *-----------------------------------------------------------------------------*/
+      /*!
+       *  \brief  First point of point pair pp
+       */
+       Point construct::pointA(const Pair& pp){
+        return round::location( round::split(pp, true) );
+      } 
+ 
+       /*!
+        *  \brief  Second point of point pair pp
+        */
+       Point construct::pointB(const Pair& pp){
+        return round::location( round::split(pp, false) );
+      }
+
+      /// Point on Circle at theta t
+      Point construct::point(const Circle& c, VSR_PRECISION t){
+        return round::point(c,t);
+      }
+      /// Point on Sphere in v direction
+      Point construct::point(const DualSphere& s, const Vec& v){
+        return pointA( pair(s,v) ).null();
+      }
+
+      /// Point from x,y,z
+      Point construct::point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
+        return round::null(x,y,z);
+      }
+      /// Point from vec
+      Point construct::point(const Vec& v){
+        return v.null();
+      } 
+
+      /// Point on line l closest to p
+      Point construct::point(const Line& line, const Point& p){
+        return round::null ( flat::location( line, p, false ) ); 
+      }
+      /// Point on dualline l closest to p
+      Point construct::point(const DualLine& dll, const Point& p){
+        return round::null ( flat::location( dll, p, true ) ); 
+      }
+     
+      /*-----------------------------------------------------------------------------
+       *  CIRCLES
+       *-----------------------------------------------------------------------------*/
+      /*!
+       *  \brief  Circle at origin in plane of bivector B
+       */
+      Circle construct::circle(const Biv& B){
+       return round::produce( round::dls(1,0,0,0), B);//a ^ b ^ c; 
+      }         
+
+      /*!
+       *  \brief  Circle at point p with radius r, facing direction biv
+      */
+      Circle construct::circle(const Point& p, VSR_PRECISION r, const Biv& biv){
+       return round::produce( round::dls(p,r*-1), biv );
+      }   
+                       
+      /// Circle at origin with normal v and radius r (default r=1.0)
+       Circle construct::circle(const Vec& v, VSR_PRECISION r){
+        return round::produce( round::dls(r*-1,0,0,0), op::dle(v) );//a ^ b ^ c; 
+      }                    
+      /// Circle at x,y,z facing in biv direction
+       Circle construct::circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv, VSR_PRECISION r){ 
+        return round::produce( round::dls(r*-1,x,y,z), biv );//a ^ b ^ c; 
+      }
+       /*-----------------------------------------------------------------------------
+        *  HYPERBOLIC AND SPHERICAL LINES
+        *-----------------------------------------------------------------------------*/
+      ///Hyperbolic line through two points
+       Circle construct::hline( const Point& a, const Point& b){
+        return a ^ b ^ EP;
+      }  
+      ///Spherical line through two points
+       Circle construct::sline( const Point& a, const Point& b){
+        return a ^ b ^ EM;
+      } 
+ 
+
+       /*-----------------------------------------------------------------------------
+        *  SPHERES
+        *-----------------------------------------------------------------------------*/
+      /// Sphere at x,y,z with radius r (default r=1.0)     
+      DualSphere construct::sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r){
+        return round::dls(r, x, y, z );
+      }
+      /// Sphere at point p with radius r (default r=1.0)
+      DualSphere construct::sphere(const Point& p, VSR_PRECISION r){
+        return round::dls(p, r);
+      }     
+ 
+
+      /*-----------------------------------------------------------------------------
+       *  PLANES
+       *-----------------------------------------------------------------------------*/
+                              
+      ///Dual plane with normal and distance from center
+       DualPlane construct::plane( VSR_PRECISION a, VSR_PRECISION b, VSR_PRECISION c, VSR_PRECISION d){
+        return Dlp(a,b,c,d);
+      } 
+      ///Dual plane from vec and distance from center
+       DualPlane construct::plane( const Vec& v, VSR_PRECISION d){
+        return v + Inf(d);
+      } 
+      ///Direct plane through three points
+       Plane construct::plane(const Pnt& a, const Pnt& b, const Pnt& c){
+        return a ^ b ^ c ^ Inf(1);
+      }             
+
+
+       /*-----------------------------------------------------------------------------
+        *  LINES
+        *-----------------------------------------------------------------------------*/
+      /*!
+       *  \brief  DualLine axis of circle c
+       */
+      DualLine construct::axis(const Cir& c){
+        return (Inf(-1) <= c).runit();
+      }
+
+      /// Line from two Vecs     
+      Line construct::line( const Vec& a, const Vec& b){
+         return point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
+      }
+
+
+      ///Direct line through origin
+      Line construct::line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
+        return Ori(1) ^ Vec(x,y,z) ^ Inf(1);
+      }
+      ///Direct line through origin
+      Line construct::dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
+        return line(x,y,z).dual();
+      }      
+      
+      ///Direct line through two points
+       Line construct::line( const Point& a, const Point& b){
+        return a ^ b ^ Inf(1);
+      }
+      ///Direct line through point a in direction b   
+       Line construct::line( const Point& a, const Vec& b){
+        return a ^ b ^ Inf(1);
+      } 
+
+      
+       
+      ///Squared Distance between a line and a point
+       VSR_PRECISION construct::distance( const Lin& lin, const Pnt& pnt){
+        return ( pnt <= lin.dual() )[0] * -2.0;
+      }
     
 
+      /* Line line(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){ */
+      /*   return point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1); */
+      /* } */
 
-} // gen::
+      #pragma mark COINCIDENCE_FUNCTIONS
 
-}   //vsr   
+       ///circle intersection of dual spheres
+       Circle construct::meet( const Dls& s, const Dls& d){
+        return (s ^ d).dual();
+      }  
+
+      ///circle intersection of dual sphere and direct plane
+       Circle construct::meet( const Dls& s, const Dlp& d){
+        return (s ^ d).dual();
+      }  
+      ///circle intersection of dual spehre and direct plane
+       Circle construct::meet( const Dls& s, const Pln& d){
+        return (s ^ d.dual()).dual();
+      }
+      //circle intersection of direct sphere and dual plane
+       Circle construct::meet( const Sphere& s, const DualPlane& d){
+        return (s.dual() ^ d).dual();
+      }
+      //circle intersection of direct sphere and direct plane
+       Circle construct::meet( const Sphere& s, const Plane& d){
+        return (s.dual() ^ d.dual()).dual();
+      } 
+
+
+      //normalized and nulled point intersection of line and dual plane
+       Point construct::meet( const Line& lin, const DualPlane& dlp){ 
+        Flp flp = ( (lin).dual()^ dlp).dual();
+        return (flp / flp[3]).null();
+      } 
+      //normalized and nulled point intersection of dualline and dual plane
+       Point construct::meet( const Dll& dll, const DualPlane& dlp){ 
+        auto flp = ( dll ^ dlp).dual();
+        return flp.null();
+      } 
+
+    
+      //Point intersection of two lines
+       Point construct::meet( const Line& la, const Line& lb){
+          Line r = la.reflect(lb);
+          Line r2 = (la - r.unit()).unit();
+          Point pori = flat::loc(r2, Ori(1), false);
+          Point tp = pori.re( lb ); 
+          return ( ( (tp / tp[3]) + pori)/2.0 ).null(); 
+        }
+         /* //test for origin */
+        /* auto t = Ori(1) ^ la; Sca(t.wt()).vprint(); */
+        /* (t.dual() ^ lb.dual() ).dual().vprint(); */
+        /* if (t.wt() != 0 ) { */
+         /*  return ( t.dual() ^ lb.dual() ).dual(); */
+        /* } else { */
+         /*  auto t2 = (Ori(1) ^ lb ); */
+         /*  if ( t2.wt() != 0 ) return ( la.dual() ^ t2.dual() ).dual(); */
+         /*  else return Flp(); */
+         /* } */
+       //}  
+
+      //point pair intersection of circle and Dual plane
+       Par construct::meet( const Cir& cir, const Dlp& dlp){ 
+        return ( (cir).dual() ^ dlp).dual();
+      } 
+ 
+      //point pair intersection of circle and Dual sphere
+       Par construct::meet( const Cir& cir, const Dls& s){ 
+        return ( (cir).dual() ^ s).dual();
+      }  
+
+       #pragma mark HIT_TESTS
+     
+       /*!
+        *  \brief  hit tests between point and pair (treats pair as an "edge")
+        */
+      bool construct::hit(const Point& pnt, const Pair& par ){
+          //if inside surround < 0
+          if( ( pnt <= round::sur( par ) )[0] < 0 ) {
+            if ( (pnt ^ par ^ Inf(1)).wt() == 0.0 ) {
+                return true;
+              }
+          } 
+          return false;
+
+      }
+
+  
+      /*!
+       *  \brief  hit tests between point and circle (treats circle as "disc")
+       */
+      bool construct::hit(const Point& p, const Circle& cir){
+
+         if ( (p<= round::sur(cir))[0] > 0){
+          if ( fabs( (p^round::car(cir)).wt()) <.00001 ) {
+            return true;
+          }
+         }
+         return false;
+      }
+
+      double construct::squaredDistance(const Point& a, const Point& b){
+        return round::sqd(a,b);
+      }
+
+
+      #pragma mark HYPERBOLIC_FUNCTIONS
+      /*-----------------------------------------------------------------------------
+       *  hyperbolic functions (see alan cortzen's document on this)
+       *-----------------------------------------------------------------------------*/
+
+      /*!
+       *  \brief  hyperbolic normalization of a conformal point
+       */
+      Point construct::hnorm(const Pnt& p){
+        return -(p / (EP<=p));
+      }
+
+      
+      /*!
+       *  \brief  hyperbolic distance between two conformal points
+       */
+      double construct::hdist(const Pnt& pa, const Pnt& pb){
+        return acosh(1 - (hnorm(pa)<=hnorm(pb))[0]);
+      }
+
+
+      /*!
+       *  \brief  hyperbolic translation transformation generator between two conformal points
+       */
+      Pair construct::hgen(const Pnt& pa, const Pnt& pb, double amt){
+        double dist = hdist(pa,pb);         //<-- h distance
+        auto hline = pa ^ pb ^ EP;          //<-- h line (circle)
+        auto par_versor = (EP <= hline).runit();      //<-- h trans generator (pair)
+       // par_versor /= par_versor.rnorm();   //<-- normalized ...
+        return par_versor * dist * amt * .5;//<-- and ready to be applied
+      }
+
+
+      /*!
+       *  \brief  hyperbolic spin transformation from pa to pb by amt (0,1)
+       */
+      Point construct::hspin(const Pnt& pa, const Pnt& pb, double amt){
+        return round::loc( pa.boost( hgen(pa,pb,amt) ) );
+        //versor * dist * amt * .5) );
+      }
+      
+
+
+} // cga::
+}   //vsr::   
 
 
  

@@ -4,14 +4,13 @@
 #include "gfx/util/gfx_glv_app.h"
 
 using namespace vsr;  
-using namespace vsr::ega3D;  
-
+using namespace vsr::ega;  
+using vsr::nga::Proj;
+using vsr::nga::gen;
  
 typedef NEVec<4> V4;
 typedef algebra< metric<4>,double> Algebra;
-//typedef NEVec<3> Vec;
-
-//idositetrachoron 24 cell                                                                         
+                                                                       
 
 auto D4 = Root::System( V4(1,0,0,0), V4(0,1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );
 auto F4 = Root::System( V4(0,1,-1,0), V4(1,-1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );  
@@ -65,6 +64,8 @@ struct MyApp : gfx::GFXAppGui {
 	       
 };
                         
+
+
 
 int main(){
 

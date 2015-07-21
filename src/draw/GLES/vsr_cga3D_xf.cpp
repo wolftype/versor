@@ -27,6 +27,8 @@ namespace vsr {
     namespace xf {
        
          using namespace vsr::cga; 
+         using vsr::cga::op;
+         
         /*!
          4x4 Transformation Matrix From Rotor
         */

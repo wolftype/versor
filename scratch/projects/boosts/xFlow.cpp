@@ -79,10 +79,12 @@ struct MyApp : App {
     
     auto rot = gen::con( log, amt );
   
+    
     for (int i=0; i<field.num(); ++i){
       field[i] = round::loc( field[i].spin(rot) ); 
     }
 
+    
     if (bReset) field.reset();
     if (bDrawTrace){
      for (int i=0; i<field.num(); ++i){
@@ -92,6 +94,7 @@ struct MyApp : App {
        }
       }
     }
+    
   }
   
 };

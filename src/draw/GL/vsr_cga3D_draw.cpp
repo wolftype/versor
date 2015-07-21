@@ -14,6 +14,7 @@ namespace gfx{
 
   //using namespace cga;
   using namespace vsr;
+  using vsr::cga::op;
   
   template<> void Renderable< cga::Vec >::DrawImmediate (const cga::Vec& s){
     //cout << "vec" << endl; 
@@ -65,8 +66,8 @@ namespace gfx{
   }
 
   template<> void Renderable< cga::Circle >::DrawImmediate( const  cga::Circle& s )  {  
-    VSR_PRECISION rad = round::rad( s );
-    bool im = round::size(s, false) > 0 ? 1 : 0;  
+    VSR_PRECISION rad = nga::round::rad( s );
+    bool im = nga::round::size(s, false) > 0 ? 1 : 0;  
      
     gfx::GL::translate( op::Pos(s).begin() );
     gfx::GL::rotate( op::AA(s).begin() ); 
@@ -76,14 +77,14 @@ namespace gfx{
   
   template<> void Renderable< cga::Point >::DrawImmediate (const  cga::Point& s){
  
-      VSR_PRECISION ta = round::size( s, true );
+      VSR_PRECISION ta = nga::round::size( s, true );
 
       //Draw as dual Sphere (if |radius^2| > 0.000001);
       if ( fabs(ta) >  FPERROR ) {
        // printf("spehere!!!!!!!!!!!!!!!!!!!!\n");
           bool real = ta > 0 ? 1 : 0;  
 
-           cga::Pnt p = round::cen( s );
+           cga::Pnt p = nga::round::cen( s );
           VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
           gfx::GL::translate ( p.begin() );
@@ -96,14 +97,14 @@ namespace gfx{
   
   template<> void Renderable< cga::Sphere >::DrawImmediate (const  cga::Sphere& s){
  
-      VSR_PRECISION ta = round::size( s, false );
+      VSR_PRECISION ta = nga::round::size( s, false );
 
       //Draw as dual Sphere (if |radius^2| > 0.000001);
       if ( fabs(ta) >  FPERROR ) {
        // printf("spehere!!!!!!!!!!!!!!!!!!!!\n");
           bool real = ta > 0 ? 1 : 0;  
 
-           cga::Pnt p = round::cen( s );
+           cga::Pnt p = nga::round::cen( s );
           VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
           gfx::GL::translate ( p.begin() );
@@ -115,27 +116,27 @@ namespace gfx{
   }
   
   template<> void Renderable< cga::FlatPoint >::DrawImmediate (const cga::FlatPoint& s){
-     Renderable< cga::Point >::DrawImmediate( round::point( s[0], s[1], s[2] ) );
+     Renderable< cga::Point >::DrawImmediate( nga::round::point( s[0], s[1], s[2] ) );
   }
   
   template<> void Renderable< cga::Pair >::DrawImmediate (const  cga::Pair& s){
        //Is Imaginary?
-       VSR_PRECISION size = round::size( s, false );
+       VSR_PRECISION size = nga::round::size( s, false );
 
        //is null?
        if ( fabs(size) < FPERROR ){
-           GL::translate( round::loc(s).begin() );
-            Renderable< cga::Vec >::DrawImmediate( -round::dir(s).copy< cga::Vec>() ); 
+           GL::translate( nga::round::loc(s).begin() );
+            Renderable< cga::Vec >::DrawImmediate( -nga::round::dir(s).copy< cga::Vec>() ); 
          
        }else{
        
-         std::vector< cga::Pnt> pp = round::split( s );
+         std::vector< cga::Pnt> pp = nga::round::split( s );
 
-         VSR_PRECISION ta = round::size( pp[0], true );   
+         VSR_PRECISION ta = nga::round::size( pp[0], true );   
                                       
          if ( fabs(ta) >  FPERROR ) {    
-              cga::Pnt p1 = round::cen( pp[0] );
-              cga::Pnt p2 = round::cen( pp[1] );
+              cga::Pnt p1 = nga::round::cen( pp[0] );
+              cga::Pnt p2 = nga::round::cen( pp[1] );
              double t = sqrt ( fabs ( ta ) );
              bool real = size > 0 ? 1 : 0;  
 
@@ -158,22 +159,22 @@ namespace gfx{
   }  
   
   template<> void Renderable< cga::DualLine >::DrawImmediate (const  cga::DualLine& s){
-       cga::Drv d = flat::dir( s.undual() );
-       cga::Dls v = flat::loc( s , PAO, true);
+       cga::Drv d = nga::flat::dir( s.undual() );
+       cga::Dls v = nga::flat::loc( s , PAO, true);
       gfx::GL::translate (v.begin());
       gfx::Glyph::DashedLine(d * 10, d * -10);  
   }  
   
   template<> void Renderable< cga::Line >::DrawImmediate (const  cga::Line& s){
-       cga::Drv d = flat::dir( s );
-       cga::Dls v = flat::loc( s , round::point(0,0,0), false);
+       cga::Drv d = nga::flat::dir( s );
+       cga::Dls v = nga::flat::loc( s , nga::round::point(0,0,0), false);
       gfx::GL::translate (v.begin());
       gfx::Glyph::Line(d * 10, d * -10);  
   }
   
   template<> void Renderable< cga::Frame >::DrawImmediate( const  cga::Frame& f){
      gfx::GL::translate ( f.pos().begin() );
-     gfx::GL::rotate( gen::aa( f.rot() ).begin() ); 
+     gfx::GL::rotate( nga::gen::aa( f.rot() ).begin() ); 
      gfx::GL::scale( f.scale() );  
      gfx::Glyph::Axes(  cga::Vec::x,  cga::Vec::y,  cga::Vec::z );
   }  
@@ -181,7 +182,7 @@ namespace gfx{
 //  template<> void Renderable< cga:: >::DrawImmediateB( const  cga::Frame& f){
 //
 //     gfx::GL::translate( f.pos().begin() );
-//     gfx::GL::rotate( gen::aa( f.rot() ).begin() ); 
+//     gfx::GL::rotate( nga::gen::aa( f.rot() ).begin() ); 
 //     gfx::GL::scale( f.scale() );  
 //     Draw(  cga::Vec::x,1,0,0);
 //     Draw(  cga::Vec::y,0,1,0);
@@ -258,7 +259,7 @@ namespace gfx{
 
    /* void Immediate( const MFrame& f){ */
    /*   gfx::GL::translate ( f.pos().begin() ); */
-   /*   gfx::GL::rotate( gen::aa( f.rot() ).begin() ); */ 
+   /*   gfx::GL::rotate( nga::gen::aa( f.rot() ).begin() ); */ 
    /*   gfx::GL::scale( f.scale() ); */  
    /*   gfx::Glyph::Axes( Vec::x, Vec::y, Vec::z ); */
   /* } */   

@@ -84,6 +84,12 @@ namespace vsr{ namespace cga {
     Par Frame::ty() const { return Par( y().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
     Par Frame::tz() const { return Par( z().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
 
+    /* Global WEIGHTED Tangent as Null Point Pair*/
+    Par Frame::tx(VSR_PRECISION v) const { return Par( x().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
+    Par Frame::ty(VSR_PRECISION v) const { return Par( y().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
+    Par Frame::tz(VSR_PRECISION v) const { return Par( z().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
+
+
     /* Real Circles */
     Cir Frame::cxy() const { return round::produce( ibound(), xy() ); }     ///< xy circle (real, direct)
     Cir Frame::cxz() const { return round::produce( ibound(), xz() ); }     ///< xz circle (real, direct)
@@ -116,12 +122,12 @@ namespace vsr{ namespace cga {
     
     /// Dual Sphere Shell
     Dls Frame::bound() const{
-      return round::dls_pnt( mPos, mScale );
+      return round::dls( mPos, mScale );
     }
 
     /// Dual Imaginary Sphere Shell
     Dls Frame::ibound() const{
-      return round::dls_pnt( mPos, -mScale );
+      return round::dls( mPos, -mScale );
     }
     
     Dll Frame::dll() const { return gen::log( mot() ); }                 ///< DualLine from Motor (for interpolating)  

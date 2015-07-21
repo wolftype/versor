@@ -40,11 +40,13 @@ struct MyData {
   }
   Vec normal = Vec(0,0,0);       //normal (gradient of position)
   Vec dn = Vec(0,0,0);           //derivative of normal
+  Rot drot = Rot(0,0,0,0);       //full derivative
 
   Biv curl = Biv(0,0,0);         //gradient of gradient
-  float kg = 0;
-  float mean =0;   //gaussian and mean;
-  double deficit;
+  float kg = 0;                  //gaussian
+  float mean =0;                 //mean;
+  
+  double deficit;                //angle deficit
   
   vector<Simplicial2> simplex;  //simplicial domain
 
@@ -65,6 +67,8 @@ struct MyApp : App {
   bool bUseCotan;
   bool bExterior;
   bool bExteriorDerivative;
+  bool bExteriorDerivativeNormals;
+  bool bFullDerivative;
   bool bDivideByArea;
   bool bDrawMean;
   bool bDrawNormals;
@@ -81,7 +85,9 @@ struct MyApp : App {
     gui(wt,"wt",-100,100);                 //<-- wt of diff
     gui(bUseCotan,"bUseCotan");            //<-- use TWOPI deficit formula
     gui(bExterior,"bExterior");            //<-- use vector derivatives then exterior
+    gui(bExteriorDerivativeNormals,"bExteriorDerivativeNormals");
     gui(bExteriorDerivative,"bExteriorDerivative");
+    gui(bFullDerivative,"bFullDerivative");
     gui(bDivideByArea,"bDivideByArea");    //<-- use vector derivatives then exterior
     gui(bDrawMean,"bDrawMean");            //<-- draw mean color (vs gaussian) 
     gui(bDrawNormals,"bDrawNormals");      //<-- draw normals
@@ -89,7 +95,7 @@ struct MyApp : App {
 
     //0. set starting parameters
     wt = 1.0;
-    amt = 10.0;
+    amt = 1.0;
     bDrawNormals = true;
     scene.camera.pos(0,0,10);
 
@@ -102,7 +108,8 @@ struct MyApp : App {
     }
     mesh.store();
     graph.UV(w,h,mesh);
-    //per node, add valence number of simplices
+
+    //2. per node, add simplices
     for(auto& i : graph.node() ){
       int num = i->valence().size();
       i->data().simplex = vector<Simplicial2>(num);
@@ -118,6 +125,7 @@ struct MyApp : App {
     if (bTrackMouse) mouse = calcMouse3D();
 
     Frame frame(mouse[0], mouse[1], .5);
+
     //Generator
     auto dll = Twist::Along( frame.dly(), amt,0);
     //transform data
@@ -129,8 +137,8 @@ struct MyApp : App {
       v = s.spin(motor);
     }
 
-    //per node
-    //1. per node, calculate reciprocal simplices in neighborhood
+  
+    //1. calculate reciprocal simplices in neighborhood
     //2. (use edge node as root?)
     for(auto& i : graph.node() ){
      
@@ -150,16 +158,17 @@ struct MyApp : App {
         
         auto normalA = simplex.exterior_derivative(Vec(a),Vec(b),Vec(c)).duale();
         auto normalB = simplex.derivative(Vec(a),Vec(b),Vec(c)).duale(); 
+        auto normalC = simplex.full_derivative(Vec(a),Vec(b),Vec(c));
         
-        v.normal += bExteriorDerivative ? normalA : normalB;
+        v.normal += bFullDerivative ? Biv(normalC).duale() : bExteriorDerivativeNormals ? normalA : normalB;
 
         area += simplex.area;       //sum area
         
         //SAVE
         v.simplex[j] = simplex;
        
-        //for compariso (the classic way of defining curvature as deficit from TWOPI)
-        deficit -= acos( ( ( Vec(c-a).unit() )<=( (Vec(b-a).unit()) ) )[0] );
+        //for comparison (the classic way of defining curvature as deficit from TWOPI)
+        deficit -= fabs( acos( ( ( Vec(c-a).unit() )<=( (Vec(b-a).unit()) ) )[0] ) );
 
       }
       v.deficit = deficit*wt;
@@ -169,7 +178,7 @@ struct MyApp : App {
       // if ( (v.normal <= orient)[0]  < 0 ) v.normal = -v.normal;
     }
 
-
+ 
     //now calculate second derivative (i.e. riemann curvature)
     for (auto& i : graph.node() ){
       auto& v = i->data();
@@ -178,6 +187,7 @@ struct MyApp : App {
       auto e = i->valence();
       float area = 0;
       float mean = 0;
+      
       for (int j=0;j<e.size();++j){
 
          auto& nb = e[j]->a().normal;
@@ -186,19 +196,22 @@ struct MyApp : App {
          //derivative of normal
          v.curl += simplex[j].exterior_derivative(na,nb,nc);
          v.dn += simplex[j].derivative(na,nb,nc).duale();
+         v.drot += simplex[j].full_derivative(na,nb,nc);
          
          area += simplex[j].area;
-
-         //for comparison, use of cotan formula 
-        
       }
       
       v.dn *= wt; 
       v.curl *= wt;
-      if (bDivideByArea){ v.dn /= area; v.curl /= area; v.deficit /=area; }
-      auto tmp0 = -(v.dn.duale() <= !(v.normal.duale())) [0];
-      auto tmp = -(v.curl <= !(v.normal.duale()))[0];
-      v.kg= bUseCotan ? v.deficit : ( bExteriorDerivative ? tmp : tmp0);
+      v.drot *= wt;
+      
+      if (bDivideByArea){ v.dn /= area; v.curl /= area; v.drot /= area; v.deficit /=area; }
+      
+      auto tmp0 = (v.dn.duale() <= !(v.normal.duale())) [0];
+      auto tmp1 = -(v.curl <= !(v.normal.duale()))[0];
+      auto tmp2 = (Biv(v.drot).duale() <= !(v.normal.duale()))[0];
+
+      v.kg= bUseCotan ? v.deficit : ( bFullDerivative ?  tmp2 : bExteriorDerivative ? tmp1 : tmp0);
 
      // v.kg= bUseCotan ? v.deficit : tmp; 
     }

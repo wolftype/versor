@@ -28,7 +28,7 @@ namespace vsr{
             for (int j = 0; j < mHeight; ++j){
                 for (int k = 0; k < mDepth; ++k){
                     int tidx = idx(i,j,k); 
-                    mPoint[ tidx ]  = round::point(px(i),  py(j),  pz(k) ); 
+                    mPoint[ tidx ]  = nga::round::point(px(i),  py(j),  pz(k) ); 
                    // mPoint[tidx].print();
                 }
             }

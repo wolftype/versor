@@ -1,5 +1,6 @@
-/*!  @File
+/*!  @file
  *   bit operations on basis blades (compile-time or run-time)
+ *   
  *   a compile-time version of the bit representation of basis blades 
  *   (bit representation method introduced by daniel fontijne)
  *  
@@ -21,10 +22,18 @@
 #include <string>
 #include <sstream> 
 
+
 /*!-----------------------------------------------------------------------------
- *  CONSTEXPR BIT MANIPULATIONS
+ * the **versor** namespace 
+ * 
  *-----------------------------------------------------------------------------*/
-namespace vsr{ namespace bits {
+namespace vsr{ 
+  
+  /*!-----------------------------------------------------------------------------
+   *  constexpr bit manipulations 
+   *
+   *-----------------------------------------------------------------------------*/
+  namespace bits {
   
 using namespace std;
   

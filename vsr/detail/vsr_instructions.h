@@ -1,3 +1,16 @@
+
+/*! @file 
+    
+      arrow tokens (deep implementation detail)
+
+ *  VERSOR
+ *
+ *  Author: Pablo Colapinto
+ *  Gmail:  wolftype
+ *  homepage: versor.mat.ucsb.edu
+ *
+ * */
+
 #ifndef INSTRUCTIONS_H_INCLUDED
 #define INSTRUCTIONS_H_INCLUDED
 
@@ -5,7 +18,8 @@
 
 namespace vsr{
 
-
+/** The value type of data (default is double) */
+#define VSR_PRECISION double
 
 /*-----------------------------------------------------------------------------
  *  Lowest level product for when to Flip product, calculate inner, or calculate outer
