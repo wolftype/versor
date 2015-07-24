@@ -121,7 +121,8 @@ struct Constrain {
 
     /// constrain a point p to a circle c
     static Point PointToCircle( const Point& p, const Circle& c){
-      auto cen = round::location( tangent::at( c, p ) ); /// point on same plane as circle
+
+      auto cen = flat::location( round::carrier(c), p );
       auto sur = round::surround(c);  /// dual sphere surround of c
       auto line =  cen ^ sur ^ Infinity(1);    ///line through center of circle and cen
       auto meet = (line.dual() ^ sur).dual(); /// meet of line and sphere
