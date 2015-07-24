@@ -119,7 +119,14 @@ struct Constrain {
        return round::loc( (da ^ db ^ dc).dual()  ) ; 
     }
 
-
+    /// constrain a point p to a circle c
+    static Point PointToCircle( const Point& p, const Circle& c){
+      auto cen = round::location( tangent::at( c, p ) ); /// point on same plane as circle
+      auto sur = round::surround(c);  /// dual sphere surround of c
+      auto line =  cen ^ sur ^ Infinity(1);    ///line through center of circle and cen
+      auto meet = (line.dual() ^ sur).dual(); /// meet of line and sphere
+      return round::split( meet ,false);   ///point on circle closest to p
+    }
     /* static Point Fabrik(const Dls& base, const Dls& goal){ */
 
     /*       //repeat until distance is decreased to within error threshold, or give up after 20 iterations */
@@ -178,11 +185,12 @@ struct DistancePtr {
   /// Set constraint from source and target
   void set(Pnt& a, const Pnt& target){
     src = &a; t = round::rad( round::at(*src,target) );
+    if (src==NULL) printf("null DistancePtr SET\n"); 
   }
 
   /// Evaluate Distance Constraint as a Dual Sphere
   Dls operator()(){ 
-    if (src==NULL) return Dls();  
+    if (src==NULL) { printf("null DistancePtr\n"); return Dls(); }  
     return round::dls( *src, t ); 
   }
 
@@ -213,7 +221,6 @@ struct RigidNode{
 /// A Rigid Contraint Node set by Two Distance Pointers
 struct Rig2 : RigidNode {
   
-
   DistancePtr da,db;
 
   Rig2() : RigidNode() {}
@@ -248,14 +255,17 @@ struct Rig3 : RigidNode {
 
   Rig3() : RigidNode() {}
 
-  Rig3( const Pnt& target, RigidNode * ra, RigidNode * rb, RigidNode * rc, bool m) : RigidNode() {
-    set(target,ra,rb,rc,m);
+  Rig3( const Pnt& target, RigidNode * ra, RigidNode * rb, RigidNode * rc, bool m, bool p) : RigidNode() {
+    set(target,ra,rb,rc,m,p);
   }
 
   /// set from target and constraints Counter Clockwise
-  void set( const Point& target, RigidNode * ra, RigidNode *rb, RigidNode *rc, bool m){
+  void set( const Point& target, RigidNode * ra, RigidNode *rb, RigidNode *rc, bool m, bool p){
     mParent.push_back(ra); mParent.push_back(rb); mParent.push_back(rc);
     bMtn = m;
+    bCoplanar=p;
+
+    if (ra==NULL || rb==NULL || rc==NULL) printf("null rig3 set\n");
     
     da.set(ra->result,target);
     db.set(rb->result,target);
@@ -306,6 +316,12 @@ struct Rigid{
 
   /// set result
   void set(const Pnt& res){
+    bCalc = false;
+    result = res;
+  }
+
+  /// set result
+  void setResult(const Pnt& res){
     bCalc = false;
     result = res;
   }

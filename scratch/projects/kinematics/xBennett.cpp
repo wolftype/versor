@@ -17,7 +17,7 @@
  */
 
 
-#include "util/vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 #include "form/vsr_linkages.h"
 #include "draw/vsr_chain_draw.h"
 
