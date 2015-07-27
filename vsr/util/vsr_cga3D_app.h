@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_cga3D_app.h
  *
- *    Description:  utility for demos which binds with gfx and glv
+ *    Description:  utility for cga demos which binds with gfx and glv
  *
  *        Version:  1.0
  *        Created:  01/26/2015 17:29:12

@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:  pretty awesome
  *
  * =====================================================================================
  */
@@ -42,7 +42,6 @@ struct Constrain {
 
    //unused?
     static Point Crease (const Point& a, const Point& dls, const DualLine d, bool mtn){
-      // Dls dls = round::at(b, a);
        Circle cir = a ^ d;
        Pair par = ( dls ^ cir.dual()).dual();
        return round::loc( round::split(par,mtn) );

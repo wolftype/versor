@@ -115,13 +115,19 @@ struct CyclideQuad{
   Circle cirU( VSR_PRECISION u) { return tframe[0].circle[1].spin( xfu(u) ); }
   Circle cirV( VSR_PRECISION v) { return tframe[3].circle[0].spin( xfv(v) ); }   
 
-  // Apply conformal rotor to a type T at u,v
+  /// Apply conformal rotor to a type T at u,v
   template<class T>
   T apply( const T& t, VSR_PRECISION u, VSR_PRECISION v) {
     return t.spin( xf(u,v) );
   }
+
+  Vec evalNormal( VSR_PRECISION u, VSR_PRECISION v){
+    auto tan = apply( tframe[0].frame.tz(), u,v);
+    return -round::direction( tan ).copy<Vec>().unit();
+  }
+
   
-  // Apply conformal rotor to a point at u,v
+  /// Apply conformal rotor to a point at u,v
   Point eval( VSR_PRECISION u, VSR_PRECISION v) {
     return round::loc( tframe[0].frame.pos().spin( xf(u,v) ) );
   }
