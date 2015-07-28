@@ -21,7 +21,7 @@ namespace gfx{
   using vsr::cga::Biv;
   using vsr::cga::Rot;
   using vsr::cga::Vec;
-  using vsr::cga::gen;
+  using vsr::cga::Gen;
   
   void Draw(const Chain& c, bool bLoop = false, bool bFrame=true, float r=1.0, float g=1.0, float b=1.0, float a=1.0){
     
@@ -57,7 +57,7 @@ namespace gfx{
       Rot rot = f.rot();
     glPushMatrix();
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );// - 2 * f.scale() );
-      gfx::GL::rotate( nga::gen::aa( rot * gen::rot( Biv::yz * PIOVERFOUR ) ).begin() );
+      gfx::GL::rotate( nga::Gen::aa( rot * Gen::rot( Biv::yz * PIOVERFOUR ) ).begin() );
       gfx::GL::scale( f.scale() );
       glColor4f(r,g,b,a); 
       ma.drawElements();
@@ -66,7 +66,7 @@ namespace gfx{
     glPushMatrix();
     
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );
-      gfx::GL::rotate( nga::gen::aa( rot ).begin() );
+      gfx::GL::rotate( nga::Gen::aa( rot ).begin() );
       gfx::GL::translate( 0, f.scale() * .5, 0 );
     
      // glPushMatrix();

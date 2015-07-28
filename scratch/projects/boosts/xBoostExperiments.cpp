@@ -57,8 +57,8 @@ struct MyApp : App {
   
 
     Pnt random(){
-      Vec v = Vec::x.sp( gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
-      return round::null(v);
+      Vec v = Vec::x.sp( Gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
+      return Round::null(v);
     }
 
     void reset(){
@@ -72,7 +72,7 @@ struct MyApp : App {
 
       //Generate Boost
       Par par = tk.par();
-      Bst bst = gen::bst( par * amt );
+      Bst bst = Gen::bst( par * amt );
 
       //For each seeded point
       for(auto& tp : pnt ){
@@ -81,19 +81,19 @@ struct MyApp : App {
          Pnt tmp = tp;
 
          //Boost
-         tp = round::loc( tp.spin( bst ) );
+         tp = Round::loc( tp.spin( bst ) );
          Draw(tp);  
          
          //make movement  
          Par tpar = tmp ^ tp; 
-         Pnt cpnt = round::pnt_cir( tpar.dual(), 0 );
-         Mot mot = gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
-         Pnt p = cpnt;//round::loc( cpnt.spin( mot * bst ) ) ;
+         Pnt cpnt = Round::pnt_cir( tpar.dual(), 0 );
+         Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
+         Pnt p = cpnt;//Round::loc( cpnt.spin( mot * bst ) ) ;
          Draw(p,1,1,0);
          //tp = p;
          for (int i=0;i<iter;++i){
            VSR_PRECISION t = (float)i/iter;
-           p = round::loc( p.spin( bst * mot ) );
+           p = Round::loc( p.spin( bst * mot ) );
            Draw(p,0,1,0,1-t);
          }
       }

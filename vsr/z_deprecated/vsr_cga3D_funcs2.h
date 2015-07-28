@@ -36,26 +36,26 @@ namespace vsr{
       *  \brief  generate a rotor transformation from a euclidean bivector
       */
       Rotor gen(const Biv& b){
-       return gen::rot(b);
+       return Gen::rot(b);
      }
      /*!
       *  \brief  generate a motor transformation from a dual line
       */
       Motor gen(const DualLine& dll){
-        return gen::mot(dll);
+        return Gen::mot(dll);
       }
      /*!
       *  \brief  generate a dilation transformation from a flat point
       */
       Dilator gen(const FlatPoint& flp){
-        return gen::dil(Pnt(flp),flp[3]);
+        return Gen::dil(Pnt(flp),flp[3]);
       }
 
       /*!
        *  \brief  generate a boost transformation from a point pair
        */
       Bst gen(const Pair& p){
-        return gen::bst(p);
+        return Gen::bst(p);
       }
 
        /*!
@@ -82,13 +82,13 @@ namespace vsr{
        *  \brief  Point at x,y,z
        */
 //       inline Point point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
-//        return round::point(x,y,z);
+//        return Round::point(x,y,z);
  //     }
       /*!
        *  \brief  Point at x,y,z
        */
      // auto point = ()(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
-     //   return round::null(x,y,z);
+     //   return Round::null(x,y,z);
      // }
     
       /*!
@@ -96,14 +96,14 @@ namespace vsr{
        */
     // template<class V>
     // inline Point pointOnLine( const Line& l, const V& v){
-   //    return round::null( flat::loc( l, v, false) );
+   //    return Round::null( Flat::loc( l, v, false) );
    //  }   
             
       /*!
        *  \brief  Point on line closest to another point v
        */
      auto pointOnLine = []( const Line& lin, const Point& v){
-       return round::null( flat::loc( lin, v, false) );
+       return Round::null( Flat::loc( lin, v, false) );
      };    
 
 
@@ -114,7 +114,7 @@ namespace vsr{
  
      /// a single point on circle c at theta t 
      auto pointOnCircle = [](const Circle& c, VSR_PRECISION t){
-      return round::pnt_cir(c,t);
+      return Round::pnt_cir(c,t);
      };
      /// n points on circle c
      auto pointsOnCircle = [](const Circle& c, int num){
@@ -126,11 +126,11 @@ namespace vsr{
      };
      /// a pair on dual sphere
      auto pairOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-      return round::produce(s, Vec::x.sp( gen::rot(t,p) ) );
+      return Round::produce(s, Vec::x.sp( Gen::rot(t,p) ) );
      };
      /// a single point on dual sphere s at theta t and phi p
      auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-       return round::split( pairOnSphere(s,t,p), true ).null(); 
+       return Round::split( pairOnSphere(s,t,p), true ).null(); 
      };
      /// many points on sphere (could use map func from gfx::data)
      auto pointsOnSphere = [](const DualSphere& s, int u, int v){
@@ -159,14 +159,14 @@ namespace vsr{
       *  \brief  First point of point pair pp
       */
       inline Point pointA(const Pair& pp){
-       return round::split(pp, true);
+       return Round::split(pp, true);
      } 
 
       /*!
        *  \brief  Second point of point pair pp
        */
       inline Point pointB(const Pair& pp){
-       return round::split(pp, false);
+       return Round::split(pp, false);
      }
 
 
@@ -174,8 +174,8 @@ namespace vsr{
        return a ^ b;
      }
 
-     auto splitA = [](const Pair& pp){ return round::split(pp,true); };
-     auto splitB = [](const Pair& pp){ return round::split(pp,false); };
+     auto splitA = [](const Pair& pp){ return Round::split(pp,true); };
+     auto splitB = [](const Pair& pp){ return Round::split(pp,false); };
      auto make_pair = []( const Point& a, const Point& b){
       return a ^ b;
      };
@@ -184,7 +184,7 @@ namespace vsr{
        *  \brief Point Pair at x,y,z with direction vec (default Y) and radius r (default 1)
        */
       inline Pair pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec = Vec::y, VSR_PRECISION r=1.0){ 
-       return round::produce( round::dls(r*-1,x,y,z), vec );//a ^ b ^ c; 
+       return Round::produce( Round::dls(r*-1,x,y,z), vec );//a ^ b ^ c; 
      }
      
       /*!
@@ -198,25 +198,25 @@ namespace vsr{
        *  \brief  Circle at origin in plane of bivector B
        */
       inline Circle circle(const Biv& B){
-       return round::produce( round::dls(1,0,0,0), B);//a ^ b ^ c; 
+       return Round::produce( Round::dls(1,0,0,0), B);//a ^ b ^ c; 
      }                          
      //circle Facing v
       inline Circle circle(const Vec& v, VSR_PRECISION r=1.0){
-       return round::produce( round::dls(r*-1,0,0,0), op::dle(v) );//a ^ b ^ c; 
+       return Round::produce( Round::dls(r*-1,0,0,0), Op::dle(v) );//a ^ b ^ c; 
      }                    
      //circle at x,y,z facing in biv
       inline Circle circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv = Biv::xy, VSR_PRECISION r=1.0){ 
-       return round::produce( round::dls(r*-1,x,y,z), biv );//a ^ b ^ c; 
+       return Round::produce( Round::dls(r*-1,x,y,z), biv );//a ^ b ^ c; 
      }
       inline Sphere sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d){
        return a ^ b ^ c ^ d;
      }  
      
      inline DualSphere sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r=1.0){
-       return round::dls(r, x, y, z );
+       return Round::dls(r, x, y, z );
      }
      inline DualSphere sphere(const Point& p, VSR_PRECISION r=1.0){
-       return round::dls_pnt(p, r);
+       return Round::dls_pnt(p, r);
      }     
 
                              
@@ -236,7 +236,7 @@ namespace vsr{
      ///Direct line through points a and b
      template<class V>
      inline Line line( const V& a, const V& b){
-        return round::point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
+        return Round::point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
      }
      ///Direct line through origin
      inline Line line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
@@ -311,7 +311,7 @@ namespace vsr{
        inline Point meet( const Line& la, const Line& lb){
           Line r = la.reflect(lb);
           Line r2 = (la - r.unit()).unit();
-          Point pori = flat::loc(r2, Ori(1), false);
+          Point pori = Flat::loc(r2, Ori(1), false);
           Point tp = pori.re( lb ); 
           return ( ( (tp / tp[3]) + pori)/2.0 ).null(); 
         }
@@ -344,7 +344,7 @@ namespace vsr{
         */
       inline bool hit(const Point& pnt, const Pair& par ){
           //if inside surround < 0
-          if( ( pnt <= round::sur( par ) )[0] < 0 ) {
+          if( ( pnt <= Round::sur( par ) )[0] < 0 ) {
             if ( (pnt ^ par ^ Inf(1)).wt() == 0.0 ) {
                 return true;
               }
@@ -359,8 +359,8 @@ namespace vsr{
        */
       inline bool hit(const Point& p, const Circle& cir){
 
-         if ( (p<= round::sur(cir))[0] > 0){
-          if ( fabs( (p^round::car(cir)).wt()) <.00001 ) {
+         if ( (p<= Round::sur(cir))[0] > 0){
+          if ( fabs( (p^Round::car(cir)).wt()) <.00001 ) {
             return true;
           }
          }
@@ -368,7 +368,7 @@ namespace vsr{
       }
 
       double squaredDistance(const Point& a, const Point& b){
-        return round::sqd(a,b);
+        return Round::sqd(a,b);
       }
 
 
@@ -409,7 +409,7 @@ namespace vsr{
        *  \brief  hyperbolic spin transformation from pa to pb by amt (0,1)
        */
       Point hspin(const Pnt& pa, const Pnt& pb, double amt){
-        return round::loc( pa.boost( hgen(pa,pb,amt) ) );
+        return Round::loc( pa.boost( hgen(pa,pb,amt) ) );
         //versor * dist * amt * .5) );
       }
       

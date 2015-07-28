@@ -189,18 +189,18 @@ struct SpaceGroup2D : PointGroup2D<V> {
       if (ga) { //replace first mirror
         this->ops.clear();
        // this->ops.push_back(this->b);
-        this->gops.push_back( this->a * gen::trs( Vec::y * .5) ); 
+        this->gops.push_back( this->a * Gen::trs( Vec::y * .5) ); 
       }        
     } else if (p<4){ 
       //Glide Reflections
       if (ga) { //replace first mirror
         this->ops.clear();
         this->ops.push_back(this->b);
-        this->gops.push_back( this->a * gen::trs(this->b * .5) ); 
+        this->gops.push_back( this->a * Gen::trs(this->b * .5) ); 
       }    
       if (gb) { //replace second mirror
         this->ops.pop_back();
-        this->gops.push_back( this->b * gen::trs(this->a * .5) ); 
+        this->gops.push_back( this->b * Gen::trs(this->a * .5) ); 
       }
     } else {
       if (p==4){
@@ -209,7 +209,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
           this->ops.clear();
           this->ops.push_back(this->b.unit());
           this->ops.push_back(this->b.reflect(this->a).unit());
-          this->gops.push_back( this->a * gen::trs((this->b - this->a) * .5) ); 
+          this->gops.push_back( this->a * Gen::trs((this->b - this->a) * .5) ); 
         }
       }
       if (p==6){
@@ -598,21 +598,21 @@ struct SpaceGroup3D : PointGroup3D<V> {
           case AxialB: //< replace a reflection with a glide
           {
             replace.push_back(0);
-            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->b) : (this->b) ) * .5 );
+            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->b) : (this->b) ) * .5 );
             this->gops.push_back( this->a * trs );
             break;
           }
           case AxialC:
           {
             replace.push_back(0);
-            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->c) : (this->c) ) * .5 );
+            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->c) : (this->c) ) * .5 );
             this->gops.push_back( this->a * trs );
             break;
           }
           case Diagonal:
           {
             replace.push_back(0); //we will replace 0 idx
-            auto trs = gen::trs( ( (mGlide.a.bInvert) ? (this->a - (this->b+this->c)) : (this->b+this->c) ) * .5 );
+            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? (this->a - (this->b+this->c)) : (this->b+this->c) ) * .5 );
             this->gops.push_back( this->a * trs ); 
             break;
           }

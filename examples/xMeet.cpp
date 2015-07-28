@@ -43,7 +43,7 @@ struct MyApp : App {
 
     draw(meet,0,1,0);                   ///<-- draw meet (circle) in green
     
-    draw(round::surround(meet),0,0,1,.5);  ///<-- draw surround of meet (a sphere) in blue with half alpha
+    draw(Round::surround(meet),0,0,1,.5);  ///<-- draw surround of meet (a sphere) in blue with half alpha
 
     draw(sphereA,1,0,0,.5);             ///<-- draw spheres in red, with half alpha
     draw(sphereB,1,0,0,.5);             ///<-- draw spheres in red, with half alpha

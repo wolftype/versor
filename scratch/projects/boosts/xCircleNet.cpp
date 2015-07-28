@@ -123,31 +123,31 @@ struct MyApp : App {
     auto saz =(ra ^ fb.pos());
     auto sa =(fa.ty() ^ fb.pos() );
     
-    auto rbz = tangent::at( saz, fb.pos() );
-    auto rb = tangent::at( sa, fb.pos() );
+    auto rbz = Tangent::at( saz, fb.pos() );
+    auto rb = Tangent::at( sa, fb.pos() );
     
-    auto rotA = gen::ratio( Vec::z, round::dir(rbz).copy<Vec>().unit() );
-    auto rotB = gen::ratio( Vec::y.spin(rotA), round::dir(rb).copy<Vec>().unit() );
+    auto rotA = Gen::ratio( Vec::z, Round::dir(rbz).copy<Vec>().unit() );
+    auto rotB = Gen::ratio( Vec::y.spin(rotA), Round::dir(rb).copy<Vec>().unit() );
     fb.rot() = rotB * rotA;
     
     auto sbz = (rbz ^ fc.pos() );
     auto sb =( fb.tx(-1) ^ fc.pos());
 
-    auto rcz= tangent::at( sbz, fc.pos() );
-    auto rc = tangent::at( sb, fc.pos() ); 
+    auto rcz= Tangent::at( sbz, fc.pos() );
+    auto rc = Tangent::at( sb, fc.pos() ); 
  
-    rotA = gen::ratio( Vec::z, -round::dir(rcz).copy<Vec>().unit() );
-    rotB = gen::ratio( Vec::x.spin(rotA), round::dir(rc).copy<Vec>().unit() );
+    rotA = Gen::ratio( Vec::z, -Round::dir(rcz).copy<Vec>().unit() );
+    rotB = Gen::ratio( Vec::x.spin(rotA), Round::dir(rc).copy<Vec>().unit() );
     fc.rot() = rotB * rotA;
     
     auto scz = (rcz^fd.pos());
     auto sc =( fc.ty() ^ fd.pos());
 
-    auto rdz = tangent::at( scz,fd.pos() );
-    auto rd = tangent::at( sc, fd.pos() );
+    auto rdz = Tangent::at( scz,fd.pos() );
+    auto rd = Tangent::at( sc, fd.pos() );
 
-    rotA = gen::ratio( Vec::z, round::dir(rdz).copy<Vec>().unit() );
-    rotB = gen::ratio( Vec::y.spin(rotA), round::dir(rd).copy<Vec>().unit() );
+    rotA = Gen::ratio( Vec::z, Round::dir(rdz).copy<Vec>().unit() );
+    rotB = Gen::ratio( Vec::y.spin(rotA), Round::dir(rd).copy<Vec>().unit() );
     fd.rot() = rotB * rotA;
     
     auto sd =( fd.tx(-1) ^ fa.pos());
@@ -188,15 +188,15 @@ struct MyApp : App {
   //  Draw( midpointD, 1,1,0);
 
     //contact
-    auto midcontactA = tangent::at( sphAx.dual(), midpointA ).dual() ^ midpointC;
-    auto midcontactB = tangent::at( sphBy.dual(), midpointB ).dual() ^ midpointD;
+    auto midcontactA = Tangent::at( sphAx.dual(), midpointA ).dual() ^ midpointC;
+    auto midcontactB = Tangent::at( sphBy.dual(), midpointB ).dual() ^ midpointD;
 
  //   Draw(midcontactA,1,0,1);
  //   Draw(midcontactB,1,0,1);
 
     //sphere contact
-    auto midsphereA = (tangent::at( sa, midpointA).dual() ^ midpointC).dual();
-    auto midsphereB = (tangent::at( sb, midpointB).dual() ^ midpointD).dual();
+    auto midsphereA = (Tangent::at( sa, midpointA).dual() ^ midpointC).dual();
+    auto midsphereB = (Tangent::at( sb, midpointB).dual() ^ midpointD).dual();
 
     //is corner inside or outside principle spheres on opposite edges
     auto dotX =  ( fa.pos() <= sphCx )[0];
@@ -204,12 +204,12 @@ struct MyApp : App {
     cout << "dot a:" << dotX << endl;
     cout << "dot b:" << dotY << endl;
 
-   auto logAx = gen::log( gen::ratio( sphAx, sphCx, bFlipX ) );
-   auto logBy = gen::log( gen::ratio( sphDy, sphBy, bFlipY ) );
+   auto logAx = Gen::log( Gen::ratio( sphAx, sphCx, bFlipX ) );
+   auto logBy = Gen::log( Gen::ratio( sphDy, sphBy, bFlipY ) );
 
-   //auto halfLogAx1 = gen::log( gen::ratio(sphAx, Dls( round::carrier( logAx.dual() ).dual() ), bFlipX));
-   auto halfLogAx1 = gen::log( gen::ratio(sphAx, Dls(sphCx-sphAx), bFlipX));
-   auto halfLogAx2 = gen::log( gen::ratio(Dls( round::carrier( logAx.dual() ).dual()), sphCx, bFlipX));
+   //auto halfLogAx1 = Gen::log( Gen::ratio(sphAx, Dls( Round::carrier( logAx.dual() ).dual() ), bFlipX));
+   auto halfLogAx1 = Gen::log( Gen::ratio(sphAx, Dls(sphCx-sphAx), bFlipX));
+   auto halfLogAx2 = Gen::log( Gen::ratio(Dls( Round::carrier( logAx.dual() ).dual()), sphCx, bFlipX));
 
    auto pairX = logAx.runit();
    auto pairY = logBy.runit();
@@ -222,8 +222,8 @@ struct MyApp : App {
     cout << "theta y " << thetaY << endl;
 
   //new midpoint method
-//   auto logAx = gen::log( gen::ratio( sphAx, midsphereB ) );
-//   auto logBy = gen::log( gen::ratio( sphDy, midsphereA ) );
+//   auto logAx = Gen::log( Gen::ratio( sphAx, midsphereB ) );
+//   auto logBy = Gen::log( Gen::ratio( sphDy, midsphereA ) );
 
     //along rotation axis
  //   auto xa = (sphAx ^ logBy).dual();
@@ -233,7 +233,7 @@ struct MyApp : App {
  //   Draw(xc,1,1,1);
 
 
- //  auto logT = gen::log( gen::ratio(sphAx, sphCx).unit() * gen::ratio(sphDy,sphBy).unit() );
+ //  auto logT = Gen::log( Gen::ratio(sphAx, sphCx).unit() * Gen::ratio(sphDy,sphBy).unit() );
 
 
    auto sphAy = (fa.ty().dual() ^ fb.pos()).dual();
@@ -249,30 +249,30 @@ struct MyApp : App {
    auto sphDz = (fd.tz().dual() ^ fa.pos()).dual();
 
 
-   auto logAz = gen::log( gen::ratio( sphAz, sphCz ) );
-   auto logBz = gen::log( gen::ratio( sphDz, sphBz ) );
+   auto logAz = Gen::log( Gen::ratio( sphAz, sphCz ) );
+   auto logBz = Gen::log( Gen::ratio( sphDz, sphBz ) );
 
 
-   auto logAy = gen::log( gen::ratio( sphAy, sphCy ) );
-   auto logBx = gen::log( gen::ratio( sphDx, sphBx ) );
+   auto logAy = Gen::log( Gen::ratio( sphAy, sphCy ) );
+   auto logBx = Gen::log( Gen::ratio( sphDx, sphBx ) );
     
    cout << "wt a: " << logAx.wt() << " " << logAx.rnorm() << endl;
    cout << "wt b: " << logBy.wt() << " " << logBy.rnorm() << endl;
 
-//  auto dirX = round::dir(logAx.dual()).copy<Biv>();
-//  cout << "sign a1: " << op::sign( dirX, fa.yz() ) << endl;
-//  cout << "sign a2: " << op::sign( dirX, fb.yz() ) << endl;
-//  cout << "sign a3: " << op::sign( dirX, fc.yz() ) << endl;
-//  cout << "sign a4: " << op::sign( dirX, fd.yz() ) << endl;
+//  auto dirX = Round::dir(logAx.dual()).copy<Biv>();
+//  cout << "sign a1: " << Op::sign( dirX, fa.yz() ) << endl;
+//  cout << "sign a2: " << Op::sign( dirX, fb.yz() ) << endl;
+//  cout << "sign a3: " << Op::sign( dirX, fc.yz() ) << endl;
+//  cout << "sign a4: " << Op::sign( dirX, fd.yz() ) << endl;
 //
-//  auto dirY = round::dir(logBy.dual()).copy<Biv>();
-//  cout << "sign b1: " << op::sign( dirY, fa.xz() ) << endl;
-//  cout << "sign b2: " << op::sign( dirY, fb.xz() ) << endl;
-//  cout << "sign b3: " << op::sign( dirY, fc.xz() ) << endl;
-//  cout << "sign b4: " << op::sign( dirY, fd.xz() ) << endl;
+//  auto dirY = Round::dir(logBy.dual()).copy<Biv>();
+//  cout << "sign b1: " << Op::sign( dirY, fa.xz() ) << endl;
+//  cout << "sign b2: " << Op::sign( dirY, fb.xz() ) << endl;
+//  cout << "sign b3: " << Op::sign( dirY, fc.xz() ) << endl;
+//  cout << "sign b4: " << Op::sign( dirY, fd.xz() ) << endl;
   
-   cout << "size a: " << round::size(logAx,true) << endl;
-   cout << "size b: " << round::size(logBy,true) << endl;
+   cout << "size a: " << Round::size(logAx,true) << endl;
+   cout << "size b: " << Round::size(logBy,true) << endl;
     
 
 
@@ -286,14 +286,14 @@ struct MyApp : App {
 
 
 
-//   Draw( round::surround ( logA.dual() ) ^ sphA.dual() ^ sphC.dual(),1,1,0 );
+//   Draw( Round::surround ( logA.dual() ) ^ sphA.dual() ^ sphC.dual(),1,1,0 );
 
-   auto sconfA = gen::bst( logAz  * -xfu);
-   auto sconfB = gen::bst( logBz * -xfv);
-   auto sconfC = gen::bst( logAx * -xfu );
-   auto sconfD = gen::bst( logBy * -xfv );
-   auto sconfE = gen::bst( logAy * -xfu );
-   auto sconfF = gen::bst( logBx * -xfv );
+   auto sconfA = Gen::bst( logAz  * -xfu);
+   auto sconfB = Gen::bst( logBz * -xfv);
+   auto sconfC = Gen::bst( logAx * -xfu );
+   auto sconfD = Gen::bst( logBy * -xfv );
+   auto sconfE = Gen::bst( logAy * -xfu );
+   auto sconfF = Gen::bst( logBx * -xfv );
    
    auto tsa = sphAz.spin( sconfA );
    auto tsb = sphDz.spin( sconfB );
@@ -305,28 +305,28 @@ struct MyApp : App {
 
 //    if (bFlipX){
 //      auto tmpCir = logAx.dual();
-//      auto dir = round::dir(tmpCir).copy<Biv>();
-//      logAx = round::produce( round::surround( tmpCir ), dir ).dual();
+//      auto dir = Round::dir(tmpCir).copy<Biv>();
+//      logAx = Round::produce( Round::surround( tmpCir ), dir ).dual();
 //    }
    // logAx = logAx.runit();
    // logBy = logBx.runit();
 
- //   auto bisectX = round::carrier( sa ).dual().unit() - round::carrier( sc ).dual().unit();
- //   auto bisectY = round::carrier( sd ).dual().unit() - round::carrier( sb ).dual().unit();
+ //   auto bisectX = Round::carrier( sa ).dual().unit() - Round::carrier( sc ).dual().unit();
+ //   auto bisectY = Round::carrier( sd ).dual().unit() - Round::carrier( sb ).dual().unit();
 
         
     for (int i=0;i<=width;++i){
       float tu=  xfu * (float)i/width;
-      auto tbstA = gen::bst( logAx * -tu );
+      auto tbstA = Gen::bst( logAx * -tu );
       
       //one dir
       auto tcirA = sa.spin(tbstA);
-      auto tpnt = round::loc( fa.pos().spin(tbstA) );
+      auto tpnt = Round::loc( fa.pos().spin(tbstA) );
 
       //another
-      auto tbstA2 = gen::bst( pairX * thetaX * -tu );
+      auto tbstA2 = Gen::bst( pairX * thetaX * -tu );
       auto tcirA2 = sa.spin(tbstA2);
-      auto tpnt2 =  round::loc( fa.pos().spin(tbstA2) );
+      auto tpnt2 =  Round::loc( fa.pos().spin(tbstA2) );
 
       if (bDrawForward){
      //   Draw(tpnt);
@@ -339,18 +339,18 @@ struct MyApp : App {
    
       for (int j=0;j<=height;++j){
         float tv=  xfv * (float)j/height;
-        auto tbstB = gen::bst( logBy * -tv );
+        auto tbstB = Gen::bst( logBy * -tv );
         auto tcirB = sd.spin(tbstB);
-        auto tpnt = round::loc( fa.pos().spin(tbstB) );
+        auto tpnt = Round::loc( fa.pos().spin(tbstB) );
         
         // Draw(tcirB,0,1,1);
         // Draw(tpnt);
-        auto nbst = tbstA * tbstB;//gen::bst( logAx * -tu + logBy * -tv);
-        auto mesh_pnt = round::loc( fa.pos().spin( nbst) );// tbstA * tbstB) );
-        auto tanA =  round::dir( tangent::at( tcirA, mesh_pnt ) ).copy<Vec>().unit();
-        auto tanB = round::dir( tangent::at( tcirB, mesh_pnt ) ).copy<Vec>().unit();
+        auto nbst = tbstA * tbstB;//Gen::bst( logAx * -tu + logBy * -tv);
+        auto mesh_pnt = Round::loc( fa.pos().spin( nbst) );// tbstA * tbstB) );
+        auto tanA =  Round::dir( Tangent::at( tcirA, mesh_pnt ) ).copy<Vec>().unit();
+        auto tanB = Round::dir( Tangent::at( tcirB, mesh_pnt ) ).copy<Vec>().unit();
 
-        auto normal_vec = -round::dir( fa.tz().spin( nbst ) ).copy<Vec>().unit();
+        auto normal_vec = -Round::dir( fa.tz().spin( nbst ) ).copy<Vec>().unit();
         auto normal_biv = tanA ^ tanB;
         
         int idx = i * (height+1) + j;
@@ -363,9 +363,9 @@ struct MyApp : App {
        if (bDrawNormal) DrawAt( mesh[idx].normal, mesh[idx].pos,0,.4,0 );
        // normal.push_back( normal_biv.duale() );
 
-      // auto tbst = gen::bst( logAx * tu ) * gen::bst( logBy * tv );
-      // auto tbst2 = gen::con( logT, tu, tv );
-      // auto tpnt = round::loc( fa.pos().spin(tbst2) );
+      // auto tbst = Gen::bst( logAx * tu ) * Gen::bst( logBy * tv );
+      // auto tbst2 = Gen::con( logT, tu, tv );
+      // auto tpnt = Round::loc( fa.pos().spin(tbst2) );
       // Draw(tpnt);
      }
  

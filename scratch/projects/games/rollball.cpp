@@ -55,10 +55,10 @@ struct MyApp : App {
   void fixedUpdate(){
     //test for intersection
     auto pp = (player.bound() ^ ground).dual();
-    if (round::size(pp,true) > 0) bHit = true;
+    if (Round::size(pp,true) > 0) bHit = true;
 
     if (bHit){
-      player.move(0,-round::rad(pp),0 );
+      player.move(0,-Round::rad(pp),0 );
     }
 
     player.move();

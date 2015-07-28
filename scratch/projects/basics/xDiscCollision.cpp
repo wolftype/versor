@@ -53,8 +53,8 @@ struct MyApp : App {
 
     draw(cir,0,1,0);
 
-    auto s = round::surround(cir);
-    auto n = round::carrier(cir);
+    auto s = Round::surround(cir);
+    auto n = Round::carrier(cir);
 
     if ( (p<=s)[0] > 0){
       cout << (p^n).wt() << endl;

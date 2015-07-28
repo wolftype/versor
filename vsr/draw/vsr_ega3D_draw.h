@@ -22,12 +22,12 @@ namespace vsr{
 	
 	ega::Rot AA( const ega::Vec& s){
 		//Biv b = Ro::dir( s ).copy<Biv>();               
-        ega::Rot r = nga::gen::ratio(ega::Vec::z, s.unit() ); 
-        return nga::gen::aa(r);
+        ega::Rot r = nga::Gen::ratio(ega::Vec::z, s.unit() ); 
+        return nga::Gen::aa(r);
     } 
 
   ega::Rot AA( const ega::Biv& s){   
-		return nga::gen::aa( nga::gen::ratio( ega::Vec::z, s.dual().unit() ) ); 
+		return nga::Gen::aa( nga::Gen::ratio( ega::Vec::z, s.dual().unit() ) ); 
 	}
 
 	void Immediate (const ega::Vec& s){
@@ -42,7 +42,7 @@ namespace vsr{
 	void Immediate (const ega::Biv& s){
 		
 		double ta = s.norm(); 
-	    bool sn = nga::op::sn( s , ega::Biv::xy * (-1));
+	    bool sn = nga::Op::sn( s , ega::Biv::xy * (-1));
 	
 		glPushMatrix();	
 			gfx::GL::rotate( AA(s).begin() );  

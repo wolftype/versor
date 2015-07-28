@@ -122,7 +122,7 @@ struct Proj<2>{
   @todo separate ND euclidean ops from ND conformal ops
   
 */
-struct op{  
+struct Op{  
   
   template<class A>  
   static auto dual( const A& a ) RETURNS (
@@ -186,7 +186,7 @@ struct op{
  * Operations on Euclidean Types 
  */
  
-struct euc{
+struct Euc{
   /*!
    *  Homegenize an ND Euclidean Vector (add a dimension with weight of 1.0)
    */
@@ -225,19 +225,19 @@ struct euc{
    These can be used as-is, or put into a .cpp file for faster compilation
    (as is done, for example, in vsr_cga3D_op.cpp)
   
-   For instance, to create a quaternionic spin transformation nga::gen::rotor will do the trick
-   and be inlined, but if working in 3D conformal space cga::gen::rotor will lead to faster 
+   For instance, to create a quaternionic spin transformation nga::Gen::rotor will do the trick
+   and be inlined, but if working in 3D conformal space cga::Gen::rotor will lead to faster 
    compile times.
    
    In keeping with the tendency throughout this library, functions can be written
-   out in longform -- e.g. gen::translator -- or @ref shorthand -- e.g. gen::trs
+   out in longform -- e.g. Gen::translator -- or @ref shorthand -- e.g. Gen::trs
 
-   @sa vsr::cga::gen for  @ref cgaops documentation
+   @sa vsr::cga::Gen for  @ref cgaops documentation
 
    @todo explain or fix multivector methods like .translate() that ONLY work in CGA
 
  */
- struct gen{
+ struct Gen{
 
 
     /*! ND Rotor from Bivector b
@@ -349,7 +349,7 @@ struct euc{
          using TRot = GARot<A>;
          using TVec = GAVec<A>;
       
-          TVec v = op::dle( pl( r ) ) ;    
+          TVec v = Op::dle( pl( r ) ) ;    
           VSR_PRECISION deg = iphi(r) * ( -180 / PI );
 
           return TRot(deg, v[0], v[1], v[2]);
@@ -526,7 +526,7 @@ struct euc{
          TRot r = ( b * a ) ; //cout << r << endl;
          r[0] += 1;  
          if (!FERROR(n)) r /= n;
-         if ( r == TRot() ) {  return TRot(1); }//else cout << r << endl; //printf("0 in gen::ratio\n");
+         if ( r == TRot() ) {  return TRot(1); }//else cout << r << endl; //printf("0 in Gen::ratio\n");
          return r;    
       } 
 
@@ -539,7 +539,7 @@ struct euc{
  * Operations on Round types (Points, Point Pairs, Circles, Spheres, N-Spheres) 
  * @ingroup cgageneric
  */
- struct round {                          
+ struct Round {                          
 
    /*! Null Point from Arbitrary Multivector 
    */   
@@ -646,7 +646,7 @@ struct euc{
    /*!
     Simple Center of A Round Element (shorthand)
     
-    @sa cga::round::cen
+    @sa cga::Round::cen
    */
     template<class A, class B>
     static constexpr GAPnt<A>
@@ -862,8 +862,8 @@ struct euc{
      static constexpr auto
      real(const A& s) RETURNS (
          produce( 
-                round::dls( round::loc( s ), -round::rad( round::sur( s ) ) ), 
-                typename A::space::origin(-1) <= round::dir( s ) 
+                Round::dls( Round::loc( s ), -Round::rad( Round::sur( s ) ) ), 
+                typename A::space::origin(-1) <= Round::dir( s ) 
               )
      )
 
@@ -875,8 +875,8 @@ struct euc{
      static constexpr auto
      imag(const A& s) RETURNS (
          produce( 
-                round::dls( round::loc( s ), round::rad( round::sur( s ) ) ), 
-                typename A::space::origin(-1) <= round::dir( s ) 
+                Round::dls( Round::loc( s ), Round::rad( Round::sur( s ) ) ), 
+                typename A::space::origin(-1) <= Round::dir( s ) 
               )
      )
      /*!
@@ -926,7 +926,7 @@ struct euc{
         using TBIV = GABiv<A>;
     
         GADll<A> axis = (GAInf<A>(1) <= c).runit();        
-        return GAVec<A>::x.sp( nga::gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() ) * nga::gen::rot(TBIV::xz * theta) );    
+        return GAVec<A>::x.sp( nga::Gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() ) * nga::Gen::rot(TBIV::xz * theta) );    
     }    
 
 
@@ -938,11 +938,11 @@ struct euc{
         using TVEC = GAVec<A>;
     
         //NDll<DIM> axis = (NInf<DIM>(-1) <= c).runit();      
-        //NRot<DIM> rot = gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() );
-       // NVec<DIM> vec = NVec<DIM>::x.sp( rot * gen::rot(TBIV::xz * t/2.0)); //BIG CHANGE . . .
-        auto normal = TVEC( round::carrier(c).dual() ).unit();
-        auto rot = nga::gen::ratio( TVEC::z, normal );
-        auto vec = TVEC::x.spin( nga::gen::rot( TBIV::xy.spin( rot ) * t/2.0 ) * rot ); 
+        //NRot<DIM> rot = Gen::ratio( TBIV::xz.duale(), TBIV(axis).duale() );
+       // NVec<DIM> vec = NVec<DIM>::x.sp( rot * Gen::rot(TBIV::xz * t/2.0)); //BIG CHANGE . . .
+        auto normal = TVEC( Round::carrier(c).dual() ).unit();
+        auto rot = nga::Gen::ratio( TVEC::z, normal );
+        auto vec = TVEC::x.spin( nga::Gen::rot( TBIV::xy.spin( rot ) * t/2.0 ) * rot ); 
                     
         return produce( sur( c ), vec );
    }       
@@ -978,7 +978,7 @@ struct euc{
      e.g. Line, DualLine, Plane, DualPlane, FlatPoint
   *
   */
-  struct flat {          
+  struct Flat {          
 
     /*! Direction of Direct Flat 
           @param Direct Flat [ Plane (Pln) or Line (Lin) ]
@@ -1045,13 +1045,13 @@ struct euc{
       /*! Direct Line at origin with coordinate v ... */
       template<typename ...T>
       static constexpr NLin<sizeof...(T)+2> line( T ... v ){
-        return nga::round::null( NVec<sizeof...(T)+2>() ) ^ nga::round::null(v...) ^ NInf<sizeof...(T)+2>(1);
+        return nga::Round::null( NVec<sizeof...(T)+2>() ) ^ nga::Round::null(v...) ^ NInf<sizeof...(T)+2>(1);
       }
 
       /*! Direct hyperbolic d-Line at origin with coordinate v ... */
       template<typename ...T>
       static constexpr NCir<sizeof...(T)+2> dline( T ... v ){
-        return nga::round::null( NVec<sizeof...(T)+2>() ) ^ nga::round::null(v...) ^ nga::round::dls(NVec<sizeof...(T)+2>(), 1.0 );
+        return nga::Round::null( NVec<sizeof...(T)+2>() ) ^ nga::Round::null(v...) ^ nga::Round::dls(NVec<sizeof...(T)+2>(), 1.0 );
       }
 
 
@@ -1063,10 +1063,10 @@ struct euc{
    *  Generic ND Operations on a @ref tangent
       @ingroup cgageneric
 
-      @sa vsr::cga::tangent for 3D case
+      @sa vsr::cga::Tangent for 3D case
       *
    */
-   struct tangent {
+   struct Tangent {
 
 //    /*! Direction of Tangent Element (similar formulation to Rounds) 
 //        @ingroup direction
@@ -1104,7 +1104,7 @@ struct euc{
     template<class A>
     static typename A::value_t wt(const A& s){
         using TOri = typename A::space::origin;
-        return ( TOri(1) <= round::dir(s) ).wt();
+        return ( TOri(1) <= Round::dir(s) ).wt();
     }
       
    };
@@ -1116,73 +1116,72 @@ struct euc{
  //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
  template<class Algebra, class B>
  Multivector<Algebra, typename Algebra::vector> Multivector<Algebra,B>::null() const{
-   return nga::round::null(*this);
+   return nga::Round::null(*this);
  } 
   
  template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::rot(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::rot(t) );
+   return this->sp( nga::Gen::rot(t) );
  } 
  template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::rotate(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::rot(t) );
+   return this->sp( nga::Gen::rot(t) );
  } 
 
  template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::trs(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::trs(t) );
+   return this->sp( nga::Gen::trs(t) );
  } 
  template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::translate(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::trs(t) );
+   return this->sp( nga::Gen::trs(t) );
  } 
 
 
  template<class Algebra, class B> template<class ... Ts>
  Multivector<Algebra,B> Multivector<Algebra,B>::trs(Ts ... v) const{
-   return this->sp( nga::gen::trs( GADrv<Algebra>(v...) ) );
+   return this->sp( nga::Gen::trs( GADrv<Algebra>(v...) ) );
  } 
   template<class Algebra, class B> template<class ... Ts>
  Multivector<Algebra,B> Multivector<Algebra,B>::translate(Ts ... v) const{
-   return this->sp( nga::gen::trs( GADrv<Algebra>(v...) ) );
+   return this->sp( nga::Gen::trs( GADrv<Algebra>(v...) ) );
  } 
 
   template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::trv(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::trv(t) );
+   return this->sp( nga::Gen::trv(t) );
  } 
    template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::transverse(const Multivector<Algebra,A>& t) const{
-   return this->sp( nga::gen::trv(t) );
+   return this->sp( nga::Gen::trv(t) );
  } 
 
  template<class Algebra, class B> template<class ... Ts>
  Multivector<Algebra,B> Multivector<Algebra,B>::trv(Ts ... v) const{
-   return this->sp( nga::gen::trv( GATrv<Algebra>(v...) ) );
+   return this->sp( nga::Gen::trv( GATrv<Algebra>(v...) ) );
  } 
   template<class Algebra, class B> template<class ... Ts>
  Multivector<Algebra,B> Multivector<Algebra,B>::transverse(Ts ... v) const{
-   return this->sp( nga::gen::trv( GATrv<Algebra>(v...) ) );
+   return this->sp( nga::Gen::trv( GATrv<Algebra>(v...) ) );
  } 
      
    template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::dil(const Multivector<Algebra,A>& s, VSR_PRECISION t) const{
-   return this->sp( nga::gen::dil(s,t) );
+   return this->sp( nga::Gen::dil(s,t) );
  } 
    template<class Algebra, class B> template<class A>
  Multivector<Algebra,B> Multivector<Algebra,B>::dilate(const Multivector<Algebra,A>& s, VSR_PRECISION t) const{
-   return this->sp( nga::gen::dil(s,t) );
+   return this->sp( nga::Gen::dil(s,t) );
  } 
  
  template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::bst( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( nga::gen::bst(t) );  
+     return this -> sp ( nga::Gen::bst(t) );  
 } 
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::boost( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( nga::gen::bst(t) );  
+     return this -> sp ( nga::Gen::bst(t) );  
 } 
-
 
 
 

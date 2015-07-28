@@ -54,7 +54,7 @@ struct MyApp : App {
     Draw(ca);
     Draw(cb);
 
-    auto plunge = ca.dual() ^ round::surround(cb);
+    auto plunge = ca.dual() ^ Round::surround(cb);
 
     auto ref1 = ca.reflect(cb);
     auto ref2 = cb.reflect(ca);

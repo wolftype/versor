@@ -71,19 +71,19 @@ struct MyApp : App {
 
     for (int i = 0;i < p.num();++i ){
       
-      auto dist = 1.0 / (.01 + round::dist(p.grid(i),f.pos()));
+      auto dist = 1.0 / (.01 + Round::dist(p.grid(i),f.pos()));
 
-     auto motor = gen::mot( Twist::Along( f.dlz(), theta, amt) * dist );
-     auto boost = gen::boost( f.tz() * amt * dist );
+     auto motor = Gen::mot( Twist::Along( f.dlz(), theta, amt) * dist );
+     auto boost = Gen::boost( f.tz() * amt * dist );
 
-      auto pa = round::loc( p.grid(i).spin( motor ));
-      auto pb = round::loc ( p.grid(i).spin( boost ));
+      auto pa = Round::loc( p.grid(i).spin( motor ));
+      auto pb = Round::loc ( p.grid(i).spin( boost ));
 
       auto ta = p[i].spin(motor);
       auto tb = p[i].spin(boost);
 
-      if (bDrawMotor) DrawAt( -round::dir(ta), pa );
-      if (bDrawBoost) DrawAt( -round::dir(tb), pb );
+      if (bDrawMotor) DrawAt( -Round::dir(ta), pa );
+      if (bDrawBoost) DrawAt( -Round::dir(tb), pb );
     }
 
     Draw(f); 

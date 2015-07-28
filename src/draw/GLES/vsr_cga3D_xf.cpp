@@ -27,7 +27,7 @@ namespace vsr {
     namespace xf {
        
          using namespace vsr::cga; 
-         using vsr::cga::op;
+         using vsr::cga::Op;
          
         /*!
          4x4 Transformation Matrix From Rotor
@@ -111,15 +111,15 @@ namespace vsr {
         4x4 Transformation matrix from Vector (translate to end of vector and rotate)
         */
         gfx::Mat4f mat(const Vec& v){
-            Rot r = gen::ratio( Vec::z, v.unit() );  
+            Rot r = Gen::ratio( Vec::z, v.unit() );  
             return mat( r, v );
         }    
 
         gfx::Mat4f mat(const Biv& b){
-          Rot r = gen::ratio( Vec::z, op::dle( b ).unit() );
+          Rot r = Gen::ratio( Vec::z, Op::dle( b ).unit() );
 
           double ta = b.norm();  
-        // bool sn = op::sn( s , Biv::xy * (-1));
+        // bool sn = Op::sn( s , Biv::xy * (-1));
     
          return mat( r, Vec(0,0,0), ta );
        }
@@ -128,10 +128,10 @@ namespace vsr {
         4x4 Transformation matrix from Circle
         */
        gfx::Mat4f mat(const Cir& s){
-            Biv b = round::dir( s ).copy<Biv>(); // Get Direction 
-            Rot r = gen::ratio( Vec::z, op::dle(b).unit() );
-            Vec v = round::loc(s);
-            VSR_PRECISION scale = round::rad( s ); 
+            Biv b = Round::dir( s ).copy<Biv>(); // Get Direction 
+            Rot r = Gen::ratio( Vec::z, Op::dle(b).unit() );
+            Vec v = Round::loc(s);
+            VSR_PRECISION scale = Round::rad( s ); 
             // printf("rad: %f\n", scale);
             return mat(r,v,scale);//,scale
         }    
@@ -140,8 +140,8 @@ namespace vsr {
           Transformation matrix from dual plane
         */                                       
         gfx::Mat4f mat(const Dlp& dlp){      
-          Dls v = flat::loc( dlp , PAO, true );
-          Rot r = gen::ratio( Vec::z, Vec( dlp ).unit() );
+          Dls v = Flat::loc( dlp , PAO, true );
+          Rot r = Gen::ratio( Vec::z, Vec( dlp ).unit() );
           return mat(r, Vec(v));
         }
       
@@ -150,7 +150,7 @@ namespace vsr {
         */
         gfx::Mat4f mat(const Dls& v, VSR_PRECISION s){
 
-          Pnt p = round::cen( v );
+          Pnt p = Round::cen( v );
           return mat( Vec(p), s );     
         }
 
@@ -159,8 +159,8 @@ namespace vsr {
         */
         gfx::Mat4f mat(const Dls& v ){
     
-          VSR_PRECISION ta = round::size( v, true );    
-          Pnt p = round::cen( v );
+          VSR_PRECISION ta = Round::size( v, true );    
+          Pnt p = Round::cen( v );
           return mat( Vec(p), sqrt( fabs(ta) ) ); 
         }   
         
@@ -169,8 +169,8 @@ namespace vsr {
         */
         gfx::Mat4f mat(const Dll& v ){
           Biv d = v.unit();
-          Rot r = gen::ratio( Vec::z, op::dle(d) );
-          Dls s = flat::loc( v , PAO, true); 
+          Rot r = Gen::ratio( Vec::z, Op::dle(d) );
+          Dls s = Flat::loc( v , PAO, true); 
           return mat( r, Vec(s) );
         }  
     
@@ -178,9 +178,9 @@ namespace vsr {
         4x4 Transformation matrix from direct line 
         */
         gfx::Mat4f mat(const Lin& v ){
-          Drv d = flat::dir(v);
-          Rot r = gen::ratio( Vec::z, d.copy<Vec>().unit() );
-          Dls s = flat::loc( v , PAO, false); 
+          Drv d = Flat::dir(v);
+          Rot r = Gen::ratio( Vec::z, d.copy<Vec>().unit() );
+          Dls s = Flat::loc( v , PAO, false); 
           return mat( r, Vec(s) );
         }
 

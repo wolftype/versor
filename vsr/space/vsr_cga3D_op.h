@@ -28,10 +28,10 @@ namespace vsr{ namespace cga{
 
    Operations for 3D CGA
    
-   In many cases (e.g. gen::rotor ) these just call the @ref generic nga::gen versions,
+   In many cases (e.g. Gen::rotor ) these just call the @ref generic nga::gen versions,
    however these 3D implementations are compiled into the libvsr.a library.
    
-   In some cases (e.g. gen::motor ) there is no generic equivalent implemented
+   In some cases (e.g. Gen::motor ) there is no generic equivalent implemented
 
    \sa @ref generic implementation in the vsr::nga namespace 
  */
@@ -43,7 +43,7 @@ namespace vsr{ namespace cga{
       @todo separate out the AA and Pos methods
       @todo eliminate redundancy
     */
-    struct op{
+    struct Op{
               
       static Rot AA( const Vec& s);   ///< axis angle from Vec stored in rotor             
       static Rot AA( const Dlp& s);   ///< axis angle from Dlp stored in rotor 
@@ -114,9 +114,9 @@ namespace vsr{ namespace cga{
    /**
    * @brief Generators and Logarithms Optimized for 3D Conformal Geometric Algebra
      @ingroup cgaops
-     @sa vsr::nga::gen for @ref generic implementation details
+     @sa vsr::nga::Gen for @ref generic implementation details
    */
-   struct gen{  
+   struct Gen{  
 
       /// vsr::cga::Rotor from vsr::cga::Bivector
       static Rot rot( const Biv& b);
@@ -133,16 +133,16 @@ namespace vsr{ namespace cga{
 
       /// vsr::cga::Translator from any type 
       template<class A>
-      static Trs trs(const A& a) { return nga::gen::trs(a); }
+      static Trs trs(const A& a) { return nga::Gen::trs(a); }
       /// vsr::cga::Translator from any type 
       template<class A>
-      static Trs translator(const A& a) { return nga::gen::trs(a); }
+      static Trs translator(const A& a) { return nga::Gen::trs(a); }
       /// vsr::cga::Transversor from any type
       template<class A>
-      static Trv trv(const A& a){ return nga::gen::trv(a); }
+      static Trv trv(const A& a){ return nga::Gen::trv(a); }
       /// vsr::cga::Transversor from any type
       template<class A>
-      static Trv transversor(const A& a){ return nga::gen::trv(a); }
+      static Trv transversor(const A& a){ return nga::Gen::trv(a); }
 
 
       /// vsr::cga::Rotor that takes one vec to another
@@ -225,8 +225,8 @@ namespace vsr{ namespace cga{
       */
       template <class A, class T>
       static Bst bst(const A& tnv, const Vec& vec, T t){
-          Par s = Par( tnv.template copy<Tnv>() ).sp( nga::gen::trs(vec) ); 
-          return gen::bst(s * t);
+          Par s = Par( tnv.template copy<Tnv>() ).sp( nga::Gen::trs(vec) ); 
+          return Gen::bst(s * t);
       }
  
       
@@ -539,7 +539,7 @@ namespace vsr{ namespace cga{
      *  \brief  Point on line closest to another point v
      */
     auto pointOnLine = []( const Line& lin, const Point& v){
-      return round::null( flat::loc( lin, v, false) );
+      return Round::null( Flat::loc( lin, v, false) );
     };    
 
     /// a single point on circle c at theta t 
@@ -556,7 +556,7 @@ namespace vsr{ namespace cga{
     };
     /// a pair on dual sphere
     auto pairOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-     return construct::pair(s, Vec::x.sp( gen::rot(t,p) ) );
+     return construct::pair(s, Vec::x.sp( Gen::rot(t,p) ) );
     };
     /// a single point on dual sphere s at theta t and phi p
     auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
@@ -584,15 +584,15 @@ namespace vsr{ namespace cga{
 
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::mot( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::gen::mot(t) );  
+     return this -> sp ( cga::Gen::mot(t) );  
 } 
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::motor( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::gen::mot(t) );  
+     return this -> sp ( cga::Gen::mot(t) );  
 } 
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::gen::mot(t) );  
+     return this -> sp ( cga::Gen::mot(t) );  
 } 
     
 
@@ -607,14 +607,14 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 #define E3 e3(1)
 
 /// A vsr::cga::Point at coordinates x,y,z
-#define PT(x,y,z) vsr::cga::round::null(vsr::cga::Vec(x,y,z))
+#define PT(x,y,z) vsr::cga::Round::null(vsr::cga::Vec(x,y,z))
 /// A vsr::cga::DualSphere at (0,0,0) with radius r
-#define DLS(r) vsr::cga::round::dls(0,0,0,r)
+#define DLS(r) vsr::cga::Round::dls(0,0,0,r)
 
-#define PV(v) vsr::cga::round::null(v)
-#define PX(f) vsr::cga::round::null(vsr::cga::Vec(f,0,0))
-#define PY(f) vsr::cga::round::null(vsr::cga::Vec(0,f,0))
-#define PZ(f) vsr::cga::round::null(vsr::cga::Vec(0,0,f))
+#define PV(v) vsr::cga::Round::null(v)
+#define PX(f) vsr::cga::Round::null(vsr::cga::Vec(f,0,0))
+#define PY(f) vsr::cga::Round::null(vsr::cga::Vec(0,f,0))
+#define PZ(f) vsr::cga::Round::null(vsr::cga::Vec(0,0,f))
 
 /// A vsr::cga::Pair of points at x,y,z and -x,-y,-z
 #define PAIR(x,y,z) (PT(x,y,z)^PT(-x,-y,-z))
@@ -630,7 +630,7 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 /// vsr::cga::Line through origin in direction x,y,z
 #define LN(x,y,z) ( vsr::cga::Point(0,0,0,1,.5)^PT(x,y,z)^vsr::cga::Inf(1) )
 /// vsr::cga::DualLine through origin in direction x,y,z
-#define DLN(x,y,z) ( vsr::op::dl(LN(x,y,z)) )
+#define DLN(x,y,z) ( vsr::Op::dl(LN(x,y,z)) )
 #define PAO vsr::cga::Point(0,0,0,1,0)   ///< vsr::cga::Point At Origin
 #define EP vsr::cga::Dls(0,0,0,1,-.5)    ///< unit vsr::cga::DualSphere at origin: swap with infinity for hyperbolic space
 #define EM vsr::cga::Dls(0,0,0,1,.5)     ///< unit imaginary vsr::cga::DualSphere at origin: swap with infinity for spherical space
@@ -639,7 +639,7 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 #define SPHERICAL_INF EM
 #define EUCLIDEAN_INF INFTY
 #define HLN(x,y,z) (vsr::cga::Ori(1)^PT(x,y,z)^EP) //hyperbolic line (circle)
-#define HDLN(x,y,z) (vsr::op::dl(HLN(x,y,z)))
+#define HDLN(x,y,z) (vsr::Op::dl(HLN(x,y,z)))
 
 /**  @} */
 

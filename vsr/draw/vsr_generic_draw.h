@@ -19,13 +19,13 @@ namespace vsr{
 	               
   template<class A>
 	GARot<A> AA( const GAVec<A>& s){
-     GARot<A> r = gen::ratio( GAVec<A>::z, s.unit() ); 
-     return nga::gen::aa(r);
+     GARot<A> r = Gen::ratio( GAVec<A>::z, s.unit() ); 
+     return nga::Gen::aa(r);
   }                                  
 
 //  template<bits::type DIM>
 //   NERot<DIM> AA( const NEBiv<DIM>& s){   
-//		return nga::gen::aa( gen::ratio( NEVec<DIM>::z, s.dual().unit() ) ); 
+//		return nga::Gen::aa( Gen::ratio( NEVec<DIM>::z, s.dual().unit() ) ); 
 //	}
 
   template<class T>
@@ -62,7 +62,7 @@ namespace vsr{
   template<class A>
   void Immediate (const GABiv<A>& s){  
 		double ta = s.norm(); 
-	    bool sn = nga::op::sn( s , GABiv<A>::xy * (-1));
+	    bool sn = nga::Op::sn( s , GABiv<A>::xy * (-1));
 	
 		glPushMatrix();	
 			gfx::GL::rotate( AA(s).begin() );  
@@ -72,18 +72,18 @@ namespace vsr{
 	
 	template<class A> 
 	GARot<A> AA( const GACir<A>& s){
-		GABiv<A> b = nga::round::dir( s ).template copy< GABiv<A> >();               
-    GARot<A> r = gen::ratio(GAVec<A>::z, nga::op::dle( b ).unit() ); 
-    return nga::gen::aa(r);
+		GABiv<A> b = nga::Round::dir( s ).template copy< GABiv<A> >();               
+    GARot<A> r = Gen::ratio(GAVec<A>::z, nga::Op::dle( b ).unit() ); 
+    return nga::Gen::aa(r);
   }
 	    
 	template<class A>  
 	void Immediate( const GACir<A>& s )	{  
-		VSR_PRECISION rad = nga::round::rad( s );
-	    bool im = nga::round::size(s, false) > 0 ? 1 : 0;  
+		VSR_PRECISION rad = nga::Round::rad( s );
+	    bool im = nga::Round::size(s, false) > 0 ? 1 : 0;  
 		 
 		//AA(s).vprint();
-		gfx::GL::translate(  nga::round::loc(s).begin() );
+		gfx::GL::translate(  nga::Round::loc(s).begin() );
 		gfx::GL::rotate( AA(s).begin() ); 
 
 			im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
@@ -91,8 +91,8 @@ namespace vsr{
 	                               
 	template<class A>
 	void Immediate (const GALin<A>& s){
-	    GADrv<A> d = nga::flat::dir( s );
-	    GADls<A> v = nga::flat::loc( s , nga::round::null( GAVec<A>() ), false);
+	    GADrv<A> d = nga::Flat::dir( s );
+	    GADls<A> v = nga::Flat::loc( s , nga::Round::null( GAVec<A>() ), false);
 	    gfx::GL::translate (v.begin());
 	    gfx::Glyph::Line(d * 10, d * -10);	
 	}
@@ -100,14 +100,14 @@ namespace vsr{
 	template<class A>
 	void Immediate (const GAPnt<A>& s){
  
-	    VSR_PRECISION ta = nga::round::size( s, true );
+	    VSR_PRECISION ta = nga::Round::size( s, true );
 
 	    //Draw as dual Sphere (if |radius^2| > 0.000001);
 	    if ( fabs(ta) >  FPERROR ) {
 		   // printf("spehere!!!!!!!!!!!!!!!!!!!!\n");
 	        bool real = ta > 0 ? 1 : 0;	
 
-	        GAPnt<A> p = nga::round::cen( s );
+	        GAPnt<A> p = nga::Round::cen( s );
 	        VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
 	        gfx::GL::translate ( p.begin() );
@@ -121,15 +121,15 @@ namespace vsr{
      template<class A> 
      void Immediate (const GAPar<A>& s){
 	        //Is Imaginary?
-	        VSR_PRECISION size = nga::round::size( s, false );
+	        VSR_PRECISION size = nga::Round::size( s, false );
 		  //  printf("size: %fn", size);
-	        std::vector< GAPnt<A> > pp = nga::round::split( s );
+	        std::vector< GAPnt<A> > pp = nga::Round::split( s );
 
-	        VSR_PRECISION ta = nga::round::size( pp[0], true );   
+	        VSR_PRECISION ta = nga::Round::size( pp[0], true );   
 	                                     
 	        if ( fabs(ta) >  FPERROR ) {    
-	            GAPnt<A> p1 = nga::round::cen( pp[0] );
-	            GAPnt<A> p2 = nga::round::cen( pp[1] );
+	            GAPnt<A> p1 = nga::Round::cen( pp[0] );
+	            GAPnt<A> p2 = nga::Round::cen( pp[1] );
 	            double t = sqrt ( fabs ( ta ) );
 	            bool real = size > 0 ? 1 : 0;	
 

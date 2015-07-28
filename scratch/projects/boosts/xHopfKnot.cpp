@@ -62,7 +62,7 @@ struct MyApp : App {
     tk.P = mP; tk.Q = mQ;  
     tk.HF.vec() = -Vec::y.rot( Biv::xy * theta );
     
-    tk.calc0( round::null(amt,0,0) );
+    tk.calc0( Round::null(amt,0,0) );
 
     for (auto& i: tk.pnt ){
        Vec v = Vec(i).unit();

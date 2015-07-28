@@ -215,7 +215,7 @@ struct Simplicial2 {
 
   
   Point center(){
-    return round::loc( round::null(0,0,0) ^ round::null(ea) ^ round::null(eb));
+    return Round::loc( Round::null(0,0,0) ^ Round::null(ea) ^ Round::null(eb));
   }
 
   //assumes s is next ccw, with shared edge eb

@@ -35,7 +35,7 @@ namespace gfx{
   //triangle and normal
   template<class T>
   void TriNormal( const T& a, const T& b, const T& c, bool cc = false ){
-    gfx::GL::normal( cga::round::dir( a^ ( !cc ? ( b^c ) : (c^b) ) ).template copy<cga::Biv>().duale().unit() );
+    gfx::GL::normal( cga::Round::dir( a^ ( !cc ? ( b^c ) : (c^b) ) ).template copy<cga::Biv>().duale().unit() );
     gfx::GL::Tri( a, b, c );
   }
 
@@ -76,8 +76,8 @@ namespace gfx{
 //    Draw( a ^ b.dual() , .2, 0, 1);
 //    Draw( a.dual() ^ b.dual(), .2, .5, .7 );
 //    Draw( a.dual() <= b.dual(), .4, .3, .6 );
-//    Draw( A( op::project(a,b) ),1,0,1,.2 );
-//    Draw( A( op::reject(a,b) ),1,1,0,.2 );
+//    Draw( A( Op::project(a,b) ),1,0,1,.2 );
+//    Draw( A( Op::reject(a,b) ),1,1,0,.2 );
 //
 //  }
 //

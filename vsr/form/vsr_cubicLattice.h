@@ -474,7 +474,7 @@ namespace vsr {
             LPnt c = mPoint[ p.c ];//gridAt ( iw + 1, ih + 1, 0 );
             LPnt d = mPoint[ p.d ];//gridAt ( iw, ih + 1, 0 );
             
-            return nga::round::null( Interp::surface<LPnt>( a,b,c,d, p.rw, p.rh) ) ;       
+            return nga::Round::null( Interp::surface<LPnt>( a,b,c,d, p.rw, p.rh) ) ;       
         }   
 
         LPnt surfGrid(double u, double v) { return surfPnt(u,v); }
@@ -503,7 +503,7 @@ namespace vsr {
             LPnt b = grid( idx (  iw + 1, ih, 0 ));
             LPnt c = grid( idx (  iw + 1, ih + 1, 0 ));
             
-            return nga::round::null( Interp::surface<LPnt> (a,b,c,d, rw, rh) );       
+            return nga::Round::null( Interp::surface<LPnt> (a,b,c,d, rw, rh) );       
         }
 
         vector<int>& face() { return mFace; }

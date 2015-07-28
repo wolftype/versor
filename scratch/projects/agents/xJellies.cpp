@@ -228,7 +228,7 @@ void Population::init(){
       if (!i) i = new Organism();
       i->population(this);
       i->pos() = point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range) ); 
-      i->rot() = gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );   
+      i->rot() = Gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );   
     }
 }
 
@@ -252,7 +252,7 @@ void Population::buildNeighborhoods() {
          float halfplane = (fb.pos() <= fa.dxy())[0];               ///<-- on which side of fa's half-plane is fb?
          if ( halfplane > 0 ){                                      ///<-- if fb is in front of fa, fa can "see it"
            
-           float dist = round::sqd( fa.bound(), fb.bound() );       ///<-- distance between fa and fb
+           float dist = Round::sqd( fa.bound(), fb.bound() );       ///<-- distance between fa and fb
            if (dist < minDistance) fa.neighborhood().toonear.push_back( {mb,dist} );   ///<-- if distance is less than min threshold fb is too near
            else if (dist < maxDistance) fa.neighborhood().nearest.push_back( {mb,dist} );               ///<-- if distance is below max threshhold then add to nearest
            if (fa.neighborhood().nearest.size() > maxNeighbors || fa.neighborhood().toonear.size() > maxNeighbors ) break;       //<-- stop after max # nearest neighbors

@@ -72,8 +72,8 @@ struct MyApp : App {
 
     for (int i=0;i<10;++i){
       Motor m = frameA.relMotor(frameB);                 //<-- motor transformation taking frameA to frameB
-      DualLine dll = gen::log(m) * (float)i/10;          //<-- bivector generator of that
-      Draw( Frame( gen::mot(dll) * frameA.mot() ) );     //<-- new frame from frameA and transformation
+      DualLine dll = Gen::log(m) * (float)i/10;          //<-- bivector generator of that
+      Draw( Frame( Gen::mot(dll) * frameA.mot() ) );     //<-- new frame from frameA and transformation
     }
     
     Draw(frameA);

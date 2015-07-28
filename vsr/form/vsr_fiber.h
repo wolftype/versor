@@ -61,11 +61,11 @@ namespace vsr{ namespace cga {
             double ptheta = PIOVERTWO * theta;
             double pphi = phi+.5;
 
-            Vec v = Vec::x.rot( Biv::xz * ptheta ) / round::rad(mCir);
-            Lin lim = mCir.sp( gen::trv( v ) );                                      //<-- Circle to a Line (Limit)
-            Mot mot = gen::ratio( lim.dual().runit(), dll(), pphi);
+            Vec v = Vec::x.rot( Biv::xz * ptheta ) / Round::rad(mCir);
+            Lin lim = mCir.sp( Gen::trv( v ) );                                      //<-- Circle to a Line (Limit)
+            Mot mot = Gen::ratio( lim.dual().runit(), dll(), pphi);
             
-            return mot * gen::trv(v * pphi ) ; 
+            return mot * Gen::trv(v * pphi ) ; 
         }
         
         //boost only no twist
@@ -74,7 +74,7 @@ namespace vsr{ namespace cga {
             double ptheta = PIOVERTWO * theta;
         
             Vec v = Vec::x.rot( Biv::xz * ptheta );
-            return  gen::trv(v * phi ); 
+            return  Gen::trv(v * phi ); 
         }
     
         //twist only
@@ -83,8 +83,8 @@ namespace vsr{ namespace cga {
             double ptheta = PIOVERTWO * theta;
 
             Vec v = Vec::x.rot( Biv::xz * ptheta );
-            Lin lim = mCir.sp( gen::trv(v.unit()) ); 
-            return gen::ratio( lim.dual().runit(), dll(), phi );
+            Lin lim = mCir.sp( Gen::trv(v.unit()) ); 
+            return Gen::ratio( lim.dual().runit(), dll(), phi );
         }
        
         /** Feed in Coordinates of a 2-Sphere, get 3-Sphere Fiber out */ 
@@ -96,23 +96,23 @@ namespace vsr{ namespace cga {
 
             //Divide by Radius
             //Vector of Circle
-            Vec v = round::vec( mCir, ptheta ) / round::rad(mCir);
+            Vec v = Round::vec( mCir, ptheta ) / Round::rad(mCir);
             
 //            v.vprint();
-//            Vector v = Vec::x.rot( Biv::xz * ptheta ) / round::rad(mCir);
+//            Vector v = Vec::x.rot( Biv::xz * ptheta ) / Round::rad(mCir);
             
-            Vec c = round::loc(mCir);
+            Vec c = Round::loc(mCir);
       
-            Bst bst = gen::bst( v, c , 1 );
+            Bst bst = Gen::bst( v, c , 1 );
        // bst.vprint();
       
             Lin lim = mCir.sp( bst );                                      //<-- Circle to a Line (Limit)
 //            lim.vprint();
-            Mot mot = gen::ratio( lim.dual().runit(), dll(), pphi);
+            Mot mot = Gen::ratio( lim.dual().runit(), dll(), pphi);
             
 
 
-            return mCir.sp( mot * gen::bst(v ,c , pphi )  ) ; 
+            return mCir.sp( mot * Gen::bst(v ,c , pphi )  ) ; 
             
         }
         
@@ -129,7 +129,7 @@ namespace vsr{ namespace cga {
         Lin lim(double theta){
             double ptheta = PIOVERTWO * theta;
             Vec v = Vec::x.rot( Biv::xz * ptheta );
-            return mCir.sp( gen::trv(v) );  
+            return mCir.sp( Gen::trv(v) );  
         }
         
         vector<Cir> poles(double theta, double phi){
@@ -142,12 +142,12 @@ namespace vsr{ namespace cga {
         }
         
         Pnt phase(double theta, double phi, double phs){
-            return round::point( fiber(theta,phi), phs * PI);
+            return Round::point( fiber(theta,phi), phs * PI);
         }
        
         
         Pnt pnt(){
-            return round::point( fiberA(), mPhase * PI ); 
+            return Round::point( fiberA(), mPhase * PI ); 
         }
         
     };

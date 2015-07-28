@@ -62,7 +62,7 @@ struct MyApp : App {
     
     timer += .01;
 
-    Draw( tcir.spin( gen::bst( cir.dual() * timer ) ), 0, 1, 0 );
+    Draw( tcir.spin( Gen::bst( cir.dual() * timer ) ), 0, 1, 0 );
 
   }
   

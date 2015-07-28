@@ -109,12 +109,12 @@ struct MyApp : App {
         
       mouse = calcMouse3D();
 
-      Pnt vertex = round::null(amtB,amt,0);
+      Pnt vertex = Round::null(amtB,amt,0);
       int num = vNum;
       vector<Pnt> nbr;
       for (int i=0; i<num;++i){
         float t = (float)i/num;
-        nbr.push_back( round::null( Vec::x.rot( Biv::xz * ( PI  + PIOVERTWO * t ) )  ));// + PIOVERTWO * t
+        nbr.push_back( Round::null( Vec::x.rot( Biv::xz * ( PI  + PIOVERTWO * t ) )  ));// + PIOVERTWO * t
         Draw(nbr[i],1,0,0);
       }
 
@@ -128,7 +128,7 @@ struct MyApp : App {
        // auto trp = rframe( nbr[i], vertex ) + Inf(amtC) ;//,nbr[next])[0];
        // auto trp = rframe(vertex, nbr[i], nbr[next] )[0] + Inf(amtC);
         auto trp = rframe( vertex, nbr[i] );//, nbr[next] )[0] ;
-        trp =  bNormalize ? round::cen(trp) : trp;// /= ( bNormalize ? trp.norm() : 1);
+        trp =  bNormalize ? Round::cen(trp) : trp;// /= ( bNormalize ? trp.norm() : 1);
         rp.push_back( trp );
         if(bDrawRecip) Draw( trp , 0,1,1,.4);//+ Inf(amtA)
       }
@@ -141,7 +141,7 @@ struct MyApp : App {
 
       cout << sum.rnorm() << endl;
       sum.print();
-      sum = round::cen(sum);
+      sum = Round::cen(sum);
       sum.print();
      // Draw(sum,0,0,1,.2);
       DrawAt( Vec(sum), vertex,0,1,1);

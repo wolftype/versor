@@ -100,8 +100,8 @@ struct MyApp : App {
       bDrawOutline ? DrawR_( (Chain)b,0,.5,1) : DrawR( (Chain)b,0,.5,1);
       
       if (bDrawMeet){
-        auto sphA = round::dls_pnt(b[1].pos(), b.lengthB());
-        auto sphB = round::dls_pnt(b[3].pos(), b.lengthA());
+        auto sphA = Round::dls_pnt(b[1].pos(), b.lengthB());
+        auto sphB = Round::dls_pnt(b[3].pos(), b.lengthA());
         //intersect xy plane of frame with circle
         auto cir = (sphA^sphB);
         Draw(cir.dual(),1,0,1);

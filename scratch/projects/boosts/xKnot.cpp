@@ -72,7 +72,7 @@ struct MyApp : App {
   void setFrame(){
     for(int i=0;i<frame.size();++i){
       float t= -5.0 + 10.0*i/frame.size();
-      frame[i].set( round::null(t,0,0), gen::rot( Biv::xy * Rand::Num() + Biv::xz * Rand::Num() ) );
+      frame[i].set( Round::null(t,0,0), Gen::rot( Biv::xy * Rand::Num() + Biv::xz * Rand::Num() ) );
     }
   }
 
@@ -82,11 +82,11 @@ struct MyApp : App {
        Par par;
        for(int j=0;j<frame.size();++j){
          if (i!=j){
-           auto odist = 1.0 / (.01 + round::dist( frame[i].pos(), frame[j].pos() ) );
+           auto odist = 1.0 / (.01 + Round::dist( frame[i].pos(), frame[j].pos() ) );
            par += tk[j].par() * odist; 
          }
        }
-       bst[i] = gen::bst( par * amt3 );
+       bst[i] = Gen::bst( par * amt3 );
      }
    }
 
@@ -144,7 +144,7 @@ struct MyApp : App {
       for (auto& i : frame){
         v += i.vec();
       }
-      auto target = round::null( v/(float)frame.size() );
+      auto target = Round::null( v/(float)frame.size() );
       Frame cam( Vec(target) + Vec(0,5,15) ); cam.orient(target);       
       scene.camera.set( cam.vec(), cam.quat() );
       

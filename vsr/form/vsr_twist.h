@@ -32,9 +32,9 @@ namespace vsr { namespace cga {
 		
 			Twist() : mExt(1){
 				//Default one unit up per half turn
-				//Mot m = gen::trs3(0,1,0) * gen::rot( Biv(0,PI/2.0,0) );
+				//Mot m = Gen::trs3(0,1,0) * Gen::rot( Biv(0,PI/2.0,0) );
 				//m /= m.rnorm();				
-				//dll( gen::log_mot(m) );
+				//dll( Gen::log_mot(m) );
 				
 				//dll( Dll(0,1,0,0,-1,0) );
 				mBiv = Biv(0,1,0);
@@ -45,7 +45,7 @@ namespace vsr { namespace cga {
 			//pass in 3d axis
       template<class T>
       Twist(const T& axis) : mExt(1) {
-				Biv b = op::dl(axis);
+				Biv b = Op::dl(axis);
 				Drv d = axis * -1 ;
 				mBiv = b;
 				mDrv = d;
@@ -53,7 +53,7 @@ namespace vsr { namespace cga {
 			}
 			
 			Twist(double x, double y, double z): mExt(1) {
-				Biv b = op::dl(Vec(x,y,z));
+				Biv b = Op::dl(Vec(x,y,z));
 				Drv d = Vec(x,y,z) * -1;
 				
 				mBiv = b;
@@ -65,16 +65,16 @@ namespace vsr { namespace cga {
 			/// Direction 
 			template <class T> 
 			void moveBy( const T& vec ){
-				mDll = mDll.sp( gen::trs(vec) );
+				mDll = mDll.sp( Gen::trs(vec) );
 			}
 			
 			Vec vec() { return drv().copy<Vec>(); }
 			
 			/// Set Distance and Period
 			void set( double distance, double period ){
-				Mot m = gen::trs( Vec( drv() ).unit() * distance ) * gen::rot( biv().unit() * period );
+				Mot m = Gen::trs( Vec( drv() ).unit() * distance ) * Gen::rot( biv().unit() * period );
 				m /= m.rnorm();
-				mDll = gen::log( m );
+				mDll = Gen::log( m );
 			}
 			
 			/// Period, i.e frequency, of twist (in PI units)
@@ -82,8 +82,8 @@ namespace vsr { namespace cga {
 			/// Pitch from 0 (othogonal, pure rotation) to 1 ( identical, pure translation )
 			double pitch() const  {  
 				return Vec( drv().copy<Vec>() ).norm();
-				//return op::sca( Vec( mBiv ) <= Vec ( mDrv ) ); 
-				//return op::sca( Vec(mDrv).unit() <= op::dle(mBiv).unit() ); //op::pj( Vec(mDrv), op::dle(mBiv) ).rnorm(); 
+				//return Op::sca( Vec( mBiv ) <= Vec ( mDrv ) ); 
+				//return Op::sca( Vec(mDrv).unit() <= Op::dle(mBiv).unit() ); //Op::pj( Vec(mDrv), Op::dle(mBiv) ).rnorm(); 
 			}
         
 			/// Distance from origin
@@ -97,7 +97,7 @@ namespace vsr { namespace cga {
                 Biv tb(td); //tb *= period;             //Drv tv(td);
                 Drv tv(td);
             
-                Vec dir = op::dle(tb);
+                Vec dir = Op::dle(tb);
                 
                 dll(tb, Drv( tv - (dir * pitch).copy<Drv>() ) );
                 
@@ -111,14 +111,14 @@ namespace vsr { namespace cga {
                 Biv tb(td); //tb *= period;             //Drv tv(td);
                 Drv tv(td);
             
-                Vec dir = op::dle(tb);
+                Vec dir = Op::dle(tb);
                 Drv drv( tv + ( dir * pitch ).copy<Drv>() );
                 
                 return Dll(tb[0], tb[1], tb[2], drv[0], drv[1], drv[2] );
             }
         
-			Rot ratio() const { return gen::ratio( Vec( biv() ), Vec( drv() ) ); }
-			Biv iphi()  const { return op::dle(biv()) ^ Vec(drv()); }
+			Rot ratio() const { return Gen::ratio( Vec( biv() ), Vec( drv() ) ); }
+			Biv iphi()  const { return Op::dle(biv()) ^ Vec(drv()); }
 			Biv pitchPlane() const { return iphi().unit(); }
 			
 			void dll( const Biv& b, const Drv & d) { 
@@ -129,7 +129,7 @@ namespace vsr { namespace cga {
 			Dll dll( double t )	 const { return mDll * t; }			
 			Dll dll() const { return mDll; }
 			Dll& dll() { return mDll; }
-			Mot mot() const { return gen::mot( mDll ); }
+			Mot mot() const { return Gen::mot( mDll ); }
 			
 			Biv biv() const { return Biv(mDll); }
 			Drv drv() const { return Drv(mDll); }
@@ -151,10 +151,10 @@ namespace vsr { namespace cga {
 			}
 			
 			/// Get Motor at t
-			Mot mot( double t ) const { return gen::mot( mDll * t * mExt ); }
+			Mot mot( double t ) const { return Gen::mot( mDll * t * mExt ); }
 			
 			/// Set Twist Axis From Destination Motor
-			void set( const Mot& m){ mDll = gen::log(m); }
+			void set( const Mot& m){ mDll = Gen::log(m); }
 
 			friend ostream& operator << (ostream&, const Twist&);
 	
@@ -217,8 +217,8 @@ namespace vsr { namespace cga {
 			/// Concatenated Motors (x first, then y, then z ) with weight of t
 			Mot mot(double t) { return mTwist[2].mot(t) * mTwist[1].mot(t) * mTwist[0].mot(t); }
 			/// Bivector Generator of motor at t
-			Dll dll(double t) { Mot m = mot(t); m/=m.rnorm(); return gen::log( m ); }
-//			Mot motor(double t) { return gen::mot_dll( dll()*t ); }
+			Dll dll(double t) { Mot m = mot(t); m/=m.rnorm(); return Gen::log( m ); }
+//			Mot motor(double t) { return Gen::mot_dll( dll()*t ); }
 
 			/// Averaged Generators
 			Dll dll() { return (mTwist[0].dll() + mTwist[1].dll() + mTwist[2].dll() ) /3.0; } 

@@ -20,10 +20,10 @@
 namespace vsr{ namespace cga {
 
     Frame::Frame() 
-    : mPos( round::point(0,0,0) ), mRot(1,0,0,0), mScale(1), aBiv(.9), aVec(.9) {}
+    : mPos( Round::point(0,0,0) ), mRot(1,0,0,0), mScale(1), aBiv(.9), aVec(.9) {}
     
     Frame::Frame(VSR_PRECISION  _x, VSR_PRECISION  _y, VSR_PRECISION  _z) 
-    : mPos( round::point(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
+    : mPos( Round::point(_x,_y,_z) ), mRot(1,0,0,0), mScale(1),  aBiv(.9), aVec(.9) {}
 
     Frame::Frame(const Vec& v, const Rotor& r, VSR_PRECISION s ) 
     : mPos( v.null() ), mRot( r ), mScale(s), aBiv(.9), aVec(.9) {} 
@@ -34,7 +34,7 @@ namespace vsr{ namespace cga {
     Frame::Frame(const DualLine& d)
     : mScale(1),  aBiv(.9), aVec(.9) 
     {
-      Motor m = gen::mot( d );
+      Motor m = Gen::mot( d );
       mPos = PAO.sp(m);
       mRot = m;
     }  
@@ -70,14 +70,14 @@ namespace vsr{ namespace cga {
     Dlp Frame::dyz() const  { return y() <= dlz(); }      ///< yz dual plane  
     
     /* Real Pair of Points around Center */
-    Par Frame::px() const { return  round::produce( ibound(), x() ); }       ///< x direction point pair aproduce center
-    Par Frame::py() const { return  round::produce( ibound(), y() );  }      ///< y direction point pair aproduce center
-    Par Frame::pz() const { return round::produce( ibound(),  z() );  }      ///< z direction point pair aproduce center  
+    Par Frame::px() const { return  Round::produce( ibound(), x() ); }       ///< x direction point pair aproduce center
+    Par Frame::py() const { return  Round::produce( ibound(), y() );  }      ///< y direction point pair aproduce center
+    Par Frame::pz() const { return Round::produce( ibound(),  z() );  }      ///< z direction point pair aproduce center  
 
     /* Imaginary Pair */
-    Par Frame::ipx() const { return  round::produce( bound(), x() ); }       ///< x direction imaginary point pair aproduce center
-    Par Frame::ipy() const { return  round::produce( bound(), y() );  }      ///< y direction imaginary point pair aproduce center
-    Par Frame::ipz() const { return round::produce( bound(),  z() );  }      ///< z direction imaginary point pair aproduce center  
+    Par Frame::ipx() const { return  Round::produce( bound(), x() ); }       ///< x direction imaginary point pair aproduce center
+    Par Frame::ipy() const { return  Round::produce( bound(), y() );  }      ///< y direction imaginary point pair aproduce center
+    Par Frame::ipz() const { return Round::produce( bound(),  z() );  }      ///< z direction imaginary point pair aproduce center  
    
     /* Global Tangent as Null Point Pair*/
     Par Frame::tx() const { return Par( x().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
@@ -91,14 +91,14 @@ namespace vsr{ namespace cga {
 
 
     /* Real Circles */
-    Cir Frame::cxy() const { return round::produce( ibound(), xy() ); }     ///< xy circle (real, direct)
-    Cir Frame::cxz() const { return round::produce( ibound(), xz() ); }     ///< xz circle (real, direct)
-    Cir Frame::cyz() const { return round::produce( ibound(), yz() ); }     ///< yz circle (real, direct)
+    Cir Frame::cxy() const { return Round::produce( ibound(), xy() ); }     ///< xy circle (real, direct)
+    Cir Frame::cxz() const { return Round::produce( ibound(), xz() ); }     ///< xz circle (real, direct)
+    Cir Frame::cyz() const { return Round::produce( ibound(), yz() ); }     ///< yz circle (real, direct)
 
     /* Imaginary Circles */
-    Cir Frame::icxy() const { return round::produce( bound(), xy() ); }     ///< xy circle (imaginary, direct)
-    Cir Frame::icxz() const { return round::produce( bound(), xz() ); }     ///< xz circle (imaginary, direct)
-    Cir Frame::icyz() const { return round::produce( bound(), yz() ); }     ///< yz circle (imaginary, direct)
+    Cir Frame::icxy() const { return Round::produce( bound(), xy() ); }     ///< xy circle (imaginary, direct)
+    Cir Frame::icxz() const { return Round::produce( bound(), xz() ); }     ///< xz circle (imaginary, direct)
+    Cir Frame::icyz() const { return Round::produce( bound(), yz() ); }     ///< yz circle (imaginary, direct)
 
     /// Set position and orientation by motor 
     Frame& Frame::mot(const Mot& m) { 
@@ -108,7 +108,7 @@ namespace vsr{ namespace cga {
       } 
 
     /// Generate Translation versor based on Position
-    Trs Frame::trs() const { return gen::trs(mPos); }   
+    Trs Frame::trs() const { return Gen::trs(mPos); }   
           
     /// Get Absolute Motor Relative to Origin 
      Mot Frame::mot() const { 
@@ -122,28 +122,28 @@ namespace vsr{ namespace cga {
     
     /// Dual Sphere Shell
     Dls Frame::bound() const{
-      return round::dls( mPos, mScale );
+      return Round::dls( mPos, mScale );
     }
 
     /// Dual Imaginary Sphere Shell
     Dls Frame::ibound() const{
-      return round::dls( mPos, -mScale );
+      return Round::dls( mPos, -mScale );
     }
     
-    Dll Frame::dll() const { return gen::log( mot() ); }                 ///< DualLine from Motor (for interpolating)  
-    DualLine Frame::dualLine() const { return gen::log( mot() ); }       ///< DualLine from Motor (for interpolating)  
+    Dll Frame::dll() const { return Gen::log( mot() ); }                 ///< DualLine from Motor (for interpolating)  
+    DualLine Frame::dualLine() const { return Gen::log( mot() ); }       ///< DualLine from Motor (for interpolating)  
         
     /// Dilate by t aproduce center
     Frame& Frame::dilate(double t) { 
       Dls s =  bound().dil( bound(), t ) ;
-      mScale = round::rad(s);
+      mScale = Round::rad(s);
       return *this;
     }
 
     /// Dilate by t around some point p 
     Frame& Frame::dilate(const Pnt& p, double t) { 
       Dls s =  bound().dil( p, t ) ;
-      mScale = round::rad(s);
+      mScale = Round::rad(s);
       return *this;
     }
 
@@ -156,21 +156,21 @@ namespace vsr{ namespace cga {
     
     /// Translation Step (translate by velocity vector)
     Frame&  Frame::move() {
-      mPos = (mPos + dVec).null();//.sp( gen::trs(dVec) );
+      mPos = (mPos + dVec).null();//.sp( Gen::trs(dVec) );
       dVec *= aVec; 
       return *this;
     }
     
     /// Spin Step (Local Rotation) */
     Frame&  Frame::spin() {      
-      mRot = gen::rot(dBiv) * mRot;
+      mRot = Gen::rot(dBiv) * mRot;
       dBiv *= aBiv;
       return *this; 
     }
 
     /// Rotate aproduce local xy and return a new frame
     Frame Frame::rotXY( VSR_PRECISION  amt) const {
-      return Frame ( mPos, gen::rot( xy() * amt )  * mRot, mScale );
+      return Frame ( mPos, Gen::rot( xy() * amt )  * mRot, mScale );
     }
 
     //DEPRECATED
@@ -192,7 +192,7 @@ namespace vsr{ namespace cga {
 
     /// Rotate by Bivector xy, xz, yz
     Frame& Frame::rotate( const Biv& b){
-      return rotate( gen::rot(b) );
+      return rotate( Gen::rot(b) );
     } 
 
     /// Rotate by Rotor R
@@ -203,7 +203,7 @@ namespace vsr{ namespace cga {
 
     /// Twist by dualLine and return this
     Frame& Frame::twist( const Dll& d ){
-      return twist(gen::mot(d));
+      return twist(Gen::mot(d));
     }
 
     /// Twist by motor and return this
@@ -215,12 +215,12 @@ namespace vsr{ namespace cga {
 
     /// Boost by point pair and return this
     Frame& Frame::boost( const Par& p){
-      return boost( gen::bst(p) );
+      return boost( Gen::bst(p) );
     }
 
     /// Boost by boost, renormalize, and return this
     Frame& Frame::boost( const Bst& b){
-      mPos = round::loc( mPos.spin(b) );
+      mPos = Round::loc( mPos.spin(b) );
       mRot = mRot.spin(b);
       mRot = mRot.unit();
       return *this;
@@ -228,21 +228,21 @@ namespace vsr{ namespace cga {
 
     /// ABSOLUTE orient z to target, and keep y as vertical as possible
     Frame& Frame::orient( const Vec& v, bool pos ){
-      Rot tRot = gen::ratio( Vec::z * (pos?1:-1), (v-vec()).unit() );
+      Rot tRot = Gen::ratio( Vec::z * (pos?1:-1), (v-vec()).unit() );
       mRot = tRot;
-      Vec ty = op::pj( Vec::y, xy() ).unit();
+      Vec ty = Op::pj( Vec::y, xy() ).unit();
       //auto cs = ty <= y();
-      Rot yRot = gen::ratio( y(), ty );
+      Rot yRot = Gen::ratio( y(), ty );
       mRot = (yRot * tRot).runit(); 
       return *this;
     }
 
     // Absolute orient z towrads target by amt t
     Frame& Frame::orient(const Vec& v, float t, bool pos){
-      Rot tRot = gen::ratio( Vec::z * (pos?1:-1), (v-vec()).unit() );
-      Vec ty = op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
-      Rot yRot = gen::ratio( Vec::y.spin(tRot), ty );
-      mRot = gen::rot( -gen::log( (yRot * tRot).runit() ) * t ); 
+      Rot tRot = Gen::ratio( Vec::z * (pos?1:-1), (v-vec()).unit() );
+      Vec ty = Op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
+      Rot yRot = Gen::ratio( Vec::y.spin(tRot), ty );
+      mRot = Gen::rot( -Gen::log( (yRot * tRot).runit() ) * t ); 
 
       return *this;
 
@@ -250,10 +250,10 @@ namespace vsr{ namespace cga {
 
     // Absolute orient x towrads target by amt t
     Frame& Frame::orientX(const Vec& v, float t, bool pos){
-      Rot tRot = gen::ratio( Vec::x * (pos?1:-1), (v-vec()).unit() );
-      Vec ty = op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
-      Rot yRot = gen::ratio( Vec::y.spin(tRot), ty );
-      mRot = gen::rot( -gen::log( (yRot * tRot).runit() ) * t ); 
+      Rot tRot = Gen::ratio( Vec::x * (pos?1:-1), (v-vec()).unit() );
+      Vec ty = Op::pj( Vec::y, Biv::xy.spin(tRot) ).unit();
+      Rot yRot = Gen::ratio( Vec::y.spin(tRot), ty );
+      mRot = Gen::rot( -Gen::log( (yRot * tRot).runit() ) * t ); 
 
       return *this;
 
@@ -261,39 +261,39 @@ namespace vsr{ namespace cga {
 
     /// RELATIVE Rotor to orient -z to target, and keep y as vertical as possible
     Rot Frame::relOrientRot( const Vec& v, bool pos){
-      Rot tRot = gen::ratio( z() * (pos?1:-1) , (v-vec()).unit() );        //Transformation to take CURRENT z to look at v
-      Vec ty = op::pj( Vec::y, xy().spin(tRot) ).unit();                   //project Absolute y axis onto transformed xy plane
-      Rot yRot = gen::ratio( y().spin(tRot), ty );                         //transformation to take currnet TRANFORMED y to proj
+      Rot tRot = Gen::ratio( z() * (pos?1:-1) , (v-vec()).unit() );        //Transformation to take CURRENT z to look at v
+      Vec ty = Op::pj( Vec::y, xy().spin(tRot) ).unit();                   //project Absolute y axis onto transformed xy plane
+      Rot yRot = Gen::ratio( y().spin(tRot), ty );                         //transformation to take currnet TRANFORMED y to proj
       return (yRot*tRot).runit();//yRot * tRot;                          //Rotation sequence
     }
 
     /// Generator to orient z to target, and keep y as vertical as possible
     Biv Frame::relOrientBiv( const Vec& v, bool pos){
-      return -gen::log( relOrientRot(v,pos) );
+      return -Gen::log( relOrientRot(v,pos) );
     }
     
     /// Releative Orientation towards v by amt t
     Frame& Frame::relOrient( const Vec& v, float t, bool pos){
-      mRot = gen::rot( relOrientBiv(v,pos) * t ) * mRot;
+      mRot = Gen::rot( relOrientBiv(v,pos) * t ) * mRot;
       mRot = mRot.runit();
       return *this;
     }
 
     /// Relative Motor to another Frame f
     Motor Frame::relMotor( const Frame& target ){
-      return target.mot() / mot();//gen::ratio( mot(), target.mot() );
+      return target.mot() / mot();//Gen::ratio( mot(), target.mot() );
     }
 
     /// Relative Twist towards target frame by amt t
     Frame& Frame::relTwist( const Frame& target, float t){
-      //DualLine dll = gen::log ( target.mot() / mot() ) * t;
-      return twist( gen::ratio ( mot(), target.mot(), t) );
+      //DualLine dll = Gen::log ( target.mot() / mot() ) * t;
+      return twist( Gen::ratio ( mot(), target.mot(), t) );
     }
 
     /// Relative Twist AWAY from target frame by amt t
     Frame& Frame::relTwistAway( const Frame& target, float t){
-      //DualLine dll = gen::log ( target.mot() / mot() ) * t;
-      return twist( !gen::ratio ( mot(), target.mot(), t) );
+      //DualLine dll = Gen::log ( target.mot() / mot() ) * t;
+      return twist( !Gen::ratio ( mot(), target.mot(), t) );
     }
     
     Frame Frame::moveX( VSR_PRECISION amt ) const{

@@ -41,23 +41,23 @@ struct MyApp : App {
     auto tcb = construct::circle(dist/2.0,0,0).twist(construct::line(1,0,0).dual() * amt );     //<-- twist circle b around x axis dualline
   
     //log of transformation from ca to cb
-    auto ratio = gen::ratio(tca,tcb);
-    auto log = gen::log( ratio );
+    auto ratio = Gen::ratio(tca,tcb);
+    auto log = Gen::log( ratio );
 
     auto trot = (tcb/tca).runit();
-    auto angle = ( round::dir(tcb).copy<Biv>().runit() / round::dir(tca).copy<Biv>().runit() )[0];
+    auto angle = ( Round::dir(tcb).copy<Biv>().runit() / Round::dir(tca).copy<Biv>().runit() )[0];
     
    // cout << trot[0] << " " << angle << endl;
     float theta = acos( trot[0] );
 
-    float planarity = (round::carrier(tca).dual().unit() ^ round::carrier(tcb).dual().unit()).wt();
+    float planarity = (Round::carrier(tca).dual().unit() ^ Round::carrier(tcb).dual().unit()).wt();
     if (FERROR(planarity)) cout << "PLANAR" << endl;
          
     int num = 100;
     for (int i = 0; i < num; ++i ){
       float t = 1.0 * i/num;
       
-      auto nc = tca.spin( gen::con(log, t * ( bPos ? 1 : -1) ) );            //<- general rotation ("spin") by general conformal transformation
+      auto nc = tca.spin( Gen::con(log, t * ( bPos ? 1 : -1) ) );            //<- general rotation ("spin") by general conformal transformation
       
 
     //  auto nnc = (tca * sin((1-t)*theta) + (tcb * sin(t*theta)) ) / sin(theta);
@@ -88,7 +88,7 @@ int main(){
 //    
 //    Con trot = (b/a).runit();
 //    //planar?
-//    float planarity = (round::carrier(a).dual().unit() ^ round::carrier(b).dual().unit()).wt();
+//    float planarity = (Round::carrier(a).dual().unit() ^ Round::carrier(b).dual().unit()).wt();
 //
 //    auto ftest = (b.unit() <= a.unit() )[0];
 //    if ( flop && trot[0] < 0 ) {//fabs(planarity)<=.000009 )  {

@@ -63,7 +63,7 @@ struct MyApp : App {
     time += speed;
     vector<Cir> cir;
 
-    auto rot = gen::rot( theta, phi );
+    auto rot = Gen::rot( theta, phi );
 
     Draw( Vec::x.spin(rot) );
 
@@ -71,10 +71,10 @@ struct MyApp : App {
     int stacks = 20;
     for (int i = 0;i<slices;++i){
       for (int j = 0;j<stacks;++j){
-        auto rot = gen::rot( -PI + TWOPI * i/slices, -PIOVERTWO + PI * j/stacks);
+        auto rot = Gen::rot( -PI + TWOPI * i/slices, -PIOVERTWO + PI * j/stacks);
         auto vec = Vec::x.spin(rot);
 
-        auto rot2 = gen::rot( time,  -PIOVERTWO + PI * j/stacks);
+        auto rot2 = Gen::rot( time,  -PIOVERTWO + PI * j/stacks);
         hf.vec() = Vec::x.spin(rot2);
         auto tcirA = hf.fiberA().translate( vec * radius );
         auto tcirB = hf.fiberB().translate( vec * radius );

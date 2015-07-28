@@ -76,7 +76,7 @@ struct Simplex {
 
   void doRot(){
     //Rotate out of extra dimension
-    auto rot = gen::ratio(doBary().unit(), vec);
+    auto rot = Gen::ratio(doBary().unit(), vec);
     using B =  NE<>::template e<N+1>;// NE<>::e<N+1>;
     using SubRot = decltype( doBary().unit() * B() );
     for(auto& i : roots){
@@ -88,7 +88,7 @@ struct Simplex {
     }
     //Rotate last to last
     Vec tvec; tvec[N-1] = 1;
-    auto nrot = gen::ratio( verts.back().unit(), tvec );
+    auto nrot = Gen::ratio( verts.back().unit(), tvec );
     using B2 = NE<>::template e<N>;// NE<>::e<N>;
     using SubRot2 = decltype( verts.back().unit() * B2() );
 
@@ -129,7 +129,7 @@ struct Simplex {
 
   void spin( const Biv& biv){
     for (auto& i : verts){
-       i = i.sp( gen::rot( biv ) );
+       i = i.sp( Gen::rot( biv ) );
      }
   }
 

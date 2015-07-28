@@ -72,7 +72,7 @@ struct CyclideQuad{
     for (int i=1;i<4;++i){
      int next = ( i < 3 ) ? i+1 : 0;
      for (int j=0;j<3;++j){
-       tframe[i].bitan[j] = tangent::at( tframe[i-1].sphere[j], tframe[i].frame.pos() );
+       tframe[i].bitan[j] = Tangent::at( tframe[i-1].sphere[j], tframe[i].frame.pos() );
        tframe[i].sphere[j] = tframe[i].bitan[j] ^ tframe[next].frame.pos();
        tframe[i].tan[j] = tframe[i].bitan[j].undual();
      }
@@ -96,18 +96,18 @@ struct CyclideQuad{
       
   // Calculate logs
   void log(){
-      mLogU = gen::log( gen::ratio(tframe[0].sphere[0].dual(), tframe[2].sphere[0].dual(), true ), altU() );
-      mLogV = gen::log( gen::ratio(tframe[3].sphere[1].dual(), tframe[1].sphere[1].dual(), true ), altV() );
+      mLogU = Gen::log( Gen::ratio(tframe[0].sphere[0].dual(), tframe[2].sphere[0].dual(), true ), altU() );
+      mLogV = Gen::log( Gen::ratio(tframe[3].sphere[1].dual(), tframe[1].sphere[1].dual(), true ), altV() );
   }
 
   void logZ(){
-      mLogNu = gen::log( gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual(),true ), false );
-      mLogNv = gen::log( gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), false );
+      mLogNu = Gen::log( Gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual(),true ), false );
+      mLogNv = Gen::log( Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), false );
   }
   
 
-  Bst xfu( VSR_PRECISION u ){ return gen::bst(mLogU * -u ); }
-  Bst xfv( VSR_PRECISION v ){ return gen::bst(mLogV * -v ); }
+  Bst xfu( VSR_PRECISION u ){ return Gen::bst(mLogU * -u ); }
+  Bst xfv( VSR_PRECISION v ){ return Gen::bst(mLogV * -v ); }
 
   // Evaluate conformal rotor at u,v
   Con xf( VSR_PRECISION u, VSR_PRECISION v) { return xfv(v) * xfu(u); }
@@ -123,13 +123,13 @@ struct CyclideQuad{
 
   Vec evalNormal( VSR_PRECISION u, VSR_PRECISION v){
     auto tan = apply( tframe[0].frame.tz(), u,v);
-    return -round::direction( tan ).copy<Vec>().unit();
+    return -Round::direction( tan ).copy<Vec>().unit();
   }
 
   
   /// Apply conformal rotor to a point at u,v
   Point eval( VSR_PRECISION u, VSR_PRECISION v) {
-    return round::loc( tframe[0].frame.pos().spin( xf(u,v) ) );
+    return Round::loc( tframe[0].frame.pos().spin( xf(u,v) ) );
   }
  
 
@@ -165,7 +165,7 @@ struct NCyclide{
 //    for (int i=1;i<num;++i){
 //     int next = ( i < (num-1) ) ? i+1 : 0;
 //     for (int j=0;j<3;++j){
-//       tframe[i].bitan[j] = tangent::at( tframe[i-1].sphere[j], tframe[i].frame.pos() );
+//       tframe[i].bitan[j] = Tangent::at( tframe[i-1].sphere[j], tframe[i].frame.pos() );
 //       tframe[i].sphere[j] = tframe[i].bitan[j] ^ tframe[next].frame.pos();
 //       tframe[i].tan[j] = tframe[i].bitan[j].undual();
 //     }

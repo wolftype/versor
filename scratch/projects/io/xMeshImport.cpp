@@ -467,7 +467,7 @@ struct MyApp : App {
     for (int i=0;i<numcontrol;++i){
       float t = (float)i/numcontrol;
       auto vec = frame.x().rot( frame.xy() * PI * t);
-      controlpoint[i] =  round::split( round::produce( frame.bound(), vec ), true).null();//frame.x().rot( //round::pnt_cir( frame.cxy(), acos((frame.y() <= Vec::y)[0]) + t*TWOPI );
+      controlpoint[i] =  Round::split( Round::produce( frame.bound(), vec ), true).null();//frame.x().rot( //Round::pnt_cir( frame.cxy(), acos((frame.y() <= Vec::y)[0]) + t*TWOPI );
       controltangent[i] = Par(vec.copy<Tnv>()).trs( controlpoint[i] ); 
       controlline[i] = frame.dlz().trs(controlpoint[i]);
     }
@@ -491,7 +491,7 @@ struct MyApp : App {
 
     //Knot
      tk.P = mP; tk.Q=mQ;
-     tk.HF.vec() = Vec::x.spin( gen::rot( theta,phi) );
+     tk.HF.vec() = Vec::x.spin( Gen::rot( theta,phi) );
      tk.HF.cir() = frame.cxz();
 
 
@@ -499,14 +499,14 @@ struct MyApp : App {
     if (bKnot){
       auto bst = tk.bst(knotspeed*dt);
       for(int i=0;i<mesh.num();++i){
-        data[i].point = round::loc( data[i].point.spin(bst) );
+        data[i].point = Round::loc( data[i].point.spin(bst) );
         mbo->mesh[i].Pos = data[i].point;
       }
     }
 
     if (bTwist){
      for(int i=0;i<mbo->mesh.num();++i){
-       auto twist = gen::mot( dfield.vol( data[i].pos ) );
+       auto twist = Gen::mot( dfield.vol( data[i].pos ) );
        mbo->mesh[i].Pos = PAO.spin(twist);
      }
     }
@@ -517,12 +517,12 @@ struct MyApp : App {
         i.distance = vector<float>(numcontrol);
         i.par = Par();
         for(int j=0;j<numcontrol;++j){
-          i.distance[j] = 1.0 / (falloff + round::dist(i.point,controlpoint[j]) ); 
+          i.distance[j] = 1.0 / (falloff + Round::dist(i.point,controlpoint[j]) ); 
           i.par += controltangent[j] * i.distance[j];
         }
       }
       for (int i=0; i<tmesh.num();++i){
-        tmesh[i].Pos = data[i].point.spin( gen::bst(data[i].par*tangentWt) );
+        tmesh[i].Pos = data[i].point.spin( Gen::bst(data[i].par*tangentWt) );
       }
     }
 
@@ -532,12 +532,12 @@ struct MyApp : App {
         i.distance = vector<float>(numcontrol);
         i.dll = Dll();
         for(int j=0;j<numcontrol;++j){
-          i.distance[j] = 1.0 / (falloff + round::dist(i.point,controlpoint[j]) ); 
+          i.distance[j] = 1.0 / (falloff + Round::dist(i.point,controlpoint[j]) ); 
           i.dll += controlline[j] * i.distance[j];
         }
       }
       for (int i=0; i<tmesh.num();++i){
-        tmesh[i].Pos = data[i].point.spin( gen::mot(data[i].dll*twistWt) );
+        tmesh[i].Pos = data[i].point.spin( Gen::mot(data[i].dll*twistWt) );
       }
  
     }
@@ -547,7 +547,7 @@ struct MyApp : App {
     if (bReset){
       mbo->mesh.reset();
       for (int i=0;i<mesh.num();++i){
-        data[i].point = round::null(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
+        data[i].point = Round::null(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
       }
     }
  

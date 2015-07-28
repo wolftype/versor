@@ -24,7 +24,7 @@ using Vec = NEVec<3>;
 
 int main(){
 
-  auto c = op::dual( Vec(1,0,0) );
+  auto c = Op::dual( Vec(1,0,0) );
 
   return 0;
 }

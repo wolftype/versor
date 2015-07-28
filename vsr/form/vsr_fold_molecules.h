@@ -35,12 +35,12 @@ struct Distance {
 
     /// Construct from two points
     Distance ( const Pnt& a, const Pnt& target) :  
-    p( a ), t( round::rad( round::at(a, target) ) )
+    p( a ), t( Round::rad( Round::at(a, target) ) )
     {}
 
     /// Set a new target (change distance)
     void set( const Pnt& target ){
-        t = round::rad( round::at(p,target) );
+        t = Round::rad( Round::at(p,target) );
     }
 
     /// Update point location (source)
@@ -53,8 +53,8 @@ struct Distance {
        p = a; set( target);
     }
 
-    Dls operator()(){ return round::dls(p,t); }
-    Dls operator()(const Pnt& tp) { return round::dls(tp,t); }
+    Dls operator()(){ return Round::dls(p,t); }
+    Dls operator()(const Pnt& tp) { return Round::dls(tp,t); }
 
 };
 
@@ -98,7 +98,7 @@ struct Rigid2_ {
 
   /// Some THETA along Orbit (from orbit's origin for now . . .);
   Pnt operator() ( float amt ) {
-    return round::point( circle(), amt );
+    return Round::point( circle(), amt );
   }
 
   /// Constrain original point to lie on circle (at closest point on possibility circle to starting position)
@@ -116,13 +116,13 @@ struct Rigid2_ {
       return (*this)( pa * (1-t) + pb * t );
   }
 
-  Pnt distanceA(const Pnt& p, bool b ) { return round::split( ( distA(p) ^ circle().dual() ).dual(), b ); }
-  Pnt distanceB(const Pnt& p, bool b) { return round::split( ( distB(p) ^ circle().dual() ).dual(), b ); }
+  Pnt distanceA(const Pnt& p, bool b ) { return Round::split( ( distA(p) ^ circle().dual() ).dual(), b ); }
+  Pnt distanceB(const Pnt& p, bool b) { return Round::split( ( distB(p) ^ circle().dual() ).dual(), b ); }
 
   Cir circle() { return ( distA() ^ distB() ).dual(); }
 
   /// get point at theta t around constraint orbit
-  Pnt orbit(VSR_PRECISION t) { return round::point( circle(), t * ( mtn?1:-1) ); }
+  Pnt orbit(VSR_PRECISION t) { return Round::point( circle(), t * ( mtn?1:-1) ); }
 
   /// Dual Plane Facet (CCW)
   Dlp dlp(){
@@ -390,10 +390,10 @@ struct Petal {
       //Line between them
       Line petalLine = petalNodeA ^ petalNodeB ^ Inf(1); petalLine = petalLine.runit();
       //new point
-      Point dmd = round::at(d, a).mot( petalLine.dual() * amt );// Draw(mmb,0,1,0);
+      Point dmd = Round::at(d, a).mot( petalLine.dual() * amt );// Draw(mmb,0,1,0);
 
       //Sphere about new point
-      //Dls dmd = round::dls(md);
+      //Dls dmd = Round::dls(md);
       //Circle of rotation
       Circle petalCa = a ^ petalA.dual();// Draw(petalCa);
       Circle petalCb = c ^ petalB.dual();// Draw(petalCb);
@@ -401,14 +401,14 @@ struct Petal {
       Pair petalPairA = ( dmd ^ petalCa.dual() ).dual(); 
       Pair petalPairB = ( dmd ^ petalCb.dual() ).dual(); 
 
-      Point ppa = round::loc( round::split( petalPairA, true) );
-      Point ppb = round::loc( round::split( petalPairB, true) );
+      Point ppa = Round::loc( Round::split( petalPairA, true) );
+      Point ppb = Round::loc( Round::split( petalPairB, true) );
 
       petal.nodeA = petalNodeA;
       petal.nodeB = petalNodeB;
       petal.flapA = ppa;
       petal.flapB = ppb;
-      petal.tip = round::loc(dmd);
+      petal.tip = Round::loc(dmd);
       petal.base = d;
       petal.stamen = b;
 
@@ -448,31 +448,31 @@ struct Preliminary {
         Point mc = c.mot( sa.dual() * amt); 
 
         //Constraints for midpoint bc
-        Dls dmc = round::dls( mc ); 
+        Dls dmc = Round::dls( mc ); 
         Line lmc = a ^ mc ^ Inf(1); lmc = lmc.runit();      // a was e    
         Circle cmc = mdc ^ ( diag.dual() );
         Pair pmc = (cmc.dual() ^ dmc ).dual();
-        Point mbc = round::loc(round::split(pmc,false));          //  Notice Alternating booleans . . .
+        Point mbc = Round::loc(Round::split(pmc,false));          //  Notice Alternating booleans . . .
         //Draw( mbc );
 
         //Constraints for point mb
-        Dls dmbc = round::dls( mbc );                       // Take a sphere for Distance edge
+        Dls dmbc = Round::dls( mbc );                       // Take a sphere for Distance edge
         Circle cmb = (b ^ ( ( a ^ c ^ Inf(1) ).dual() ) );   // And  Circle for Rotational crease (a was e)
         Pair pmb = ( cmb.dual() ^ dmbc ).dual();             // And intersect them
-        Point mb = round::loc( round::split(pmb,true) );
+        Point mb = Round::loc( Round::split(pmb,true) );
         //Draw(mb); 
         
         //Constraints for midpoint mab
-        Dls dmb = round::dls( mb );                         // Repeat
+        Dls dmb = Round::dls( mb );                         // Repeat
         Circle cmab = ((a+b)/2.0).null() ^ diag.dual();
         Pair pmab = ( cmab.dual() ^ dmb ).dual();
-        Point mab = round::loc( round::split(pmab, false) );
+        Point mab = Round::loc( Round::split(pmab, false) );
         //Draw(mab);
 
-        Dls dmab  = round::dls( mab );
+        Dls dmab  = Round::dls( mab );
         Circle cma = a ^ sb.dual();
         Pair pma = ( cma.dual() ^ dmab ).dual();
-        Point ma = round::loc( round::split(pma,true) );
+        Point ma = Round::loc( Round::split(pma,true) );
         //Draw(ma);
 
         return { ma, mb, mc, d, e, mab, mbc, mdc, mda };

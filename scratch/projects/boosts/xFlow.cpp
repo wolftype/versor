@@ -72,16 +72,16 @@ struct MyApp : App {
     Draw( ca.re(cb),0,0,1);
     Draw( cb.re(ca),0,0,1);
 
-    auto ratio = gen::ratio( ca, cb );
-    auto log = gen::log( ratio );
+    auto ratio = Gen::ratio( ca, cb );
+    auto log = Gen::log( ratio );
 
     cout << log[0].wt() << " " << log[1].wt() << endl;
     
-    auto rot = gen::con( log, amt );
+    auto rot = Gen::con( log, amt );
   
     
     for (int i=0; i<field.num(); ++i){
-      field[i] = round::loc( field[i].spin(rot) ); 
+      field[i] = Round::loc( field[i].spin(rot) ); 
     }
 
     
@@ -90,7 +90,7 @@ struct MyApp : App {
      for (int i=0; i<field.num(); ++i){
        for (int j=0;j<20;++j){
         float t = (float)j/20.0;
-        Draw( round::loc( field[i].spin(gen::con(log,t*amtB)) ),t,0,1-t );
+        Draw( Round::loc( field[i].spin(Gen::con(log,t*amtB)) ),t,0,1-t );
        }
       }
     }

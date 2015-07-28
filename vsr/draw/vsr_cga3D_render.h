@@ -188,8 +188,8 @@ namespace gfx{
   /* } */
 
   /* template<> void Drawable<Cir>::Immediate( const Cir& s )  { */  
-  /*   VT rad = round::rad( s ); */
-  /*   bool im = round::size(s, false) > 0 ? 1 : 0; */  
+  /*   VT rad = Round::rad( s ); */
+  /*   bool im = Round::size(s, false) > 0 ? 1 : 0; */  
   
   /*   gfx::GL::translate( Op::Pos(s).begin() ); */
   /*   gfx::GL::rotate( Op::AA(s).begin() ); */ 
@@ -199,13 +199,13 @@ namespace gfx{
   
   /* template<> void Drawable<Pnt>::Immediate (const Pnt& s){ */
  
-  /*     VT ta = round::size( s, true ); */
+  /*     VT ta = Round::size( s, true ); */
 
   /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
   /*     if ( fabs(ta) >  FPERROR ) { */
   /*         bool real = ta > 0 ? 1 : 0; */  
 
-  /*         Pnt p = round::cen( s ); */
+  /*         Pnt p = Round::cen( s ); */
   /*         VT t = sqrt ( fabs ( ta ) ); */
 
   /*         gfx::GL::translate ( p.begin() ); */
@@ -217,13 +217,13 @@ namespace gfx{
   
   /* template<> void Drawable<Sph>::Immediate (const Sph& s){ */
  
-  /*     VT ta = round::size( s, false ); */
+  /*     VT ta = Round::size( s, false ); */
 
   /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
   /*     if ( fabs(ta) >  FPERROR ) { */
   /*         bool real = ta > 0 ? 1 : 0; */  
 
-  /*         Pnt p = round::cen( s ); */
+  /*         Pnt p = Round::cen( s ); */
   /*         VT t = sqrt ( fabs ( ta ) ); */
 
   /*         gfx::GL::translate ( p.begin() ); */
@@ -234,27 +234,27 @@ namespace gfx{
   /* } */
   
   /* template<> void Drawable<Flp>::Immediate (const Flp& s){ */
-  /*   Immediate( round::null( s[0], s[1], s[2] ) ); */
+  /*   Immediate( Round::null( s[0], s[1], s[2] ) ); */
   /* } */
   
   /*  template<> void Drawable<Par>::Immediate (const Par& s){ */
   /*        //Is Imaginary? */
-  /*     VT size = round::size( s, false ); */
+  /*     VT size = Round::size( s, false ); */
 
   /*     //is null? */
   /*     if ( fabs(size) < FPERROR ){ */
-  /*         GL::translate( round::loc(s).begin() ); */
-  /*         Immediate( -round::dir(s).copy<Vec>() ); */ 
+  /*         GL::translate( Round::loc(s).begin() ); */
+  /*         Immediate( -Round::dir(s).copy<Vec>() ); */ 
         
   /*     }else{ */
       
-  /*       std::vector<Pnt> pp = round::split( s ); */
+  /*       std::vector<Pnt> pp = Round::split( s ); */
 
-  /*       VT ta = round::size( pp[0], true ); */   
+  /*       VT ta = Round::size( pp[0], true ); */   
                                      
   /*       if ( fabs(ta) >  FPERROR ) { */    
-  /*           Pnt p1 = round::cen( pp[0] ); */
-  /*           Pnt p2 = round::cen( pp[1] ); */
+  /*           Pnt p1 = Round::cen( pp[0] ); */
+  /*           Pnt p2 = Round::cen( pp[1] ); */
   /*           double t = sqrt ( fabs ( ta ) ); */
   /*           bool real = size > 0 ? 1 : 0; */  
 

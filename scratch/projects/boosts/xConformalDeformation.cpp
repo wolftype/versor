@@ -65,10 +65,10 @@ struct MyApp : App {
 
       auto nc =frame.cxy().reflect(circle);
 
-      auto transform = gen::con(nc, frame.cxy(), amt);
+      auto transform = Gen::con(nc, frame.cxy(), amt);
       auto tc = nc.spin(transform);
       if (bReset) Draw( tc, 0,1,0);
-      Draw( round::location(tc), 0,1,1);
+      Draw( Round::location(tc), 0,1,1);
 
     }
   

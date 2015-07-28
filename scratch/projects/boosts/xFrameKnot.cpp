@@ -57,10 +57,10 @@ struct MyApp : App {
 
     for (int i = 0;i < tk.iter();++i){
       auto pair = tk.par() * amt;
-     // pnt = round::loc( pnt.boost(pair) );
+     // pnt = Round::loc( pnt.boost(pair) );
       mot = mot.boost( pair );
       Frame frame(mot);
-      frame.pos() = round::loc( frame.pos() );
+      frame.pos() = Round::loc( frame.pos() );
       frame.rot() = frame.rot().unit();
      // mot = mot.runit();
       //rot = frame.mot().boost( pair );

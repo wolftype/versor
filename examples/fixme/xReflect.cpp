@@ -41,8 +41,8 @@ struct MyApp : gfx::GFXAppGui {
 		Draw(yz,0,1,1);   
 		
 		//ROTATIONS 
-		Rot tr =  gen::rot( xz * theta / 2.0 ); 
-		Rot pr = gen::rot( xy.sp(tr) * phi /2.0); 
+		Rot tr =  Gen::rot( xz * theta / 2.0 ); 
+		Rot pr = Gen::rot( xy.sp(tr) * phi /2.0); 
 		Vec nv = x.sp( pr * tr ); 
 		
 		Draw(xy.sp(tr));

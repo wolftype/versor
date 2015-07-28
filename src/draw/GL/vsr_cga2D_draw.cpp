@@ -24,10 +24,10 @@ namespace vsr{
   using namespace cga2D;
   
   Rot AA( const Vec& s){            
-       Rot r = nga::gen::ratio(Vec::y, s.unit() ); 
-        //Vec v = Op::dle( nga::gen::pl( r ) ) ;
-       VSR_PRECISION deg = nga::gen::iphi(r) * ( -180 / PI );
-       return Rot(deg, nga::gen::pl( r )[0]);
+       Rot r = nga::Gen::ratio(Vec::y, s.unit() ); 
+        //Vec v = Op::dle( nga::Gen::pl( r ) ) ;
+       VSR_PRECISION deg = nga::Gen::iphi(r) * ( -180 / PI );
+       return Rot(deg, nga::Gen::pl( r )[0]);
 
    } 
 
@@ -50,14 +50,14 @@ namespace vsr{
   
   void Immediate (const Point& s){
  
-      VSR_PRECISION ta = nga::round::size( s, true );
+      VSR_PRECISION ta = nga::Round::size( s, true );
 
       //treat as dual circle (if |radius^2| > 0.000001);
       if ( fabs(ta) >  FPERROR ) {
 
           bool real = ta > 0 ? 1 : 0;  
 
-          Pnt p = nga::round::cen( s );
+          Pnt p = nga::Round::cen( s );
           VSR_PRECISION t = sqrt ( fabs ( ta ) );
 
           gfx::GL::translate ( p[0], p[1], 0 );
@@ -83,14 +83,14 @@ namespace vsr{
   
   void Immediate (const Pair& s){
     //Is Imaginary?
-     VSR_PRECISION size = nga::round::size( s, false );
-     std::vector<Pnt> pp = nga::round::split( s );
+     VSR_PRECISION size = nga::Round::size( s, false );
+     std::vector<Pnt> pp = nga::Round::split( s );
 
-     VSR_PRECISION ta = nga::round::size( pp[0], true );   
+     VSR_PRECISION ta = nga::Round::size( pp[0], true );   
                                   
      if ( fabs(ta) >  FPERROR ) {    
-         Pnt p1 = nga::round::cen( pp[0] );
-         Pnt p2 = nga::round::cen( pp[1] );
+         Pnt p1 = nga::Round::cen( pp[0] );
+         Pnt p2 = nga::Round::cen( pp[1] );
          double t = sqrt ( fabs ( ta ) );
          bool real = size > 0 ? 1 : 0;  
 
@@ -109,8 +109,8 @@ namespace vsr{
   }
   
   void Immediate (const Line& s){
-      Drv d = nga::flat::dir( s );
-      Dls v = nga::flat::loc( s , nga::round::point(0,0), false);
+      Drv d = nga::Flat::dir( s );
+      Dls v = nga::Flat::loc( s , nga::Round::point(0,0), false);
       gfx::GL::translate (v[0], v[1],0);
       gfx::Glyph::Line2D(d * 10, d * -10);  
   }

@@ -43,7 +43,7 @@ struct State{
   
   bool bGlideA, bGlideB, bGlideC;
 
-  Point point = round::null(0,0,0);
+  Point point = Round::null(0,0,0);
 
   float xratio,yratio,zratio;
   int numX, numY, numZ;
@@ -70,10 +70,10 @@ void drawState(State * state){
 //       Draw(res[i],(float)i/res.size(),0,1-(float)i/res.size());
 //       Draw(res2[i],(float)i/res.size(),1,1-(float)i/res.size());
 //      // Draw(res3[i],(float)i/res.size(),1,1-(float)i/res.size());
-//        auto a =  round::split(res[i], true);
-//        auto b =  round::split(res[i], false);
-//        auto c =  round::split(res2[i], true);
-//        auto d =  round::split(res3[i], true);
+//        auto a =  Round::split(res[i], true);
+//        auto b =  Round::split(res[i], false);
+//        auto c =  Round::split(res2[i], true);
+//        auto d =  Round::split(res3[i], true);
 //  
 //        glColor3f(1,1,0);
 //        Glyph::Triangle(a,b,c);
@@ -103,10 +103,10 @@ void drawState(State * state){
     
      for (int i=0;i<latticeRes.size();++i) {
 
-        auto a =  round::split(latticeRes[i], true);
-        auto b =  round::split(latticeRes[i], false);
-        auto c =  round::split(latticeRes2[i], true);
-        auto d =  round::split(latticeRes3[i], true);
+        auto a =  Round::split(latticeRes[i], true);
+        auto b =  Round::split(latticeRes[i], false);
+        auto c =  Round::split(latticeRes2[i], true);
+        auto d =  Round::split(latticeRes3[i], true);
   
         glColor3f(1,1,0);
         Glyph::Triangle(a,b,c);
@@ -133,7 +133,7 @@ struct MyApp : App {
   bool bReset = false;
   bool bSetMouse=false;
 
-  Point mouse = round::null(1,1,1);;
+  Point mouse = Round::null(1,1,1);;
 
   float latticetype;
 

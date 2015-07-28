@@ -61,9 +61,9 @@ struct MyApp : App {
 
       //Done.  Now here we illustrate the geometry of How it works:
       // point coplanar with circle closest to input point
-      auto coplanar = flat::location( round::carrier(circle), point);
+      auto coplanar = Flat::location( Round::carrier(circle), point);
       // line through coplanar point and circle center
-      auto line =  coplanar ^ round::sur(circle) ^ Inf(1);
+      auto line =  coplanar ^ Round::sur(circle) ^ Inf(1);
             
       Draw( coplanar, 0,1,0);
       Draw(line, 1,1,1);

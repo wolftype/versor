@@ -34,7 +34,7 @@ namespace vsr { namespace cga {
     // }   
     
     inline Vec sph2vec(double theta, double phi){
-        Rot r = gen::rot(theta/2.0, phi/2.0);
+        Rot r = Gen::rot(theta/2.0, phi/2.0);
         return Vec::x.sp(r);   
     }
     

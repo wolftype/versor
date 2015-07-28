@@ -55,7 +55,7 @@ struct TorusKnot  {
     }    
 //    int num() { return pnt.size(); }
     int iter() { 
-        return ( P == 0 || Q == 0 ) ?  1.0/amt : P * Q / (amt * round::size(HF.cir(), false) );
+        return ( P == 0 || Q == 0 ) ?  1.0/amt : P * Q / (amt * Round::size(HF.cir(), false) );
     }
     
     Par par() { 
@@ -64,7 +64,7 @@ struct TorusKnot  {
     }
         
     Bst bst() {
-        return gen::bst( par() * amt  );
+        return Gen::bst( par() * amt  );
     }
     
     Bst bst(double t) { amt = t; return bst(); }
@@ -80,7 +80,7 @@ struct TorusKnot  {
     int tnum = iter();
     
     for (int i = 0; i < tnum; ++ i ){
-      np = round::loc( np.sp( tbst ) );  
+      np = Round::loc( np.sp( tbst ) );  
       add(np);
     }
               
@@ -104,7 +104,7 @@ struct TorusKnot  {
 
     for (int i = 0; i < tnum; ++ i ){
       np = np.sp( tbst ) ;  
-      add( round::loc( np) );
+      add( Round::loc( np) );
     }   
 
     //Tube Neighborhood  
@@ -126,7 +126,7 @@ struct TorusKnot  {
     auto tmp = input;
     for (int i=0; i<iter();++i){
       tmp = tmp.spin(tbst);
-      output.push_back( round::loc(tmp) );
+      output.push_back( Round::loc(tmp) );
     }
     return output;
   }
@@ -150,7 +150,7 @@ struct TorusKnot  {
           //Idx of Neighbor
           int idxA = i < num - 1 ? i + 1 : 0;
 
-          double ta = round::dist( pnt[i], pnt[idxA]);
+          double ta = Round::dist( pnt[i], pnt[idxA]);
           local.push_back(ta);
 
           totalA += ta;
@@ -165,7 +165,7 @@ struct TorusKnot  {
           for (int j = 0; j < num; ++j){
 
               if ( i != j ) {
-                  double chord = round::sqd( pnt[i], pnt[j] );
+                  double chord = Round::sqd( pnt[i], pnt[j] );
 
                   double diffA = fabs( globalA[j] - globalA[i] );
                   double diffB = fabs( (totalA - globalA[j] ) + globalA[i] );//fabs( globalB[j] - globalA[i] );
@@ -230,7 +230,7 @@ struct TorusKnot  {
 //             mF.mot( sF.mot() * mot() ); 
 //         }
 //         
-//         Bst bst() { return gen::bst( par() * mAmt ); }
+//         Bst bst() { return Gen::bst( par() * mAmt ); }
 // 
 //         Par par(const Orbit& o, double t){
 //             Orbit no = Frame::Twist( f(), o.f(), t );
@@ -315,11 +315,11 @@ struct TorusKnot  {
 //     Par parb() const { return pb(bRealB) * PI/mN; }
 //     
 //     //Separated out
-//     Bst bsta() const { return gen::bst( para() * mAmt ); }
-//     Bst bstb() const { return gen::bst( parb() * mAmt ); }
+//     Bst bsta() const { return Gen::bst( para() * mAmt ); }
+//     Bst bstb() const { return Gen::bst( parb() * mAmt ); }
 //     Bst bstc() const { return bsta() * bstb(); }
 //     
-//     Bst bst() { return gen::bst( par() * mAmt ); }
+//     Bst bst() { return Gen::bst( par() * mAmt ); }
 // 
 //     //? not sure what this would do or should do
 //     Knot operator * (const Knot& k){
@@ -327,7 +327,7 @@ struct TorusKnot  {
 //     }
 // 
 //     static Bst bst(const Knot& ka, const Knot& kb, double t){
-//         return gen::bst( ka.par() * (1-t) + kb.par() * t );
+//         return Gen::bst( ka.par() * (1-t) + kb.par() * t );
 //     }
 //     
 //     

@@ -54,7 +54,7 @@ struct MyApp : App {
     Draw(fa); Draw(fb);
 
 
-    auto yratio = gen::ratio( fa.y(), fb.y() );
+    auto yratio = Gen::ratio( fa.y(), fb.y() );
 
     auto ratio = fb.rot() / fa.rot(); // rotor to take 
 

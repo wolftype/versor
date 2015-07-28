@@ -79,7 +79,7 @@ struct Cylindrical {
 
 struct Helical {
   Helical( VSR_PRECISION period = PI, VSR_PRECISION pitch = 1.0 ) : mFrame(), mPeriod( period), mPitch(pitch) {}
-  Frame operator() (VSR_PRECISION amt) { return Frame( gen::mot( Twist::Along( mFrame.dlz(), mPeriod, mPitch ) * amt ) * mFrame.mot() ); }
+  Frame operator() (VSR_PRECISION amt) { return Frame( Gen::mot( Twist::Along( mFrame.dlz(), mPeriod, mPitch ) * amt ) * mFrame.mot() ); }
   Frame mFrame;
   VSR_PRECISION mPeriod, mPitch;
 };
@@ -93,8 +93,8 @@ struct Planar {
 struct  Spherical : public Joint {
   Spherical( const Frame& f = Frame() ) : Joint(Joint::SPHERICAL, f) {}
   VSR_PRECISION theta, phi;
-  Frame operator() (VSR_PRECISION rx, VSR_PRECISION ry) { theta = rx; phi = ry; return Frame( pos(), gen::rot(theta,phi) ); }
-  virtual Frame operator() () const { return Frame( pos(), gen::rot(theta,phi) ); } 
+  Frame operator() (VSR_PRECISION rx, VSR_PRECISION ry) { theta = rx; phi = ry; return Frame( pos(), Gen::rot(theta,phi) ); }
+  virtual Frame operator() () const { return Frame( pos(), Gen::rot(theta,phi) ); } 
 };
 //spherical (sph coords)
 //planar
@@ -122,7 +122,7 @@ struct  Spherical : public Joint {
     void _init(){
       for (int i = 0; i < mNum; ++i){
         Vec v(0,1.0,0);
-        mLink[i].pos() = round:: null(v);
+        mLink[i].pos() = Round:: null(v);
       }
        fk();
     }
@@ -250,22 +250,22 @@ struct  Spherical : public Joint {
       
       /// Sphere Centered at Joint K Going Through Joint K+1 
       Dls nextSphere(int k) const{
-        return round::dls(mFrame[k].pos(), mLink[k].vec().norm() );//mFrame[k+1].pos());
+        return Round::dls(mFrame[k].pos(), mLink[k].vec().norm() );//mFrame[k+1].pos());
       }
       /// Sphere Centered at Joint K Going Through Joint K-1
       Dls prevSphere(int k) const{
-        return round::dls(mFrame[k].pos(), mLink[k-1].vec().norm());//mFrame[k-1].pos());
+        return Round::dls(mFrame[k].pos(), mLink[k-1].vec().norm());//mFrame[k-1].pos());
       }
       
       /// Dual Plane of rotation of kth joint (translated by link rejection from yz)
       Dlp nextPlane(int k) const {
-        auto rj = op::rj( link(k).vec(), Biv::xy );
+        auto rj = Op::rj( link(k).vec(), Biv::xy );
         return mFrame[k].dxy().translate(rj);
       }
 
       /// Dual Plane of rotation of k-1th joint (translated by link rejection from yz)
       Dlp prevPlane(int k) const {
-        auto rj = op::rj( link(k-1).vec(), Biv::xy );
+        auto rj = Op::rj( link(k-1).vec(), Biv::xy );
         auto uxy = mFrame[k].dxy().spin( !link(k-1).rot() );//<-- "undo" orientation of current xy plane
         return uxy.translate(-rj);
       }
@@ -283,18 +283,18 @@ struct  Spherical : public Joint {
 
       /// Sphere at Point p through Joint K
       Dls goalSphere(const Pnt& p, int k){
-         return round::dls(p, mLink[k].vec().norm());
+         return Round::dls(p, mLink[k].vec().norm());
       }
       /// Sphere at point p through last link (default, or set arbitary link)
       Dls lastSphere(const Pnt& p){
-        return round::dls(p,mLink[mNum-1].vec().norm());
+        return Round::dls(p,mLink[mNum-1].vec().norm());
       }
         
       /* Possible Points */
       
       /// Pnt at position t along Link idx
       Pnt at(int idx, double t = 0.0){
-          return round:: null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
+          return Round:: null( Interp::linear<Vec>( mFrame[idx].vec(), mFrame[idx+1].vec(), t) );
       }
       
       Frame& base() { return mBaseFrame;} //mFrame[0]; }
@@ -303,7 +303,7 @@ struct  Spherical : public Joint {
       
       /// Vert xy Plane Containing Root Target Point v ( NORMALIZED )
       Dlp xy(const Pnt& p) {
-        return op::dl(frame(0).pos()^round:: null(0,1,0)^p^Inf(1)).unit();
+        return Op::dl(frame(0).pos()^Round:: null(0,1,0)^p^Inf(1)).unit();
       }
       /// Horiz xz Plane Containing Target Point v
       Dlp xz(const Pnt& p)  {
@@ -311,13 +311,13 @@ struct  Spherical : public Joint {
       }
 
       /// Dual Line Forward: Line from kth frame to kth Link
-      Dll linkf(int k) { return op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }      
+      Dll linkf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }      
       /// Dual Line Forward: Line from kth frame to kth+1 joint
-      Dll linf(int k) { return op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
+      Dll linf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
       /// Dual Line Backward: Line from kth frame to kth-1 joint
-      Dll linb(int k ) { return op::dl( mFrame[k].pos() ^ mFrame[k-1].pos() ^ Inf(1) ).runit() ; }
+      Dll linb(int k ) { return Op::dl( mFrame[k].pos() ^ mFrame[k-1].pos() ^ Inf(1) ).runit() ; }
       /// Dual Line From Kth Joint to Input Target (Default is From Last joint)
-      Dll lin(const Pnt& p ) { return op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
+      Dll lin(const Pnt& p ) { return Op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
 
       /// relative transformation (lagrangian) at kth joint
       Mot rel(int k){
@@ -396,7 +396,7 @@ struct  Spherical : public Joint {
  //                       dls = nextSphere(i);               //set boundary sphere through i-1 th frame;
  //                       dll = linf(i);                  //get line from tmp to i-1th frame
  //                       par = (dll ^ dls).dual();       //get point pair intersection of line and boundary sphere
- //                       tmpGoal = round:: split(par,true);         //extract point from point pair intersection
+ //                       tmpGoal = Round:: split(par,true);         //extract point from point pair intersection
  //                   }
  //                   
  //                   //backward correction
@@ -404,7 +404,7 @@ struct  Spherical : public Joint {
  //                       dls = prevSphere(i);                   //set boundary sphere through i+1 th frame
  //                       dll = linb(i);                      //get line to i+1th frame;
  //                       par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere
- //                       tmpBase = round:: split(par,true);
+ //                       tmpBase = Round:: split(par,true);
  //                       mFrame[i-1].pos(tmpBase);             //set position of i+1th frame
  //                   }
  //                   
@@ -448,7 +448,7 @@ struct  Spherical : public Joint {
                         dls = prevSphere(i);                   //set boundary sphere through i-1 th frame;
                         dll = linb(i);                         //get line from ith to i-1th frame
                         par = (dll ^ dls).dual();              //get point pair intersection of line and boundary sphere
-                        tmpGoal = round:: split(par,true);     //extract point from point pair intersection
+                        tmpGoal = Round:: split(par,true);     //extract point from point pair intersection
                     }
                     
                     //forward correction
@@ -456,7 +456,7 @@ struct  Spherical : public Joint {
                         dls = nextSphere(i);                   //set boundary sphere through i+1 th frame
                         dll = linf(i);                         //get line to i+1th frame;
                         par = (dll ^ dls).dual();              //get point pair intersection of line and boundary sphere
-                        tmpBase = round:: split(par,true);
+                        tmpBase = Round:: split(par,true);
                         mFrame[i+1].pos(tmpBase);              //set position of i+1th frame
                     }
                     
@@ -480,16 +480,16 @@ struct  Spherical : public Joint {
 //                  int next = i < (mNum-1) ? i+1 : 0;    
 //                          
 //                  auto target = (mFrame[next].vec() - mFrame[i].vec() ).unit();         //target direction
-//                  auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+//                  auto linkRot = Gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
 //                 // target = target.spin( !linkRot );
-//                  auto tmpRot = gen::ratio( Vec::y, target );                           //how to get there
+//                  auto tmpRot = Gen::ratio( Vec::y, target );                           //how to get there
 //                  
 //
 //                  tmpRot = !linkRot * !ry  * tmpRot;// * !linkRot;                           //...compensate for that and previous compound
 //                
-//                  Vec correctedTarget = Vec(op::project( Vec::y.spin( tmpRot ), Biv::xy)).unit();  //project onto xy axis of local link
+//                  Vec correctedTarget = Vec(Op::project( Vec::y.spin( tmpRot ), Biv::xy)).unit();  //project onto xy axis of local link
 //
-//                  auto adjustedRot = gen::ratio( Vec::y, correctedTarget );
+//                  auto adjustedRot = Gen::ratio( Vec::y, correctedTarget );
 //                  mJoint[i].rot() = adjustedRot;
 //
 //                  ry = ry * mJoint[i].rot() * mLink[i].rot();                            //compound: last * current * next
@@ -509,7 +509,7 @@ struct  Spherical : public Joint {
  //                 auto dir = Vec::y.spin( ry );                                         //current direction
  //                 
  //                 auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();        //global target direction
- //                 auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+ //                 auto linkRot = Gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
  //                   
  //                 //target in terms of origin
  //                 target = target.spin( !linkRot * !mFrame[i].rot() );
@@ -517,7 +517,7 @@ struct  Spherical : public Joint {
  //                 //DrawAt( dir, mFrame[i].pos() + mFrame[i].y() );
  //                // DrawAt( target.spin(  mFrame[i].rot() ) , mFrame[i].pos() + mFrame[i].y(),1,1,0);
  // 
- //                 auto adjustedRot = gen::ratio( dir.spin( !mFrame[i].rot() ), target );
+ //                 auto adjustedRot = Gen::ratio( dir.spin( !mFrame[i].rot() ), target );
 
  //                 mJoint[i].rot() = adjustedRot;// * !mFrame[i].rot();
 
@@ -539,12 +539,12 @@ struct  Spherical : public Joint {
                   //auto dir = Vec::y.spin( ry );                                         //current direction
                   
                   auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();        //global target direction
-                  auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
+                  auto linkRot = Gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position contributes...
                     
                   //target in terms of origin
                   target = target.spin( !linkRot * !ry );
   
-                  auto adjustedRot = gen::ratio( Vec::y, target );
+                  auto adjustedRot = Gen::ratio( Vec::y, target );
 
                   mJoint[i].rot() = adjustedRot;// * !mFrame[i].rot();
 
@@ -560,16 +560,16 @@ struct  Spherical : public Joint {
         if (!bOrientation){
           for (int i = 0; i < mNum; ++i){
             int next = (i<mNum-1)?i+1:0;
-            //mLink[i].rot() = gen::ratio( mFrame[i].z(), mFrame[next].z() );
+            //mLink[i].rot() = Gen::ratio( mFrame[i].z(), mFrame[next].z() );
             //auto ratio = mFrame[next].rot() / mFrame[i].rot();                //relative transform
-            auto yratio = gen::ratio( mFrame[i].y(), mFrame[next].y() );      //relative rotational component
+            auto yratio = Gen::ratio( mFrame[i].y(), mFrame[next].y() );      //relative rotational component
 
-            //auto theta = gen::iphi( gen::ratio( mFrame[i].z(), mFrame[next].z() ) );//acos( (mFrame[i].z()<=mFrame[next].z())[0] );
+            //auto theta = Gen::iphi( Gen::ratio( mFrame[i].z(), mFrame[next].z() ) );//acos( (mFrame[i].z()<=mFrame[next].z())[0] );
             mLink[i].rot() = !mFrame[i].rot() * !yratio * mFrame[next].rot(); //SEQUENCE MATTERS!  first local rot, then undow local ys, then undo source
 
             auto dv = mFrame[next].vec() - mFrame[i].vec();
-           // Vec project = op::project(dv, mFrame[i].xy());
-           // Vec reject = op::reject(dv, mFrame[i].xy());
+           // Vec project = Op::project(dv, mFrame[i].xy());
+           // Vec reject = Op::reject(dv, mFrame[i].xy());
            //under local transformation 
             mLink[i].pos() = dv.spin( !mFrame[i].rot() ).null(); 
             ////project + rejectVec(0,ylength,0).null();
@@ -577,9 +577,9 @@ struct  Spherical : public Joint {
         } else{
           for (int i = 0; i < mNum; ++i){
             int next = (i<mNum-1)?i+1:0;
-            //mLink[i].rot() = gen::ratio( mFrame[i].z(), mFrame[next].z() );
+            //mLink[i].rot() = Gen::ratio( mFrame[i].z(), mFrame[next].z() );
             auto theta = acos( (mFrame[i].z()<=mFrame[next].z())[0] );
-            mLink[i].rot() = gen::rotor( Biv::xz * theta * .5 );
+            mLink[i].rot() = Gen::rotor( Biv::xz * theta * .5 );
             auto vec = (mFrame[next].vec() - mFrame[i].vec()).spin( !mFrame[i].rot() );
             mLink[i].pos() = vec.null();
           }   
@@ -593,9 +593,9 @@ struct  Spherical : public Joint {
                 Rot R =  mJoint[k].rot();
                                 
                 Biv b = Biv( R ) * -1;
-                // * ( (t > 1) ? ); // note: check Op:lg and gen::log_rot (maybe mult by -1 there as well)
+                // * ( (t > 1) ? ); // note: check Op:lg and Gen::log_rot (maybe mult by -1 there as well)
 
-                Rot nr = gen::rot( b.unit() * theta );
+                Rot nr = Gen::rot( b.unit() * theta );
                 
                 mJoint[k].rot( nr );
                 
@@ -616,10 +616,10 @@ struct  Spherical : public Joint {
 //                 if (bLoop){
 //                  Vec y = Vec::y.spin(ry);
 //                  auto target = Vec(mFrame[0].pos()-mFrame[mNum-1].pos()).unit();
-//                  auto linkRot = gen::ratio( Vec::y, mLink[mNum-1].vec().unit() );
+//                  auto linkRot = Gen::ratio( Vec::y, mLink[mNum-1].vec().unit() );
 //                  auto dv = target.spin( !linkRot );    //current status
 //                  
-//                  mJoint[mNum-1].rot() = gen::ratio( y, dv );//gen::rot( Biv::xy * acos( ( dv <= y )[0] )/2.0  ); //set rotation
+//                  mJoint[mNum-1].rot() = Gen::ratio( y, dv );//Gen::rot( Biv::xy * acos( ( dv <= y )[0] )/2.0  ); //set rotation
 //                }
 //
 //                Vec t = mBaseFrame.y(); // Vec::y;
@@ -633,10 +633,10 @@ struct  Spherical : public Joint {
 //                //From Here forward, what rotation we need to point where we want to go (note: assumes no offset!)
 //                for (int i=start;i<mNum-1;++i){
 //                    
-//                    Vec target = Vec(mFrame[i+1].pos() - mFrame[i].pos()).unit(); // op::dle( Biv( linf(i) ) );  //0. Goal (Direction of Line to next joint) 
+//                    Vec target = Vec(mFrame[i+1].pos() - mFrame[i].pos()).unit(); // Op::dle( Biv( linf(i) ) );  //0. Goal (Direction of Line to next joint) 
 //                   // if (i>0) t = t.sp( mLink[i-1].rot() );       //1. Consider Rotary Contribution of Previous Link 
-//                    Vec q = t.sp( gen::ratio(Vec::y, mLink[i].vec().unit()) ); // And Translated Contribution of Current Link                
-//                    Rot nr = gen::ratio( q, target );        //2. What additional work it takes to turn the current integration towards Goal
+//                    Vec q = t.sp( Gen::ratio(Vec::y, mLink[i].vec().unit()) ); // And Translated Contribution of Current Link                
+//                    Rot nr = Gen::ratio( q, target );        //2. What additional work it takes to turn the current integration towards Goal
 //                    //R = nr * R;                         //3. Compound into R
 //                   // mFrame[i].rot( R );                 //4. Apply Rotation to Frame temporarily
 //                    mJoint[i].rot( nr ); //new
@@ -645,8 +645,8 @@ struct  Spherical : public Joint {
 //
 //                if (bLoop){
 //                  Vec target = Vec(mFrame[0].pos()-mFrame[mNum-1].pos()).unit();
-//                  Vec q = t.sp( gen::ratio( Vec::y, mLink[mNum-1].vec().unit() ) );
-//                  Rot nr = gen::ratio( q, target );
+//                  Vec q = t.sp( Gen::ratio( Vec::y, mLink[mNum-1].vec().unit() ) );
+//                  Rot nr = Gen::ratio( q, target );
 //                  mJoint[mNum-1].rot(nr);
 //                }
 

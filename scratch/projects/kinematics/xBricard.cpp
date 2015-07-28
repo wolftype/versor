@@ -73,7 +73,7 @@ struct MyApp : App {
     float R[] = {R0,R1,R2,R3,R4,R5};
     float theta[] = {theta0,theta1,theta2,theta3,theta4,  theta5};
     for (int i=0;i<6;++i){
-      auto rot =  gen::rot( Biv::xz * theta[i]);
+      auto rot =  Gen::rot( Biv::xz * theta[i]);
       chain.link(i).pos( Vec(0,3,0) + Vec(0,0,R[i]) );//.spin(rot) );
       chain.link(i).rot() = rot;
     }
@@ -117,11 +117,11 @@ struct MyApp : App {
     auto p5 = chain.prevPlane(5);
     auto c5 = chain.prevCircle(5);
 
-    auto dlp = Dlp(round::sur(c5) - round::sur(c1));
+    auto dlp = Dlp(Round::sur(c5) - Round::sur(c1));
     Draw(dlp,1,1,0);
 
-    auto con = gen::ratio( c1, c5 );
-    auto con2 = gen::con( gen::log(con), .5 );
+    auto con = Gen::ratio( c1, c5 );
+    auto con2 = Gen::con( Gen::log(con), .5 );
     Draw( Line(c1.spin(con2)),0,1,0); 
 
 

@@ -13,7 +13,7 @@ struct MyApp : App {
 	TorusKnot tkA;
 	TorusKnot tkB;
 
-  Pnt a = round::null( Vec(2,0,0) ); 
+  Pnt a = Round::null( Vec(2,0,0) ); 
 	Cir cir = CXZ(1);
 	
 	void setup(){
@@ -47,7 +47,7 @@ struct MyApp : App {
 			 
 			auto bst = tkA.bst(amt);  
 					
-			np = round::loc( np.spin( bst ) );   
+			np = Round::loc( np.spin( bst ) );   
 			
 			Draw(np,0,1,0);
 		}   

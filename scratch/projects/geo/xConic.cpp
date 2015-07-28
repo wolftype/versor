@@ -79,9 +79,9 @@ struct MyApp : App {
         
      mouse = calcMouse3D();
 
-    // Draw( Vec::x.sp(  gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 ); 
+    // Draw( Vec::x.sp(  Gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 ); 
 
-    auto p = flat::loc( mousePlane, Ori(1), true );
+    auto p = Flat::loc( mousePlane, Ori(1), true );
     p.print();
     // Draw( ,1,0,0); 
     

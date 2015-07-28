@@ -31,15 +31,15 @@ namespace vsr { namespace cga {
    @ingroup cgaops
 
 
-    3D CGA Template Specializations of ND functions found in vsr::nga::round
+    3D CGA Template Specializations of ND functions found in vsr::nga::Round
     Note: the ND functions are inlined and can be used instead, but using these
     will speed up compile times since they are precompiled into libvsr.a
 
     @sa @ref round for a list of @ref cgatypes on which these methods operate   
-    @sa vsr::nga::round for the @ref generic n-dimensional implementation details
+    @sa vsr::nga::Round for the @ref generic n-dimensional implementation details
 
  */
- struct round {                          
+ struct Round {                          
 
   ///@{
   /*! Null Point from a vec 
@@ -103,7 +103,7 @@ namespace vsr { namespace cga {
    /*!
       Simple Center of A Round (not normalized -- use loc or location method instead)
 
-      @sa nga::round::center for @ref generic case
+      @sa nga::Round::center for @ref generic case
    */
     static  Point center( const DualSphere& s);
    /*
@@ -122,7 +122,7 @@ namespace vsr { namespace cga {
       Simple Center of a @ref round Element (shorthand)
       @ingroup shorthand
 
-      @sa nga::round::cen for @ref generic implementation
+      @sa nga::Round::cen for @ref generic implementation
     */
     template<class A>
     static Point cen( const A& s) { return center(s); }    
@@ -130,7 +130,7 @@ namespace vsr { namespace cga {
     /*!
       Location (normalized) of A Round Element (normalized) (Shorthand)
 
-      @sa nga::round::location for @ref generic implementation
+      @sa nga::Round::location for @ref generic implementation
     */  
     template<class A>
     static  Point location(const A& s){ return null( cen(s) ); }
@@ -139,7 +139,7 @@ namespace vsr { namespace cga {
       Location (normalizd) of a @ref round Element (shorthand)
       @ingroup shorthand
 
-      @sa nga::round::cen for @ref generic implementation
+      @sa nga::Round::cen for @ref generic implementation
     */
    
     template<class A>
@@ -305,14 +305,14 @@ namespace vsr { namespace cga {
     /*! Carrier Flat of Pair 
          @param p vsr::cga::Pair
 
-         @sa nga::round::carrier for @ref generic implementation
+         @sa nga::Round::carrier for @ref generic implementation
      * */
     static  Line carrier(const Pair& p);
 
     /*! Carrier Flat of Circle 
          @param c vsr::cga::Circle
 
-         @sa nga::round::carrier for @ref generic implementation
+         @sa nga::Round::carrier for @ref generic implementation
      * */
 
     static  Plane carrier(const Circle& c);    
@@ -320,7 +320,7 @@ namespace vsr { namespace cga {
     /*! Carrier Flat of Direct? Round Element (Shorthand) 
         @ingroup shorthand
 
-        @sa nga::round::car for @ref generic implementation
+        @sa nga::Round::car for @ref generic implementation
       
     */
     template<class A>
@@ -329,19 +329,19 @@ namespace vsr { namespace cga {
 
     
     /*! Dual Surround of a Direct or Dual Pair 
-        @sa nga::round::surround for @ref generic implementation
+        @sa nga::Round::surround for @ref generic implementation
     */
     static  DualSphere surround( const Pair& s);
     
     /*! Dual Surround of a Direct or Dual Circle 
-        @sa nga::round::surround for @ref generic implementation
+        @sa nga::Round::surround for @ref generic implementation
     */
     static  DualSphere surround( const Circle& s);    
     
     /*! Dual Surround of a Direct or Dual Round Element (Shorthand)
         @ingroup shorthand
 
-        @sa nga::round::sur for @ref generic implementation
+        @sa nga::Round::sur for @ref generic implementation
      */
     template <class A>
     static  DualSphere sur( const A& s) { return surround(s); }
@@ -355,7 +355,7 @@ namespace vsr { namespace cga {
        
        @returns Pair
 
-       @sa nga::round::produce for @ref generic implementation
+       @sa nga::Round::produce for @ref generic implementation
 
      */  
      static  Pair produce(const DualSphere& dls, const Vec& v);     
@@ -369,7 +369,7 @@ namespace vsr { namespace cga {
        
        @returns Circle
 
-       @sa nga::round::produce for @ref generic implementation
+       @sa nga::Round::produce for @ref generic implementation
 
      */  
      static  Circle produce(const DualSphere& dls, const Biv& b);     
@@ -381,8 +381,8 @@ namespace vsr { namespace cga {
 //     auto
 //     real(const A& s) RETURNS (
 //         produce( 
-//                round::dls( round::loc( s ), -round::rad( round::sur( s ) ) ), 
-//                typename A::space::origin(-1) <= round::dir( s ) 
+//                Round::dls( Round::loc( s ), -Round::rad( Round::sur( s ) ) ), 
+//                typename A::space::origin(-1) <= Round::dir( s ) 
 //              )
 //     )
 //
@@ -394,8 +394,8 @@ namespace vsr { namespace cga {
 //     auto
 //     imag(const A& s) RETURNS (
 //         produce( 
-//                round::dls( round::loc( s ), round::rad( round::sur( s ) ) ), 
-//                typename A::space::origin(-1) <= round::dir( s ) 
+//                Round::dls( Round::loc( s ), Round::rad( Round::sur( s ) ) ), 
+//                typename A::space::origin(-1) <= Round::dir( s ) 
 //              )
 //     )
      
@@ -436,10 +436,10 @@ namespace vsr { namespace cga {
      @ingroup cgaops 
  
     @sa @ref flat for a list of @ref cgatypes on which these methods operate    
-    @sa vsr::nga::flat for  @ref generic n-dimensional implementation details
+    @sa vsr::nga::Flat for  @ref generic n-dimensional implementation details
   *
   */
-  struct flat {          
+  struct Flat {          
 
     ///@{
     /*! Direction of Line 
@@ -462,7 +462,7 @@ namespace vsr { namespace cga {
           @param s Line or Plane
           @returns a @ref direction
 
-          @sa nga::flat::dir for @ref generic implementation
+          @sa nga::Flat::dir for @ref generic implementation
       */
       template<class A> static auto dir( const A& s ) -> decltype( direction(s) ) { return direction(s); }
       ///@}
@@ -476,7 +476,7 @@ namespace vsr { namespace cga {
 
           @returns Point
 
-          @sa nga::flat::location for the @ref generic implementation 
+          @sa nga::Flat::location for the @ref generic implementation 
       */
       static Point location(const DualLine& f, const Point& p, bool dual=true);
 
@@ -487,7 +487,7 @@ namespace vsr { namespace cga {
 
           @returns conformal point in same metric as f
 
-          @sa nga::flat::location for the @ref generic implementation
+          @sa nga::Flat::location for the @ref generic implementation
       */
       static Point location(const Line& f, const Point& p, bool dual=false);
 
@@ -498,7 +498,7 @@ namespace vsr { namespace cga {
 
           @returns Point      
       
-          @sa nga::flat::location for the @ref generic implementation   
+          @sa nga::Flat::location for the @ref generic implementation   
       */
       static Point location(const DualPlane& f, const Point& p, bool dual=true);
 
@@ -509,16 +509,16 @@ namespace vsr { namespace cga {
 
           @returns Point
 
-          @sa nga::flat::location for the @ref generic implementation
+          @sa nga::Flat::location for the @ref generic implementation
       */
       static Point location(const Plane& f, const Point& p, bool dual=false);
 
       /*! Location of flat (shorthand) 
           @ingroup shorthand
 
-          three-letter version of cga::flat::location
+          three-letter version of cga::Flat::location
 
-          @sa nga::flat::loc for the @ref generic implementation
+          @sa nga::Flat::loc for the @ref generic implementation
       */
       template<class A> static Point loc( const A& a, const Point& p, bool dual )  { return location(a,p); }      
       ///@}
@@ -549,10 +549,10 @@ namespace vsr { namespace cga {
       @ingroup cgaops
 
       @sa @ref tangent for a list of @ref cgatypes on which these methods operate
-      @sa vsr::nga::tangent for the @ref generic  n-dimensional implementation details
+      @sa vsr::nga::Tangent for the @ref generic  n-dimensional implementation details
 
    */
-   struct tangent {
+   struct Tangent {
 
     /*! Tangent Element of A Circle at Point p
         

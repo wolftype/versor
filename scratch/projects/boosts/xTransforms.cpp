@@ -52,8 +52,8 @@ struct MyApp : App {
 
     auto pair = pa^pb;
 
-    auto bst = gen::boost( pair * amt );
-    auto tp = round::location( cga::point(1,0,0).spin( bst ) );
+    auto bst = Gen::boost( pair * amt );
+    auto tp = Round::location( cga::point(1,0,0).spin( bst ) );
 
     Draw( ca ); Draw( cga::sphere(tp,.1), 1,0,0 );
 

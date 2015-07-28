@@ -80,12 +80,12 @@ struct MyApp : App {
 
         if (da < db ){
           nodeA = pa;
-          nodeB = flat::loc( perim[i], pa, false ).null();
+          nodeB = Flat::loc( perim[i], pa, false ).null();
           nodeC = pnt[next];
           nodeD = pnt[i];
        } else {
           nodeA = pb;
-          nodeB = flat::loc( perim[prev], pb, false ).null();
+          nodeB = Flat::loc( perim[prev], pb, false ).null();
           nodeC = pnt[i];
           nodeD = pnt[prev];
        }

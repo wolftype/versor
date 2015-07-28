@@ -129,8 +129,8 @@ struct MyApp : App {
 
      for (auto& f : frame ){
         Vec v( Rand::Num(), Rand::Num(), Rand::Num());
-        f.pos() = round::null(v * initialspacing );
-        f.rot() = gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
+        f.pos() = Round::null(v * initialspacing );
+        f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
         f.scale() = .5;
      }
   }
@@ -199,7 +199,7 @@ struct MyApp : App {
        float tacc=0;
        float racc;
 
-       float dist = round::sqd(fa.pos(), mouse);          ///<-- distance from frame to mouse
+       float dist = Round::sqd(fa.pos(), mouse);          ///<-- distance from frame to mouse
        float famt = 1.0/(.01 + (dist*dist) );          ///<-- weighting distance
 
        float thresh = nearestspacing;                  ///<-- distance threshold                      
@@ -208,7 +208,7 @@ struct MyApp : App {
        for (auto& fb : frame){
          float halfplane = (fb.pos() <= fa.dxy())[0];          ///<-- on which side of fa's half-plane is fb?
          if ( halfplane > 0 ){                                 ///<-- if it is in front of fa, fa can "see it"
-           float dist = round::sqd( fa.bound(), fb.bound() );     ///<-- distance between frames
+           float dist = Round::sqd( fa.bound(), fb.bound() );     ///<-- distance between frames
            if (dist < min) fa.toonear.push_back( Member::Neighbor(fb,dist) );           ///<-- if it is less than min threshhold
            else if (dist < thresh) fa.nearest.push_back( Member::Neighbor(fb,dist) );        ///<-- if it is within distance threshhold
            if (fa.nearest.size() > numNeighbors || fa.toonear.size() > numNeighbors ) break;       //<-- stop after # nearest neighbors

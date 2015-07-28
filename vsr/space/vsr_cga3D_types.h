@@ -51,7 +51,7 @@ namespace cga{
    While it is sometimes useful for clarity to write out @ref TangentVector,
    I find the terseness of @ref Tnv to be sufficiently necessary.  
    Note that this encoding mirrors the shorthand for methods, which also 
-   can be written out in longform, as in `gen::transversor` or shorthand, as in `gen::trv`
+   can be written out in longform, as in `Gen::transversor` or shorthand, as in `Gen::trv`
 
    @sa @ref cgatypes
 
@@ -190,9 +190,9 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
     by their characteristics in the documentation -- e.g. a @ref flat or @ref round -- and to use
     static functions to evaluate them. For instance:
       
-      - vsr::flat::direction(<a @ref flat>) returns the @ref direction component of a @ref flat argument
+      - vsr::Flat::direction(<a @ref flat>) returns the @ref direction component of a @ref flat argument
 
-      - vsr::round::direction(<a @ref round>) returns the @ref direction component of a @ref round argument
+      - vsr::Round::direction(<a @ref round>) returns the @ref direction component of a @ref round argument
 
    Note, that the library user is responsible for ensuring that the arguments are of the correct category. 
 
@@ -213,12 +213,12 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   ###Organization
   
   Group names like @ref round and @ref flat are \e not actual types but categories of types which can be 
-  operated on by the similarly named static methods.  For instance, vsr::cga::round methods can be applied 
+  operated on by the similarly named static methods.  For instance, vsr::cga::Round methods can be applied 
   to @ref cgatypes of the @ref round category.  To determine the direction of a Circle:
 
         Circle c = CXY(1);
         ...
-        vsr::cga::round::direction(c)
+        vsr::cga::Round::direction(c)
 
   There is no inheritance or introspection which lets a Multivector know whether it is a @ref round or not,
   so the user of the library is responsible for feeding the right arguments to the right functions.
@@ -260,7 +260,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   @detail
   A @ref flat Element is a @ref round Element wedged with Infinity.
 
-  A @ref flat Element can be operated on by vsr::cga::flat static methods.
+  A @ref flat Element can be operated on by vsr::cga::Flat static methods.
 
   ###Flat Elements in 3D CGA
 
@@ -270,8 +270,8 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   - vsr::cga::Plane
   - vsr::cga::DualPlane
 
-   @sa vsr::cga::flat for operations on these @ref cgatypes 
-   @sa vsr::nga::flat for operations on @ref generic ND types 
+   @sa vsr::cga::Flat for operations on these @ref cgatypes 
+   @sa vsr::nga::Flat for operations on @ref generic ND types 
 
 */  
 
@@ -283,7 +283,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
 
   A @ref round Element is an n-sphere an can be operated.
   
-  A @ref round Element can be operated on by vsr::cga::round static methods.  
+  A @ref round Element can be operated on by vsr::cga::Round static methods.  
   
   The conformal model of geometric algebra
   is based on the representation of \\(p-1\\)-spheres of \\(\\mathbb{R}^p\\) 
@@ -304,8 +304,8 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   
   \\(n+1\\)-spheres can be built by wedging \\(n\\)-spheres with a 0-sphere point
 
-  @sa vsr::cga::round for operations on these @ref cgatypes 
-  @sa vsr::nga::round for operations on @ref generic ND @ref Multivector Types
+  @sa vsr::cga::Round for operations on these @ref cgatypes 
+  @sa vsr::nga::Round for operations on @ref generic ND @ref Multivector Types
   
 */
  
@@ -338,22 +338,22 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
       can be used as generators of translations in longform:
           
           using namespace vsr::cga;
-          auto trs = gen::translator( DirectionVector(.5,0,0) );
+          auto trs = Gen::translator( DirectionVector(.5,0,0) );
 
       or in @ref shorthand:
 
-          auto trs = gen::trs( Drv(.5,0,0) );
+          auto trs = Gen::trs( Drv(.5,0,0) );
 
       or 
          
-          auto trs = gen::trs(.5,0,0);
+          auto trs = Gen::trs(.5,0,0);
 
           
 
       ###Twisting
 
       vsr::cga::DualLine has a vsr::cga::DirectionVector component and can be fed as an 
-      argument into vsr::cga::gen::motor to generate a twist 
+      argument into vsr::cga::Gen::motor to generate a twist 
       
       @sa @refTwist for a helper class to build generators
 
@@ -371,7 +371,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
 
       @detail
       
-      A @ref tangent can be operated on by vsr::cga::tangent static methods.
+      A @ref tangent can be operated on by vsr::cga::Tangent static methods.
       Optionally translated to create null-sized rounds.  
 
       ###Examples of Tangent Types
@@ -394,11 +394,11 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
       The 2-blade entitites, vsr::cga::TangentVector and vsr::cga::Pair, 
       can be used as generators of conformal transformations
 
-      A vsr::cga::TangentVector can be fed as an argument into vsr::cga::gen::transversor.
+      A vsr::cga::TangentVector can be fed as an argument into vsr::cga::Gen::transversor.
       
-      A vsr::cga::Pair can be fed as an argument into vsr::cga::gen::boost
+      A vsr::cga::Pair can be fed as an argument into vsr::cga::Gen::boost
 
-      @sa vsr::cga::tangent for operations on these @ref cgatypes 
+      @sa vsr::cga::Tangent for operations on these @ref cgatypes 
 
       \todo document link to a paper on this
  
@@ -412,7 +412,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
     
     A @ref rotor is used to transform geometric elements of the algebra.
     
-    A @ref rotor can be operated on by vsr::cga::gen static methods.
+    A @ref rotor can be operated on by vsr::cga::Gen static methods.
     
     They are typically created by passing in some 2-blade to a method
     in vsr::gen, and the result applied to any element x by calling the
@@ -421,7 +421,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
     For instance, to create a quaternionic rotation we use a Euclidean plane of rotation
 
           auto v = Vec(1,0,0);
-          auto q = gen::rotor( Biv(PI,0,0) );
+          auto q = Gen::rotor( Biv(PI,0,0) );
           auto n = v.spin(q);
 
     ###Rotors in 3D CGA
@@ -434,8 +434,8 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
     - vsr::cga::Boost
     - vsr::cga::ConformalRotor
     
-    @sa vsr::cga::gen for operations making these @cgatypes
-    @sa vsr::nga::gen for @ref generic operations 
+    @sa vsr::cga::Gen for operations making these @cgatypes
+    @sa vsr::nga::Gen for @ref generic operations 
     @sa @ref Twist 
 
     

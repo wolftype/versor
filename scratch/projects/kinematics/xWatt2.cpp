@@ -27,10 +27,10 @@ struct Watt{
      fitness = 0;
      length = 0;
 
-     Point pa = round::point(-distance/2,0,0);
-     Point pb = round::point(distance/2,0,0);
-     Dls sa = round::dls(pa,distance*ra);
-     Dls sb = round::dls(pb,distance*rb);
+     Point pa = Round::point(-distance/2,0,0);
+     Point pb = Round::point(distance/2,0,0);
+     Dls sa = Round::dls(pa,distance*ra);
+     Dls sb = Round::dls(pb,distance*rb);
 
      Cir ca = (sa^Dlp(0,0,1)).dual();
      auto cb = (sb^Dlp(0,0,1));
@@ -39,16 +39,16 @@ struct Watt{
      for (int i=0;i<50;++i){
         
         double theta = PI * i/50;
-        auto tp = round::pnt_cir(ca, theta);
-        Dls sc = round::dls(tp, rc*distance);
+        auto tp = Round::pnt_cir(ca, theta);
+        Dls sc = Round::dls(tp, rc*distance);
         
         //intersection
         auto meet = (sc ^ sb).dual();
 
         Vec tmid; Vec last;
-        if (round::size(meet, false) >= 0){
+        if (Round::size(meet, false) >= 0){
           auto par = ( meet.dual() ^ Dlp(0,0,1) ).dual();
-          auto tq = round::loc( round::split(par,true));
+          auto tq = Round::loc( Round::split(par,true));
           auto mid = ( tp + ( (tq - tp ) *.5) ).null();
           vp.push_back(mid);
           ap.push_back(tp);
@@ -76,8 +76,8 @@ struct Watt{
    }
 
    void draw( float r, float g, float b, bool bDrawAll=false){
-     Point pa = round::point(-distance/2,0,0);
-     Point pb = round::point(distance/2,0,0);
+     Point pa = Round::point(-distance/2,0,0);
+     Point pb = Round::point(distance/2,0,0);
      
 
      for (int i=0;i<vp.size();++i){
@@ -87,8 +87,8 @@ struct Watt{
      }
 
     if(bDrawAll){
-       Draw( (round::dls(pa,distance*ra)^Dlp(0,0,1)).dual(),0,0,1);
-       Draw( (round::dls(pb,distance*rb)^Dlp(0,0,1)).dual(),0,0,1);
+       Draw( (Round::dls(pa,distance*ra)^Dlp(0,0,1)).dual(),0,0,1);
+       Draw( (Round::dls(pb,distance*rb)^Dlp(0,0,1)).dual(),0,0,1);
 
      if (!vp.empty() ){
        glColor3f(b,r,b);

@@ -111,17 +111,17 @@ struct MyApp : App {
 
       if (bSnap){                
         for (auto& i : single){
-          auto sa =  round::split(i,true);
-          auto sb =  round::split(i,false);
+          auto sa =  Round::split(i,true);
+          auto sb =  Round::split(i,false);
 
-          if ( round::sqd(sa, pa) < .03 ) pa = round::null( pa + (sa-pa) *.05);
-          else if ( round::sqd(sb, pa) < .03 ) pa = round::null( pa + (sb-pa)*.05);
-          if ( round::sqd(sa, pb) < .03   ) pb = round::null( pb + (sa-pb) *.05);
-          else if ( round::sqd(sb, pb) < .03 ) pb = round::null( pb + (sb-pb)*.05);
-          if ( round::sqd(sa, pc) < .03 ) pc = round::null( pc + (sa-pc) *.05);
-          else if ( round::sqd(sb, pc) < .03 ) pc = round::null( pc + (sb-pc)*.05);
-          if ( round::sqd(sa, pd) < .03 ) pd = round::null( pd + (sa-pd) *.05);
-          else if ( round::sqd(sb, pd) < .03 ) pd = round::null( pd + (sb-pd)*.05);
+          if ( Round::sqd(sa, pa) < .03 ) pa = Round::null( pa + (sa-pa) *.05);
+          else if ( Round::sqd(sb, pa) < .03 ) pa = Round::null( pa + (sb-pa)*.05);
+          if ( Round::sqd(sa, pb) < .03   ) pb = Round::null( pb + (sa-pb) *.05);
+          else if ( Round::sqd(sb, pb) < .03 ) pb = Round::null( pb + (sb-pb)*.05);
+          if ( Round::sqd(sa, pc) < .03 ) pc = Round::null( pc + (sa-pc) *.05);
+          else if ( Round::sqd(sb, pc) < .03 ) pc = Round::null( pc + (sb-pc)*.05);
+          if ( Round::sqd(sa, pd) < .03 ) pd = Round::null( pd + (sa-pd) *.05);
+          else if ( Round::sqd(sb, pd) < .03 ) pd = Round::null( pd + (sb-pd)*.05);
 
         }
       }
@@ -134,10 +134,10 @@ struct MyApp : App {
       }
 
       if (bDrawMotif){
-        Draw( round::dls(pa,.1),0,0,0,.5  );
-        Draw( round::dls(pb,.1),0,0,0,.5  );
-        Draw( round::dls(pc,.1),0,0,0,.5 );
-        Draw( round::dls(pd,.1),0,0,0,.5 );
+        Draw( Round::dls(pa,.1),0,0,0,.5  );
+        Draw( Round::dls(pb,.1),0,0,0,.5  );
+        Draw( Round::dls(pc,.1),0,0,0,.5 );
+        Draw( Round::dls(pd,.1),0,0,0,.5 );
       }
       
       if(bReset){

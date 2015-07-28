@@ -13,11 +13,11 @@
   For instance we can generate a twisting transformation (a vsr::cga::Motor)
   by either relative Lines
   
-      gen::ratio(const DualLine& dllA, const DualLine& dllB, amt t)
+      Gen::ratio(const DualLine& dllA, const DualLine& dllB, amt t)
   
   or relative Motors
       
-      gen::ratio(const Motor& motA, const Motor& motB, amt t)  
+      Gen::ratio(const Motor& motA, const Motor& motB, amt t)  
   
 
   

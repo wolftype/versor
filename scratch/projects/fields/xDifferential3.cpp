@@ -132,8 +132,8 @@ struct MyApp : App {
     for(int i=0;i<mesh.num();++i){
       auto& v = mesh[i].pnt; 
       auto& s = mesh.store(i).pnt;
-      double dist = 1.0/(.1+fabs( round::sqd(frame.pos(), s ) ) );
-      auto motor = gen::mot(dll*dist);
+      double dist = 1.0/(.1+fabs( Round::sqd(frame.pos(), s ) ) );
+      auto motor = Gen::mot(dll*dist);
       v = s.spin(motor);
     }
 

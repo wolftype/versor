@@ -6,7 +6,7 @@
 using namespace vsr;  
 using namespace vsr::ega;  
 using vsr::nga::Proj;
-using vsr::nga::gen;
+using vsr::nga::Gen;
  
 typedef NEVec<4> V4;
 typedef algebra< metric<4>,double> Algebra;
@@ -34,7 +34,7 @@ struct MyApp : gfx::GFXAppGui {
 	  if (d4){
 	   
      for (auto &i : D4 ){
-			  if (bSpin) i = i.sp( gen::rot( Multivector< Algebra, Basis<10,12> > (.01,.01) ) );
+			  if (bSpin) i = i.sp( Gen::rot( Multivector< Algebra, Basis<10,12> > (.01,.01) ) );
 			  Vec tp = Proj<4>::Call(5.0 , i);
 			  Vec to = Proj<4>::Ortho<3>(i);
 			  Draw( bOrtho ? to : tp );
@@ -43,7 +43,7 @@ struct MyApp : gfx::GFXAppGui {
 	
 	  if (f4){
 	   for (auto &i : F4 ){
-			if (bSpin) i = i.sp( gen::rot( Multivector<Algebra, Basis<10,12> > (.01,.01) ) );
+			if (bSpin) i = i.sp( Gen::rot( Multivector<Algebra, Basis<10,12> > (.01,.01) ) );
 			Vec tp = Proj<4>::Call(5.0 , i);
 			Vec to = Proj<4>::Ortho<3>(i);
 			Draw( bOrtho ? to : tp );
@@ -53,7 +53,7 @@ struct MyApp : gfx::GFXAppGui {
 	 
 	  if (h4){
 		  for (auto &i : H4 ){
-			  if (bSpin) i = i.sp( gen::rot( Multivector<Algebra, Basis<12> > (.01) ) );
+			  if (bSpin) i = i.sp( Gen::rot( Multivector<Algebra, Basis<12> > (.01) ) );
 			  Vec tp = Proj<4>::Call(5.0 , i);
 			  Vec to = Proj<4>::Ortho<3>(i);
 			  Draw( bOrtho ? to : tp );

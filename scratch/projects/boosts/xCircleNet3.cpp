@@ -39,9 +39,9 @@ struct MyData{
 
 template<> void Renderable<CyclideQuad>::DrawImmediate(const CyclideQuad& s){
   for (int i=0;i<4;++i){
-     auto tx = -round::dir(s.tframe[i].bitan[0].undual()).copy<Vec>().unit();
-     auto ty = -round::dir(s.tframe[i].bitan[1].undual()).copy<Vec>().unit();
-     auto tz = -round::dir(s.tframe[i].bitan[2].undual()).copy<Vec>().unit();
+     auto tx = -Round::dir(s.tframe[i].bitan[0].undual()).copy<Vec>().unit();
+     auto ty = -Round::dir(s.tframe[i].bitan[1].undual()).copy<Vec>().unit();
+     auto tz = -Round::dir(s.tframe[i].bitan[2].undual()).copy<Vec>().unit();
 
      DrawAt( tx, s.tframe[i].frame.pos(), 1,0,0);
      DrawAt( ty, s.tframe[i].frame.pos(), 0,1,0);
@@ -135,9 +135,9 @@ struct MyApp : App {
     auto pb = construct::point(cir_top, amt2);
 
    
-    auto tan3a = tangent::at( sphA.undual(), pa ).dual();
-    auto tan3b = tangent::at( sphA.undual(), pb ).dual();
-    auto tan1a = tangent::at( cir_top, pa );
+    auto tan3a = Tangent::at( sphA.undual(), pa ).dual();
+    auto tan3b = Tangent::at( sphA.undual(), pb ).dual();
+    auto tan1a = Tangent::at( cir_top, pa );
 
     //plunge!
     auto pd = construct::pointA( ((sphB^tan3a).dual() ^ sphB).dual() );
@@ -164,9 +164,9 @@ struct MyApp : App {
     cyclide.pos(pa, pb, pc, pd);
  
    
-   Rot trotA = gen::ratio( Vec::z, -round::dir(tan3a).copy<Vec>().unit()); 
-   Rot trotB = gen::ratio( Vec::x.spin(trotA), -round::dir(tan1a).copy<Vec>().unit());
-   Rot trotC = gen::rot( ( Vec::x.spin(trotB*trotA) ^ Vec::y.spin(trotB*trotA) ) * xfu );
+   Rot trotA = Gen::ratio( Vec::z, -Round::dir(tan3a).copy<Vec>().unit()); 
+   Rot trotB = Gen::ratio( Vec::x.spin(trotA), -Round::dir(tan1a).copy<Vec>().unit());
+   Rot trotC = Gen::rot( ( Vec::x.spin(trotB*trotA) ^ Vec::y.spin(trotB*trotA) ) * xfu );
 
    cyclide.tframe[0].frame.rot() = trotC*trotB*trotA; 
 
@@ -202,7 +202,7 @@ struct MyApp : App {
 
          int idx = i*(height+1) + j;
          mesh[idx].pos = np;
-         mesh[idx].normal = -round::dir(tan).copy<Vec>().unit();
+         mesh[idx].normal = -Round::dir(tan).copy<Vec>().unit();
         // Draw(np,0,1,1);
        }
       }
@@ -228,9 +228,9 @@ struct MyApp : App {
 
    for (int i=0;i<4;++i){
 
-     auto tx = -round::dir(cyclide.tframe[i].bitan[0].undual()).copy<Vec>().unit();
-     auto ty = -round::dir(cyclide.tframe[i].bitan[1].undual()).copy<Vec>().unit();
-     auto tz = -round::dir(cyclide.tframe[i].bitan[2].undual()).copy<Vec>().unit();
+     auto tx = -Round::dir(cyclide.tframe[i].bitan[0].undual()).copy<Vec>().unit();
+     auto ty = -Round::dir(cyclide.tframe[i].bitan[1].undual()).copy<Vec>().unit();
+     auto tz = -Round::dir(cyclide.tframe[i].bitan[2].undual()).copy<Vec>().unit();
    
 //     DrawAt( tx, cyclide.tframe[i].frame.pos(), 1, .2, 0);
 //     DrawAt( ty, cyclide.tframe[i].frame.pos(), .2, 1, 0);

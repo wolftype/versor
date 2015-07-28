@@ -40,7 +40,12 @@ Recent Changes
 
 Some major revisions have been enacted that change the API.
 
-* all namespaces are lowercase, (gen::, round::, flat::, tangent::)
+* namespaces are used to distinguish between algebras:
+	* vsr::nga:: is now the namespace for generic n-dimensional functions
+	* vsr::cga:: is now the namespace for 3D Conformal Geometric Algebra
+* all static function structs (Round::, Flat::, Tangent::) are written in full (as opposed to Ro::, Fl:: and Ta::).  Note these are captialized, since earlier versions of the devel branch used lowercase namespaces.
+* `vsr::nga::Round::` calls the generic implementation of n-D round elements, whereas vsr::cga::Round calls the 3D CGA specificati
+* Construct:: is now used to construct useful objects within a particular namespace
 * header folders **`/detail /space /form /draw`** and **`/util`** organize the various files
 
 ## CONTENTS: ##
@@ -135,15 +140,11 @@ Use Cases
 
 While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in functionality for specifically working with Conformal Geometric Algebra of 3D space, which is THE way to model all Euclidean transformations:
 
-.translate(float x, float y, float z)
-.rotate( )
-.dilate
-.twist
-.boost
+	Point p = Round::point(0,0,0);
 
-twisting (translation * rotation)
+	auto tp = p.translate(x, y, z);
 
-
+	auto rp = p.rotate( Biv::xy * theta)
 
 
 TROUBLESHOOTING
@@ -170,7 +171,7 @@ It's a fantastic book and if you're reading this you should also consider readin
 License
 ---
 Built to aid in my modelling of organic forms, the initial development was partially funded by the Olivia Long Converse Fellowship for Botanic research, courtesy of the Graduate Division at the University of California in Santa Barbara.  Currently it is supported by the Robert W. Deutsch Foundation, and under a UC Regents General Public License.  Feel free to use and distribute for **noncommercial** use as long as copyrights and credits
-are maintained. For commercial use, a licensing agreement will be necessary.
+are maintained. For commercial use, a licensing agreement may be necessary.
 
 
 ---
@@ -209,9 +210,9 @@ As for CGA, all the Pnt, Vec, Dll notation remains as before, but i've started a
 since it helps people out. 
 
 
-	auto pa = round::point( 1,0,0 ); 
-	auto pb = round::point( 0,1,0 ); 
-	auto pc = round::point(-1,0,0 ); 
+	auto pa = Round::point( 1,0,0 ); 
+	auto pb = Round::point( 0,1,0 ); 
+	auto pc = Round::point(-1,0,0 ); 
 	auto circle = pa ^ pb ^ pc;
   
 	Draw(c); 
@@ -258,11 +259,11 @@ We can extract the Scalar into a c++ double like so:
 
 Points thought of as Spheres (really, Dual Spheres, more on _Duality_ later): they are Spheres of zero radius.  As such they are a type of _Round_ element.  We can also build points this way:
 
-	round::null( 1,0,0 );
+	Round::null( 1,0,0 );
 
 or you can pass in another element
 
-	round::null( Vec(1,0,0) );
+	Round::null( Vec(1,0,0) );
 
 or use the built-in method
 
@@ -276,15 +277,15 @@ which is just "syntactic sugar" for `Vec(1,0,0).null()`
 
 Speaking of Spheres, we can also make spheres with a radius this way:
 
-	DualSphere dls = round::dls( Vec( 1,0,0 ).null(), 1 );
+	DualSphere dls = Round::dls( Vec( 1,0,0 ).null(), 1 );
 
 or  
 
-	DualSphere dls = round::dls( Vec( 1,0,0 ), 1 );
+	DualSphere dls = Round::dls( Vec( 1,0,0 ), 1 );
 	
 or, specifying the radius first and then the coordinate:  
 
-	DualSphere dls = round::dls( 1 /* <--radius */ , 1,0,0 )
+	DualSphere dls = Round::dls( 1 /* <--radius */ , 1,0,0 )
 	
 all of which give a dual sphere of radius 1 at coordinate 1,0,0; 
 
@@ -356,12 +357,11 @@ dual lines to generate transformations which twist things around them.
 Gui
 ---
 
-The examples/*.cpp files include bindings to the GLV framework for windowing and user interface controls.  
-A GLVApp class and GLVInterface class provide the necessary glue to get started quickly.
+The examples/*.cpp files include bindings to the GLV framework for windowing and user interface controls. This provides the minumum necessary glue to get started quickly building your own GA based graphics applications.
     
 The interface has a built in gui, mouse info, and keyboard info stored.  
     
-	static Circle circle;
+	Circle circle;
 	Touch(inteface, circle);
 	Draw(circle);
 	
@@ -528,8 +528,8 @@ COMMON CONFORMAL FUNCTIONS
 
 * `gen::` methods **generate** or otherwise operate on versors
 * `roond::` methods create or otherwise operate on **Round** elements (Points, Point Pairs, Circles, Spheres)
-* `flat::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
-* `tangent::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
+* `Flat::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
+* `Tangent::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
 
 
 GENERATORS 

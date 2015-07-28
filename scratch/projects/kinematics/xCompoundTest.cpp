@@ -54,11 +54,11 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    mFrame[0].rot() = gen::rot( Biv::xy * amt );
+    mFrame[0].rot() = Gen::rot( Biv::xy * amt );
 
     for (int i = 1; i < mFrame.size(); ++i){
       float t= (float)i/mFrame.size();
-      mFrame[i] = mFrame[i-1].mot() * gen::trs(0,1,0) * gen::rot( Biv::xz * PIOVERTWO * t ) * gen::rot (Biv::xy * t/2.0);
+      mFrame[i] = mFrame[i-1].mot() * Gen::trs(0,1,0) * Gen::rot( Biv::xz * PIOVERTWO * t ) * Gen::rot (Biv::xy * t/2.0);
     }
   
     int mNum = mFrame.size();
@@ -70,7 +70,7 @@ struct MyApp : App {
      int next = i < (mNum-1) ? i + 1 : 0;
      auto ylength =  (mFrame[next].vec() - mFrame[i].vec()).norm(); 
      auto theta = acos( (mFrame[i].z()<=mFrame[next].z())[0] );
-     mLink[i].rot() = gen::rotor( Biv::xz * theta * .5 );
+     mLink[i].rot() = Gen::rotor( Biv::xz * theta * .5 );
      mLink[i].pos() = Vec(0, ylength, 0).null(); 
     }
 
@@ -80,21 +80,21 @@ struct MyApp : App {
       int next = i < (mNum-1) ? i + 1 : 0;            
       auto target = (mFrame[next].vec() - mFrame[i].vec() ).unit();         //target direction
       auto ty = Vec::y.spin( ry );
-      auto theta = gen::iphi( gen::ratio(ty,target) );//acos( (ty<=target)[0] );//
-      auto xyRot = gen::rotor( Biv::xy * theta/2.0);
+      auto theta = Gen::iphi( Gen::ratio(ty,target) );//acos( (ty<=target)[0] );//
+      auto xyRot = Gen::rotor( Biv::xy * theta/2.0);
 
-      auto tmpRot = gen::ratio( Vec::y, target );                           //how to get there from origin
+      auto tmpRot = Gen::ratio( Vec::y, target );                           //how to get there from origin
       tmpRot = !ry * tmpRot;
-      Vec correctedTarget = Vec( op::project( Vec::y.spin( tmpRot ), Biv::xy ) ).unit();  //project onto xy axis of local link
+      Vec correctedTarget = Vec( Op::project( Vec::y.spin( tmpRot ), Biv::xy ) ).unit();  //project onto xy axis of local link
       
-      auto adjustedRot = gen::ratio( Vec::y, correctedTarget );
+      auto adjustedRot = Gen::ratio( Vec::y, correctedTarget );
       
-     // auto linkRot = gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position does...
+     // auto linkRot = Gen::ratio(Vec::y,  mLink[i].vec().unit() );           //what link position does...
      // auto adjustedRot = !ry * tmpRot;//!linkRot * tmpRot * !ry;//target.spin( !ry * !linkRot );                  //...compensate for that
 //      DrawAt( Vec::y.spin(adjustedRot), mFrame[i].vec(),0,0,1);
      
      // Vec y = Vec::y.spin(ry);                                              // spin Y by current rotation
-      mJoint[i].rot() = adjustedRot;//gen::ratio( Vec::y, adjustedTarget);//gen::rot( Biv::xy * acos( ( dv <= y )[0] )/2.0  ); //set rotation
+      mJoint[i].rot() = adjustedRot;//Gen::ratio( Vec::y, adjustedTarget);//Gen::rot( Biv::xy * acos( ( dv <= y )[0] )/2.0  ); //set rotation
       ry = ry * mJoint[i].rot() * mLink[i].rot();                  //compound
 
     }

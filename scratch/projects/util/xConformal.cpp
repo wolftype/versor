@@ -44,8 +44,8 @@ int main(){
 
   auto t = Vec(1,2,3);
 
-  round::null(t).print();
-  round::null(1.0).print();
+  Round::null(t).print();
+  Round::null(1.0).print();
   //Biv().print();
 
   return 0;

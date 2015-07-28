@@ -39,9 +39,9 @@ struct MyApp : App {
 
   Frame f;
   
-  Pnt sPnt = round::null(0,0,0);
+  Pnt sPnt = Round::null(0,0,0);
   Pnt rPnt; 
-  Pnt wPnt = round::null(0,0,0).trs(-2,0,0); 
+  Pnt wPnt = Round::null(0,0,0).trs(-2,0,0); 
   
 
   void setup(){
@@ -81,7 +81,7 @@ struct MyApp : App {
 
 
       //Point set by radius
-      rPnt = round::dls( radius,0,0,0 ).trs(-2,0,0);
+      rPnt = Round::dls( radius,0,0,0 ).trs(-2,0,0);
       //Point set by weight
       wPnt[3] = weight;
      
@@ -94,12 +94,12 @@ struct MyApp : App {
       for (int i = 0; i < iter; ++ i ){
          rp = rp.sp(tbst);  
          wp = wp.sp(tbst);  
-         rpnts.push_back( round::loc(rp) );
-         wpnts.push_back( round::loc(wp) );
+         rpnts.push_back( Round::loc(rp) );
+         wpnts.push_back( Round::loc(wp) );
       }   
 
       //increment orbit
-      sPnt = round::loc( sPnt.sp( tbst ) );
+      sPnt = Round::loc( sPnt.sp( tbst ) );
 
       //Frame
       DrawAt( f.y(), f.pos(), 1,0,0 );
@@ -108,7 +108,7 @@ struct MyApp : App {
     //  Draw(tk2.HF.fiberA(),0,1,0 );
     //  Draw(tk2.HF.fiberB(),0,1,0 );     
       //Orbit  
-   //   Draw(round::dls(sPnt,.2),0,1,1 );
+   //   Draw(Round::dls(sPnt,.2),0,1,1 );
       //Orbits
       for (auto& i : rpnts) Draw(i,1,0,0); //Draw radius-based points in red
       for (auto& i : wpnts) Draw(i,1,1,0); //Draw weight-based points in yellow

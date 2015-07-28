@@ -18,7 +18,7 @@
 
 
 /**@file 
-    3D CGA Frame
+    3D CGA Orthonormal Frame
 */
 
 #ifndef  vsr_cga3D_frame_INC
@@ -37,7 +37,7 @@ namespace vsr { namespace cga {
  
 //   using namespace types;
   /*!
-   *  \brief  Position and Orientation.
+   *  \brief  Orthonormal Frame composed from a Position and Orientation.
    *
    *  3D position and orientation along with methods for extracting local geometry.
    *  (i.e. a circle on a local xy plane, or a line in the in local y axis) 
@@ -82,7 +82,7 @@ namespace vsr { namespace cga {
     /// Set Scale
     Frame& scale( VSR_PRECISION s ) { mScale = s; return *this; }    
     /// Reset to Origin
-    Frame& reset() { mPos = round::point(0,0,0); mRot = Rot(1,0,0,0); return *this; }
+    Frame& reset() { mPos = Round::point(0,0,0); mRot = Rot(1,0,0,0); return *this; }
     
     /// Get Scale
     VSR_PRECISION scale() const { return mScale; }
@@ -105,7 +105,7 @@ namespace vsr { namespace cga {
     /// Set rotor with rotor 
     Frame& rot( const Rot& r) { mRot = r; return *this; }  
     /// Set rotor with bivector generator 
-    Frame& rot( const Biv& B) { mRot = gen::rot(B); return *this; }      
+    Frame& rot( const Biv& B) { mRot = Gen::rot(B); return *this; }      
     /// Transpose rotor to quaternionic representation
     Rot quat() const { return Rot( mRot[0], -(mRot[3]), (mRot[2]), -(mRot[1]) ); }
     /// Orient z axis towards coordinate v, keeping y axis as vertical as possible (uses projection)
@@ -145,8 +145,8 @@ namespace vsr { namespace cga {
     /// Set Position from Point p
     Frame& pos( const Pnt& p ) { mPos = p; return *this; } 
     /// Set Position from x,y,z coordinates
-    Frame& pos( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = round::point(_x,_y,_z); return *this; } 
-    //Frame& set( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = round::null(_x,_y,_z); return *this; }
+    Frame& pos( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Round::point(_x,_y,_z); return *this; } 
+    //Frame& set( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Round::null(_x,_y,_z); return *this; }
 
     
     Vec x() const;    ///< Local x 

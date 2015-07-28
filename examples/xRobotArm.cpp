@@ -40,9 +40,9 @@ struct MyApp : App {
 		
     Frame secondFrame( 0, distA, 0 );
 
-    // Make a sphere from a point and a radius, calls round::dls( Pnt, float )
-	  auto firstSphere = round::sphere( secondFrame.pos(), distA ); 	
-    auto targetSphere = round::sphere( targetPos, distA ); 
+    // Make a sphere from a point and a radius, calls Round::dls( Pnt, float )
+	  auto firstSphere = Round::sphere( secondFrame.pos(), distA ); 	
+    auto targetSphere = Round::sphere( targetPos, distA ); 
         
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
@@ -62,10 +62,10 @@ struct MyApp : App {
 		 draw(fjoint);  
 		
  	   	 //Pick the one closest to the base frame
-		 Frame finalFrame ( round::split(fjoint,false), Rot(1,0,0,0) );
+		 Frame finalFrame ( Round::split(fjoint,false), Rot(1,0,0,0) );
 
 		 //Sphere around fframe
-		 auto ffsphere = round::sphere( finalFrame.pos(), distA);
+		 auto ffsphere = Round::sphere( finalFrame.pos(), distA);
 
 		 //Circle of Possibilities
 		 Circle cir = ( ffsphere ^ firstSphere).dual();
@@ -76,7 +76,7 @@ struct MyApp : App {
 		 draw(fpair, 1,.5,.5);
 
 		 //Pick One and put the middle frame there
-		 Frame middleFrame( round::split(fpair,true) );
+		 Frame middleFrame( Round::split(fpair,true) );
 
 
 		 //We can store the `positions in a chain class which will sort out relative orientations for us
@@ -87,7 +87,7 @@ struct MyApp : App {
 		 k[4] = targetFrame;
 
 		 //Base Frame will rotate to plane defined by its yaxis and target point
-		 Rot r1 =  gen::ratio( Vec::z, Vec( rotationPlane.dual().unit() ) );
+		 Rot r1 =  Gen::ratio( Vec::z, Vec( rotationPlane.dual().unit() ) );
 		 k[0].rot( r1 );
 
 		 //for all the other frames, calculate joint rotations and link lengths from current positions

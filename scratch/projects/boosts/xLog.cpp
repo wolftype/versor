@@ -44,7 +44,7 @@ Boost con_( const vector<Pair>& log, float amtA){
     if (log.size() > 1){
       par += log[1] * amtA;
     }
-    return gen::bst(par);
+    return Gen::bst(par);
 }
 
 
@@ -53,7 +53,7 @@ Boost con_( const vector<Pair>& log, float amtA, float amtB){
     if (log.size() > 1){
       par += log[1] * amtB;
     }
-    return gen::bst(par);
+    return Gen::bst(par);
 }
 
 } }
@@ -106,7 +106,7 @@ struct MyApp : App {
 
     
     fa.pos(-2,0,0);
-    fa.rot() = gen::rot(0,PIOVERFOUR/2.0);
+    fa.rot() = Gen::rot(0,PIOVERFOUR/2.0);
     
     //fb.pos() = fa.pos().reflect( Dlp(1,0,0) );
     fb.mot( fa.mot().reflect( Dlp(1,0,0) ) );
@@ -144,24 +144,24 @@ struct MyApp : App {
 
     //Transformation from circle a to circle b, and log
     //.................................flip?  theta  
-    auto fullxf =  gen::ratio( ca, cc, false, hopftheta); 
+    auto fullxf =  Gen::ratio( ca, cc, false, hopftheta); 
 
-    auto log = gen::log( fullxf );
+    auto log = Gen::log( fullxf );
 
     //conformal motion (small differential)
     float amtP = (P==0) ? 0 : seg*amt/P;
     float amtQ = (Q==0) ? 0 : seg*amt/Q;
 
-    auto conf =  gen::con(log, amtP, amtQ);
+    auto conf =  Gen::con(log, amtP, amtQ);
 
     //Just the Split (for drawing purposes)
-    auto split = gen::split( fullxf );
+    auto split = Gen::split( fullxf );
     
     //numStart Points around a circle starting at theta with spread of phi,
     auto pnt = points(ca, (int)numStart, theta, phi);
 
     for (auto& i : pnt){
-      i = i.twist( (round::par_cir(ca,0)^Inf(1)).dual() * twistAmt );
+      i = i.twist( (Round::par_cir(ca,0)^Inf(1)).dual() * twistAmt );
     }
  
     //common product
@@ -180,7 +180,7 @@ struct MyApp : App {
        vector<Circle> coord;
 
        start = start.spin(conf);
-       auto tp = round::loc(start);
+       auto tp = Round::loc(start);
        Draw(tp , t, 1, 1-t);
 
        float titer =0;
@@ -189,15 +189,15 @@ struct MyApp : App {
             auto cir = tp^s;
             coord.push_back(cir);
             Draw(cir,t,titer,1-t);
-            Draw( tangent::at(cir,tp),t,1-titer,1-t);
+            Draw( Tangent::at(cir,tp),t,1-titer,1-t);
             titer+=1;
            }
 
            for (int k=0;k<iter;++k){
 
               float tk = seg2 * harmonic2 * (float)k/iter;
-              auto conf2 = gen::con( coord[0].dual(), split[1].dual(), tk/P2, tk/Q2 );
-              Draw( round::location( tp.spin(conf2) ), 0, 1, 0 );
+              auto conf2 = Gen::con( coord[0].dual(), split[1].dual(), tk/P2, tk/Q2 );
+              Draw( Round::location( tp.spin(conf2) ), 0, 1, 0 );
 
            }
            
@@ -215,17 +215,17 @@ struct MyApp : App {
        float t = (float)i/iter ;
 
        //Absolute Circles      
-       auto fxf = gen::con( log, t);
+       auto fxf = Gen::con( log, t);
        auto nc = ca.spin(fxf);
      //  Draw(nc);
 
 
        //Absolute points along orbit
    //    float tamt = seg * harmonic * t;
-   //    auto txf = gen::con( log, tamt/P, tamt/Q );
+   //    auto txf = Gen::con( log, tamt/P, tamt/Q );
 
     //  for (auto& j : pnt ){
-    //     auto tmp = round::location( j.spin(txf) );
+    //     auto tmp = Round::location( j.spin(txf) );
     //     Draw(tmp,1,0,0);
     //   }
  

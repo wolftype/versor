@@ -48,7 +48,7 @@ struct MyApp : App {
     
     auto point = calcMouse3D();
 
-    auto cen = round::point(0,0,0);
+    auto cen = Round::point(0,0,0);
 
 
     auto t = point <= (cen^Inf(1));

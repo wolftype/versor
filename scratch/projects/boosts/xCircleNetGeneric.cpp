@@ -98,23 +98,23 @@ struct Ortho {
   }
  
   DualSphere sigmaX(){
-    auto bst = gen::bst( frame.tx() * -amtX );
+    auto bst = Gen::bst( frame.tx() * -amtX );
     return Dls( frame.dyz() ).spin(bst);
   }
 
  
   DualSphere sigmaY(){
-    auto bst = gen::bst( frame.ty() * -amtY );
+    auto bst = Gen::bst( frame.ty() * -amtY );
     return Dls( frame.dxz() ).spin(bst);
   }
   
   DualSphere sigmaZX(){
-    auto bst = gen::bst( frame.tz() * -amtZX );
+    auto bst = Gen::bst( frame.tz() * -amtZX );
     return Dls( frame.dxy() ).spin(bst);
   }
 
   DualSphere sigmaZY(){
-    auto bst = gen::bst( frame.tz() * -amtZY );
+    auto bst = Gen::bst( frame.tz() * -amtZY );
     return Dls( frame.dxy() ).spin(bst);
   }
 
@@ -226,14 +226,14 @@ struct MyApp : App {
 
     bShadedOutput = bReset;
 
-    ortho1.frame.set( point(-dist,0,0) );//, gen::rot(PIOVERFOUR,PIOVERFOUR) );
-    ortho2.frame.set( point(dist,0,0) );//, gen::rot(-PIOVERFOUR,-PIOVERFOUR) );
+    ortho1.frame.set( point(-dist,0,0) );//, Gen::rot(PIOVERFOUR,PIOVERFOUR) );
+    ortho2.frame.set( point(dist,0,0) );//, Gen::rot(-PIOVERFOUR,-PIOVERFOUR) );
 
     ortho1.set(amtX1,amtY1,amtZ1,amtZ2);
     ortho2.set(amtX2,amtY2,amtZ1,amtZ2);
    
-    auto logX = gen::log( gen::ratio( ortho1.sigmaX(), ortho2.sigmaX() ) );
-    auto logY = gen::log( gen::ratio( ortho1.sigmaY(), ortho2.sigmaY() ) );
+    auto logX = Gen::log( Gen::ratio( ortho1.sigmaX(), ortho2.sigmaX() ) );
+    auto logY = Gen::log( Gen::ratio( ortho1.sigmaY(), ortho2.sigmaY() ) );
 
     
    // cout << ortho1.sigmaX() * ortho2.sigmaX() << endl;
@@ -242,14 +242,14 @@ struct MyApp : App {
 
  //   for (int i =0;i< 10;++i){
  //       float tu = .5 * (float)i/10;
- //       auto bst = gen::bst( logX * tu * amtTU);
+ //       auto bst = Gen::bst( logX * tu * amtTU);
  //       Draw( ortho1.sigmaX().spin(bst),tu,0,1-tu,.2);
  //       for (int j =0;j<10;++j){
  //         float tv = (float)j/10;
 
- //         auto con = gen::bst(logY * tv * amtTU ) * gen::bst(logX * tu * amtTV );
+ //         auto con = Gen::bst(logY * tv * amtTU ) * Gen::bst(logX * tu * amtTV );
 
- //         auto npnt = round::loc(ortho1.frame.pos().spin(con));
+ //         auto npnt = Round::loc(ortho1.frame.pos().spin(con));
  //         Draw (npnt);
 
  //       }
@@ -269,11 +269,11 @@ struct MyApp : App {
 
  //    for (int i =0;i<= 10;++i){
  //       float tu =  (float)i/10;
- //       auto bst = gen::bst_( logX * tu * -amtTU);
+ //       auto bst = Gen::bst_( logX * tu * -amtTU);
  //       auto sph = ortho1.sigmaX().spin(bst);
  //       auto cir = (sph^Dlp(0,0,1) ).dual();
  //       auto cirB = (sph^Dlp(0,1,0)).dual();
- //       auto cirC = (sph^Dlp(1,0,0).translate(round::loc(sph))).dual();
+ //       auto cirC = (sph^Dlp(1,0,0).translate(Round::loc(sph))).dual();
 
  //       Draw( cir, .5,.2,.2,2);
  //       Draw( cirB, .2,.5,.2,2);
@@ -282,8 +282,8 @@ struct MyApp : App {
  //       if (bDrawPnts){
  //       for (auto& j : pnts){
  //         auto p = j;//
- //         auto p2 = tangent::at(sphere,j).dual();
- //         Draw( round::loc( p.spin(bst)),0,.2,0 );   
+ //         auto p2 = Tangent::at(sphere,j).dual();
+ //         Draw( Round::loc( p.spin(bst)),0,.2,0 );   
  //         
  //       }
  //       }
@@ -323,13 +323,13 @@ struct MyApp : App {
 //   if (bDrawY) Draw(sphY,0,1,0,.2);
 //   
 //   
-//   auto log = gen::log( gen::ratio( sphX, sphY ) );
+//   auto log = Gen::log( Gen::ratio( sphX, sphY ) );
 //
-//   auto log2 = gen::log( gen::ratio( cirX, cirY ) );
+//   auto log2 = Gen::log( Gen::ratio( cirX, cirY ) );
 //   for (int i =0;i<=10;++i){
 //     double t = (float)i/10 * amt;
-//     auto rot = gen::bst( log * t );
-//     auto rot2 = gen::con( log2, t );
+//     auto rot = Gen::bst( log * t );
+//     auto rot2 = Gen::con( log2, t );
 //
 //     auto ncir = cirX.spin( rot2 * amt );
 //     

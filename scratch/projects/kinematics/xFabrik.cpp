@@ -122,7 +122,7 @@ vector<typename HEGraph<T>::HalfEdge*> edgeLoop( vector<typename HEGraph<T>::Hal
 
 //construct a point with some extra structure
 struct RigidPoint : public Point {
-  RigidPoint(const Point& p=round::null(0,0,0) ) : Point(p){ }
+  RigidPoint(const Point& p=Round::null(0,0,0) ) : Point(p){ }
 
   //constraint options
   Rig rig;
@@ -346,7 +346,7 @@ struct MyApp : App {
             iter++;
             auto dist = (nd.result <= i.meet()).wt();
             if (fabs(dist)>.001){
-              draw( round::dls(nd.result,.1),0,0,1);
+              draw( Round::dls(nd.result,.1),0,0,1);
               glColor3f(.8,.2,0);
             } else {
               glColor3f(0,t,1-t);

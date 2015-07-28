@@ -136,7 +136,7 @@ struct MyApp : App {
     //positions
     float pos[] = {posA, posB, posC, posD };
     for (int i=0;i<4;++i){
-      cyclide.tframe[i].frame.pos() = round::point( net.cxy(), ((float)i/4 + pos[i] )*TWOPI);
+      cyclide.tframe[i].frame.pos() = Round::point( net.cxy(), ((float)i/4 + pos[i] )*TWOPI);
     }
 
     //calculate frames and log
@@ -181,9 +181,9 @@ struct MyApp : App {
 
   for (int i=0;i<4;++i){
 
-     auto tx = -round::dir(cyclide.tframe[i].bitan[0].undual()).copy<Vec>().unit();
-     auto ty = -round::dir(cyclide.tframe[i].bitan[1].undual()).copy<Vec>().unit();
-     auto tz = -round::dir(cyclide.tframe[i].bitan[2].undual()).copy<Vec>().unit();
+     auto tx = -Round::dir(cyclide.tframe[i].bitan[0].undual()).copy<Vec>().unit();
+     auto ty = -Round::dir(cyclide.tframe[i].bitan[1].undual()).copy<Vec>().unit();
+     auto tz = -Round::dir(cyclide.tframe[i].bitan[2].undual()).copy<Vec>().unit();
 
      DrawAt( tx, cyclide.tframe[i].frame.pos(), 1, .2, 0);
      DrawAt( ty, cyclide.tframe[i].frame.pos(), .2, 1, 0);
@@ -229,10 +229,10 @@ struct MyApp : App {
 
     if (bDrawF){
 
- //     auto ratU = gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual() );
- //     auto ratV = gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual() );
- //     auto logU = gen::log( ratU  );
- //     auto logV = gen::log( ratV  );
+ //     auto ratU = Gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual() );
+ //     auto ratV = Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual() );
+ //     auto logU = Gen::log( ratU  );
+ //     auto logV = Gen::log( ratV  );
 
  //     auto curvature = Pair(logU % logV);
  //     auto k = tan.dual() <= curvature;

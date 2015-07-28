@@ -47,8 +47,8 @@ struct MyApp : App {
 
       auto tangent = Pair( Tnv(0,1,0) ).trs(mouse);
 
-      auto projCir = op::project(tangent, cir);
-      auto projSph = op::project(tangent, dls.dual());
+      auto projCir = Op::project(tangent, cir);
+      auto projSph = Op::project(tangent, dls.dual());
 
      // Pair flatPointCircle = projCir;
       Pair flatPointSphere = projSph;

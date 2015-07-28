@@ -38,12 +38,12 @@ namespace gfx{
   using vsr::cga::Dll; 
   using vsr::cga::Drv; 
   using vsr::cga::Rot; 
-  using vsr::cga::gen;
+  using vsr::cga::Gen;
 
   //FOR ALL ROUND MULTIVECTOR TYPES:
   template<class A>  
   Vec3f ObjectController :: ObjectPtr<A> :: worldPosition(){
-    auto p = cga::round::loc(*mAddress);
+    auto p = cga::Round::loc(*mAddress);
     return Vec3f(p[0],p[1],p[2]);
   }
 
@@ -65,7 +65,7 @@ namespace gfx{
       A& ps = tObject;
 
       //Center of Defining Sphere   
-      Pnt pnt = cga::round::loc(ts); //was pos
+      Pnt pnt = cga::Round::loc(ts); //was pos
               
       //2D coordinates of Defining Sphere
       Vec3f sc = i->mScene->project(pos);  
@@ -81,7 +81,7 @@ namespace gfx{
                   //Drag towards or away from element . . . 
                   int neg = (tm1.len() > tm2.len()) ? 1 : -1; 
                   float amt =  i->io().drag().len() * neg;
-                  auto tsd = gen::dil( pnt, amt);
+                  auto tsd = Gen::dil( pnt, amt);
 
                   ts = ps.sp( tsd );
 
@@ -149,7 +149,7 @@ namespace gfx{
           case 'r': //ROTATE 
           {    
               auto b = i->axisCat();
-              Rot tr = gen::rot( Vec(b[0],b[1],b[2]).duale() );
+              Rot tr = Gen::rot( Vec(b[0],b[1],b[2]).duale() );
               ts.rot() = tr * ps.rot();
               break;
           }

@@ -43,7 +43,7 @@ struct MyApp : App {
   void onAnimate(){
     if (bAnimate){
       TorusKnot tk(0,1,amt);
-      a = round::loc( a.sp( tk.bst() ) );
+      a = Round::loc( a.sp( tk.bst() ) );
     }
   }
 
@@ -53,7 +53,7 @@ struct MyApp : App {
 		TorusKnot tk(P,Q,amt);  
 		
     //Draw the point (with an added radius)
-		draw( round::dls(a,.1), 1, 1, 0 );
+		draw( Round::dls(a,.1), 1, 1, 0 );
 
     //Calculate knot orbit starting at point p
 		tk.calc( a );

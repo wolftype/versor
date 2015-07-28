@@ -88,14 +88,14 @@ struct Fold {
     }
 
     static Point Perpendicular( const Point& c, const Line& line){
-      return flat::loc(line, c, false).null();
+      return Flat::loc(line, c, false).null();
     }
 
     static vector<Point> Perpendiculars( const Point& c, const vector<Line>& lines){
       vector<Point> vp;
 
       for (auto i : lines){
-        vp.push_back( flat::loc(i, c, false).null() ); //location of point closest to line
+        vp.push_back( Flat::loc(i, c, false).null() ); //location of point closest to line
       }
 
       return vp;

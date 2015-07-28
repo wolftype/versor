@@ -91,11 +91,11 @@ namespace vsr{  namespace cga {
         Biv la =  Biv::xz * mTheta/2.0; 
         Biv lb =  Biv::xz * mPhi/2.0;
 
-        mLink[0].rot() = gen::rot(la);
-        mLink[2].rot() = gen::rot(la);
+        mLink[0].rot() = Gen::rot(la);
+        mLink[2].rot() = Gen::rot(la);
 
-        mLink[1].rot() = gen::rot(-lb);
-        mLink[3].rot() = gen::rot(-lb);
+        mLink[1].rot() = Gen::rot(-lb);
+        mLink[3].rot() = Gen::rot(-lb);
 
     }
 
@@ -117,7 +117,7 @@ namespace vsr{  namespace cga {
       Meet of 1st and 3rd spheres of possibilities
     */
      Circle circleMeet(){
-       return ( nextSphere(1) ^ prevSphere(3) ).dual();//round::dls(mFrame[1].pos(), mLengthB) ^ round::dls(mFrame[3].pos(), mLengthA) ).dual();
+       return ( nextSphere(1) ^ prevSphere(3) ).dual();//Round::dls(mFrame[1].pos(), mLengthB) ^ Round::dls(mFrame[3].pos(), mLengthA) ).dual();
      }
 
      Pair pairMeet(){
@@ -125,7 +125,7 @@ namespace vsr{  namespace cga {
      }
 
      Circle orbit(){
-       return ( nextPlane(3) ^ prevSphere(0) ).dual();//( mFrame[3].dxy() ^ round::dls( mJoint[0].pos(), mLengthB ) ).dual();
+       return ( nextPlane(3) ^ prevSphere(0) ).dual();//( mFrame[3].dxy() ^ Round::dls( mJoint[0].pos(), mLengthB ) ).dual();
      }
 
      
@@ -139,19 +139,19 @@ namespace vsr{  namespace cga {
 
         resetJoints();
 
-        mJoint[0].rot() = gen::rot( Biv::xy * amt/2.0 );
+        mJoint[0].rot() = Gen::rot( Biv::xy * amt/2.0 );
         fk(1);
         
         mFrame[3].mot( mBaseFrame.mot() * !mLink[3].mot() );
         
         //calculate intersection
         //auto dualMeet = nextSphere(1) ^ prevSphere(3);
-        auto dualMeet = nga::round::dls_pnt(mFrame[1].pos(), mLengthB) ^ nga::round::dls_pnt(mFrame[3].pos(), mLengthA);
+        auto dualMeet = nga::Round::dls_pnt(mFrame[1].pos(), mLengthB) ^ nga::Round::dls_pnt(mFrame[3].pos(), mLengthA);
         //Pair p = (nextPlane(1)^dualMeet).dual();
         Pair p = ( mFrame[1].dxy() ^ dualMeet).dual();
         
         //pick one
-        mFrame[2].pos() = round::location( round::split(p, !bSwitch) );           
+        mFrame[2].pos() = Round::location( Round::split(p, !bSwitch) );           
         
         Rot ry = mFrame[1].rot(); 
         for (int i = 1; i < 4; ++i){
@@ -159,12 +159,12 @@ namespace vsr{  namespace cga {
           int next = i < 3 ? i + 1 : 0;
           auto target = mFrame[next].vec(); 
 
-          auto linkRot = gen::ratio( mLink[i].vec().unit(), Vec::y );
+          auto linkRot = Gen::ratio( mLink[i].vec().unit(), Vec::y );
           
           Vec dv = (target-mFrame[i].vec()).unit().spin( linkRot );
 
-          //mJoint[i].rot() = gen::ratio(y,dv);
-          mJoint[i].rot() = gen::rot(  Biv::xy * acos( ( dv <= y )[0] )/2.0 * (bSwitch ?  -1 : 1 ) );
+          //mJoint[i].rot() = Gen::ratio(y,dv);
+          mJoint[i].rot() = Gen::rot(  Biv::xy * acos( ( dv <= y )[0] )/2.0 * (bSwitch ?  -1 : 1 ) );
           
          // ry = mJoint[i].rot() * ry;
           ry = ry * mJoint[i].rot() * mLink[i].rot();
@@ -196,7 +196,7 @@ namespace vsr{  namespace cga {
 
       b3.baseFrame() = Frame( b2[2].mot() * !b2.joint(2).rot() );
       
-      return b3( nga::gen::iphi( b2.joint(2).rot() ) );
+      return b3( nga::Gen::iphi( b2.joint(2).rot() ) );
 
      }
 
@@ -222,7 +222,7 @@ namespace vsr{  namespace cga {
       //set baseframe of new linkage to nth frame and undo local in-socket transformation
       b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
       //set phase of new linkage mechanism from nth joint's rotation
-      b2( bSwitch ? -nga::gen::iphi( mJoint[N].rot())  : nga::gen::iphi( mJoint[N].rot() ) );
+      b2( bSwitch ? -nga::Gen::iphi( mJoint[N].rot())  : nga::Gen::iphi( mJoint[N].rot() ) );
       //use linkAt_ to debug this point
 
       if (la==0) la = mLengthA; //else la = mLengthA;
@@ -234,7 +234,7 @@ namespace vsr{  namespace cga {
       for (int i=0;i<b3.num();++i){
         b3[i].scale() = (*this)[i].scale();
       }
-      return b3( bSwitch ? -nga::gen::iphi( b2.joint(2).rot() ) : nga::gen::iphi( b2.joint(2).rot() )  );
+      return b3( bSwitch ? -nga::Gen::iphi( b2.joint(2).rot() ) : nga::Gen::iphi( b2.joint(2).rot() )  );
 
      }
 
@@ -247,7 +247,7 @@ namespace vsr{  namespace cga {
       //set baseframe to nth frame and undo local transformation
       b2.baseFrame() = Frame( mFrame[N].mot() * !mJoint[N].rot() );
       //set phase of new linkage mechanism from nth joint's rotation
-      return b2( bSwitch ? -nga::gen::iphi( mJoint[N].rot())  : nga::gen::iphi( mJoint[N].rot() ) );
+      return b2( bSwitch ? -nga::Gen::iphi( mJoint[N].rot())  : nga::Gen::iphi( mJoint[N].rot() ) );
       
      }     
 
@@ -299,12 +299,12 @@ namespace vsr{  namespace cga {
               Dls tb = !flip ? db : db.dil( mChainB[i].pos(), log(tRatio) );
 
               Par tp = ta ^ tb;
-              bool isLegit = round::size( tp, true ) > 0;  
+              bool isLegit = Round::size( tp, true ) > 0;  
 
               if ( isLegit ){
               
                   Par p = ( ta ^ tb ^ dlp ).dual(); 
-                  Pnt pnt = round::split(p,flip);
+                  Pnt pnt = Round::split(p,flip);
 
                   mChainA[i+1].pos() = pnt;
                   mChainB[i+1].pos() = pnt;
@@ -313,9 +313,9 @@ namespace vsr{  namespace cga {
                   double b = tRatio;
             
                   if (i < mChainA.num() - 2){
-                    mChainA[i+2].pos() =  round::null( mChainA[i].vec() + 
+                    mChainA[i+2].pos() =  Round::null( mChainA[i].vec() + 
                     ( ( mChainA[i+1].vec() - mChainA[i].vec() ) * (1 + ( (flip) ? b : a ) ) ) );
-                    mChainB[i+2].pos() =  round::null( mChainB[i].vec() + 
+                    mChainB[i+2].pos() =  Round::null( mChainB[i].vec() + 
                     ( ( mChainB[i+1].vec() - mChainB[i].vec() ) * (1 + ( (flip) ? a : b ) ) ) );
                   }
 

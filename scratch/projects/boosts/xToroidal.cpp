@@ -46,8 +46,8 @@ Pair pgen(const Pnt& pa, const Pnt& pb, const Pnt& rel, VSR_PRECISION amt){
 
 //a null pair pa to pb along circle c
 Point pspin(const Point& pa, const Point& pb, const Dls& rel, double amt){
-  //auto rel = round::surround( PAO ^ c.dual() ); //sphere
-  return round::location(pa.boost( pgen(pa, pb, rel, amt) ));
+  //auto rel = Round::surround( PAO ^ c.dual() ); //sphere
+  return Round::location(pa.boost( pgen(pa, pb, rel, amt) ));
 }
 
 struct MyApp : App {
@@ -77,14 +77,14 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    auto tcir = round::produce( fa.ibound(), Biv::xz);
+    auto tcir = Round::produce( fa.ibound(), Biv::xz);
 
     auto cir = point(-3,0,0) ^ tcir.dual();
 
     auto pnt1 = point(cir,theta1);
     auto pnt2 = point(cir,theta2);
     
-    auto trans = round::loc( pnt2.boost( tcir.dual() * acosh(amt) ) );
+    auto trans = Round::loc( pnt2.boost( tcir.dual() * acosh(amt) ) );
 
     auto trans2 = pspin( pnt2, pnt1, fa.ibound(), amt );
 
