@@ -3,7 +3,7 @@
  *
  *       Filename:  xCircleBlending.cpp
  *
- *    Description:  blending of circles after doran
+ *    Description:  blending of circles after doran (linear)
  *
  *        Version:  1.0
  *        Created:  04/18/2015 17:35:03
@@ -20,6 +20,7 @@
 #include "vsr_app.h"   
 
 using namespace vsr;
+using namespace vsr::cga;
 
 struct MyApp : App {
  
@@ -28,8 +29,8 @@ struct MyApp : App {
   float amt = 0;
 
 
-  Circle ca = cga::circle(-3,0,0);
-  Circle cb = cga::circle(3,0,0);
+  Circle ca = Construct::circle(-3,0,0);
+  Circle cb = Construct::circle(3,0,0);
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables

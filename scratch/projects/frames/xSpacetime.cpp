@@ -1,7 +1,5 @@
 //ooph spacetime algebra
-//#include "vsr_products.h" 
-#include "vsr_GLVimpl.h"
-#include "vsr_sta.h"    
+#include "space/vsr_sta.h"    
  
 using namespace vsr;   
 

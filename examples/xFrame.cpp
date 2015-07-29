@@ -31,7 +31,7 @@ struct MyApp : App {
 
   Frame frameA = Frame(-3,0,0);
   Frame frameB = Frame(3,0,0);
-  Point mouse = construct::point(0,0,0);
+  Point mouse = Construct::point(0,0,0);
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables

@@ -1115,7 +1115,7 @@ struct Euc{
   
  //METHODS (MOTORS IMPLEMENTED SEPARATELY, IN SPECIFIC INSTANTIATIONS)
  template<class Algebra, class B>
- Multivector<Algebra, typename Algebra::vector> Multivector<Algebra,B>::null() const{
+ Multivector<Algebra, typename Algebra::vector_basis> Multivector<Algebra,B>::null() const{
    return nga::Round::null(*this);
  } 
   

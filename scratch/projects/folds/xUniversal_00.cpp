@@ -70,9 +70,9 @@ struct MyApp : App {
       for (int i = 0; i < bisect.size(); i+=2){
         int prev = i > 0 ? i - 1 : bisect.size() -1;
         int next = i < bisect.size() - 1 ? i + 1 : 0;
-        auto pa = construct::meet( bisect[i], bisect[next]);
+        auto pa = Construct::meet( bisect[i], bisect[next]);
         VSR_PRECISION da = Vec( pa - pnt[i] ).wt();
-        auto pb = construct::meet( bisect[prev], bisect[i]);
+        auto pb = Construct::meet( bisect[prev], bisect[i]);
         VSR_PRECISION db = Vec( pb - pnt[i] ).wt();
         
         Pnt nodeA, nodeB;

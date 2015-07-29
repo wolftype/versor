@@ -351,7 +351,7 @@ struct RabbitEar{
     auto edges = Fold::Lines( V.a, V.b, V.c);
     auto bisectors = Fold::Bisect( edges );
     
-    V.e = construct::meet( bisectors[0], bisectors[1] );    
+    V.e = Construct::meet( bisectors[0], bisectors[1] );    
     V.d = Fold::Perpendicular( V.e, edges[1] );
 
     ra.set( V.d, V.e, V.c );
@@ -384,8 +384,8 @@ struct Petal {
       Line petalB = petalA.reflect( bd );  //Draw(petalA); Draw(petalB);
      
       //New nodes
-      Point petalNodeA = construct::meet(petalA, a ^ b ^ Inf(1) ); //Draw(petalNodeA,0,1,0);
-      Point petalNodeB = construct::meet(petalB, b ^ c ^ Inf(1) ); //Draw(petalNodeB,0,1,0);
+      Point petalNodeA = Construct::meet(petalA, a ^ b ^ Inf(1) ); //Draw(petalNodeA,0,1,0);
+      Point petalNodeB = Construct::meet(petalB, b ^ c ^ Inf(1) ); //Draw(petalNodeB,0,1,0);
 
       //Line between them
       Line petalLine = petalNodeA ^ petalNodeB ^ Inf(1); petalLine = petalLine.runit();
@@ -438,7 +438,7 @@ struct Preliminary {
         Line diag = ( a ^ c ^ Inf(1)); // a was e
 
         // mid point
-        Point e = construct::meet(sa, diag); 
+        Point e = Construct::meet(sa, diag); 
 
         //Midpoints along Edges
         Point mdc = ((d+c)/2.0).null();

@@ -208,7 +208,7 @@ namespace vsr{
        *-----------------------------------------------------------------------------*/
        
        /// Conformal Mapping \\(\\boldsymbol(x)\\to n_o + \\boldsymbol{x} + \\boldsymbol{x}^2n_\\infty \\)
-       Multivector<algebra, typename algebra::vector > null() const; 
+       Multivector<algebra, typename algebra::vector_basis > null() const; 
         
        ///@{ 
        /// rotate in b plane

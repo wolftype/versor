@@ -60,7 +60,7 @@ struct MyApp : App {
  
 
     for (int i=0;i<f.num();++i){
-      auto circle = cga::circle( f[i], radius );
+      auto circle = Construct::circle( f[i], radius );
       Draw(circle,1,0,0);
 
       auto nc =frame.cxy().reflect(circle);

@@ -226,13 +226,15 @@ namespace vsr {
          template<bits::type grade>
          using make_grade =  mv_t< typename blade<dim,grade>::type >;
 
+         /// certain prenamed types in euclidean and conformal 
          using types = named_types<impl>;
 
          ///Next Higher Algebra over the same field
          using up = algebra< typename metric::up, value_t>;  
          
          
-         using vector = typename blade<dim,1>::type;          ///<-- 1-blade vector element
+         using vector_basis = typename blade<dim,1>::type;          ///<-- 1-blade vector basis (no data)
+         using vec = mv_t< vector_basis >;                          ///<-- 1-blade vector type  (stores data)
       
 
     };
@@ -244,7 +246,9 @@ namespace vsr {
     *  ALGEBRA SPECIFIC PRODUCTS
     *-----------------------------------------------------------------------------*/
     template<typename Algebra, bool Euclidean, bool Conformal>
-    struct algebra_impl {};
+    struct algebra_impl {
+       // using algebra = Algebra;  
+    };
 
    /*-----------------------------------------------------------------------------
     *  EUCLIDEAN (NO NEGATIVE METRIC)
@@ -269,6 +273,7 @@ namespace vsr {
     *-----------------------------------------------------------------------------*/
    template<typename Algebra>
    struct algebra_impl<Algebra,false, false>  {
+       using algebra = Algebra;
        using metric_type = typename Algebra::metric::type;
       // static const bits::type dim = Algebra::dim;
 
@@ -299,7 +304,26 @@ namespace vsr {
 
 
 
-   template<typename alg> struct named_types{};
+   /*-----------------------------------------------------------------------------
+    *  Default Metric Types don't exist . . . use ::vector
+    *-----------------------------------------------------------------------------*/
+   template<typename A> 
+   struct named_types{
+     
+      using alg = typename A::algebra;
+      //use as e<1,2,3> will return e123 blade
+      template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;  
+      template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
+
+      using sca = Basis<0>;  
+      using pss = Basis<bits::pss(alg::dim)>;
+      using vec = typename Blade1<alg::dim>::VEC;   
+      using biv = typename alg::template op_basis_t<vec,vec>;
+      using tri = typename alg::template op_basis_t<vec,biv>;
+      using rot = typename alg::template sum_basis_t<biv,sca>;
+     
+     
+    };
    
    /*-----------------------------------------------------------------------------
     *  Default Euclidean Basis Types (specialize named_types to your own needs)

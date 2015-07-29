@@ -23,7 +23,7 @@ using namespace vsr::cga::types;
 
 struct MyApp : App {
 
-  Circle cir = cga::circle(0,0,0);
+  Circle cir = Construct::circle(0,0,0);
  
   //Some Variables
   bool bReset = false;

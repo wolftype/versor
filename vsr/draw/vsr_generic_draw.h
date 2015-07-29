@@ -161,7 +161,7 @@ namespace vsr{
   template<typename T>
   void ColorTriangles( const T& a, const T& b, const T& c){
 
-    auto normal = -NEVec<3>( ( nga::euc::hom(a) ^ nga::euc::hom(b) ^ nga::euc::hom(c) ).dual() ).unit();
+    auto normal = -NEVec<3>( ( nga::Euc::hom(a) ^ nga::Euc::hom(b) ^ nga::Euc::hom(c) ).dual() ).unit();
 
     GL::normal( normal.begin() );
     glBegin(GL_TRIANGLES);

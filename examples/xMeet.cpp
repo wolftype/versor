@@ -25,8 +25,8 @@ using namespace vsr::cga;
 struct MyApp : App {
 
   ///DualSpheres centered at x=-.5 and x=.5, each with radius of 1
-  DualSphere sphereA = construct::sphere(-.5,0,0,1);
-  DualSphere sphereB = construct::sphere(.5,0,0,1);
+  DualSphere sphereA = Construct::sphere(-.5,0,0,1);
+  DualSphere sphereB = Construct::sphere(.5,0,0,1);
 
   void setup(){
     

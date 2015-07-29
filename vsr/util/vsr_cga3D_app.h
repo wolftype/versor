@@ -49,12 +49,12 @@ struct App : public gfx::GFXAppGui {
 
     Vec tz (tv[0], tv[1], tv[2] );
 
-    mMouse2D =  vsr::cga::construct::point(p[0],p[1],0);
-    mMouse3D =  vsr::cga::construct::point(p[0],p[1],p[2]);
+    mMouse2D =  vsr::cga::Construct::point(p[0],p[1],0);
+    mMouse3D =  vsr::cga::Construct::point(p[0],p[1],p[2]);
     mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity(1); 
 
     //intersection of ray with plane
-    mMouse3D = vsr::cga::construct::meet( mMouseRay, vsr::cga::DualPlane(tz) );
+    mMouse3D = vsr::cga::Construct::meet( mMouseRay, vsr::cga::DualPlane(tz) );
 
     return mMouse3D;
  

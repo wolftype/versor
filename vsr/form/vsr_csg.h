@@ -18,7 +18,7 @@
 
 
 #include "vsr_cga3D_frame.h"
-#include "space/vsr_cga3D_funcs.h"
+#include "space/vsr_cga3D_round.h"
 
 namespace vsr { namespace cga {
 
@@ -29,7 +29,7 @@ namespace vsr { namespace cga {
     
     for (int i =0;i<num;++i){
       VSR_PRECISION t = theta + phi * (VSR_PRECISION) i/num;
-      pnt.push_back( point(k,t) );  
+      pnt.push_back( Construct::point(k,t) );  
     }
 
     return pnt;

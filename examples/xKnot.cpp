@@ -16,7 +16,7 @@ struct MyApp : App {
 	
 	float amt,P, Q;
 
-  Point a = construct::point(2,0,0);
+  Point a = Construct::point(2,0,0);
 
   bool bDrawMode, bAnimate;
 	

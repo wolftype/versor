@@ -16,22 +16,14 @@
  * =====================================================================================
  */
 
-#include "vsr_euclidean.h"
-#include "vsr_generic_op.h"
+#include "vsr.h"
 
 using namespace vsr;
 
-
-typedef EGAMV<2, MV<Basis<1,2>,float>> Vec;
-typedef decltype( Vec() * Vec() ) Complex;
-
-typedef EGAMV<2, MV<Basis<0,3>, Complex>> C2;
-
- 
 int main(){
 
-  Complex().print();
-  Complex::PrintGP<Complex>();
-
-  C2::PrintGP<C2>();
+//  Complex().print();
+//  Complex::PrintGP<Complex>();
+//
+//  C2::PrintGP<C2>();
 }

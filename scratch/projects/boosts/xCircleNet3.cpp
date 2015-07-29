@@ -21,7 +21,7 @@
 #include "form/vsr_graph.h"  
 #include "form/vsr_cyclide.h"
 
-#include "draw/vsr_graph_draw.h"
+//#include "draw/vsr_graph_draw.h"
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -48,6 +48,27 @@ template<> void Renderable<CyclideQuad>::DrawImmediate(const CyclideQuad& s){
      DrawAt( tz, s.tframe[i].frame.pos(), 0,0,1);
   }
 }
+
+/*-----------------------------------------------------------------------------
+ *  Surface DRAW METHOD (immediate mode)
+ *-----------------------------------------------------------------------------*/
+   template<> 
+   void Renderable<vsr::HEGraph<MyData>>::DrawImmediate( const vsr::HEGraph<MyData>& graph){
+     glBegin(GL_TRIANGLES);
+     for (auto& i : graph.face()){
+          auto& a = i->a();
+          auto& b = i->b();
+          auto& c = i->c(); 
+          //glColor4f(.2,1,.2,.7);
+          GL::normal( a.normal.begin() );
+          GL::vertex( a.pos.begin() );
+          GL::normal( b.normal.begin() );
+          GL::vertex( b.pos.begin() );
+          GL::normal( c.normal.begin() );
+          GL::vertex( c.pos.begin() );
+     }
+     glEnd();
+  }
 
 
 
@@ -78,7 +99,7 @@ struct MyApp : App {
   
   int width = 10; 
   int height = 10;
-
+  float linewidth;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -92,6 +113,7 @@ struct MyApp : App {
     //gui(posA)(posB)(posC)(posD);
     //gui(bDrawForward,"bDrawForward");
     gui(bDrawA, "circles")(bDrawB, "surface")(bDrawC,"const_coord")(bDrawD, "edges")(bDrawE,"z");//(bDrawF)(bDrawNormal);
+    gui(linewidth,"linewidth",.1,10);
    // gui(bDrawEdges,"bDrawEdges");
     
     control.rot( Biv::yz * PIOVERFOUR/2.0 + Biv::xz * .01 );
@@ -124,6 +146,8 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
+    glLineWidth(linewidth);
+
     auto sphA = fa.bound();
     auto sphB = fb.bound();
     
@@ -131,8 +155,8 @@ struct MyApp : App {
     Circle cir_top = (sphA ^ Dlp(0,1,0,amt3).rotate( Biv::xy * amt ) ).dual();
     
 
-    auto pa = construct::point(cir_top, PI);
-    auto pb = construct::point(cir_top, amt2);
+    auto pa = Construct::point(cir_top, PI);
+    auto pb = Construct::point(cir_top, amt2);
 
    
     auto tan3a = Tangent::at( sphA.undual(), pa ).dual();
@@ -140,8 +164,8 @@ struct MyApp : App {
     auto tan1a = Tangent::at( cir_top, pa );
 
     //plunge!
-    auto pd = construct::pointA( ((sphB^tan3a).dual() ^ sphB).dual() );
-    auto pc = construct::pointA( ((sphB^tan3b).dual() ^ sphB).dual() );
+    auto pd = Construct::pointA( ((sphB^tan3a).dual() ^ sphB).dual() );
+    auto pc = Construct::pointA( ((sphB^tan3b).dual() ^ sphB).dual() );
 
 
     Draw( sphB^tan3a, 1, 0, 1);
@@ -152,7 +176,7 @@ struct MyApp : App {
    Circle cir = pb ^ pa ^ pd;
    Draw(cir,.3,0,0);
 
-   auto pc2 = construct::pointA( (sphB^cir.dual()).dual() );
+   auto pc2 = Construct::pointA( (sphB^cir.dual()).dual() );
 
    Draw(pa,0,1,1,1);
    Draw(pb,0,1,1,1);
@@ -174,6 +198,8 @@ struct MyApp : App {
     //calculate frames and log
     cyclide.frame();
     cyclide.log();
+
+    Draw(cyclide);
 
     //evaluate circle edges
     if (bDrawA){

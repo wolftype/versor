@@ -59,26 +59,26 @@ struct ConvexHull {
     /// Make dual euclidean plane from a face
     //template<bits::type DIM>
     auto facetPlane( Face& f) RETURNS (
-     (euc::hom( f.a() ) ^ euc::hom (f.b()) ^ euc::hom( f.c() ) ).dual()
+     (Euc::hom( f.a() ) ^ Euc::hom (f.b()) ^ Euc::hom( f.c() ) ).dual()
     )
 
     /// Make direct line from an edge
     //template<bits::type DIM>
     auto edgeLine ( Edge& e) RETURNS(
-      euc::hom( e.a() ) ^ euc::hom( e.b() )
+      Euc::hom( e.a() ) ^ Euc::hom( e.b() )
     )
 
     /// Make plane from two edges
     //template<bits::type DIM>
     auto edgePlane( Edge& ea,  Edge& eb ) RETURNS (
-     (euc::hom( ea.a() ) ^ euc::hom (ea.b()) ^ euc::hom( eb.a() ) ).dual()
+     (Euc::hom( ea.a() ) ^ Euc::hom (ea.b()) ^ Euc::hom( eb.a() ) ).dual()
     )
 
     ///are all members of group in same half space relative to plane?
     template<class DualPlaneType>
     bool isHalfSpace( DualPlaneType& dlp, vector<Type>& group ){
       for (auto& i: group){
-        auto hi = euc::hom(i);
+        auto hi = Euc::hom(i);
         auto halfspace = (hi <= dlp)[0];
         cout << halfspace << endl; 
         if (halfspace < -0.0001 ) return false;
@@ -138,12 +138,12 @@ struct ConvexHull {
           it++;
       }
 
-      auto edge = euc::hom(*ta) ^ euc::hom(*tb);
+      auto edge = Euc::hom(*ta) ^ Euc::hom(*tb);
 
       it = 0;
       for (auto& i : group){
           if( (ta!=&i) && (tb!=&i) ){
-            auto plane = (edge ^ euc::hom(i)).dual();
+            auto plane = (edge ^ Euc::hom(i)).dual();
            // cout << "iter " << it << endl; 
             bool bShell = isHalfSpace(plane, group);
             if (bShell) {
@@ -193,9 +193,9 @@ struct ConvexHull {
           auto& edgeA = graph.lastEdge();         // Last Added Edge  
           auto& edgeB = *(graph.lastEdge().next); // Next to Last Added Edge
 
-          auto ea = euc::hom(edgeA.a());
-          auto eb = euc::hom(edgeA.b());
-          auto ec = euc::hom(edgeB.a());
+          auto ea = Euc::hom(edgeA.a());
+          auto eb = Euc::hom(edgeA.b());
+          auto ec = Euc::hom(edgeB.a());
 
           auto edgeLineA = ea ^ eb;                // Last Edge Line
           auto edgeLineB = ec ^ ea;                // Alternative Edge
@@ -208,7 +208,7 @@ struct ConvexHull {
                        
             if ( !bVisited[i] ) {
 
-              auto n = euc::hom( group[i] );      // Homogenize
+              auto n = Euc::hom( group[i] );      // Homogenize
               
               // Candidate Plane
               auto ndlp = (n ^ edgeLineA).dual().unit();
@@ -264,7 +264,7 @@ struct ConvexHull {
         if (!bVisited[it]){
           //try some edge
           for (auto& e : graph.edge() ){
-            auto dlp = ( edgeLine(*e) ^ euc::hom( group[it] ) ).dual(); // Dual plane
+            auto dlp = ( edgeLine(*e) ^ Euc::hom( group[it] ) ).dual(); // Dual plane
             if ( isHalfSpace(dlp, group) ) {
                 //success, add point to edge
                 graph.addAt( group[it], *e );
@@ -298,9 +298,9 @@ struct ConvexHull {
           auto& edgeA = graph.lastEdge();         // Last Added Edge  
           auto& edgeB = *(graph.lastEdge().next); // Next to Last Added Edge
 
-          auto ea = euc::hom(edgeA.a());
-          auto eb = euc::hom(edgeA.b());
-          auto ec = euc::hom(edgeB.a());
+          auto ea = Euc::hom(edgeA.a());
+          auto eb = Euc::hom(edgeA.b());
+          auto ec = Euc::hom(edgeB.a());
 
           auto edgeLineA = ea ^ eb;                // Last Edge Line
           auto edgeLineB = ec ^ ea;                // Alternative Edge
@@ -312,7 +312,7 @@ struct ConvexHull {
                        
             if ( !bVisited[i] ) {
 
-              auto n = euc::hom( group[i] );      // Homogenize
+              auto n = Euc::hom( group[i] );      // Homogenize
               
               // Candidate Plane
               auto ndlp = (n ^ edgeLineA).dual().unit();
@@ -373,7 +373,7 @@ struct ConvexHull {
         if (!bVisited[it]){
           //try some edge
           for (auto& e : graph.edge() ){
-            auto dlp = ( edgeLine(*e) ^ euc::hom( group[it] ) ).dual(); // Dual plane
+            auto dlp = ( edgeLine(*e) ^ Euc::hom( group[it] ) ).dual(); // Dual plane
             if ( isHalfSpace(dlp, group) ) {
                 //success, add point to edge
                 graph.addAt( group[it], *e );
@@ -425,7 +425,7 @@ struct ConvexHull {
                 }
                 
                 //3. Otherwise keep track of shallowest, most convex match 
-                auto n = euc::hom( i->a() );    
+                auto n = Euc::hom( i->a() );    
                 auto ndlpA = ( n ^ ela ).dual().unit();
                 auto ndlpB = ( ela ^ n ).dual().unit();
                 VSR_PRECISION convex = (ndlpA <= dlp)[0];

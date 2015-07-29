@@ -319,15 +319,15 @@ namespace vsr{ namespace cga{
 
         if we are in namespace cga we can just write
 
-            construct::point(x,y,z) 
+            Construct::point(x,y,z) 
 
         or to help create a generic generator
 
-            construct::gen( <some bivector element> )
+            Construct::gen( <some bivector element> )
 
         @ingroup cgaops 
     */
-    struct construct {
+    struct Construct {
    
       /*-----------------------------------------------------------------------------
        *  PAIRS
@@ -544,7 +544,7 @@ namespace vsr{ namespace cga{
 
     /// a single point on circle c at theta t 
     auto pointOnCircle = [](const Circle& c, VSR_PRECISION t){
-     return construct::point(c,t);
+     return Construct::point(c,t);
     };
     /// n points on circle c
     auto pointsOnCircle = [](const Circle& c, int num){
@@ -556,11 +556,11 @@ namespace vsr{ namespace cga{
     };
     /// a pair on dual sphere
     auto pairOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-     return construct::pair(s, Vec::x.sp( Gen::rot(t,p) ) );
+     return Construct::pair(s, Vec::x.sp( Gen::rot(t,p) ) );
     };
     /// a single point on dual sphere s at theta t and phi p
     auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-      return construct::pointA( pairOnSphere(s,t,p) ).null(); 
+      return Construct::pointA( pairOnSphere(s,t,p) ).null(); 
     };
     /// many points on sphere (could use map func from gfx::data)
     auto pointsOnSphere = [](const DualSphere& s, int u, int v){

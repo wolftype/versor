@@ -18,7 +18,7 @@ struct MyApp : App {
   bool bRandom,bUpdate; 
   float amt;
 
-  Dls dls = construct::sphere(3,1,0);
+  Dls dls = Construct::sphere(3,1,0);
   
   void setup() {
 

@@ -6,32 +6,32 @@
 	
  SEE Hestenes Space Time Algebra
 */
-#include "vsr_products.h"
+#include "detail/vsr_multivector.h"
  
 namespace vsr{
 	
 	namespace sta {
-	struct STA : MGA< typename RMetric<1,3>::Type >{
+
+    using algebra = algebra< metric<1,3>, double >;
          
 		/*STANDARD FRAME of Orthonormal vectors decribes an Event ( time + location )
 	      An event, "proper vector" can be a proper momentum ( energy-momentum vector ) of a particle 
 		  or a proper velocity
 		*/        
-		                         
+		                         		
+		 //"Proper Vector"
+		 using event = algebra::vec;
 		
-		//"Proper Vector"
-		using Event = Vec;
-		
-		//Dirac Matrices are the Y . . . 
-	     using Y0 = e<1>; 								//timelike observer (squares to 1) 
-	  													 //forward light cone
-	                
-         using Y1 = e<2>; 								//spacelike    
-		 using Y2 = e<3>; 								//spacelike    
-		 using Y3 = e<4>; 								//spacelike   
+		 //Dirac Matrices are the Y . . . 
+	   using y0 = algebra::e<1>; 							   	//timelike observer (squares to 1) 
+	  													          //forward light cone
+	   //Spacelike             
+     using y1 = algebra::e<2>; 						
+		 using y2 = algebra::e<3>; 						 
+		 using y3 = algebra::e<4>; 						
 		
 		//Right-handed unit pseudoscalar
-		 using I = MV< pss(4) >; 
+		 using I = algebra::blades<4>: 
        
 		//individual position space vectors are made from spacetime bivectors yk^y0 
 		// (considered "relative vectors..." -- relative to y0 . . . 

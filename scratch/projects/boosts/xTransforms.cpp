@@ -45,7 +45,7 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
  
-    auto ca = cga::circle(0,0,0);
+    auto ca = Construct::circle(0,0,0);
   
     auto pa = cga::point(ca,PIOVERTWO);
     auto pb = cga::point(ca,-PIOVERTWO);

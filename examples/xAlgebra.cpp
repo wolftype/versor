@@ -8,7 +8,7 @@
  *        Version:  1.0
  *        Created:  04/14/2015 18:57:17
  *       Revision:  none
- *       Compiler:  gcc or clang
+ *       Compiler:  gcc or clang with c++11 support
  *
  *         Author:  Pablo Colapinto (), gmail->wolftype
  *   Organization:  wolftype
@@ -40,6 +40,8 @@ using cga = vsr::algebra< vsr::metric<4,1,true>, double >;
 //a twistor algebra of conformalized spacetime  
 //...................................<p,q>, field  >
 using twistor = vsr::algebra< vsr::metric<2,4,true>, double >;
+
+
 
 
 /*-----------------------------------------------------------------------------

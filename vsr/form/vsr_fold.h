@@ -84,7 +84,7 @@ struct Fold {
     }
 
     static Point Meet ( const vector<Line>& lines) {
-      return construct::meet( lines[0], lines[1] ) ;
+      return Construct::meet( lines[0], lines[1] ) ;
     }
 
     static Point Perpendicular( const Point& c, const Line& line){

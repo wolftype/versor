@@ -84,6 +84,8 @@ struct MyApp : App {
   int width = 10; 
   int height = 10;
 
+
+  float linewidth,offset;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -99,6 +101,8 @@ struct MyApp : App {
     gui(bDrawForward,"bDrawForward");
     gui(bDrawA, "coordinate curves")(bDrawB, "surface")(bDrawC,"coordinate surface")(bDrawD,"edges")(bDrawE,"z")(bDrawF)(bDrawNormal);
     gui(bDrawEdges,"bDrawEdges");
+    gui(offset,"offset",-10,10);
+    gui(linewidth, "linewidth",0,100);
     
     control.rot( Biv::yz * PIOVERFOUR/2.0 + Biv::xz * .01 );
 
@@ -119,6 +123,8 @@ struct MyApp : App {
 
     bShadedOutput = false;
     fnum=4;
+
+    mColor.set(.8,.8,.8);
   }
 
 
@@ -127,9 +133,11 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
+
+    glLineWidth(linewidth);
     //red NET
     net.scale(amt);
-    Draw(net.cxy(),.2,0,0);
+    Draw(net.cxy(),1,0,0);
 
     cyclide.tframe[0].frame = control;
 
@@ -142,6 +150,9 @@ struct MyApp : App {
     //calculate frames and log
     cyclide.frame();
     cyclide.log();
+
+    cout << "red: " << cyclide.altU() << endl;
+    cout << "green: " << cyclide.altV() << endl;
 
     //evaluate and draw circle edges
     if (bDrawA){
@@ -169,11 +180,16 @@ struct MyApp : App {
          auto np = cyclide.eval(tu,tv);
          //tangent
          auto norm = cyclide.evalNormal(tu,tv);
+         //offset
+         auto tan = Gen::bst( cyclide.tframe[3].tan[2] * offset );
+         auto tp = cyclide.tframe[0].frame.pos().spin ( tan );
+         auto offset = Round::location( cyclide.apply(tp,tu,tv) );
          
          mesh[i*(height+1)+j].pos = np;
          mesh[i*(height+1)+j].normal = norm;
 
          Draw(np,0,1,1);
+         Draw(offset,1,0,1);
        }
       }
 

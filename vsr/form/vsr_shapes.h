@@ -37,10 +37,10 @@ namespace vsr{ namespace cga {
 
           for (int j = 0; j < slices; ++j){
             VSR_PRECISION tu = PI * (VSR_PRECISION)j/slices;
-            Pnt pa = Round::pnt_cir(cirb, tu);
+            Pnt pa = Round::point(cirb, tu);
             for (int i = 0; i < stacks; ++i){   
                VSR_PRECISION tv = PI * (VSR_PRECISION)i/stacks;
-               Pnt pb = Round::pnt_cir( (pa <= cira).dual(), tv ); 
+               Pnt pb = Round::point( (pa <= cira).dual(), tv ); 
                m.add(pb);      
             }
         }
@@ -81,7 +81,7 @@ namespace vsr{ namespace cga {
             double t= 1.0 * i/res;
             
             for (int j = 0; j < num; ++j){
-                Vec v = Round::pnt_cir( cir[j], TWOPI * t );
+                Vec v = Round::point( cir[j], TWOPI * t );
                 m.add( v[0], v[1], v[2] );
             }
         }

@@ -61,12 +61,12 @@ Boost con_( const vector<Pair>& log, float amtA, float amtB){
 struct MyApp : App {
  
   //Some Variables
-  bool bReset, bDrawXf, bDrawPair, bDrawInterp,bDrawCoordinateGrid = false;
+  bool bReset, bDrawXf, bDrawSplit, bDrawPair, bDrawInterp,bDrawCoordinateGrid = false;
   float amt, P, Q, P2,Q2,wt,seg,seg2 = 0;
   float bivA,bivB,theta,phi,hopftheta,twistAmt,offset,iter;
 
-  bool bRealA, bRealB, bTangentA, bTangentB, bAxis, bPoint;
-  float numStart;
+  bool bRealA, bRealB, bTangentA, bTangentB, bAxis, bPoint, bFlow;
+  float numStart,linewidth;
   Frame fa,fb;
 
   /*-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ struct MyApp : App {
     gui(wt,"wt",-100,100);
    
     gui(seg,"seg",-100,100);           //<-- number of segments along "template"
-    gui(seg2,"seg2",-100,100);           //<-- number of segments along "template"
+    gui(seg2,"seg2",-100,100);         //<-- number of segments along "template"
     gui(theta,"theta",0,TWOPI);        //<-- theta position of starting orbit around circle ca 
     gui(phi,"phi",0,TWOPI);            //<-- phi spread of positions on 
     gui(hopftheta,"hopftheta",0,TWOPI);            //<-- phi spread of positions on 
@@ -97,13 +97,15 @@ struct MyApp : App {
     gui(iter,"iter",0,1000);           //<-- number of circles
   
     gui(bDrawCoordinateGrid,"bDrawCoordinateGrid");
+    gui(bDrawSplit, "bDrawSplit");
     gui(bRealA,"realA");
     gui(bRealB,"realB");
     gui(bTangentA, "tangentA");
     gui(bTangentB, "tangentB");
-    gui(bAxis, "bAxis")(bPoint, "bPoint");;
+    gui(bAxis, "bAxis")(bPoint, "bPoint");
+    gui(bFlow, "bFlow");
     gui(bivA, "bivA",-100,100)(bivB,"bivB",-100,100);
-
+    gui(linewidth,"linewidth",.5,10);
     
     fa.pos(-2,0,0);
     fa.rot() = Gen::rot(0,PIOVERFOUR/2.0);
@@ -120,6 +122,9 @@ struct MyApp : App {
     wt = 1; seg=4; amt = .01;
 
     P=3; Q=2;
+
+    mColor.set(.8,.8,.8);
+
   }
 
 
@@ -128,6 +133,8 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
+    glLineWidth(linewidth);
+    
     //Circles A and B On Frames
     auto ca = bTangentA ? fa.tz().dual() : (bRealA ? fa.cxy() : fa.icxy());
     auto cb = bTangentB ? fb.tz().dual() : (bRealB ? fb.cxy() : fb.icxy());
@@ -161,7 +168,7 @@ struct MyApp : App {
     auto pnt = points(ca, (int)numStart, theta, phi);
 
     for (auto& i : pnt){
-      i = i.twist( (Round::par_cir(ca,0)^Inf(1)).dual() * twistAmt );
+      i = i.twist( (Round::pair(ca,0)^Inf(1)).dual() * twistAmt );
     }
  
     //common product
@@ -231,25 +238,27 @@ struct MyApp : App {
  
    }
    
-    //Draw Original Circle 
-    Draw(ca);
+    //Draw Original Circles
+    Draw(ca,0,0,1);
     if (bPoint) Draw(caorth,1,0,1);
-    
-    
+    else if(!bAxis) Draw(cb,0,0,1);
+ 
     //Draw Transformed Circle
     if (!bAxis) Draw( ca.spin(fullxf),0,1,1);
     else Draw( Line( ca.spin(fullxf) ),0,1,1);
  
 
     //Draw frames    
-   // Draw(fa);
-  //  Draw(fb);
+    Draw(fa.pos(),0,0,1);
+    Draw(fb.pos(),0,0,1);
 
     // Draw Split
-    bool bBlue = false;
-    for (auto& i : split){
-     Draw(i.dual(),0,1,bBlue ? 1 : 0);
-     bBlue = !bBlue;
+    if (bDrawSplit){
+     bool bBlue = false;
+     for (auto& i : split){
+       Draw(i.dual(),0,1,bBlue ? 1 : 0);
+      bBlue = !bBlue;
+      }
     }
  
   

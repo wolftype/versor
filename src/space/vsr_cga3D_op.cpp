@@ -88,7 +88,7 @@ namespace cga {
       Dll b = dll;
       Biv B(b[0],b[1],b[2]); //Biv B(dll);  
 
-      VSR_PRECISION w = B.wt();
+      Mot::value_t w = B.wt();
 
       VSR_PRECISION  c = ( sqrt( fabs ( w ) ) );
       VSR_PRECISION sc = sin(c);
@@ -449,14 +449,14 @@ namespace cga {
       *  PAIRS
       *-----------------------------------------------------------------------------*/
       /// Pair on Sphere in v direction
-      Pair construct::pair(const DualSphere& s, const Vec& v){
+      Pair Construct::pair(const DualSphere& s, const Vec& v){
         return Round::produce(s,v);
       }
       
       /*!
        *  \brief Point Pair at x,y,z with direction vec (default Y) and radius r (default 1)
        */
-      Pair construct::pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec , VSR_PRECISION r){ 
+      Pair Construct::pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec , VSR_PRECISION r){ 
        return Round::produce( Round::dls(r*-1,x,y,z), vec );//a ^ b ^ c; 
       }
       
@@ -468,41 +468,41 @@ namespace cga {
       /*!
        *  \brief  First point of point pair pp
        */
-       Point construct::pointA(const Pair& pp){
+       Point Construct::pointA(const Pair& pp){
         return Round::location( Round::split(pp, true) );
       } 
  
        /*!
         *  \brief  Second point of point pair pp
         */
-       Point construct::pointB(const Pair& pp){
+       Point Construct::pointB(const Pair& pp){
         return Round::location( Round::split(pp, false) );
       }
 
       /// Point on Circle at theta t
-      Point construct::point(const Circle& c, VSR_PRECISION t){
+      Point Construct::point(const Circle& c, VSR_PRECISION t){
         return Round::point(c,t);
       }
       /// Point on Sphere in v direction
-      Point construct::point(const DualSphere& s, const Vec& v){
+      Point Construct::point(const DualSphere& s, const Vec& v){
         return pointA( pair(s,v) ).null();
       }
 
       /// Point from x,y,z
-      Point construct::point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
+      Point Construct::point(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z){
         return Round::null(x,y,z);
       }
       /// Point from vec
-      Point construct::point(const Vec& v){
+      Point Construct::point(const Vec& v){
         return v.null();
       } 
 
       /// Point on line l closest to p
-      Point construct::point(const Line& line, const Point& p){
+      Point Construct::point(const Line& line, const Point& p){
         return Round::null ( Flat::location( line, p, false ) ); 
       }
       /// Point on dualline l closest to p
-      Point construct::point(const DualLine& dll, const Point& p){
+      Point Construct::point(const DualLine& dll, const Point& p){
         return Round::null ( Flat::location( dll, p, true ) ); 
       }
      
@@ -512,34 +512,34 @@ namespace cga {
       /*!
        *  \brief  Circle at origin in plane of bivector B
        */
-      Circle construct::circle(const Biv& B){
+      Circle Construct::circle(const Biv& B){
        return Round::produce( Round::dls(1,0,0,0), B);//a ^ b ^ c; 
       }         
 
       /*!
        *  \brief  Circle at point p with radius r, facing direction biv
       */
-      Circle construct::circle(const Point& p, VSR_PRECISION r, const Biv& biv){
+      Circle Construct::circle(const Point& p, VSR_PRECISION r, const Biv& biv){
        return Round::produce( Round::dls(p,r*-1), biv );
       }   
                        
       /// Circle at origin with normal v and radius r (default r=1.0)
-       Circle construct::circle(const Vec& v, VSR_PRECISION r){
+       Circle Construct::circle(const Vec& v, VSR_PRECISION r){
         return Round::produce( Round::dls(r*-1,0,0,0), Op::dle(v) );//a ^ b ^ c; 
       }                    
       /// Circle at x,y,z facing in biv direction
-       Circle construct::circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv, VSR_PRECISION r){ 
+       Circle Construct::circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv, VSR_PRECISION r){ 
         return Round::produce( Round::dls(r*-1,x,y,z), biv );//a ^ b ^ c; 
       }
        /*-----------------------------------------------------------------------------
         *  HYPERBOLIC AND SPHERICAL LINES
         *-----------------------------------------------------------------------------*/
       ///Hyperbolic line through two points
-       Circle construct::hline( const Point& a, const Point& b){
+       Circle Construct::hline( const Point& a, const Point& b){
         return a ^ b ^ EP;
       }  
       ///Spherical line through two points
-       Circle construct::sline( const Point& a, const Point& b){
+       Circle Construct::sline( const Point& a, const Point& b){
         return a ^ b ^ EM;
       } 
  
@@ -548,11 +548,11 @@ namespace cga {
         *  SPHERES
         *-----------------------------------------------------------------------------*/
       /// Sphere at x,y,z with radius r (default r=1.0)     
-      DualSphere construct::sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r){
+      DualSphere Construct::sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r){
         return Round::dls(r, x, y, z );
       }
       /// Sphere at point p with radius r (default r=1.0)
-      DualSphere construct::sphere(const Point& p, VSR_PRECISION r){
+      DualSphere Construct::sphere(const Point& p, VSR_PRECISION r){
         return Round::dls(p, r);
       }     
  
@@ -562,15 +562,15 @@ namespace cga {
        *-----------------------------------------------------------------------------*/
                               
       ///Dual plane with normal and distance from center
-       DualPlane construct::plane( VSR_PRECISION a, VSR_PRECISION b, VSR_PRECISION c, VSR_PRECISION d){
+       DualPlane Construct::plane( VSR_PRECISION a, VSR_PRECISION b, VSR_PRECISION c, VSR_PRECISION d){
         return Dlp(a,b,c,d);
       } 
       ///Dual plane from vec and distance from center
-       DualPlane construct::plane( const Vec& v, VSR_PRECISION d){
+       DualPlane Construct::plane( const Vec& v, VSR_PRECISION d){
         return v + Inf(d);
       } 
       ///Direct plane through three points
-       Plane construct::plane(const Pnt& a, const Pnt& b, const Pnt& c){
+       Plane Construct::plane(const Pnt& a, const Pnt& b, const Pnt& c){
         return a ^ b ^ c ^ Inf(1);
       }             
 
@@ -581,38 +581,38 @@ namespace cga {
       /*!
        *  \brief  DualLine axis of circle c
        */
-      DualLine construct::axis(const Cir& c){
+      DualLine Construct::axis(const Cir& c){
         return (Inf(-1) <= c).runit();
       }
 
       /// Line from two Vecs     
-      Line construct::line( const Vec& a, const Vec& b){
+      Line Construct::line( const Vec& a, const Vec& b){
          return point(a[0], a[1], a[2]) ^ Vec(b[0], b[1], b[2]) ^ Inf(1);
       }
 
 
       ///Direct line through origin
-      Line construct::line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
+      Line Construct::line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
         return Ori(1) ^ Vec(x,y,z) ^ Inf(1);
       }
       ///Direct line through origin
-      Line construct::dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
+      Line Construct::dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z ){
         return line(x,y,z).dual();
       }      
       
       ///Direct line through two points
-       Line construct::line( const Point& a, const Point& b){
+       Line Construct::line( const Point& a, const Point& b){
         return a ^ b ^ Inf(1);
       }
       ///Direct line through point a in direction b   
-       Line construct::line( const Point& a, const Vec& b){
+       Line Construct::line( const Point& a, const Vec& b){
         return a ^ b ^ Inf(1);
       } 
 
       
        
       ///Squared Distance between a line and a point
-       VSR_PRECISION construct::distance( const Lin& lin, const Pnt& pnt){
+       VSR_PRECISION Construct::distance( const Lin& lin, const Pnt& pnt){
         return ( pnt <= lin.dual() )[0] * -2.0;
       }
     
@@ -624,42 +624,42 @@ namespace cga {
       #pragma mark COINCIDENCE_FUNCTIONS
 
        ///circle intersection of dual spheres
-       Circle construct::meet( const Dls& s, const Dls& d){
+       Circle Construct::meet( const Dls& s, const Dls& d){
         return (s ^ d).dual();
       }  
 
       ///circle intersection of dual sphere and direct plane
-       Circle construct::meet( const Dls& s, const Dlp& d){
+       Circle Construct::meet( const Dls& s, const Dlp& d){
         return (s ^ d).dual();
       }  
       ///circle intersection of dual spehre and direct plane
-       Circle construct::meet( const Dls& s, const Pln& d){
+       Circle Construct::meet( const Dls& s, const Pln& d){
         return (s ^ d.dual()).dual();
       }
       //circle intersection of direct sphere and dual plane
-       Circle construct::meet( const Sphere& s, const DualPlane& d){
+       Circle Construct::meet( const Sphere& s, const DualPlane& d){
         return (s.dual() ^ d).dual();
       }
       //circle intersection of direct sphere and direct plane
-       Circle construct::meet( const Sphere& s, const Plane& d){
+       Circle Construct::meet( const Sphere& s, const Plane& d){
         return (s.dual() ^ d.dual()).dual();
       } 
 
 
       //normalized and nulled point intersection of line and dual plane
-       Point construct::meet( const Line& lin, const DualPlane& dlp){ 
+       Point Construct::meet( const Line& lin, const DualPlane& dlp){ 
         Flp flp = ( (lin).dual()^ dlp).dual();
         return (flp / flp[3]).null();
       } 
       //normalized and nulled point intersection of dualline and dual plane
-       Point construct::meet( const Dll& dll, const DualPlane& dlp){ 
+       Point Construct::meet( const Dll& dll, const DualPlane& dlp){ 
         auto flp = ( dll ^ dlp).dual();
         return flp.null();
       } 
 
     
       //Point intersection of two lines
-       Point construct::meet( const Line& la, const Line& lb){
+       Point Construct::meet( const Line& la, const Line& lb){
           Line r = la.reflect(lb);
           Line r2 = (la - r.unit()).unit();
           Point pori = Flat::loc(r2, Ori(1), false);
@@ -679,12 +679,12 @@ namespace cga {
        //}  
 
       //point pair intersection of circle and Dual plane
-       Par construct::meet( const Cir& cir, const Dlp& dlp){ 
+       Par Construct::meet( const Cir& cir, const Dlp& dlp){ 
         return ( (cir).dual() ^ dlp).dual();
       } 
  
       //point pair intersection of circle and Dual sphere
-       Par construct::meet( const Cir& cir, const Dls& s){ 
+       Par Construct::meet( const Cir& cir, const Dls& s){ 
         return ( (cir).dual() ^ s).dual();
       }  
 
@@ -693,7 +693,7 @@ namespace cga {
        /*!
         *  \brief  hit tests between point and pair (treats pair as an "edge")
         */
-      bool construct::hit(const Point& pnt, const Pair& par ){
+      bool Construct::hit(const Point& pnt, const Pair& par ){
           //if inside surround < 0
           if( ( pnt <= Round::sur( par ) )[0] < 0 ) {
             if ( (pnt ^ par ^ Inf(1)).wt() == 0.0 ) {
@@ -708,7 +708,7 @@ namespace cga {
       /*!
        *  \brief  hit tests between point and circle (treats circle as "disc")
        */
-      bool construct::hit(const Point& p, const Circle& cir){
+      bool Construct::hit(const Point& p, const Circle& cir){
 
          if ( (p<= Round::sur(cir))[0] > 0){
           if ( fabs( (p^Round::car(cir)).wt()) <.00001 ) {
@@ -718,7 +718,7 @@ namespace cga {
          return false;
       }
 
-      double construct::squaredDistance(const Point& a, const Point& b){
+      double Construct::squaredDistance(const Point& a, const Point& b){
         return Round::sqd(a,b);
       }
 
@@ -731,7 +731,7 @@ namespace cga {
       /*!
        *  \brief  hyperbolic normalization of a conformal point
        */
-      Point construct::hnorm(const Pnt& p){
+      Point Construct::hnorm(const Pnt& p){
         return -(p / (EP<=p));
       }
 
@@ -739,7 +739,7 @@ namespace cga {
       /*!
        *  \brief  hyperbolic distance between two conformal points
        */
-      double construct::hdist(const Pnt& pa, const Pnt& pb){
+      double Construct::hdist(const Pnt& pa, const Pnt& pb){
         return acosh(1 - (hnorm(pa)<=hnorm(pb))[0]);
       }
 
@@ -747,7 +747,7 @@ namespace cga {
       /*!
        *  \brief  hyperbolic translation transformation generator between two conformal points
        */
-      Pair construct::hgen(const Pnt& pa, const Pnt& pb, double amt){
+      Pair Construct::hgen(const Pnt& pa, const Pnt& pb, double amt){
         double dist = hdist(pa,pb);         //<-- h distance
         auto hline = pa ^ pb ^ EP;          //<-- h line (circle)
         auto par_versor = (EP <= hline).runit();      //<-- h trans generator (pair)
@@ -759,7 +759,7 @@ namespace cga {
       /*!
        *  \brief  hyperbolic spin transformation from pa to pb by amt (0,1)
        */
-      Point construct::hspin(const Pnt& pa, const Pnt& pb, double amt){
+      Point Construct::hspin(const Pnt& pa, const Pnt& pb, double amt){
         return Round::loc( pa.boost( hgen(pa,pb,amt) ) );
         //versor * dist * amt * .5) );
       }
