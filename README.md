@@ -23,6 +23,8 @@ A (fast, lightweight) Generic C++ library for Euclidean, Projective, and Conform
 
 [Bibtex (for referencing this work in your paper)](http://versor.mat.ucsb.edu/bibtex.txt)
 
+[Reference Documentation](http://wolftype.github.io/versor/devel/html/)
+
 **Versor** is a C++ Library for **Geometric Algebra**, sometimes called **Clifford Algebra**, a system for encoding geometric concepts numerically.
 
 The headers generate optimized code at compile-time through template metaprogramming.  The core of the library
