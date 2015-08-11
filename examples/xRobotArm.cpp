@@ -1,17 +1,17 @@
-#include "vsr_app.h"
-#include "form/vsr_chain.h"
+#include <vsr/vsr_app.h>
+#include "<vsr/form/vsr_chain.h>
 
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
-	
+
 	float amt,linewidth;
 	Chain k = Chain(5);
 	Pnt targetPos;
 	float distA;
-		
+
 	void setup(){
       bindGLV();
       gui(distA, "LinkLength", 1,10);
@@ -24,43 +24,43 @@ struct MyApp : App {
 	void onDraw(){
 
     glLineWidth(linewidth);
-        
+
 		Frame baseFrame;
-		
+
     auto mouse = calcMouse3D();
-    
+
     auto v = io().viewdata.ray;
     auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
 
-		targetPos = Construct::point( line, Ori(1) );  
-		
-		Frame targetFrame ( targetPos ); 
+		targetPos = Construct::point( line, Ori(1) );
 
-		draw(targetPos, 1,0,0); 
-		
+		Frame targetFrame ( targetPos );
+
+		draw(targetPos, 1,0,0);
+
     Frame secondFrame( 0, distA, 0 );
 
     // Make a sphere from a point and a radius, calls Round::dls( Pnt, float )
-	  auto firstSphere = Round::sphere( secondFrame.pos(), distA ); 	
-    auto targetSphere = Round::sphere( targetPos, distA ); 
-        
+	  auto firstSphere = Round::sphere( secondFrame.pos(), distA );
+    auto targetSphere = Round::sphere( targetPos, distA );
+
 		 //Plane of Rotation formed by yaxis of base and target point
 		 auto rotationPlane = baseFrame.ly() ^ targetPos;
-		
-		 draw(rotationPlane,0,1,0);   
-          
+
+		 draw(rotationPlane,0,1,0);
+
  		//XZ plane of Target
 		 DualPlane targetXZ = targetFrame.dxz();
 		 draw(targetXZ,0,.5,1);
- 
+
 		 //Line of Target
 		 Dll tline = targetXZ ^ rotationPlane.dual();
 		 draw(tline,1,1,0);
- 
+
 		 //Point Pairs of Final joint
 		 Pair fjoint = ( tline ^ targetSphere ).dual();
-		 draw(fjoint);  
-		
+		 draw(fjoint);
+
  	   	 //Pick the one closest to the base frame
 		 Frame finalFrame ( Round::split(fjoint,false), Rot(1,0,0,0) );
 
@@ -91,16 +91,16 @@ struct MyApp : App {
 		 k[0].rot( r1 );
 
 		 //for all the other frames, calculate joint rotations and link lengths from current positions
-		 k.calcJoints(1); 
+		 k.calcJoints(1);
 		 k.links();
-         
+
 
 
 		 for (int i = 0; i < 4; ++i){
 
 			 glColor3f(0,1,0);
 			 gfx::Glyph::Line( k[i].pos(), k[i+1].pos() );
-			
+
 		     draw(k[i]);
 		 }
 
@@ -109,27 +109,27 @@ struct MyApp : App {
 		 draw(firstSphere,1,0,0,.4,true);
 	}
 };
-                        
+
 
 int main(){
-                          
+
   MyApp app;
   app.start();
-	
+
 	return 0;
-	
+
 }
 
 
-         
-
-
- 
- 
 
 
 
 
- 
 
- 
+
+
+
+
+
+
+
