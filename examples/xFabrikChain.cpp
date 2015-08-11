@@ -3,7 +3,7 @@
  *
  *       Filename:  xFabrikChain.cpp
  *
- *    Description:  "FABRIK" Iterative Solver 
+ *    Description:  "FABRIK" Iterative Solver
                     (see paper Aristodou and Lasenby "Inverse Kinematic Solutions using Conformal Geometric Algebra")
  *
  *        Version:  1.0
@@ -18,9 +18,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "vsr/form/vsr_chain.h"
-#include "vsr/draw/vsr_chain_draw.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_chain.h>
+#include <vsr/draw/vsr_chain_draw.h>
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -29,7 +29,7 @@ using namespace vsr::cga;
 
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -47,18 +47,18 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-    
+
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-  
+
 
     auto point = calcMouse3D();
-    
+
     //adjust amt variable to adjust error threshold
     chain.fabrik(point,chain.num()-1,0,amt);
     chain.fk();
@@ -67,12 +67,12 @@ struct MyApp : App {
 
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 
