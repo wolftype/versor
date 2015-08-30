@@ -3,12 +3,12 @@
  *
  *       Filename:  xConstrainedFabrik.cpp
  *
- *    Description:  rotational constraints added to spherical fabrik
+ *    Description:  Inverse Kinematics Constrained to R (rotation) joints only
  *
  *        Version:  1.0
- *        Created:  08/09/2015 18:11:33
+ *        Created:  08/29/2015 18:39:41
  *       Revision:  none
- *       Compiler:  gcc
+ *       Compiler:  gcc or clang with c++11 support
  *
  *         Author:  Pablo Colapinto (), gmail->wolftype
  *   Organization:  wolftype
@@ -44,16 +44,18 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100);
-    //gui(amt2,"amt2",-100,100)(amt3,"amt3",-100,100);
     gui(bReset,"bReset")(linewidth,"linewidth",1,10);
 
     //reset chain
     reset();    
 
     amt = .001;
+
+    scene.camera.pos(0,0,13);
   }
 
   void onKeyDown( const gfx::Keyboard& k){
+    //hit 's' to start/stop tracking of mouse position
     if (k.code == 's' ){
         bTrack = !bTrack;
     }
@@ -81,17 +83,13 @@ struct MyApp : App {
       if (bReset) reset();
 
       point = calcMouse3D();
-      //adjust amt variable to adjust error threshold
+     
+      //adjust amt variable to adjust error threshold (default is .001)
       chain.constrainedFabrik(point,chain.num()-1,0,amt);
       chain.fk();
-     } else {
-       //chain.joint(0).rot() = Gen::rot( Biv::xy * amt );
-       //chain.joint(1).rot() = Gen::rot( Biv::xy * amt2);
-       //chain.joint(2).rot() = Gen::rot( Biv::xy * amt3 );
-       //if (bReset) chain.fk();
-
-     }
-     
+     } 
+          
+     //Draw the chain
      Draw(chain);
 
      //Draw circle of rotation of each joint
@@ -99,34 +97,16 @@ struct MyApp : App {
         Draw( i.cxy(),1,0,0); 
      }
 
+     //Draw the in-socket rotation of each joint
      for (int i=1;i<chain.num();++i){
 
-        //rotation in terms of prev frame
-        auto dir = Vec(chain[i].pos()-chain[i-1].pos()).unit();
-        //unit projection of direction onto xy
-        Biv txy = chain[i].xy();
-        Vec pj = Op::project( dir, txy ).unit();
-
-        // possible joint rotation
-        Vec ty = chain[i].y();
-        Rot rot = Gen::ratio(  pj,ty );
-
-        auto biv = Gen::log(rot);
+        auto tyb = chain[i].y();
+        auto tya = Vec::y.spin( chain[i].rot() * !chain.joint(i).rot() );
+        auto biv = Gen::log( Gen::ratio(tya,tyb) );
         for (int j=0;j<10;++j){
           float t = (float)j/10;
-          DrawAt( pj.rotate(-biv*t), chain[i].pos(), 1,t,1-t);
+          DrawAt(tya.rotate(-biv*t), chain[i].pos(), 1,t,1-t);
         }
-
-        //get bxy of frame (minus link)
-        auto adjustedRot = chain.prevRot(i);// !rot * chain[i].rot() * !chain.link(i-1).rot();
-        Frame tmp; tmp.rot() = adjustedRot;
-
-        auto normal = tmp.z();//Vec::y.spin( adjustedRot); 
-        auto y = tmp.y();
-
-      //  DrawAt( normal, chain[i].pos(),0,0,1 );
-      //  DrawAt( y, chain[i].pos(),0,1,1 );
-                
 
      }
   }
