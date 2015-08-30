@@ -38,7 +38,7 @@ struct App : public gfx::GFXAppGui {
   vsr::cga::Point mMouse3D;
   vsr::cga::Line mMouseRay;
 
-  bool bShadedOutput = true;
+  bool bShadedOutput = false; ///< default for output
 
   vsr::cga::Point calcMouse3D(float z=.99){
 

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+make -C ext/glv
 mkdir -p build
 mkdir -p build/doc
 cd build

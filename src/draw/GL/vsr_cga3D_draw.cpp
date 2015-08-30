@@ -16,13 +16,13 @@ namespace gfx{
   using namespace vsr;
   using vsr::cga::Op;
   
-  template<> void Renderable< cga::Vec >::DrawImmediate (const cga::Vec& s){
+  template<> void Renderable< cga::Vec,0 >::DrawImmediate (const cga::Vec& s){
     //cout << "vec" << endl; 
     gfx::Glyph::Line(s);
     glPushMatrix();  
       gfx::GL::translate( s.begin() );
       gfx::GL::rotate( Op::AA(s).begin() );  
-      Glyph::Cone();
+      Glyph::SolidCone();
     glPopMatrix();
   }  
 
@@ -36,7 +36,7 @@ namespace gfx{
 //      glPopMatrix();                       
 //  }
   
-  template<> void Renderable< cga::Biv >::DrawImmediate(const  cga::Biv& s){
+  template<> void Renderable< cga::Biv,0 >::DrawImmediate(const  cga::Biv& s){
 		double ta = s.norm(); 
 	  bool sn = Op::sn( s ,  cga::Biv::xy * (-1));
 	
@@ -46,26 +46,26 @@ namespace gfx{
 		glPopMatrix();
   }
   
-  template<> void Renderable< cga::Tnv >::DrawImmediate (const  cga::Tnv& s){
+  template<> void Renderable< cga::Tnv,0 >::DrawImmediate (const  cga::Tnv& s){
     Renderable< cga::Vec >::DrawImmediate( s.copy< cga::Vec>() );
   }   
   
                     
-   template<> void Renderable< cga::Drv >::DrawImmediate (const  cga::Drv& s){ 
+   template<> void Renderable< cga::Drv,0 >::DrawImmediate (const  cga::Drv& s){ 
     Renderable< cga::Vec >::DrawImmediate( s.copy< cga::Vec>() );
   }
 
-  template<> void Renderable< cga::DualPlane >::DrawImmediate (const  cga::DualPlane& s){
+  template<> void Renderable< cga::DualPlane,0 >::DrawImmediate (const  cga::DualPlane& s){
     gfx::GL::translate( Op::Pos(s).begin() );
     gfx::GL::rotate( Op::AA(s).begin() ); 
     Glyph::SolidGrid(6,6,5);
       //Glyph::Rect(10,10);
   }
-  template<> void Renderable< cga::Plane >::DrawImmediate (const  cga::Plane& s){
+  template<> void Renderable< cga::Plane,0 >::DrawImmediate (const  cga::Plane& s){
     Renderable< cga::DualPlane >::DrawImmediate(s.dual());
   }
 
-  template<> void Renderable< cga::Circle >::DrawImmediate( const  cga::Circle& s )  {  
+  template<> void Renderable< cga::Circle,0 >::DrawImmediate( const  cga::Circle& s )  {  
     VSR_PRECISION rad = nga::Round::rad( s );
     bool im = nga::Round::size(s, false) > 0 ? 1 : 0;  
      
@@ -75,7 +75,7 @@ namespace gfx{
     im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
   }  
   
-  template<> void Renderable< cga::Point >::DrawImmediate (const  cga::Point& s){
+  template<> void Renderable< cga::Point,0 >::DrawImmediate (const  cga::Point& s){
  
       VSR_PRECISION ta = nga::Round::size( s, true );
 
@@ -95,7 +95,7 @@ namespace gfx{
       }
   } 
   
-  template<> void Renderable< cga::Sphere >::DrawImmediate (const  cga::Sphere& s){
+  template<> void Renderable< cga::Sphere,0 >::DrawImmediate (const  cga::Sphere& s){
  
       VSR_PRECISION ta = nga::Round::size( s, false );
 
@@ -115,11 +115,11 @@ namespace gfx{
       }
   }
   
-  template<> void Renderable< cga::FlatPoint >::DrawImmediate (const cga::FlatPoint& s){
+  template<> void Renderable< cga::FlatPoint,0 >::DrawImmediate (const cga::FlatPoint& s){
      Renderable< cga::Point >::DrawImmediate( nga::Round::point( s[0], s[1], s[2] ) );
   }
   
-  template<> void Renderable< cga::Pair >::DrawImmediate (const  cga::Pair& s){
+  template<> void Renderable< cga::Pair,0 >::DrawImmediate (const  cga::Pair& s){
        //Is Imaginary?
        VSR_PRECISION size = nga::Round::size( s, false );
 
@@ -158,25 +158,38 @@ namespace gfx{
        }
   }  
   
-  template<> void Renderable< cga::DualLine >::DrawImmediate (const  cga::DualLine& s){
+  template<> void Renderable< cga::DualLine,0 >::DrawImmediate (const  cga::DualLine& s){
        cga::Drv d = nga::Flat::dir( s.undual() );
        cga::Dls v = nga::Flat::loc( s , PAO, true);
       gfx::GL::translate (v.begin());
       gfx::Glyph::DashedLine(d * 10, d * -10);  
   }  
   
-  template<> void Renderable< cga::Line >::DrawImmediate (const  cga::Line& s){
+  template<> void Renderable< cga::Line,0 >::DrawImmediate (const  cga::Line& s){
        cga::Drv d = nga::Flat::dir( s );
        cga::Dls v = nga::Flat::loc( s , nga::Round::point(0,0,0), false);
       gfx::GL::translate (v.begin());
       gfx::Glyph::Line(d * 10, d * -10);  
   }
   
-  template<> void Renderable< cga::Frame >::DrawImmediate( const  cga::Frame& f){
+  template<> void Renderable< cga::Frame,0 >::DrawImmediate( const  cga::Frame& f){
      gfx::GL::translate ( f.pos().begin() );
      gfx::GL::rotate( nga::Gen::aa( f.rot() ).begin() ); 
      gfx::GL::scale( f.scale() );  
      gfx::Glyph::Axes(  cga::Vec::x,  cga::Vec::y,  cga::Vec::z );
+  }  
+
+  template<> void Renderable< cga::Frame,1 >::DrawImmediate( const  cga::Frame& f){
+     gfx::GL::translate ( f.pos().begin() );
+     //gfx::GL::rotate( nga::Gen::aa( f.rot() ).begin() ); 
+     gfx::GL::scale( f.scale() );  
+     gfx::GL::color(1,0,0);
+     render::draw( f.x() );
+     gfx::GL::color(0,1,0);
+     render::draw( f.y() );
+     gfx::GL::color(0,0,1);
+     render::draw( f.z() );
+    // gfx::Glyph::Axes(  cga::Vec::x,  cga::Vec::y,  cga::Vec::z );
   }  
 
 //  template<> void Renderable< cga:: >::DrawImmediateB( const  cga::Frame& f){
@@ -190,14 +203,14 @@ namespace gfx{
 //  }  
   
 
-  template<> void Renderable< Field<cga::Sca> >::DrawImmediate( const Field< cga::Sca>& f){
+  template<> void Renderable< Field<cga::Sca>,0 >::DrawImmediate( const Field< cga::Sca>& f){
      static cga::Pnt p =  cga::Pnt();
     for (int i = 0; i < f.num(); ++i){  
       render::drawAt(p, f.grid(i));//, f[i][0], 1, 1 - f[i][0] ); 
     }
   }
 
-  template<> void Renderable< Field<cga::Vec> >::DrawImmediate( const Field< cga::Vec>& f){
+  template<> void Renderable< Field<cga::Vec>,0 >::DrawImmediate( const Field< cga::Vec>& f){
     for (int i = 0; i < f.num(); ++i){  
       render::drawAt( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
     }
@@ -209,13 +222,13 @@ namespace gfx{
 //    }
 //  }
 
-  template<> void Renderable< Field<cga::Tnv> >::DrawImmediate( const Field< cga::Tnv>& f){
+  template<> void Renderable< Field<cga::Tnv>,0 >::DrawImmediate( const Field< cga::Tnv>& f){
     for (int i = 0; i < f.num(); ++i){  
       render::drawAt( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); 
     }
   }  
 
-  template<> void Renderable< Field<cga::Frame> >::DrawImmediate( const Field< cga::Frame>& f){
+  template<> void Renderable< Field<cga::Frame>,0 >::DrawImmediate( const Field< cga::Frame>& f){
     for (int i = 0; i < f.num(); ++i){  
       glPushMatrix(); 
       Renderable< cga::Frame >::DrawImmediate( f[i] ); 
@@ -223,7 +236,7 @@ namespace gfx{
     }
   } 
   
-   template<> void Renderable< Field<cga::Point> >::DrawImmediate( const Field< cga::Point>& f){
+   template<> void Renderable< Field<cga::Point>,0 >::DrawImmediate( const Field< cga::Point>& f){
      for (int i = 0; i < f.num(); ++i){  
       //Draw( f[i] ); 
       render::begin();

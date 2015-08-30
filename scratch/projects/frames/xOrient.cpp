@@ -1,13 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  xFabrikChain.cpp
+ *       Filename:  xOrient.cpp
  *
- *    Description:  "FABRIK" Iterative Solver
-                    (see paper Aristodou and Lasenby "Inverse Kinematic Solutions using Conformal Geometric Algebra")
+ *    Description:  example orientation keeping y axis as vertical as possible
  *
  *        Version:  1.0
- *        Created:  07/20/2015 19:56:35
+ *        Created:  08/28/2015 12:55:04
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -17,25 +16,16 @@
  * =====================================================================================
  */
 
-
-#include <vsr/vsr_app.h>
-#include <vsr/form/vsr_chain.h>
-#include <vsr/draw/vsr_chain_draw.h>
+#include "vsr_app.h"   
 
 using namespace vsr;
 using namespace vsr::cga;
 
-
 struct MyApp : App {
-
+ 
   //Some Variables
   bool bReset = false;
   float amt = 0;
-
-
-  //Chain of 10 links
-  Chain chain = Chain(10);
-
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
@@ -45,39 +35,53 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-
+    
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines
+   *  Draw Routines 
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-    auto point = calcMouse3D();
 
-    //adjust amt variable to adjust error threshold
-    chain.fabrik(point,chain.num()-1,0,amt);
-    chain.fk();
+    scene.camera.lens.bOrtho = bReset;
+    Vec target(2,2,2);
+    //Draw( Construct::point(2,2,2),1,0,0 );
 
-   // Draw(chain);
+    Frame fa;
+    Frame fb;
+    Frame fc;
+    
+    fb.rot() = Gen::ratio( Vec::z, target.unit() );
+    fc.orient(target);
 
-    for (int i = 0;i<chain.num(); ++i){
-      Draw( chain[i]);
-      Draw( chain.nextLine(i),1,0,0);
-      Draw( chain.nextSphere(i),0,1,1,.3);
-    }
 
+    fa.pos(-2,0,0);
+    fc.pos(2,0,0);
+//    Draw(fa);
+//    if (bReset) {
+      DrawB(fa);
+     // DrawAt(target.unit(),fa.pos(),0,0,1,.5);
+      Draw(fb.xy(),.3,.3,.2);
+      DrawB(fb);
+      DrawAt( Vec(Op::project( Vec::y, fb.xy() )).unit(), fb.pos(), 0,1,0,.5 );
+//    }
+//    else {
+      
+      DrawB(fc);
+//    }
 
   }
-
+  
 };
 
 
 int main(){
-
+                             
   MyApp app;
   app.start();
 
   return 0;
 
 }
+

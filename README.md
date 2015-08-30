@@ -13,9 +13,8 @@ CSS: scripts/style.css
 
 Versor (libvsr)
 ===
-###version 3.0
 
-A (fast, lightweight) Generic C++ library for Euclidean, Projective, and Conformal Geometric Algebra.  Spacetime Algebra too (etc).  
+A (fast) Generic C++ library for Geometric Algebras, including Euclidean, Projective, Conformal, Spacetime (etc).  
 ---
 ### Currently tested on Linux and Mac OS X ###
 
@@ -33,25 +32,13 @@ is under 150kb, and supports arbitrary dimensions and metrics (limited by your c
 The library can be used as a math-only, or as an application with built-in graphics.  Both OpenGL and OpeGLES draw routines are supported.   
 
 
-Developer: Pablo Colapinto  
+Lead Developer: Pablo Colapinto  
 `gmail: wolftype`  
 
 
-Recent Changes
----
-
-Some major revisions have been enacted that change the API.
-
-* namespaces are used to distinguish between algebras:
-	* vsr::nga:: is now the namespace for generic n-dimensional functions
-	* vsr::cga:: is now the namespace for 3D Conformal Geometric Algebra
-* all static function structs (Round::, Flat::, Tangent::) are written in full (as opposed to Ro::, Fl:: and Ta::).  Note these are captialized, since earlier versions of the devel branch used lowercase namespaces.
-* `vsr::nga::Round::` calls the generic implementation of n-D round elements, whereas vsr::cga::Round calls the 3D CGA specificati
-* Construct:: is now used to construct useful objects within a particular namespace
-* header folders **`/detail /space /form /draw`** and **`/util`** organize the various files
-
 ## CONTENTS: ##
-                               
+
+* [Recent Changes](#recentchanges)                               
 * [Quickstart](#quickstart)   
 * [Introduction](#introduction)
 * [Generators](#generators) 
@@ -60,6 +47,22 @@ Some major revisions have been enacted that change the API.
 * [Gui](#gui)
 * [Operators](#operators)
 * [Elements](#elements)
+ 
+Recent Changes
+---
+
+Some major revisions have been enacted that change the API.
+
+* namespaces are used to distinguish between algebras:
+	* **`vsr::nga::`** is the namespace for generic n-dimensional functions
+	* **`vsr::cga::`** is the namespace for 3D Conformal Geometric Algebra
+		* For example **`vsr::nga::Round::`** calls the generic implementation of n-D round elements whereas **`vsr::cga::Round::`** calls the 3D CGA specification
+* all static function structs (**`Round::`**, **`Flat::`**, **`Tangent::`**) are written in full (as opposed to **`Ro::`**, **`Fl::`** and **`Ta::`**).  We note these are Capitalized, since earlier versions of the devel branch used lowercase namespaces.
+* **`Construct::`** is now used to construct useful objects within a particular namespace
+	* example: **`Construct::point(0,1,0)`** constructs a point at coordinate `(0,1,0)`
+* header folders **`/detail /space /form /draw`** and **`/util`** organize the various files
+
+
 
 ## LINKS: ##
 
@@ -93,11 +96,11 @@ Some major revisions have been enacted that change the API.
 QUICKSTART
 ---
 
-Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher)
+Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want'glew.  See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
 
 	git clone git://github.com/wolftype/versor.git 
  
-You'll want to initialize the submodules to build any graphics examples:
+You'll need to initialize the submodules to build any graphics examples:
 
 	cd versor
 	git submodule init
@@ -111,7 +114,7 @@ To build math only
 
 	./build.sh
      
-If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below, email me, or post an issue on github.
+If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below, or post as an issue on github.
 
 
 Use Cases
@@ -151,6 +154,10 @@ While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in fun
 
 TROUBLESHOOTING
 ---                 
+
+* You may need to install Glew on newer macs.  Best way to do this is with brew:
+    
+    brew install glew
 
 * You'll need C++11 support on your compiler (See makefile notes below). For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).
 * Alternatively an earlier version of Versor is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
@@ -339,7 +346,7 @@ That's up to you: Both long-name and nick-name versions are valid in libvsr (the
 You can also generate rotors using `Gen::rot( <some bivector> )`  In fact, all transformations can be generated this way, and then later applied to arbitrary elements.
 For instance, `Motors` can be generated which translate and rotate an element at the same time.  This is also called a _twist_.
 
-	Motor m = gen::mot(<some dual line>); 	//<-- Makes A Twisting Motor around Some Dual Line
+	Motor m = Gen::mot(<some dual line>); 	//<-- Makes A Twisting Motor around Some Dual Line
 	Point p = Vec(0,0,0).null().sp(m);		//<-- Applies above motor to a Point
 		
 You'll notice there are _dual_ versions of elements: as in a `DualLine` (or `Dll` for short).  That's because in the real world of abstract geometry, there are usually
@@ -363,11 +370,13 @@ The examples/*.cpp files include bindings to the GLV framework for windowing and
     
 The interface has a built in gui, mouse info, and keyboard info stored.  
     
+    //... a member of your App 
 	Circle circle;
-	Touch(inteface, circle);
-	Draw(circle);
+    //...in App::setup() 
+	objectController.attach(&circle);
+
 	
-Putting the above code inside your application's `onDraw()` loop will enable you to click and modify geometric elements by hitting the "G", "R" and "S" keys.  
+Putting the above code inside your application will enable you to click and modify geometric elements by hitting the "T", "R" and "S" keys (for translate, rotate, and scale)
 Hit any other key to deselect all elements.   
 
 
@@ -380,9 +389,10 @@ Key                                 | Response
 `SHIFT` + `Mouse` or `Arrow Keys`   | Translate the camera  in x and z directions.  
 `CTRL`+ `Mouse` or `Arrow Keys` 	| Rotate the camera  
 `ALT` +`Arrow Keys`              	| Rotate the model view around.  
-`G`                                 | Grab an Element  
+`T`                                 | Translate an Element  
 `R`                                 | Rotate an Element  
 `S`                                 | Scale an Element 
+`Tab`                               | Switch from navigation mode (default) to object manipulation mode
 Any other key						| Release all Elements 
  
 
@@ -528,7 +538,7 @@ COMMON CONFORMAL FUNCTIONS
 
 `vsr_generic_op.h` and `vsr_cga3D_op.h` contain the bulk of the functions for generating elements from other elements.  Some guidelines:
 
-* `gen::` methods **generate** or otherwise operate on versors
+* `Gen::` methods **generate** or otherwise operate on versors
 * `roond::` methods create or otherwise operate on **Round** elements (Points, Point Pairs, Circles, Spheres)
 * `Flat::` methods create or otherwise operate on **Flat** elements (Lines, Dual Lines, Planes, Dual Planes, or Flat Points)
 * `Tangent::` methods create or otherwise operate on **Tangent** elements (Tangent Vectors, Tangent Bivectors, Tangent Trivectors)
@@ -540,12 +550,12 @@ GENERATORS
 |       |                                     |  
 Returns | Function                            | Description  
 ------- | ----------------------------------- | -------------------------------------------------  
-Rot     | gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector  
-Trs     | gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector  
-Mot     | gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line  
-Dil     | gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount  
-Trv     | gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector  
-Bst     | gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair  
+Rot     | Gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector  
+Trs     | Gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector  
+Mot     | Gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line  
+Dil     | Gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount  
+Trv     | Gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector  
+Bst     | Gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair  
 
    
 REFLECTIONS

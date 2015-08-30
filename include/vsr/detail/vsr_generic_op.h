@@ -856,7 +856,7 @@ struct Euc{
      )
 
     /*!
-      Creates a real / imaginary round from an imaginary / real round
+      Creates a real round from an imaginary / real round
      */
      template<class A>
      static constexpr auto

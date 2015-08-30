@@ -7,14 +7,23 @@
 //#include "vsr_smart.h"
 
 namespace vsr{
+
+
+  //empty struct default data (so reference can be returned
+  struct nada {
+
+  };
  
- /*! Templated half edge structure (pointers to any type)
+ /*! Templated half edge structure (pointers to any type, with any type at any edge)
   *  Navigates references to surface topology of data only (DOES NOT STORE DATA)
   *
-  *  thoughts: could this be applied to any complex?  perhaps by treating edges
+  *  thoughts: could this half-edge approach be applied to any simplicial complex? i.e. by treating edges
   *  as generic k-1 simplices...
+
+      @todo generalize half-edge data structure to any dimension
+      @todo add templates to faces as well
   */ 
- template<class T>
+ template<class T, class E=nada>
  struct HEGraph {
 
    struct HalfEdge;                     
@@ -22,30 +31,31 @@ namespace vsr{
    struct Node;
    
 
-   /*!-----------------------------------------------------------------------------
+   /*!
     *  A Node stores address of value of type T and pointer to an emanating edge.
     *  It includes functions for finding all emanating edges, faces, connected neighbors,
     *  and a boolean visitation flag that can be set to avoid endless looping algorithms  
-    *-----------------------------------------------------------------------------*/
+    */
    struct Node {
 
      Node() : ptr(NULL), edge(NULL), bVisited(false){}
 
      T * ptr;                           ///< Pointer to type T
-     HalfEdge * edge;                   ///< An emanating half-edge
-      
+     HalfEdge * edge;                   ///< An emanating half-edge      
      bool bVisited;                     ///< Flag for keeping track of visitation
 
      /// Get reference to data;
      T& data() { return *ptr; }    
+     /// Get const reference to data
      T data() const { return *ptr; }
 
+     /// Set data value
      Node& data( T& v ) { ptr = &v; return *this; }
 
-     /// Find all outgoing Edges
+     /// Find all emanating edges
      vector<HalfEdge*> valence() const;
      
-     /// Find edge loop (next of edges)
+     /// Find edge loop (next of all emanating edges)
      vector<HalfEdge*> edgeLoop() const;
 
      /// Test for node closure (no null Edges in loop)
@@ -65,8 +75,11 @@ namespace vsr{
      /// Find all Neighboring nodes
      vector<Node*> neighbors();
 
+     /// set visitation flag value to t
      void visited(bool t) { bVisited=t; }
+     /// get visitation flag value
      bool visited(){ return bVisited; }
+     /// set visitation flag value to zero
      void reset() { bVisited=false; }
         
    };
@@ -74,9 +87,9 @@ namespace vsr{
 
 
       
-   /*!-----------------------------------------------------------------------------
+   /*!
     * HALF EDGE Data structure 
-    *-----------------------------------------------------------------------------*/
+    */
    struct HalfEdge{ 
 
      //int id;
@@ -84,20 +97,27 @@ namespace vsr{
      HalfEdge() : node(NULL), face(NULL), opp(NULL), next(NULL), bVisited(false)
      {}
          
-     bool bVisited;    
+     E * ptr;                      ///< Pointer to data assigned to each edge (e.g. constraint)
+     /// Get reference to data;
+     E& data() { return *ptr; }    
+     /// Get const reference to data
+     E data() const { return *ptr; }
+         
+     bool bVisited;                ///< Whether visited? 
+
           
-     Node    * node;       // Incident vertex
-     Face    * face;       // Face membership
+     Node    * node;                ///< Incident vertex
+     Face    * face;                ///< Face membership
+    
+     HalfEdge  * opp;               ///< Opposite half-edge
+     HalfEdge  * next;              ///< Next half-edge counterclockwise
 
-     HalfEdge  * opp;      // Opposite half-edge
-     HalfEdge  * next;     // Next half-edge counterclockwise
+     HalfEdge& prev() { return *(next -> next); }  ///< Reference to Previous Edge (clockwise) 
 
-     HalfEdge& prev() { return *(next -> next); }
+     T& a() { return node -> data(); }             ///< Reference to T data at incident node
+     T& b() { return prev().node -> data(); }      ///< Reference to T data at other end
 
-     T& a() { return node -> data(); }
-     T& b() { return prev().node -> data(); }
-
-     bool isBorder() { return opp == NULL; }
+     bool isBorder() { return opp == NULL; }       ///< Whether edge is on the edge of the manifold
 
      void set( HalfEdge& e){
         node = &(*e.node);
@@ -131,11 +151,12 @@ namespace vsr{
         }
      }
 
-     /// Check for shared Node with another HalfEdge
+     /// is clockwise edge relative to argument (Checks for shared Node with another HalfEdge)
      bool ccwFrom( HalfEdge& eb ){
        if ( node == eb.prev().node ) return true;
        return false;
      }
+     /// is clockwise edge relative to argument (Checks for shared Node with another HalfEdge)
      bool cwFrom( HalfEdge& eb){
        if ( prev().node == eb.node  ) return true;
        return false;
@@ -151,10 +172,6 @@ namespace vsr{
      void seal( HalfEdge& eb) {
        opp = &eb; eb.opp = this;
      }
-
-     /* vector< HalfEdge* > edgeLoop(){ */
-
-     /* } */
 
      /// Check for simple Loop (triangle)
      bool triangle(){
@@ -514,17 +531,22 @@ namespace vsr{
 
    }
 
-    //removes a face
+    //removes a face @todo code half-edge face removal
     void removeFacet( int idx ) {
 
     }
 
-    //removes an edge
+    /// removes an edge @todo code half-edge edge removal
     void removeEdge( int idx ) {
 
     }
 
-    //given an edge loop around a node, find next outer edge loop
+    /// given an edge loop, determine whether it is closed
+    bool isClosed( vector<HalfEdge*> loop){
+        return loop.back()->node == loop[0]->prev().node;
+    }
+
+    /// given an edge loop around a node, find next outer edge loop
     vector<HalfEdge*> edgeLoop0( vector<HalfEdge*> loop ){//const Node& n){
       
       vector<HalfEdge*> result;
@@ -572,7 +594,7 @@ namespace vsr{
       return result;
     }
 
-
+  /// emanating edges from an input loop of emanating edges
   vector<HalfEdge*> emanatingEdges( vector<HalfEdge*> loop ){
       
       HalfEdge * first = NULL;
@@ -694,7 +716,7 @@ namespace vsr{
        }
     }
 
-    /// Get null edge path (boundary) of graph
+    /// null edge path (boundary) of graph
     vector<HalfEdge*> nullEdgeLoop(){
 
       vector<HalfEdge*> tmp;
@@ -772,8 +794,8 @@ namespace vsr{
 
 
      //NODE METHODS
-    template<class T>
-    inline typename HEGraph<T>::HalfEdge& HEGraph<T>::Node::null(){     
+    template<class T,class E>
+    inline typename HEGraph<T,E>::HalfEdge& HEGraph<T,E>::Node::null(){     
       HEGraph::HalfEdge * e = edge -> opp;
       while ( e != NULL && e != edge -> next -> next ){
         e = e -> next -> opp;
@@ -781,9 +803,9 @@ namespace vsr{
       return *e;
     }
 
-    template<class T>
-    inline bool HEGraph<T>::Node::closed() const{
-      HEGraph<T>::HalfEdge * e = edge -> opp;
+    template<class T,class E>
+    inline bool HEGraph<T,E>::Node::closed() const{
+      HEGraph::HalfEdge * e = edge -> opp;
       if (e == NULL) return false;
       while ( e != edge -> next -> next ){
           e = e -> next -> opp; 
@@ -792,10 +814,10 @@ namespace vsr{
       return true;
     }
 
-    template<class T>
-    inline vector< typename HEGraph<T>::HalfEdge* > HEGraph<T>::Node::nulls(){
-      vector<HEGraph<T>::HalfEdge*> tmp;
-      HEGraph<T>::HalfEdge * e = edge -> opp;
+    template<class T,class E>
+    inline vector< typename HEGraph<T,E>::HalfEdge* > HEGraph<T,E>::Node::nulls(){
+      vector<HEGraph::HalfEdge*> tmp;
+      HEGraph::HalfEdge * e = edge -> opp;
       while ( e != NULL && e != edge -> next -> next ){
         e = e -> next -> opp;
       }
@@ -812,10 +834,10 @@ namespace vsr{
 
     
     //edge loop around a node collects (emanating) edges
-    template<class T>
-    inline vector<typename HEGraph<T>::HalfEdge*> HEGraph<T>::Node::valence() const {
-        vector<HEGraph<T>::HalfEdge*> tmp;
-        HEGraph<T>::HalfEdge * e = edge;
+    template<class T,class E>
+    inline vector<typename HEGraph<T,E>::HalfEdge*> HEGraph<T,E>::Node::valence() const {
+        vector<HEGraph::HalfEdge*> tmp;
+        HEGraph::HalfEdge * e = edge;
        
         if (closed()){
        
@@ -843,9 +865,9 @@ namespace vsr{
         return tmp;
     }
 
-    template<class T>
-    inline vector<typename HEGraph<T>::HalfEdge*> HEGraph<T>::Node::edgeLoop() const {
-      vector<HEGraph<T>::HalfEdge*> tmp;
+    template<class T, class E>
+    inline vector<typename HEGraph<T, E>::HalfEdge*> HEGraph<T,E>::Node::edgeLoop() const {
+      vector<HEGraph::HalfEdge*> tmp;
       auto v = valence();
       for(auto& i : v){
         tmp.push_back(i->next);
@@ -856,17 +878,17 @@ namespace vsr{
 
 
     //faceloop around a node collects faces
-    template<class T>
-    inline vector<typename HEGraph<T>::Face*> HEGraph<T>::Node::faces(){
-      vector<HEGraph<T>::Face*> tmp;
+    template<class T, class E>
+    inline vector<typename HEGraph<T,E>::Face*> HEGraph<T,E>::Node::faces(){
+      vector<HEGraph::Face*> tmp;
       for (auto& i : valence() ){
         tmp.push_back( i -> face );
       }
     }
    //for each  in valence, add in node at other end (plus last node if open)
-    template<class T>
-    inline vector<typename HEGraph<T>::Node*> HEGraph<T>::Node::neighbors(){
-      vector<typename HEGraph<T>::Node*> tmp;
+    template<class T, class E>
+    inline vector<typename HEGraph<T,E>::Node*> HEGraph<T,E>::Node::neighbors(){
+      vector<typename HEGraph::Node*> tmp;
       auto res = valence();
       for(auto& i : res){
         tmp.push_back( i->node );
@@ -896,9 +918,9 @@ namespace vsr{
      *  a--->b
      *-----------------------------------------------------------------------------*/
     /// class S needs only be indexable by operator[]
-    template<class T> template<class S>
-    inline HEGraph<T>& HEGraph<T>::UV(int w, int h, S& p, bool bCloseU, bool bCloseV){
-      HEGraph<T>& graph = *this;
+    template<class T,class E> template<class S>
+    inline HEGraph<T,E>& HEGraph<T,E>::UV(int w, int h, S& p, bool bCloseU, bool bCloseV){
+      HEGraph& graph = *this;
       //left column
       for (int j = 0; j < h; ++j){
           int idx = j;

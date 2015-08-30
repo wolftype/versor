@@ -68,4 +68,35 @@ namespace gfx{
 //    static void Draw( const vsr::HEGraph<T>& f, GFXSceneNode*){}
 //  };
 
+/*-----------------------------------------------------------------------------
+ *  Surface DRAW METHOD (immediate mode)
+ *-----------------------------------------------------------------------------*/
+   template<class A, class T> 
+   struct Renderable<vsr::HEGraph< Multivector<A,T> >> : RenderableBase<vsr::HEGraph< Multivector<A,T>>>{
+     
+     using TVec = typename A::types::Vec;
+     static void DrawImmediate( const vsr::HEGraph< Multivector<A,T> >& graph){
+     
+      glBegin(GL_TRIANGLES);
+      for (auto& i : graph.face()){
+          auto& a = i->a();
+          auto& b = i->b();
+          auto& c = i->c(); 
+          //glColor4f(.2,1,.2,.7);
+          TVec normal = (TVec(b-a).unit() ^ TVec(c-a).unit()).duale();
+          GL::normal( normal.begin() );
+          glColor3f(1,.2,1);
+          GL::vertex( a.begin() );
+       //   GL::normal( b.normal.begin() );
+          glColor3f(1,1,.2);
+          GL::vertex( b.begin() );
+       //   GL::normal( c.normal.begin() );
+          glColor3f(.2,1,1);
+          GL::vertex( c.begin() );
+      }
+      glEnd();
+     }
+
+   };
+
 } //gfx::

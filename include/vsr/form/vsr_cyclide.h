@@ -56,6 +56,12 @@ struct CyclideQuad{
   Pair mLogU, mLogV;      ///<-- two bivectors
   Pair mLogNu, mLogNv;    ///<-- two more (normals)
 
+  DualSphere commonSphere(){
+      return (mLogU ^ mLogV).dual();
+  }
+
+
+
   // Calculate frame positions
   void frame(){
 
@@ -93,6 +99,18 @@ struct CyclideQuad{
     auto dotV =  ( tframe[0].frame.pos() <= tframe[1].sphere[1].dual() )[0];
     return dotV < 0;
   }  
+
+  bool altWU(){
+    auto dotW =  ( tframe[0].frame.pos() <= tframe[2].sphere[2].dual() )[0];
+    return dotW < 0;
+
+  }
+
+  bool altWV(){
+    auto dotW =  ( tframe[0].frame.pos() <= tframe[1].sphere[2].dual() )[0];
+    return dotW < 0;
+
+  }
       
   // Calculate logs
   void log(){
@@ -101,19 +119,52 @@ struct CyclideQuad{
   }
 
   void logZ(){
-      mLogNu = Gen::log( Gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual(),true ), false );
-      mLogNv = Gen::log( Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), false );
+      mLogNu = Gen::log( Gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual(),true ), altWU() );
+      mLogNv = Gen::log( Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), altWV() );
   }
   
-
+  // Simple Rotor in U direction 
   Bst xfu( VSR_PRECISION u ){ return Gen::bst(mLogU * -u ); }
+  
+  // Simple Rotor in V direction 
   Bst xfv( VSR_PRECISION v ){ return Gen::bst(mLogV * -v ); }
+
+  Bst xfwu( VSR_PRECISION wu ){ return Gen::bst(mLogNu * -wu ); }
+  Bst xfwv( VSR_PRECISION wv ){ return Gen::bst(mLogNv * -wv ); }
+  
+  Pair ortho(VSR_PRECISION u, VSR_PRECISION v){
+      return tframe[0].sphere[2].dual().spin( xfwu(u) ) ^ tframe[3].sphere[2].dual().spin( xfwv(v) ); 
+  }
 
   // Evaluate conformal rotor at u,v
   Con xf( VSR_PRECISION u, VSR_PRECISION v) { return xfv(v) * xfu(u); }
 
+  // Evaluate conformal rotor at u,v, w
+  Con xf( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) { return xfwv(u) * xfwu(v) * xf(u,v); }
+
+
   Circle cirU( VSR_PRECISION u) { return tframe[0].circle[1].spin( xfu(u) ); }
-  Circle cirV( VSR_PRECISION v) { return tframe[3].circle[0].spin( xfv(v) ); }   
+  Circle cirV( VSR_PRECISION v) { return tframe[3].circle[0].spin( xfv(v) ); }  
+  Circle cirW( VSR_PRECISION u, VSR_PRECISION v){
+    auto p = eval(u,v); 
+    auto parA = p <= mLogU; // dual sphere
+    auto parB = p <= mLogV; // dual sphere
+
+    //return (parA ^ parB).dual();
+    auto pair = p <= (parA^parB).dual(); //pair
+    return pair ^ commonSphere();
+  } 
+
+  Circle cirWB( VSR_PRECISION u, VSR_PRECISION v){
+    auto p = eval(u,v); 
+    auto parA = p <= mLogU; // dual sphere
+    auto parB = p <= mLogV; // dual sphere
+
+    return (parA ^ parB).dual();
+    //auto pair = p <= (parA^parB).dual(); //pair
+    //return pair ^ commonSphere();
+  } 
+
 
   /// Apply conformal rotor to a type T at u,v
   template<class T>
@@ -131,7 +182,14 @@ struct CyclideQuad{
   Point eval( VSR_PRECISION u, VSR_PRECISION v) {
     return Round::loc( tframe[0].frame.pos().spin( xf(u,v) ) );
   }
+
+  /// Apply conformal rotor to a point at u,v amt w
+  Point eval( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) {
+    return Round::loc( tframe[0].frame.pos().spin( xf(u,v,w) ) );
+  }
  
+ 
+  
 
 };
 

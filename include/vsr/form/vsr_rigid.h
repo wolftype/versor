@@ -29,6 +29,8 @@
 #ifndef  vsr_rigid_INC
 #define  vsr_rigid_INC
 
+#include "vsr_graph.h"
+
 namespace vsr { namespace cga {
 
 
@@ -68,6 +70,7 @@ struct Constrain {
     }
 
     /// circle tangency constraint, two distances and an original point (closest to original)
+    /// see PointToCircle below
     static Point Tangency(const Pnt& p, const Dls& da, const Dls& db){
 
       auto meet = (da ^ db).dual();
@@ -112,20 +115,21 @@ struct Constrain {
     }
 
 
-
-    // three distances, center of meet pre-SPLIT (experimental)
-    static Point Triple0 (const Dls& da, const Dls& db, const Dls& dc){
-       return Round::loc( (da ^ db ^ dc).dual()  ) ; 
-    }
-
-    /// constrain a point p to a circle c
+    /// Constrain a point p to a circle c
     static Point PointToCircle( const Point& p, const Circle& c){
 
       auto cen = Flat::location( Round::carrier(c), p );
-      auto sur = Round::surround(c);  /// dual sphere surround of c
-      auto line =  cen ^ sur ^ Infinity(1);    ///line through center of circle and cen
-      auto meet = (line.dual() ^ sur).dual(); /// meet of line and sphere
-      return Round::split( meet ,false);   ///point on circle closest to p
+      auto sur = Round::surround(c);                    // dual sphere surround of c
+      auto line =  cen ^ sur ^ Infinity(1);             // line through center of circle and cen
+      auto meet = (line.dual() ^ sur).dual();           // meet of line and sphere
+      return Round::split( meet ,false);                // point on circle closest to p
+    }
+
+    // Constrain a point p to a sphere s
+    static Point PointToSphere( const Point& p, const DualSphere& s){
+      auto dll = (p ^ s ^ Inf(1) ).dual();
+      auto pair = (dll ^ s).dual();
+      return Construct::pointB(pair);
     }
     /* static Point Fabrik(const Dls& base, const Dls& goal){ */
 
@@ -173,10 +177,11 @@ struct Constrain {
 struct DistancePtr {
   
   Point * src = NULL;      ///< Pointer to Point Source 
-  double t;          ///< Distance t from Source
+  double t;                ///< Distance t from Source
 
-  DistancePtr(){};
+  DistancePtr() : src(NULL) {};
 
+  /// Feed a source and a target
   DistancePtr( Pnt& a, const Pnt& target)  
   {
     set(a,target);  
@@ -196,32 +201,238 @@ struct DistancePtr {
 
 };
 
+/// Mutual Distance Constraint is two DistancePtrs
+struct MutualDistancePtr{
+
+  DistancePtr da,db;
+
+  void set(Point& a, Point& b){
+    da.set(a,b);
+    db.set(b,a);
+  }
+  
+  Dls forward(){ return da(); }
+  Dls backward(){ return db(); }
+
+};
+
+
+/// Stores Result and Flags for Whether to evaluate
+struct RNode  {
+
+  RNode(const Point& p) : result(p){}
+  
+  Point result = Point();
+  bool bCalc = true;
+  bool bVisited = false;
+  void reset(){
+    bCalc = true; bVisited = false;
+  }
+
+  void init(const Point& p) { result = p; }
+
+ // vector<RNode*> m
+};
+
+
+/// Calculation of an edge-based circular constraint
+struct REdge{
+
+  bool bCalc = true;
+       
+  bool bConstrained;            ///< Whether constrained?
+  
+  double maxAngle = PI;         ///< angular constraint evaluated in range (-PI,PI) (experimental)
+  double minAngle = -PI;        ///< angular constraint (experimental)
+
+ 
+  //Point *ra;                  ///< pointer to first constraining point 
+  //Point *rb;                  ///< pointer to second constrainig point
+  Point *result;                ///< pointer to calculated result
+   
+  DistancePtr da, db;           ///< Distance Pointer Constraint
+
+  REdge(Point& t, Point& a, Point& b){
+    set(t,a,b);
+  }
+
+  /// set rigid constraint based on target point and two other points
+  void set(Point& target, Point& a, Point&b){
+    //ra = &a; rb = &b; 
+    result = &target;
+    da.set(a, target);
+    db.set(b, target);
+  }
+
+  /// the circular constraint
+  Circle meet(){
+    return (da() ^ db()).dual();
+  }
+
+  /// measure error -- a value of 0 means we result is on constraining circle and we are good
+  double error(){
+    return fabs( (*result <= meet()).wt() );
+  }
+
+  bool ok(){
+      return error() < .001;
+  }
+
+  void eval(double amt){
+    if (bCalc) *result = Round::point( (da() ^ db()).dual(), amt); 
+  }
+
+  void eval(){
+    if (bCalc) *result = Constrain::PointToCircle( *result, meet() );
+  }
+
+
+  
+};
+
+/// Feed in three points
+struct RSimplex{
+  
+  RNode *ra,*rb,*rc;
+  MutualDistancePtr ab, bc, ca;
+  
+  void set(RNode * a, RNode *b, RNode *c){
+    ra = a; rb = b; rc = c;
+    ab.set(a->result, b->result);
+    bc.set(b->result, c->result);
+    ca.set(c->result, a->result);
+  }
+
+  /// Circle constraint around an edge
+  Circle ea(){
+    return (bc.backward() ^ ca.forward()).dual();
+  }
+
+  Circle eb(){
+    return (ca.backward() ^ ab.forward()).dual();
+  }
+
+  Circle ec(){
+    return (ab.backward() ^ bc.forward()).dual();
+  }
+
+
+  void onEval(){
+    
+  }
+  
+};
+
+struct RNodeN{
+
+  virtual void onEval(){
+
+  }
+  
+};
+
+
 /// Generic Rigid Constraint Node
 struct RigidNode{
 
-  Point result = Point();                             ///< stored evaluated result
+  /// Type of Fold
+//  enum Fold{
+//    Mountain, Valley, Planar
+//  };
+
+  /// Point original = Point();
+  Point result = Point();                   ///< stored evaluated result
   
   bool bCalc = true;                        ///< whether to Evaluate
-  
-  virtual void onEval(double amt) = 0;     ///< evaluation implementation to be implemented by subclass
- 
-  vector <RigidNode*> mParent;              ///< parents which might need to be evaluated before this one
+  bool bVisited = false;                    ///< whether node has been visited already
 
+  void reset(){
+    bCalc = true;
+    bVisited = false;
+  }
+  
+  virtual void onEval(double amt) = 0;      ///< evaluation implementation to be implemented by subclass
+  virtual void onEvalAt(const Point& p)=0;  ///< evaluation dependendent on some point p (i.e. closest to p)
+ 
+  vector <RigidNode*> mParent;              ///< list of dependencies which might need to be evaluated before this one
+  vector <RigidNode*> mChild;               ///< list of dependents which will need to be evaluated after this one
+  vector <DistancePtr> mDistance;           ///< list of distance constraints i should satisfy w.r.t parents
+  vector <DistancePtr> mChildDistance;      ///< list of distance constraints children should satisfy w.r.t me
+
+  /// Evaluate (with optional input range)
   Point eval(double amt=0){
+    for (auto& i : mDistance) if (i.src==NULL) bCalc = false; // don't calculate if distance ptrs have NOT been set
     if (bCalc) onEval(amt);
-    return  result;
+    return result;
   }
 
-  void setResult(const Point& p){
+  /// Evaluate (with optional point)
+  Point eval(const Point& p){
+    if (bCalc) onEvalAt(p);
+    return result;
+  }
+
+  /// Evaluate by traversing tree upwards (backwards)
+  Point up(){
+    if (!bVisited){
+      bVisited =true;
+      for (auto& i : mParent){
+        i->up();
+      }
+    }
+    return eval();
+  }
+
+  /// Evaluate by traversing tree downwards (forwards)
+  void down(){
+    eval();
+    if (!bVisited){
+      bVisited = true;
+      for (auto& i : mChild){
+        i->down();
+      }
+    }
+  }
+
+  /// Set result (must do this initialization step first)
+  void initResult(const Point& p){         
     result = p;
+  }
+
+  /// Add a rigid distance constraint
+  RigidNode& add(RigidNode * ra){
+    if (ra==NULL) printf("null ra set\n");
+    mParent.push_back(ra);
+    mDistance.push_back( DistancePtr(ra->result,result) );
+    ra->mChild.push_back(this);
+    ra->mChildDistance.push_back( DistancePtr(result, ra->result) );
+    return *this;
   }
 
 };
 
-/// A Rigid Contraint Node set by Two Distance Pointers
+
+/**
+* @brief A rig constrained by N Edges (circles)
+
+        Specialize evaluation strategy
+*/
+struct RigN : RigidNode {
+
+    virtual void onEval(double amt){
+      
+    }
+
+    virtual void onEvalAt(const Point& p){}
+};
+
+
+/// A Rigid Constraint with closest point evaluation strategy
+
+
+/// A Rigid Constraint Node set by Two Distance Pointers
 struct Rig2 : RigidNode {
   
-  DistancePtr da,db;
 
   Rig2() : RigidNode() {}
   
@@ -230,59 +441,110 @@ struct Rig2 : RigidNode {
   }
 
   void set(const Point& target, RigidNode * ra, RigidNode * rb){
-    mParent.push_back(ra); mParent.push_back(rb);
-    da.set(ra->result,target);
-    db.set(rb->result,target);
 
-    bCalc=true;
-    result = target;
+    initResult(target);
+    set(ra,rb);
   }
+
+  void set(RigidNode * ra, RigidNode * rb){
+
+    add(ra).add(rb);
+    bCalc=true;
+  }
+
+  Circle meet(){
+    return (mDistance[0]() ^ mDistance[1]()).dual();
+  }
+
 
   virtual void onEval(double amt){
-    result = Round::point( (da() ^ db()).dual(), amt); 
+    result = Round::point( (mDistance[0]() ^ mDistance[1]()).dual(), amt); 
   }
 
+
+  void onEvalAt(const Point& p){
+    result = Constrain::PointToCircle( p, meet() );
+  }
 
 };
 
+
+/// Three Distances constraint, with optional co-planarity constraint
 struct Rig3 : RigidNode {
-
-
-  DistancePtr da,db,dc;
   
-  bool bMtn;      ///< fold is a mountain fold
-  bool bCoplanar = false; ///< result is coplanar with three constraints
+  bool bMtn;               ///< fold is a mountain fold
+  bool bCoplanar = false;  ///< is result coplanar with three constraints
 
   Rig3() : RigidNode() {}
-
+  
+  /**
+  * @brief Constructor
+  *
+  * @param target cga::Point
+  * @param ra RigidNode constraint
+  * @param rb RigidNode constraint
+  * @param rc RigidNode constraint
+  * @param m boolean to specify Mountain or Valley Fold
+  * @param p boolean to specify Coplanar
+  */
   Rig3( const Pnt& target, RigidNode * ra, RigidNode * rb, RigidNode * rc, bool m, bool p) : RigidNode() {
     set(target,ra,rb,rc,m,p);
   }
 
-  /// set from target and constraints Counter Clockwise
+  /// set from target and constraints Counter Clockwise, bool mtn, bool coplanar
   void set( const Point& target, RigidNode * ra, RigidNode *rb, RigidNode *rc, bool m, bool p){
-    mParent.push_back(ra); mParent.push_back(rb); mParent.push_back(rc);
+     result = target;
+     set(ra,rb,rc,m,p);
+  }
+
+  /// set from target and constraints Counter Clockwise
+  void set( RigidNode * ra, RigidNode *rb, RigidNode *rc, bool m, bool p){
+   // mParent.push_back(ra); mParent.push_back(rb); mParent.push_back(rc);
+    add(ra).add(rb).add(rc);
     bMtn = m;
     bCoplanar=p;
 
-    if (ra==NULL || rb==NULL || rc==NULL) printf("null rig3 set\n");
-    
-    da.set(ra->result,target);
-    db.set(rb->result,target);
-    dc.set(rc->result,target); 
-
     bCalc=true;
-    result = target;
+  }
+
+  Circle meet(){
+    return (mDistance[0]() ^ mDistance[2]()).dual();
+  }
+
+
+  virtual void onEval(double amt){
+    result = bCoplanar ? Constrain::Planar( mDistance[0](), mDistance[1](), mDistance[2](),bMtn) : 
+                         Constrain::Triple( mDistance[0](), mDistance[1](), mDistance[2](),bMtn);
+  }
+
+  //pass through
+  virtual void onEvalAt(const Point& p){
+    //result = onEval(0);
+  }
+
+};
+
+
+/// A Rigid Constraint node in quad formation
+struct Rig4 : RigidNode {
+
+  Rig4( const Point& target, RigidNode * ra, RigidNode * rb, RigidNode *rc, RigidNode *rd) : RigidNode(){
 
   }
 
   virtual void onEval(double amt){
-    result = bCoplanar ? Constrain::Planar(da(),db(),dc(),bMtn) : Constrain::Triple(da(),db(),dc(),bMtn);
+
   }
 
+  virtual void onEvalAt(const Point& p){
 
+  }
+
+  /// feed current result back in
+  virtual void onEvalRecursive(){
+    
+  }
 };
-
 
 /// A Rigid Constraint Node set by Three Distance Pointers
 struct Rigid{
@@ -419,7 +681,7 @@ struct Rigid{
     return ( da() ^ db() ^ dc() ).dual();
   }
 
-  //bring three spheres closer together towards mutual center until meet is legit.
+  // experimental: bring three spheres closer together towards mutual center until meet is legit.
   void satisfy(int max=20){
     auto& pa = *da.src; auto& pb = *db.src; auto& pc = *dc.src;
     auto rs = Round::size(meet(),false);
@@ -734,7 +996,7 @@ struct Rigid2{
 
 
 /*!
- *  \brief  Rig has n spherical constraints to satisfy (try using fabrik solver here)
+ *  \brief  Rig has n distance constraints to satisfy (try using fabrik solver here)
  */
 struct Rig {
 

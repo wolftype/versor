@@ -42,14 +42,15 @@ struct State{
   bool pqbar=false;
   
   bool bGlideA, bGlideB, bGlideC;
+  float glideA, glideB, glideC;
 
   Point point = Round::null(0,0,0);
 
   float xratio,yratio,zratio;
   int numX, numY, numZ;
 
-  SpaceGroup3D<Vec>::LatticeType latticeType;
- 
+  float bravaisType;
+  float latticeType;
 
 };
 
@@ -57,67 +58,55 @@ struct State{
 void drawState(State * state){
 
      State& s = *state;
-//     if (s.p < 7 && s.q < 5){
-//     PointGroup3D<Vec> pg(s.p,s.q,s.pbar,s.qbar,s.pqbar);
-//    
-//     Draw(pg.a,1,0,0); Draw(pg.b,0,1,0); Draw(pg.c,0,0,1);
-//    
-//     auto res =  pg( s.point ^ s.point.trs(1,0,2) );
-//     auto res2 = pg( s.point ^ s.point.trs(0,3.5,.2) );
-//     auto res3 = pg( s.point ^ s.point.trs(0,0,3) );
-//
-//     for (int i=0;i<res.size();++i) {
-//       Draw(res[i],(float)i/res.size(),0,1-(float)i/res.size());
-//       Draw(res2[i],(float)i/res.size(),1,1-(float)i/res.size());
-//      // Draw(res3[i],(float)i/res.size(),1,1-(float)i/res.size());
-//        auto a =  Round::split(res[i], true);
-//        auto b =  Round::split(res[i], false);
-//        auto c =  Round::split(res2[i], true);
-//        auto d =  Round::split(res3[i], true);
-//  
-//        glColor3f(1,1,0);
-//        Glyph::Triangle(a,b,c);
-//        glColor3f(0,1,1);
-//        Glyph::Triangle(a,b,d);
-//        glColor3f(1,0,1);
-//        Glyph::Triangle(b,c,d);
-//        glColor3f(1,.5,.5);
-//        Glyph::Triangle(b,a,d);
-//
-//      }
     
-
+     SpaceGroup3D<Vec>::Lattice lattice = {(int)s.bravaisType,(int)s.latticeType};
      Vec ratioVec(s.xratio,s.yratio,s.zratio);
-     SpaceGroup3D<Vec> sg(s.p,s.q,s.pbar,s.qbar,s.pqbar, s.latticeType, ratioVec);
+     SpaceGroup3D<Vec>::Glide glide = { {(int)s.glideA, s.bGlideA},{(int)s.glideB,s.bGlideB},{(int)s.glideC,s.bGlideC} };
+     
+     SpaceGroup3D<Vec> sg(s.p,s.q,s.pbar,s.qbar,s.pqbar, lattice, ratioVec, glide);
 
+     Draw( sg.a,1,0,0);
+     Draw( sg.b,1,1,0);
+     Draw( sg.c,1,0,1);
+     Draw( sg.mB_dir );
+     Draw( sg.mB_length,1,0,1);
+     Draw( sg.mC_dir, 1,.3,.1 );
+     Draw( sg.mC_length,0,1,1);
 
-     auto res =  sg( s.point ^ s.point.trs(1,0,2) );
-     auto res2 = sg( s.point ^ s.point.trs(0,3.5,.2) );
-     auto res3 = sg( s.point ^ s.point.trs(0,0,3) );
-
-     cout << "num ref: " <<  res.size() << endl;
-
-     auto latticeRes = sg.hang( res , s.numX,s.numY,s.numZ);
-     auto latticeRes2 = sg.hang( res2 ,s.numX,s.numY,s.numZ);
-     auto latticeRes3 = sg.hang( res3 ,s.numX,s.numY,s.numZ);
-    
-     for (int i=0;i<latticeRes.size();++i) {
-
-        auto a =  Round::split(latticeRes[i], true);
-        auto b =  Round::split(latticeRes[i], false);
-        auto c =  Round::split(latticeRes2[i], true);
-        auto d =  Round::split(latticeRes3[i], true);
-  
-        glColor3f(1,1,0);
-        Glyph::Triangle(a,b,c);
-        glColor3f(0,1,1);
-        Glyph::Triangle(a,b,d);
-        glColor3f(1,0,1);
-        Glyph::Triangle(b,c,d);
-        glColor3f(1,.5,.5);
-        Glyph::Triangle(b,a,d);
-
+     auto dls = Round::sphere(s.point, .3);
+     vector<Point> pnt;
+     for (int i=0;i<4;++i){
+        float t = (float)i/4;
+        Rotor r = Gen::rot( Biv::xz * PI * t);
+        pnt.push_back( Construct::point(dls, Vec::x.spin( r ) ) );
      }
+     pnt.push_back( s.point.translate(0,.15,0) );
+
+     auto res = sg.apply( pnt );
+     auto latticeRes = sg.hang( res , s.numX,s.numY,s.numZ);
+
+   
+    for (int i=0;i<latticeRes.size(); i+=pnt.size() ) {
+
+       auto a = latticeRes[i]; 
+       auto b = latticeRes[i+1]; 
+       auto c = latticeRes[i+2]; 
+       auto d = latticeRes[i+3];
+       auto e = latticeRes[i+4];  
+       glColor3f(1,1,0);
+       Glyph::Triangle(a,b,e);
+       glColor3f(0,1,1);
+       Glyph::Triangle(b,c,e);
+       glColor3f(1,0,1);
+       Glyph::Triangle(c,d,e);
+       glColor3f(1,.5,.5);
+       Glyph::Triangle(d,a,e);
+       glColor3f(.2,1,.5);
+       Glyph::Triangle(a,b,c);
+       Glyph::Triangle(c,d,a);
+
+    }
+
    }
 
 /*-----------------------------------------------------------------------------
@@ -126,7 +115,6 @@ void drawState(State * state){
 
 struct MyApp : App {
 
- // cuttlebone::Maker<State> maker;
   State * state;
    
   //Some Variables
@@ -136,8 +124,6 @@ struct MyApp : App {
   Point mouse = Round::null(1,1,1);;
 
   float latticetype;
-
- // MyApp() : App(), maker("192.168.10.255"){}
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
@@ -161,23 +147,28 @@ struct MyApp : App {
     gui(s.xratio, "xratio",1,100);
     gui(s.yratio, "yratio",1,100);
     gui(s.zratio, "zratio",1,100);
-    gui(latticetype, "latticetype",0,6);
-    gui(s.bGlideA, "glide a");
-    gui(s.bGlideB, "glide b");
-    gui(s.bGlideC, "glide c");
-    gui(s.numX, "num x");
-    gui(s.numY, "num y");
-    gui(s.numZ, "num z");
-
+    gui(s.latticeType, "latticeType",1,5);
+    gui(s.bravaisType, "bravaisType",1,7);
+    gui(s.glideA, "glide a",0,5);
+    gui(s.bGlideA, "glide a alt");
+    gui(s.glideB, "glide b",0,5);
+    gui(s.bGlideB, "glide b alt");
+    gui(s.glideC, "glide c",0,5);
+    gui(s.bGlideC, "glide c alt");
+    gui(s.numX, "num x",1,100);
+    gui(s.numY, "num y",1,100);
+    gui(s.numZ, "num z",1,100);
 
     s.xratio = s.yratio = s.zratio =1;
-    s.p=3;s.q=2;
+    s.p=4;s.q=2;
     s.pbar=s.qbar=s.pqbar=0;
-    s.bGlideA = s.bGlideB = s.bGlideC = 0;
+    s.glideA = s.glideB = s.glideC = 0;
+    s.latticeType = 1;
+    s.bravaisType = 1;
 
-    s.numX = 5;
-    s.numY = 5;
-    s.numZ = 5;
+    s.numX = 1;
+    s.numY = 1;
+    s.numZ = 1;
   }
 
   void onKeyDown(const gfx::Keyboard& k){
@@ -189,8 +180,6 @@ struct MyApp : App {
     state -> point = mouse;
     state -> pose = (Pose)scene.camera;
     state -> model = scene.model;
-    //maker.set(*state);
-    state -> latticeType = (SpaceGroup3D<Vec>::LatticeType)latticetype;
   }
   /*-----------------------------------------------------------------------------
    *  Draw Routines 

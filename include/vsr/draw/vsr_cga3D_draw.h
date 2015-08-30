@@ -90,29 +90,30 @@ namespace gfx{
 //    }
 
      
-  template<> void Renderable<cga::Vec>::DrawImmediate  (const cga::Vec& s);  
- // template<> void Renderable<cga::Vec>::DrawImmediateB (const cga::Vec& s);                        
-  template<> void Renderable<cga::Biv>::DrawImmediate  (const cga::Biv& s);    
-  template<> void Renderable<cga::Drv>::DrawImmediate  (const cga::Drv& s); 
-  template<> void Renderable<cga::Dlp>::DrawImmediate  (const cga::Dlp& s);
-  template<> void Renderable<cga::Pln>::DrawImmediate  (const cga::Pln& s); 
-  template<> void Renderable<cga::Cir>::DrawImmediate  (const cga::Cir& s ); 
-  template<> void Renderable<cga::Pnt>::DrawImmediate  (const cga::Pnt& s);
-  template<> void Renderable<cga::Sph>::DrawImmediate  (const cga::Sph& s);
-  template<> void Renderable<cga::Flp>::DrawImmediate  (const cga::Flp& s);
-  template<> void Renderable<cga::Par>::DrawImmediate  (const cga::Par& s); 
-  template<> void Renderable<cga::Dll>::DrawImmediate  (const cga::Dll& s);  
-  template<> void Renderable<cga::Lin>::DrawImmediate  (const cga::Lin& s);
-  template<> void Renderable<cga::Tnv>::DrawImmediate  (const cga::Tnv& t);
-  template<> void Renderable<cga::Frame>::DrawImmediate  (const cga::Frame& f);
+  template<> void Renderable<cga::Vec,0>::DrawImmediate  (const cga::Vec& s);  
+ // template<> void Renderable<cga::V,0ec>::DrawImmediateB (const cga::Vec& s);                        
+  template<> void Renderable<cga::Biv,0>::DrawImmediate  (const cga::Biv& s);    
+  template<> void Renderable<cga::Drv,0>::DrawImmediate  (const cga::Drv& s); 
+  template<> void Renderable<cga::Dlp,0>::DrawImmediate  (const cga::Dlp& s);
+  template<> void Renderable<cga::Pln,0>::DrawImmediate  (const cga::Pln& s); 
+  template<> void Renderable<cga::Cir,0>::DrawImmediate  (const cga::Cir& s ); 
+  template<> void Renderable<cga::Pnt,0>::DrawImmediate  (const cga::Pnt& s);
+  template<> void Renderable<cga::Sph,0>::DrawImmediate  (const cga::Sph& s);
+  template<> void Renderable<cga::Flp,0>::DrawImmediate  (const cga::Flp& s);
+  template<> void Renderable<cga::Par,0>::DrawImmediate  (const cga::Par& s); 
+  template<> void Renderable<cga::Dll,0>::DrawImmediate  (const cga::Dll& s);  
+  template<> void Renderable<cga::Lin,0>::DrawImmediate  (const cga::Lin& s);
+  template<> void Renderable<cga::Tnv,0>::DrawImmediate  (const cga::Tnv& t);
+  template<> void Renderable<cga::Frame,0>::DrawImmediate  (const cga::Frame& f);
+  template<> void Renderable<cga::Frame,1>::DrawImmediate  (const cga::Frame& f);
 //  template<> void Renderable<cga::Frame>::DrawImmediateB (const cga::Frame& s);   
   
 
-  template<> void Renderable<Field<cga::Vec>>::DrawImmediate( const Field<cga::Vec>& f);
+  template<> void Renderable<Field<cga::Vec>,0>::DrawImmediate( const Field<cga::Vec>& f);
   //template<> void ImmediateB( const Field<cga::Vec>& f);
-  template<> void Renderable<Field<cga::Sca>>::DrawImmediate( const Field<cga::Sca>& f);
-  template<> void Renderable<Field<cga::Tnv>>::DrawImmediate( const Field<cga::Tnv>& f);
-  template<> void Renderable<Field<cga::Frame>>::DrawImmediate( const Field<cga::Frame>& f);
+  template<> void Renderable<Field<cga::Sca>,0>::DrawImmediate( const Field<cga::Sca>& f);
+  template<> void Renderable<Field<cga::Tnv>,0>::DrawImmediate( const Field<cga::Tnv>& f);
+  template<> void Renderable<Field<cga::Frame>,0>::DrawImmediate( const Field<cga::Frame>& f);
 //   #ifdef GFX_IMMEDIATE_MODE
   
 

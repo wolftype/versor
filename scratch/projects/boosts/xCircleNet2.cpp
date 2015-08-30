@@ -65,7 +65,7 @@ struct MyApp : App {
  
   //Some Variables
   bool bReset = false;
-  float fnum,amt,amt2,xfu,xfv = 0;
+  float fnum,amt,amt2,xfu,xfv, amtW = 0;
   float posA,posB,posC,posD;
 
   bool bFlipX, bFlipY, bFlipTx, bFlipTy;
@@ -76,7 +76,7 @@ struct MyApp : App {
 
   CyclideQuad cyclide;
 
-  bool bDrawA,bDrawB,bDrawC,bDrawD,bDrawE,bDrawF,bDrawForward,bDrawNormal,bDrawEdges;
+  bool bDrawA,bDrawB,bDrawC,bDrawD,bDrawE,bDrawF,bDrawForward,bDrawNormal,bDrawEdges,bDrawOrtho3;
 
   HEGraph<MyData> graph;
   vector<MyData> mesh;
@@ -97,14 +97,16 @@ struct MyApp : App {
     gui(amt,"amt",-100,1000)(amt2,"amt2",-100,1000)(bReset,"bReset");
     gui(xfu,"xfu",-1000,1000);
     gui(xfv,"xfv",-1000,1000);
+    gui(amtW,"amtW",-1000,1000);
     gui(posA)(posB)(posC)(posD);
     gui(bDrawForward,"bDrawForward");
     gui(bDrawA, "coordinate curves")(bDrawB, "surface")(bDrawC,"coordinate surface")(bDrawD,"edges")(bDrawE,"z")(bDrawF)(bDrawNormal);
     gui(bDrawEdges,"bDrawEdges");
+    gui(bDrawOrtho3,"bDrawOrtho3");
     gui(offset,"offset",-10,10);
     gui(linewidth, "linewidth",0,100);
     
-    control.rot( Biv::yz * PIOVERFOUR/2.0 + Biv::xz * .01 );
+    control.rot( Biv::yz * PIOVERFOUR);
 
     objectController.attach(&control);
 
@@ -127,12 +129,16 @@ struct MyApp : App {
     mColor.set(.8,.8,.8);
   }
 
+  void reset(){
+    control.rot(Biv::yz * PIOVERFOUR);
+  }
 
   /*-----------------------------------------------------------------------------
    *  Draw Routines 
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
+   // if (bReset){ reset(); }
 
     glLineWidth(linewidth);
     //red NET
@@ -150,13 +156,13 @@ struct MyApp : App {
     //calculate frames and log
     cyclide.frame();
     cyclide.log();
+    cyclide.logZ(); //z direction log
 
     cout << "red: " << cyclide.altU() << endl;
     cout << "green: " << cyclide.altV() << endl;
 
     //evaluate and draw circle edges
     if (bDrawA){
-
        for (int j=0;j<=10;++j){
          auto t = (float)j/10;
         
@@ -190,9 +196,48 @@ struct MyApp : App {
 
          Draw(np,0,1,1);
          Draw(offset,1,0,1);
+
+         if (bDrawOrtho3){
+           auto tcir = bReset? cyclide.cirWB(tu,tv) : cyclide.cirW(tu,tv);
+          
+           Draw(tcir);
+            
+          // int w = amtW;
+
+          // Draw( cyclide.eval(amtW,0) <= cyclide.mLogV );
+         
+          // auto nucir = cyclide.tframe[0].circle[2].spin( cyclide.xfu(tu) );
+          // Draw(nucir,0,0,1);
+          // auto nvcir = cyclide.tframe[3].circle[2].spin( cyclide.xfv(tv) );
+          // Draw(nvcir,0,1,1);
+
+
+          // auto mcir = cyclide.ortho(tu,tv);
+         //  Draw( mcir.dual() );
+
+         // auto da = np <= cyclide.mLogU;
+         // auto db = np <= cyclide.mLogV;
+
+        //  auto pair = cyclide.logNu(tu)
+
+        //  Draw(da,0,0,1,.2);
+        //  Draw(db,0,0,1,.2);
+
+           for (int k=0;k<10;++k){
+           // float tw = (float)k/10;
+           // auto gen = cyclide.xfwu(amtW*tu*tw) * cyclide.xf(tu,tv); // * cyclide.xfwu(amtW*tu*tw)
+            //Gen::bst( nvcir.dual() * amtW * tw ) * Gen::bst( nucir.dual() * amtW * tw );
+           // auto bstw =  Gen::bst( ( Inf(1) <= tcir ) * amtW * tw );
+           // Draw( Round::loc( cyclide.tframe[0].frame.pos().spin( gen ) ), 0, 1, 1 );
+
+
+          // auto npw = cyclide.eval(tu,tv,amtW*tw);
+           //Draw(npw,1,0,0);
+
+           }
+         }
        }
       }
-
     }
 
   for (int i=0;i<4;++i){
