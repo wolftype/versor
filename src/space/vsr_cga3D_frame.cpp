@@ -228,12 +228,21 @@ namespace vsr{ namespace cga {
 
     /// ABSOLUTE orient z to target, and keep y as vertical as possible
     Frame& Frame::orient( const Vec& v, bool pos ){
-      Rot tRot = Gen::ratio( Vec::z * (pos?1:-1), (v-vec()).unit() );
+      Vec dir = Vec::z * (pos?1:-1);
+      Vec target = (v-vec()).unit();
+      Rot tRot = Gen::ratio( dir, target );
       mRot = tRot;
-      Vec ty = Op::pj( Vec::y, xy() ).unit();
-      //auto cs = ty <= y();
-      Rot yRot = Gen::ratio( y(), ty );
-      mRot = (yRot * tRot).runit(); 
+      auto biv = xy();
+      Rot yRot;
+      //if z is just flipped around then do something special for y
+      if ( (dir<=target)[0] < -.9999 ) {
+        yRot = Gen::rot( Biv::xy * PIOVERTWO );
+      }
+      else {
+        Vec ty = Op::pj( Vec::y, xy() ).unit();   
+        yRot = Gen::ratio( y(), ty );
+      }
+       mRot = (yRot * tRot).runit();        
       return *this;
     }
 

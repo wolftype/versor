@@ -42,7 +42,9 @@ struct MyApp : App {
   float link;             //which link to link with
 
   bool bSubBennett;
-  bool bPrintPs,bDrawOutline,bDrawMeet;
+  bool bPrintPs,bDrawOutline,bDrawMeet,bDrawPlane;
+
+  float lightX, lightY, lightZ;
 
 
   void setup(){
@@ -63,11 +65,22 @@ struct MyApp : App {
       gui(amty1,"amty1",-1,1);
       gui(amty2,"amty2",-1,1);
 
+
       gui(link,"link",0,3);
       gui(bSubBennett,"subbennett");
       gui(bPrintPs, "printps");
       gui(bDrawOutline, "bDrawOutline");
       gui(bDrawMeet, "bDrawMeet");
+      gui(bDrawPlane, "bDrawPlane");
+
+      gui(lightX,"lightX",-10,10);
+      gui(lightY,"lightY",-10,10);
+      gui(lightZ,"lightZ",-10,10);
+      gui(bShadedOutput, "bShadedOutput");      
+      gui(bOffsetOutput, "bOffsetOutput");      
+      gui(bOccludeOutput, "bOccludeOutput");      
+      gui(bSortOutput, "bSortOutput");      
+    
 
       link = 2;
       d1 = 3; d2 = 3; theta = PIOVERFOUR; rot = .5; amtx1=amtx2=amty1=amty2=.5; thetax = -1; thetay = -1;
@@ -78,6 +91,8 @@ struct MyApp : App {
     virtual void onDraw(){ 
         
       auto mouse = calcMouse3D();
+
+      GL::lightPos(lightX,lightY,lightZ);
 
       Bennett b( theta, d1, d2 );
       for (int i=0;i<b.num();++i){
@@ -100,16 +115,16 @@ struct MyApp : App {
       bDrawOutline ? DrawR_( (Chain)b,0,.5,1) : DrawR( (Chain)b,0,.5,1);
       
       if (bDrawMeet){
-        auto sphA = Round::dls_pnt(b[1].pos(), b.lengthB());
-        auto sphB = Round::dls_pnt(b[3].pos(), b.lengthA());
+        auto sphA = Construct::sphere(b[1].pos(), b.lengthB());
+        auto sphB = Construct::sphere(b[3].pos(), b.lengthA());
         //intersect xy plane of frame with circle
         auto cir = (sphA^sphB);
         Draw(cir.dual(),1,0,1);
         auto pair = ( b[1].dxy() ^ cir ).dual();
         Draw(b[1].dxy(),0,0,0);
        // Draw(pair,1,0,0);
-        Draw(cga::pointA(pair),1,0,0);
-        Draw(cga::pointB(pair),1,0,0);
+        Draw(Construct::pointA(pair),1,0,0);
+        Draw(Construct::pointB(pair),1,0,0);
 
         Draw(sphA,1,0,0,.2);
         Draw(sphB,1,0,0,.2);

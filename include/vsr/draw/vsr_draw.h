@@ -53,6 +53,13 @@ namespace gfx{
    render::begin(r,g,b,a);
    render::drawAt(s,p);
  }  
+
+  //Draw Routine (Immediate Mode)
+ template<class A, class B>
+ void DrawBAt( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
+   render::begin(r,g,b,a);
+   render::drawBAt(s,p);
+ }  
   /*-----------------------------------------------------------------------------
    *  General Drawing strategy for a type T calls "Advanced" method from RenderCall<T>
    *-----------------------------------------------------------------------------*/

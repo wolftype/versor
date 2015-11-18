@@ -146,7 +146,7 @@ namespace vsr { namespace cga {
     Frame& pos( const Pnt& p ) { mPos = p; return *this; } 
     /// Set Position from x,y,z coordinates
     Frame& pos( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Round::point(_x,_y,_z); return *this; } 
-    //Frame& set( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Round::null(_x,_y,_z); return *this; }
+    Frame& set( VSR_PRECISION _x, VSR_PRECISION _y, VSR_PRECISION _z) { mPos = Round::null(_x,_y,_z); mRot = Rot(1); return *this; }
 
     
     Vec x() const;    ///< Local x 
@@ -172,7 +172,8 @@ namespace vsr { namespace cga {
     Dll dlx() const;    ///< x direction dual line
     Dll dly() const;    ///< y direction dual line
     Dll dlz() const;    ///< z direction dual line
-    
+   
+    /*! @todo make direct planes from e.g. xy^inf */ 
     /* Homogenous Planes in Conformal Space */
     Dlp dxz() const;    ///< xz dual plane
     Dlp dxy() const;    ///< xy dual plane
@@ -265,6 +266,10 @@ namespace vsr { namespace cga {
     Frame& move( VSR_PRECISION dx , VSR_PRECISION dy, VSR_PRECISION dz );
     /// Move by Vec
     Frame& move( const Vec& v);
+    /// Translate (same as move)
+    Frame& translate( VSR_PRECISION dx , VSR_PRECISION dy, VSR_PRECISION dz ){ return move(dx,dy,dz); }
+    /// Translate by Vec (same as move);
+    Frame& translate( const Vec& v){ return move(v); }
     // Spin by Biv
     Frame& rotate( const Biv& b);
     /// Rotate by Rot

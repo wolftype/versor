@@ -158,8 +158,6 @@ struct MyApp : App {
     cyclide.log();
     cyclide.logZ(); //z direction log
 
-    cout << "red: " << cyclide.altU() << endl;
-    cout << "green: " << cyclide.altV() << endl;
 
     //evaluate and draw circle edges
     if (bDrawA){
@@ -197,44 +195,13 @@ struct MyApp : App {
          Draw(np,0,1,1);
          Draw(offset,1,0,1);
 
+        
          if (bDrawOrtho3){
-           auto tcir = bReset? cyclide.cirWB(tu,tv) : cyclide.cirW(tu,tv);
-          
-           Draw(tcir);
-            
-          // int w = amtW;
 
-          // Draw( cyclide.eval(amtW,0) <= cyclide.mLogV );
-         
-          // auto nucir = cyclide.tframe[0].circle[2].spin( cyclide.xfu(tu) );
-          // Draw(nucir,0,0,1);
-          // auto nvcir = cyclide.tframe[3].circle[2].spin( cyclide.xfv(tv) );
-          // Draw(nvcir,0,1,1);
-
-
-          // auto mcir = cyclide.ortho(tu,tv);
-         //  Draw( mcir.dual() );
-
-         // auto da = np <= cyclide.mLogU;
-         // auto db = np <= cyclide.mLogV;
-
-        //  auto pair = cyclide.logNu(tu)
-
-        //  Draw(da,0,0,1,.2);
-        //  Draw(db,0,0,1,.2);
-
-           for (int k=0;k<10;++k){
-           // float tw = (float)k/10;
-           // auto gen = cyclide.xfwu(amtW*tu*tw) * cyclide.xf(tu,tv); // * cyclide.xfwu(amtW*tu*tw)
-            //Gen::bst( nvcir.dual() * amtW * tw ) * Gen::bst( nucir.dual() * amtW * tw );
-           // auto bstw =  Gen::bst( ( Inf(1) <= tcir ) * amtW * tw );
-           // Draw( Round::loc( cyclide.tframe[0].frame.pos().spin( gen ) ), 0, 1, 1 );
-
-
-          // auto npw = cyclide.eval(tu,tv,amtW*tw);
-           //Draw(npw,1,0,0);
-
-           }
+             if (j==0){
+              auto tc = cyclide.apply( cyclide.tframe[0].sphere[2], tu, tv );
+              Draw(tc,0,1,1,.2);
+             }
          }
        }
       }

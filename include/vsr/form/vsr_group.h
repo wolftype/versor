@@ -62,6 +62,8 @@ struct Group {
   /// Trs is the translator type of whatever conformal metric we are in
   //typedef typename V::template BType< typename V::Mode::Trs > Trs; 
   using Trs = typename V::space::translator;
+  using GlideType = decltype(V()*Trs());
+  using ScrewType = decltype(V()*V()*Trs());
 
    vector<V> ops;                              ///< Pin Operators (Vec, etc)
    vector<decltype(V()*V())> sops;             ///< Spin Operators (Rot, etc)
@@ -356,15 +358,61 @@ struct PointGroup3D : Group<V> {
       int type, opIdx, resIdx;
     };
 
+    stringstream opStream(const OpIdx& i){
+       stringstream s;
+
+       if (i.type==0){
+        if (i.opIdx==0) s << "a";
+        else if (i.opIdx==1) s << "b";
+        else if (i.opIdx==2) s << "c";
+       } else if (i.type==1){
+        if (i.opIdx==0) s << "ab";
+        else if (i.opIdx==1) s << "bc";
+        else if (i.opIdx==2) s << "ac";
+       } else if (i.type==2){
+        if (i.opIdx==0) s << "abc";
+        else if (i.opIdx==1) s << "bac";
+       } else if ( i.type==3 ){
+        if (i.opIdx==0) s << "aT";
+        else if (i.opIdx==1) s << "bT";
+        else if (i.opIdx==2) s << "cT";
+       } else if (i.type==4){
+        if (i.opIdx==0) s << "abT";
+        else if (i.opIdx==1) s << "bcT";
+        else if (i.opIdx==2) s << "acT";
+       }
+
+       if (i.resIdx!=0) s << opStream(opIdx[i.resIdx-1]).str();
+
+       return s;
+    }
+
     using Biv = typename V::space::Biv;
     using Vec = typename V::space::Vec;
+    using GlideType = typename Group<V>::GlideType;
+    using ScrewType = typename Group<V>::ScrewType;
 
-    V a, b, c;          //<-- basis generators
+    V a, b, c;            ///< root versors
 
-    vector<OpIdx> opIdx; //<-- given a seed vector, store all operations here.
+    int mNumGen;          ///< number of generators
+
+    vector<OpIdx> opIdx;  ///< given a seed vector, store all transformations here.
+
+
+    /// Symmetry point group data
+    struct Sym{
+      int p,q;
+    };
+    Sym mSym;
+    
+    bool is33(){
+      return (mSym.p==mSym.q) && (mSym.p==3);
+    }
 
     //must satisfy dicycle ab^p = bc^q = ac^2
-    PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) {
+    PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) 
+    : mSym{p,q}
+    {
       
       //0. a and c are at 90 degrees, must find b...
       a = V::x;
@@ -372,8 +420,8 @@ struct PointGroup3D : Group<V> {
       
       //1. employ the good old spherical trig cosine rule ...
       double tb = PIOVERTWO;
-      double ta = PI/(int)p;
-      double tc = PI/(int)q;
+      double ta = is33() ? -PI/(int)p : PI/(int)p;
+      double tc = is33() ? PI/(int)q : -PI/(int)q;
 
       double ca = cos(ta);
       double sa = sin(ta);
@@ -390,39 +438,36 @@ struct PointGroup3D : Group<V> {
       auto bivC = (a ^ c).rot( c.duale() * tA / 2.0 );
 
       //3. ... and find b via coincidence of planes ...
-      b = (bivA.duale() ^ bivC.duale()).duale().unit();
+      b = (bivA.duale() ^ bivC.duale()).duale().unit() * ( is33() ? 1 : -1 ); //note neg!
 
-      this->ops = {a,b,c};
-      this->sops = {a*b, b*c, c*a}; 
-      this->tops = {a*b*c};
+      setOps();
 
 
-      if (!abar && !bbar && !abbar ){              //Case of only reflections. easy!
-        //this->ops = {a,b,c};
-        opIdx= {  {0,0,0}, {0,1,0}, {0,2,0} };
-       } else if (abbar){
-         //this->tops.push_back(a*b*c); //<--implications?
-        opIdx = { {-1,0,0} };
+      if (!abar && !bbar && !abbar ){                   //Case of only reflections. easy!
+         opIdx= {  {0,0,0}, {0,1,0}, {0,2,0} };
+       } else if (abbar){                               // Case of roto-reflection
+         opIdx = { {2,0,0} };                            
        } else if ( abar && bbar ) { 
          opIdx = { {1,0,0}, {1,1,0} };
-         //this->sops.push_back(a*b);
-         //this->sops.push_back(b*c);
        } else if (abar){                                 //Case of only one or other are cyclic
-          opIdx = { {0,2,0},{1,0,0} };
-          //this->sops.push_back(a*b);
-          //this->ops.push_back(c);              
+         opIdx = { {0,2,0},{1,0,0} };          
        } else if (bbar){
-          opIdx = { {0,0,0},{1,1,0} };
-          //this->sops.push_back(b*c);
-          //this->ops.push_back(a);
-       }
+         opIdx = { {0,0,0},{1,1,0} };
+       } //note need an ac bar option for space groups
 
-        for (auto& i : opIdx){
-          cout << i.type << " " << i.opIdx << " " << i.resIdx << endl;
-        }
          // seed a random vector to "record" all unique reflection and spin operations
          seed();
 
+         mNumGen = opIdx.size();
+
+    }
+
+    void setOps(){
+      this->ops = {a,b,c};
+      this->sops = {a*b, b*c, a*c}; 
+      this->tops = {a*b*c, b*a*c};
+      this->gops = vector<GlideType>(3);
+      this->scrops = vector<ScrewType>(3);
     }
 
     void seed(const Vec& vec=Vec(.213,.659,1.6967).unit() ){
@@ -433,9 +478,18 @@ struct PointGroup3D : Group<V> {
         Vec tmp;
 
         for (auto& i: opIdx){
-           tmp = i.type == 0 ? vec.reflect( this->ops[ i.opIdx ] )
-                             : vec.spin( this->sops[i.opIdx] );                                               
-           tv.push_back(tmp);
+          switch (i.type){
+            case 0:
+               tmp = vec.reflect( this->ops[i.opIdx]);
+               break;
+            case 1:
+               tmp = vec.spin( this->sops[i.opIdx]);
+               break;
+            case 2:
+               tmp = vec.reflect( this->tops[i.opIdx] );
+               break;
+          }
+          tv.push_back(tmp);
         }
 
 
@@ -450,12 +504,20 @@ struct PointGroup3D : Group<V> {
           int tn = tv.size();
           
           //Any New Reflection Results
-
           for(int i =0; i<numBasicOps; ++i){
             for (int j=0;j<tn;++j){
               
-              tmp = opIdx[i].type == 0 ? tv[j].reflect( this->ops[ opIdx[i].opIdx ] )
-                                       : tv[j].spin( this->sops[opIdx[i].opIdx] );
+              switch (opIdx[i].type){
+                  case 0:
+                    tmp =  tv[j].reflect( this->ops[ opIdx[i].opIdx ] );
+                    break;
+                  case 1:
+                    tmp = tv[j].spin( this->sops[opIdx[i].opIdx] );
+                    break;
+                  case 2:
+                    tmp = tv[i].reflect( this->tops[opIdx[i].opIdx] );
+                    break;
+              }
        
               bool exists = false;
               for (auto& k : tv){
@@ -468,25 +530,15 @@ struct PointGroup3D : Group<V> {
               //if new, add result to tv and idx 
               if (!exists){
                 tv.push_back(tmp);
-                cout << tmp << endl;
                 opIdx.push_back( {opIdx[i].type, opIdx[i].opIdx, j} );
                 keepgoing=true;
               }
             }
           }
         }
-          
-        
-        
-        for (auto& i: opIdx){
-          cout << i.type << " means " << i.resIdx  << " reflected over " << i.opIdx << endl;
-        }
-        cout << opIdx.size() << endl;
-
-
     }
  
-    /// striated results
+    /// apply to a std::vector and striate results
     template<class T>
     vector<T> apply(const vector<T>& p){
       vector<T> res( (opIdx.size()+1) * p.size() );
@@ -504,6 +556,7 @@ struct PointGroup3D : Group<V> {
       return res;
     }
     
+    // apply transformation group to a multivector T
     template<class T>
     vector<T> apply(const T& p){
             
@@ -520,8 +573,8 @@ struct PointGroup3D : Group<V> {
          case 1: //spin
               tmp = input.spin( this->sops[ i.opIdx] );
               break;
-          case 2: 
-              tmp = input.reflect( this->tops[0] );
+          case 2: //roto-reflect (invert)
+              tmp = input.reflect( this->tops[i.opIdx] );
               break;
           case 3: //glide
               tmp = input.reflect( this->gops[ i.opIdx] );
@@ -551,51 +604,91 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
     using Trs = typename V::space::translator; 
     using Vec = typename V::space::Vec;
+    using Biv = typename V::space::Biv;
 
-    Vec mB_length, mC_length;       //actual (non-unit) b
-    Vec mB_dir, mC_dir;  //actuall cell edge
-
+    /// Lattice cell system 
     enum BravaisType{
       Triclinic=1, Monoclinic, Orthorhombic, Tetragonal, Trigonal, Hexagonal, Cubic
     };
 
+    /// Lattice cell type 
     enum LatticeType{
       Primitive=1, Body, SingleFace, Face, Rhombo
     };
 
+    /// Cell type and system
     struct Lattice{
       int system; //bravais system (Triclinic, Tetragonal, etc)
       int type;   //latticetype (primitive, Body, single face, etc)
     };
     
-    //A axial (a), B axial (b), C axial (c), Diagonal (n), Diamond (d)
+    /// A axial (a), B axial (b), C axial (c), Diagonal (n), Diamond (d)
     enum GlideType{
       None=0, AxialA, AxialB, AxialC, Diagonal, Diamond
     };
+    /// Glide type and boolean for subtype
     struct GlideParameter{
       int type; //
       bool bInvert;   //boolean switch for b or a-b, b+c or a-b+c
     };
+    /// Glide types (axial a b c, diagonal or diamond)
     struct Glide{
       GlideParameter a, b, c;
     };
+    /// Screw data
+    struct Screw{
+      int ab,bc,ac;
+      int ab_trs, bc_trs, ca_trs;
+    };
+
       
-    Lattice mLattice;
-    Glide mGlide;
+   // Sym mSym;           ///< Symmetry Class (i.e. 4,3), from which lattice system can be deduced
+    Lattice mLattice;   ///< lattice type (Primitive, Body, etc) and system (Triclinic, Cubic etc)
+    Glide mGlide;       ///< glide reflections
+    Screw mScrew;       ///< screw displacement
 
-    Vec mRatio; //<-- ratio of width to height
-    int mScrew;
+    Vec mA_length, mB_length, mC_length;       //actual (non-unit)
+    Vec mA_dir, mB_dir, mC_dir;                //actual cell edge
+    double mB_angle, mC_angle;                 //angle offsets of lattice for triclinic and monoclinic
 
+    void angleB(double t){ mB_angle = t; dirB(); lengthB(); }
+    void angleC(double t){ mC_angle = t; dirC(); lengthC(); }
+
+    Vec mRatio;      ///< ratios along a, b and c
+
+   // vector<Vec> glides[(3);   ///< upto 3 glides;
+
+    void ratio(double x, double y, double z){
+      mRatio = Vec(x,y,z);
+      dirB(); lengthB();
+      dirC(); lengthC();
+    }
+
+    
+    /**
+    * @brief 3D SpaceGroup Generator
+    *
+    * @param p 
+    * @param q
+    * @param abar default false
+    * @param bbar default false
+    * @param abbar default false
+    * @param lattice default {Triclinic, Primitive}
+    * @param ratio  default Vec(1,1,1)
+      @param glide default 0
+      @param screw defulat 0
+    */
     SpaceGroup3D(
       int p, int q, 
       bool abar=false, bool bbar=false, bool abbar=false,
       Lattice lattice = {Triclinic, Primitive},
       Vec ratio= Vec(1,1,1),
       Glide glide = Glide(),
-      int screw=0
+      Screw screw = {0,0,0,0,0,0}
       ) 
       : 
       PointGroup3D<V>(p,q,abar,bbar,abbar),
+      //mSym{p,q},
       mLattice(lattice),
       mRatio(ratio),
       mGlide(glide),
@@ -604,15 +697,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
         init();
       }
 
-
-    //Q: how to seed non-symmorphic space groups
-    void init(){
-
-         mB_dir = bdir();
-         mC_dir = cdir();
-         mB_length = blength();
-         mC_length = clength();
-
+    void print(){
+         if (this->is33()) printf("33\n");
          switch(mLattice.system){
             case Triclinic:
               printf("Triclinic\n"); break;
@@ -642,197 +728,362 @@ struct SpaceGroup3D : PointGroup3D<V> {
               printf("Rhombo\n"); break;
          }
 
+         for (auto& i : this->opIdx) {
+           cout << this->opStream(i).str() << endl;
+         }
+    }
+
+ //   void setCrystalSystem(){
+ //     switch (mSym.p){
+ //       case 1:
+ //       case 2:
+ //         break;
+ //       case 3:
+ //         mLattice.system = Cubic;
+ //         break;
+ //       case 4:
+ //         if (mSym.q==3) mLattice.system = Cubic;
+ //         break;
+ //         
+ //     }
+ //   }
+
+    /**
+    * @brief Calculate glide a Vector
+    *
+    * @return cga3D::Vec
+    */    
+    Vec glideA(){
+      //vector<Vec> res;
+      switch(mGlide.a.type){
+        case AxialB:// "b" replace a reflection with a glide along b edge (NOT in clinic, trigonal, hexagonal)
+          return mB_dir;
+        case AxialC:
+          return mC_dir;
+        case Diagonal:
+          return this->is33() ? (mB_dir + mC_dir - mA_dir)  : (mB_dir+mC_dir);
+        case Diamond:
+          return (this->is33() ? (mB_dir + mC_dir - mA_dir)  : (mB_dir+mC_dir) ) * .5;
+      }
+
+      return Vec();
+    }
+
+    /**
+    * @brief Calculate glide b Vector
+    *
+    * @return cga3D::Vec
+    */
+    Vec glideB(){
+      switch(mGlide.b.type){
+        case AxialA:
+          return mA_dir;
+        case AxialC:
+          return mC_dir;
+        case Diagonal:
+          return mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir;      
+        case Diamond:
+          return (mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir) * .5;   
+      }
+
+      return Vec();
+    }
+
+
+
+    /**
+    * @brief Calculate glide c Vector
+    *
+    * @return cga3D::Vec
+    */
+    Vec glideC(){
+      switch(mGlide.c.type){
+        case AxialA:
+          return mA_dir;
+        case AxialB:
+          return mB_dir;
+        case Diagonal:
+          return mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir;      
+        case Diamond:
+          return (mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir)  * .5;   
+      }
+
+      return Vec();
+
+    }
+
+  
+    /**
+    * Calculate Glide Reflections
+    */
+    void setGlides(){
         //GLIDE replacements for non-symmorphic groups
         vector<int> replaceReflection; //keep track of indices into this->ops to replace
-        switch(mGlide.a.type){
-          case AxialB: //< replace a reflection with a glide
-          {
+  
+        if (mGlide.a.type != None)  {
             replaceReflection.push_back(0);
-            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? ( this->a - mB_length ) : ( mB_length ) ) * .5 );
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case AxialC:
-          {
-            replaceReflection.push_back(0);
-            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? (this->a - this->c) : (this->c) ) * .5 );
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case Diagonal:
-          {
-            replaceReflection.push_back(0); //we will replace 0 idx
-            auto trs = Gen::trs( ( (mGlide.a.bInvert) ? (this->a - ( mB_length+this->c)) : ( mB_length+this->c) ) * .5 );
-            this->gops.push_back( this->a * trs ); 
-            break;
-          }
-          case Diamond:
-          {
-            replaceReflection.push_back(0);
-            break;
-          }
-          
+            auto trs = Gen::trs( glideA()* .5 );
+            this->gops[0] = this->a * trs;
         }
-
-        switch(mGlide.b.type){
-          case AxialA: //< replace a reflection with a glide
-          {
+    
+        if(mGlide.b.type != None){      
             replaceReflection.push_back(1);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a) : (this->a) ) * .5 ); //any alt?
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case AxialC:
-          {
-            replaceReflection.push_back(1);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a -  mB_length + this->c) : (this->c) ) * .5 );
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case Diagonal:
-          {
-            replaceReflection.push_back(1); //we will replace 0 idx
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a +this->c) : (this->a+this->c) ) * .5 );
-            this->gops.push_back( this->a * trs ); 
-            break;
-          }
-          case Diamond:
-          {
-            replaceReflection.push_back(1);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? ( mB_length*2 - this->c - this->a*3) : (this->c - this->a) ) * .25 );
-            break;
-          }
-        }
-
-        switch(mGlide.c.type){
-          case AxialA: //< replace a reflection with a glide
-          {
+            auto trs = Gen::trs( glideB()* .5 );
+            this->gops[1] = this->b * trs;
+         }          
+      
+        if(mGlide.c.type != None){
             replaceReflection.push_back(2);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a) : (this->a) ) * .5 ); //any alt?
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case AxialB:
-          {
-            replaceReflection.push_back(2);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a - this->b + this->c) : (this->c) ) * .5 );
-            this->gops.push_back( this->a * trs );
-            break;
-          }
-          case Diagonal:
-          {
-            replaceReflection.push_back(2); //we will replace 0 idx
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->a +this->b) : (this->a+this->c) ) * .5 );
-            this->gops.push_back( this->a * trs ); 
-            break;
-          }
-          case Diamond:
-          {
-            replaceReflection.push_back(2);
-            auto trs = Gen::trs( ( (mGlide.b.bInvert) ? (this->b*2 - this->c - this->a*3) : (this->a + this->c) ) * .25 );
-            break;
-          }
+            auto trs = Gen::trs( glideC()* .5 );
+            this->gops[2] = this->c * trs;
+         }             
 
-        }
-
-
-        //replace instructions
+        // replace reflections with glide reflections
         for (auto& i : replaceReflection){
           for (auto& j : this->opIdx){
-            if (j.opIdx==i) j.type = 3; 
+            if (j.opIdx==i && j.type==0 ) j.type = 3; 
+         }
+        }
+    }
+
+    //replace rotations with screws
+    void setScrews(){
+
+        vector<int> replaceRotation;
+
+        if (mScrew.a){
+          replaceRotation.push_back(0);
+          auto vec = mC_dir * (float)mScrew.a/this->mSym.p;
+
+          auto scr = this->sops[0] * Gen::trs( vec );
+          this->scrops[0] = scr;
+        }
+
+
+        // replace rotations with screw displacements
+        for (auto& i : replaceRotation){
+          for (auto& j : this->opIdx){
+            if (j.opIdx==i && j.type == 1) j.type = 4; 
          }
         }
 
+    }
+
+    // Q: do we need a method seed non-symmorphic space groups in general position and eliminate redundancies?
+    void init(){
+
+        // determine system based on Sym p and q
+        // setCrystalSystem();
+
+         setCell();
+
+         mB_angle = 0;
+         mC_angle = 0;
+
+         setGlides();
 
         //replace rotation with screw
         vector<int> replaceRotation;
 
+        if (mScrew.ab){
+          
+          replaceRotation.push_back(0);
+          
+          //switcher
+          float ratio = (float)mScrew.ab/this->mSym.p;
+          auto vec = mC_dir * ratio;
+          auto scr = this->sops[0] * Gen::trs( vec );
+          
+          //possible trans of scr
+          if (mScrew.ab_trs){
+            if (mScrew.ab_trs==1) scr = scr.translate( -mB_dir * (1-ratio) );
+            else scr = scr.translate( mA_dir * (1-ratio) );
+          }
+
+          this->scrops[0] = scr;
+        }
+
+
+        if (mScrew.bc){
+
+          replaceRotation.push_back(1);
+          
+          //switcher
+          float ratio = (float)mScrew.bc/this->mSym.q;
+          auto vec = mA_dir * ratio;
+          if (mLattice.system == Tetragonal){
+            vec = (mA_dir - mB_dir) * ratio;
+          }
+         
+          auto scr = this->sops[1] * Gen::trs( vec );
+
+          //possible trans of scr
+          if (mScrew.bc_trs){
+            if (mScrew.bc_trs==1) scr = scr.translate( mB_dir * .25 );
+            else scr = (typename Group<V>::ScrewType(this->sops[1])).translate( mB_dir * .25 );  //see e.g. 198 and 199 in hestenes/holt paper
+          }
+
+          
+          this->scrops[1] = scr;
+        }
+
+        if (mScrew.ac){
+
+           replaceRotation.push_back(2);
+          
+           //switcher
+           // auto vec = this->a * mRatio[0] * mScrew.b;
+           auto vec = mB_dir * .25;
+           auto scr = this->sops[2] * Gen::trs( vec );
+           this->scrops[2] = scr;
+
+         // this->scrops[1] = tmp;
+        }
+
+
+        // replace rotations with screw displacements
+        for (auto& i : replaceRotation){
+          for (auto& j : this->opIdx){
+            if (j.opIdx==i && j.type == 1) j.type = 4; 
+         }
+        }
 
         
     }
 
 
+    //test for cubic 33 system (special)
+ //   bool is33(){
+ //      return (mLattice.system==Cubic) && FERROR( fabs((this->b<=this->a)[0]) - fabs((this->b<=this->c)[0]) );
+ //   }
+
+    void setCell(){
+
+       if (this->is33()){
+         auto rota = Gen::ratio( this->a, Vec(1,0,-1).unit() );
+         auto rotb = Gen::ratio( this->c.spin(rota), Vec(-1,0,-1).unit() );
+         auto rot = rotb*rota;
+         this->a = this->a.spin(rot);
+         this->b = this->b.spin(rot);
+         this->c = this->c.spin(rot);
+       }
+
+       this->setOps();
+      
+        dirA();
+        dirB();
+        dirC();
+
+        //cout << mB_dir << endl;
+
+        mA_length = lengthA();
+        mB_length = lengthB();
+        mC_length = lengthC();
+
+    }
+
+    /// get edge of lattice in a direction
+    Vec dirA(){
+      Vec tmp = this->a * mRatio[0];
+      //switch(mLattice.system){
+      //  case Cubic:
+          if (this->is33()) tmp = (this->a - this->c) * mRatio[0]/2.0;
+      //}
+      mA_dir = tmp;
+      return mA_dir;
+    }
+
     /// get corrected direction of b vec along bravais lattice
     /// is stored in mB_dir on init();
-    Vec bdir(){
+    Vec dirB(){
       Vec tmp;
       switch(mLattice.system){
        case Triclinic:
        case Monoclinic:
+        tmp = this->b.rotate( Biv::xz * mB_angle ) * mRatio[1];
+        break;
        case Orthorhombic:
        case Trigonal:
-        tmp = this->b;
+        tmp = this->b * mRatio[0];
         break;
        case Tetragonal:
-       case Hexagonal:
-        tmp = this->a.reflect( (this->b^this->c).duale().unit() );
+       case Hexagonal: //* ratio?
+        tmp = this->a.reflect( (this->b^this->c).duale().unit() ) * mRatio[0];
         break;
        case Cubic:
-        if ( FERROR( fabs((this->b<=this->a)[0]) - fabs((this->b<=this->c)[0]) ) )
-             tmp=this->b;
-        else tmp = -this->a.reflect(this->b);        
+        if (this->is33() ) tmp=(this->c + this->a)*mRatio[0]/2.0;
+        else tmp = (-this->a.reflect(this->b))*mRatio[0];        
         break;
       }
-      return tmp;
+
+      mB_dir = tmp;
+      return mB_dir;
     }
 
-    Vec cdir(){
+    Vec dirC(){
       Vec tmp;
       switch(mLattice.system){
+       case Triclinic:
+        tmp = this->c.rotate( Biv::xy * mC_angle ) * mRatio[2];
+        break;
        case Cubic:
-        if ( FERROR( fabs((this->b<=this->a)[0]) - fabs((this->b<=this->c)[0]) ) )
-             tmp=this->c;
-        else tmp = (this->a ^ this->b).duale().unit(); 
+        if (this->is33()) tmp=((this->b * 2) - this->a - this->c)*mRatio[0]/2.0;
+        else tmp = ((this->a ^ this->b).duale().unit())*mRatio[0]; 
         break;
 
        default:
-        tmp = this->c;
+        tmp = this->c * mRatio[2];
         break;
       }     
-      return tmp;
+      
+      mC_dir = tmp;
+      return mC_dir;
     }
 
+    Vec lengthA(){
+      return this->a * mRatio[0];
+    }
  
      /// corrected length of b
     /// is stored as mB_length on init();
-    Vec blength(){
+    Vec lengthB(){
      Vec tmp;
      switch(mLattice.system){
        case Triclinic:
        case Monoclinic:
        case Orthorhombic:
        case Trigonal:
-        tmp = this->b;
+        tmp = mB_dir;
         break;
        case Tetragonal:
        case Hexagonal:
-        tmp = this->a + mB_dir;
+        tmp = mA_dir + mB_dir;
         break;
        case Cubic:
-         if ( FERROR( fabs((this->b<=this->a)[0]) - fabs((this->b<=this->c)[0]) ) )
-           tmp = this->b;
+         if ( this->is33() ) tmp = this->b*mRatio[0];
          else 
-           tmp = this->a + mB_dir; 
+           tmp = mA_dir + mB_dir; 
           break;
        
       }
+      mB_length = tmp;
       return tmp;
     }
 
      /// corrected length of c
     /// is stored as mC_length on init();
-    Vec clength(){
+    Vec lengthC(){
      Vec tmp;
      switch(mLattice.system){
        case Cubic:
-        if ( FERROR( fabs((this->b<=this->a)[0]) - fabs((this->b<=this->c)[0]) ) )
-             tmp = this->c;
+        if ( this->is33() ) tmp = this->c*mRatio[0];
         else tmp = mB_dir + mC_dir; 
         break;
        default:
-        tmp = this->c;
+        tmp = mC_dir;
         break;
       }
+      mC_length = tmp;
       return tmp;
     }
 
@@ -841,7 +1092,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
      * Calculate a vector transformation basice on generators and ratio 
      *-----------------------------------------------------------------------------*/
     Vec vec(float x, float y, float z){
-        return this->a*x * mRatio[0] + mB_dir*y * mRatio[1] + mC_dir*z * mRatio[2]; 
+        return mA_dir*x + mB_dir*y + mC_dir*z; 
     }
 
 
@@ -859,7 +1110,12 @@ struct SpaceGroup3D : PointGroup3D<V> {
               for (int j=-x/2.0;j<x/2.0;++j){
                 for (int k=-y/2.0;k<y/2.0;++k){
                   for (int l=-z/2.0;l<z/2.0;++l){
-                    res.push_back( motif.trs( vec(j,k,l) ) );                
+ //             for (int j=0;j<x;++j){
+ //               for (int k=0;k<y;++k){
+ //                 for (int l=0;l<z;++l){
+ //                   //auto vec = vec(j,k,l);
+                    res.push_back( motif.trs( vec(j,k,l) ) ); 
+                    //if (l==z-1) res.push_back( motif.trs( cellBack() ) );               
                   }
                 }
               }
@@ -867,9 +1123,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
             }
             case Body:
             {
-             for (int j=-x/2.0;j<x/2.0;++j){
-               for (int k=-y/2.0;k<y/2.0;++k){
-                 for (int l=-z/2.0;l<z/2.0;++l){
+//             for (int j=-x/2.0;j<x/2.0;++j){
+//               for (int k=-y/2.0;k<y/2.0;++k){
+//                 for (int l=-z/2.0;l<z/2.0;++l){
+                for (int j=0;j<x;++j){
+                 for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                   res.push_back( motif.trs( vec(j,k,l) ) );   
                   res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,.5) ) );    
                  }
@@ -882,9 +1142,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
             switch(mLattice.system){
               case Monoclinic:
               {
-                 for (int j=-x/2.0;j<x/2.0;++j){
-                   for (int k=-y/2.0;k<y/2.0;++k){
-                     for (int l=-z/2.0;l<z/2.0;++l){
+ //                for (int j=-x/2.0;j<x/2.0;++j){
+ //                  for (int k=-y/2.0;k<y/2.0;++k){
+ //                    for (int l=-z/2.0;l<z/2.0;++l){
+               for (int j=0;j<x;++j){
+                for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                        res.push_back( motif.trs( vec(j,k,l)  ) );  
                        res.push_back( motif.trs( vec(j,k,l) + vec(0,.5,.5) ) );    
                      }
@@ -894,9 +1158,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
               }
              case Orthorhombic:
              {
-                for (int j=-x/2.0;j<x/2.0;++j){
-                  for (int k=-y/2.0;k<y/2.0;++k){
-                    for (int l=-z/2.0;l<z/2.0;++l){
+ //               for (int j=-x/2.0;j<x/2.0;++j){
+ //                 for (int k=-y/2.0;k<y/2.0;++k){
+ //                   for (int l=-z/2.0;l<z/2.0;++l){
+               for (int j=0;j<x;++j){
+                for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                       res.push_back( motif.trs( vec(j,k,l)  ) );  
                       res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,0) ) );    
                     }
@@ -907,9 +1175,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
               case Trigonal:
               case Hexagonal:
               {
-                 for (int j=-x/2.0;j<x/2.0;++j){
-                   for (int k=-y/2.0;k<y/2.0;++k){
-                     for (int l=-z/2.0;l<z/2.0;++l){
+//                 for (int j=-x/2.0;j<x/2.0;++j){
+//                   for (int k=-y/2.0;k<y/2.0;++k){
+//                     for (int l=-z/2.0;l<z/2.0;++l){
+              for (int j=0;j<x;++j){
+                for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                        res.push_back( motif.trs( vec(j,k,l)  ) );  
                        res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,0) ) );    
                        res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,0) ) );   
@@ -927,9 +1199,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
               case Orthorhombic:
               case Cubic:
                {
-                  for (int j=-x/2.0;j<x/2.0;++j){
-                    for (int k=-y/2.0;k<y/2.0;++k){
-                      for (int l=-z/2.0;l<z/2.0;++l){
+//                  for (int j=-x/2.0;j<x/2.0;++j){
+//                    for (int k=-y/2.0;k<y/2.0;++k){
+//                      for (int l=-z/2.0;l<z/2.0;++l){
+               for (int j=0;j<x;++j){
+                 for (int k=0;k<y;++k){
+                   for (int l=0;l<z;++l){
+
                         res.push_back( motif.trs( vec(j,k,l)  ) );  
                         for (int m =1;m<2;++m){
                          float t = (float)m/2;
@@ -945,9 +1221,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
               case Trigonal:
               case Hexagonal:
                 {
-                   for (int j=-x/2.0;j<x/2.0;++j){
-                     for (int k=-y/2.0;k<y/2.0;++k){
-                       for (int l=-z/2.0;l<z/2.0;++l){
+//                   for (int j=-x/2.0;j<x/2.0;++j){
+//                     for (int k=-y/2.0;k<y/2.0;++k){
+//                       for (int l=-z/2.0;l<z/2.0;++l){
+              for (int j=0;j<x;++j){
+                for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                          res.push_back( motif.trs( vec(j,k,l)  ) );  
                          for (int m =1;m<3;++m){
                           float t = (float)m/3;
@@ -965,9 +1245,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
           }
           case Rhombo:
           {
-             for (int j=-x/2.0;j<x/2.0;++j){
-               for (int k=-y/2.0;k<y/2.0;++k){
-                 for (int l=-z/2.0;l<z/2.0;++l){
+//             for (int j=-x/2.0;j<x/2.0;++j){
+//               for (int k=-y/2.0;k<y/2.0;++k){
+//                 for (int l=-z/2.0;l<z/2.0;++l){
+              for (int j=0;j<x;++j){
+                for (int k=0;k<y;++k){
+                  for (int l=0;l<z;++l){
+
                    res.push_back( motif.trs( vec(j,k,l)  ) );  
                    res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,.3333333) ) );    
                    res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,.6666666) ) );   
@@ -994,6 +1278,27 @@ struct SpaceGroup3D : PointGroup3D<V> {
         }
         ii++;
       }
+      return res;
+    }
+
+    /// a std::vector of Points representing cell positions of a single lattice
+    vector<Point> cellPositions(){
+      
+      vector<Point> res;
+    //  switch( ){
+    //    case Primitive:
+
+    //     break;
+    //    case Body:
+    //      break;
+    //    case SingleFace:
+    //      break;
+    //    case Face:
+    //      break;
+    //    case Rhombic:
+    //      break;
+    //  }
+
       return res;
     }
 

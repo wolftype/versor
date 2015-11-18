@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  xSpaceGroup3D.cpp
+ *       Filename:  xSpaceGroup3D_Operations.cpp
  *
- *    Description:  from allo
+ *    Description:  create a field of operations
  *
  *        Version:  1.0
- *        Created:  04/30/2015 15:30:13
+ *        Created:  11/02/2015 13:39:18
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -19,9 +19,90 @@
 
 #include "vsr_app.h"   
 #include "form/vsr_group.h"
+#include "form/vsr_field.h"
+#include "form/vsr_graph.h"
 
 using namespace vsr;
 using namespace vsr::cga;
+
+
+vector<Vertex> SphereMesh(int w=20, int h=20){
+
+
+  vector<Vertex> v;
+
+  for (int i = 0;i<w;++i){
+    for (int j=0;j<h;++j){
+      auto tu = (float)i/w * TWOPI;
+      auto tv = -PIOVERTWO + (float)j/h * PI;
+      auto rot = Gen::rot(tu,tv);    
+      v.push_back(  Vec3f( Vec::x.spin(rot) ) );         
+    }
+  }
+
+  return v;
+}
+
+
+vector<Vertex> CylinderMesh(int w=20, int h=20, float radius = 1.0, float height = 2.0){
+
+
+  vector<Vertex> v;
+
+  for (int i = 0;i<w;++i){
+    for (int j=0;j<h;++j){
+      auto tu = (float)i/w * PI;
+      auto tv = -height/2.0 + (float)j/h * height;
+      auto rot = Gen::rot( Biv::xz * tu);    
+      v.push_back(  Vec3f( Vec::x.spin(rot) * radius ) + Vec3f(0,tv,0));         
+    }
+  }
+
+  return v;
+}
+
+   template<> 
+   void Renderable<vsr::HEGraph<Vertex>>::DrawImmediate( const vsr::HEGraph<Vertex>& graph){
+     glBegin(GL_TRIANGLES);
+     int iter =0;
+     bool bChecker = false;
+     for (auto& i : graph.face()){
+          iter++;
+          float t = (float)iter/graph.face().size(); 
+          auto& a = i->a();
+          auto& b = i->b();
+          auto& c = i->c(); 
+          glColor3f(bChecker,bChecker,bChecker);
+          GL::normal( a.Norm[0], a.Norm[1],a.Norm[2]);//.begin() );
+          GL::vertex( a.Pos[0], a.Pos[1], a.Pos[2] );
+          GL::normal( b.Norm[0], b.Norm[1], b.Norm[2] );
+          GL::vertex( b.Pos[0], b.Pos[1], b.Pos[2] );
+          GL::normal( c.Norm[0], c.Norm[1], c.Norm[2] );
+          GL::vertex( c.Pos[0], c.Pos[1], c.Pos[2] );
+          if (!(iter&1)) bChecker = !bChecker;
+     }
+     glEnd();
+ //    glColor3f(0,.7,.7);
+ //    glBegin(GL_LINES);
+ //    for (auto& i : graph.face()){
+ //         auto& a = i->a();
+ //         auto& b = i->b();
+ //         auto& c = i->c(); 
+ //         //glColor4f(.2,1,.2,.7);
+ //      //   GL::normal( a.Norm[0], a.Norm[1],a.Norm[2]);//.begin() );
+ //         GL::vertex( a.Pos[0], a.Pos[1], a.Pos[2] );
+ //      //   GL::normal( b.Norm[0], b.Norm[1], b.Norm[2] );
+ //         GL::vertex( b.Pos[0], b.Pos[1], b.Pos[2] );
+ //     //    GL::normal( a.Norm[0], a.Norm[1],a.Norm[2]);//.begin() );
+ //     //    GL::vertex( a.Pos[0], a.Pos[1], a.Pos[2] );
+ //     //    GL::normal( c.Norm[0], c.Norm[1], c.Norm[2] );
+ //     //    GL::vertex( c.Pos[0], c.Pos[1], c.Pos[2] );
+ //    }
+ //    glEnd();
+     
+  }
+
+
 
 struct State{
 
@@ -45,6 +126,8 @@ struct State{
 
   Point point = Round::null(0,0,0);
 
+  bool bSphere = false;
+
   float xratio,yratio,zratio;
   int numX, numY, numZ;
 
@@ -52,6 +135,10 @@ struct State{
   float latticeType;
 
   float angleB, angleC;
+  float lightX,lightY;
+
+  float cellsWidth, cellsHeight;
+  float totalHeight;
 
   //drawing
   bool bDrawRoots,bDrawVectors,bDrawScrews, bDrawGlides, bDrawCell, bDrawMotif, bDrawDiamond, bLights;
@@ -62,10 +149,12 @@ struct State{
 void drawState(State * state){
 
 
-     State& s = *state;
+    
+    State& s = *state;
+    GL::lightPos(s.lightX, 0, s.lightY );
 
-     if (s.bLights) GL::lightsOn();
-     else GL::lightsOff();
+   //  if (s.bLights) GL::lightsOn();
+   //  else GL::lightsOff();
 
 
      Vec ratioVec(s.xratio,s.yratio,s.zratio); 
@@ -80,35 +169,18 @@ void drawState(State * state){
      sg.angleB(s.angleB);
      sg.angleC(s.angleC);
      
-     sg.print();    
+     //sg.print();    
 
      Vec v(0,0,0);
+    
 
+      //cell info
      if (s.bDrawRoots){
       DrawAt( sg.a, v, 1,0,0);
       DrawAt( sg.b, v, 0,1,0);
       DrawAt( sg.c, v, 0,0,1);
      }
-    
-    if (s.bDrawScrews){
-      
-      for (auto& i : sg.scrops){
-         auto dll = Gen::log(i);
-         Draw( dll, 0,0,0 );
 
-        for (auto& input : sg.apply(s.point) ){
-         glBegin(GL_LINE_STRIP);
-         for (int j=0; j<50;++j){
-          float t = s.screwIterStart + s.screwIter * (float)j/50;
-          auto p = input.spin( Gen::mot(dll*t) );
-          GL::vertex(p.begin());
-         }
-         glEnd();
-        }
-      }
-
-    }
-      //cell info
     if (s.bDrawVectors){
      //cout << sg.mB_dir << endl;
      glColor3f(0,0,0);
@@ -151,121 +223,61 @@ void drawState(State * state){
 
     }
     
-     auto dls = Round::sphere(s.point, s.radius);
-     vector<Point> pnt;
- 
-    if (s.bDrawDiamond){
-   for (int i=0;i<4;++i){
-      float t = (float)i/4;
-      Rotor r = Gen::rot( Biv::xz * PI * t);
-      pnt.push_back( Construct::point(dls, Vec::x.spin( r ) ) );
-   }
-   pnt.push_back( s.point.translate(-.1,.25,0) );
-   pnt.push_back( s.point.translate(.1,-.25,0) );
+    auto tcir = Round::produce( Round::sphere(s.point, -s.radius), Vec::y.rot(Biv::xy * s.angleB) );
+    vector<Pair> cir;
+    cir.push_back( tcir ); 
+   
+    auto groupA = sg.apply( cir );
+    auto groupB = sg.hang( groupA , s.numX,s.numY,s.numZ);
 
-   auto res = sg.apply( pnt );
-   auto latticeRes = sg.hang( res , s.numX,s.numY,s.numZ);
-
-   float t= s.alpha;
-
-  if (s.bDrawMotif){
-    for (int i=0;i<latticeRes.size(); i+=pnt.size() ) {
-
-       auto a = latticeRes[i]; 
-       auto b = latticeRes[i+1]; 
-       auto c = latticeRes[i+2]; 
-       auto d = latticeRes[i+3];
-       auto e = latticeRes[i+4];  
-       auto f = latticeRes[i+5];
-       glColor4f(.6,.2,.2,t);
-      // GL::color( ca.begin() );
-       Glyph::Triangle(a,b,e);
-       glColor4f(.2,.6,.6,t);
-      // GL::color( cb.begin() );
-       Glyph::Triangle(b,c,e);
-       glColor4f(.6,.2,.6,t);
-       Glyph::Triangle(c,d,e);
-       glColor4f(.3,.3,.6,t);
-       Glyph::Triangle(d,a,e);
-       glColor4f(.4,1,.4,t);
-       Glyph::Triangle(a,b,f);
-       glColor4f(.4,1,.3,t);
-       Glyph::Triangle(b,c,f);
-       glColor4f(.3,1,.1,t);
-       Glyph::Triangle(c,d,f);
-       glColor4f(.1,1,.4,t);
-       Glyph::Triangle(d,a,f);
-
-    }
-  }
-
-      } else {
-      float phi = PIOVERTWO * s.width;
-      for (int i=0;i<4;++i){
-        float t = (float)TWOPI * i/4.0;
-        auto rota = Gen::rot(t,-phi);
-        auto rotb = Gen::rot(t,phi);
-        pnt.push_back( Construct::point(dls, Vec::x.spin( rota ) ) );
-        pnt.push_back( Construct::point(dls, Vec::x.spin( rotb ) ) );
-
-      }
-
-       auto res = sg.apply( pnt );
-       auto latticeRes = sg.hang( res , s.numX,s.numY,s.numZ);
-
-     if (s.bDrawMotif){
-      for (int i=0;i<latticeRes.size(); i+=pnt.size() ) {
-         auto a = latticeRes[i]; 
-         auto b = latticeRes[i+1]; 
-         auto c = latticeRes[i+2]; 
-         auto d = latticeRes[i+3];
-         auto e = latticeRes[i+4];  
-         auto f = latticeRes[i+5];
-         auto g = latticeRes[i+6];
-         auto h = latticeRes[i+7];
-        
-         glBegin(GL_QUADS);
-        
-         glColor3f(.6,.2,.2);
-         GL::normal( ((c-a)^(b-a)).duale().unit().begin() );
-         GL::Quad(a,c,d,b);         
-         glColor3f(.2,.6,.6);
-         GL::normal( ((e-c)^(d-c)).duale().unit().begin() );
-         GL::Quad(c,e,f,d);         
-         glColor3f(.6,.2,.6);
-         GL::normal( ((g-e)^(f-e)).duale().unit().begin() );
-         GL::Quad(e,g,h,f);         
-         glColor3f(.1,1,.4);
-         GL::normal( ((a-g)^(h-g)).duale().unit().begin() );
-         GL::Quad(g,a,b,h);  
-         glColor3f(.3,.3,.6);
-         GL::normal( ((c-a)^(g-a)).duale().unit().begin() );
-         GL::Quad(a,c,e,g);         
-         glColor3f(.8,1,.2);
-         GL::normal( ((d-b)^(h-b)).duale().unit().begin() );
-         GL::Quad(b,d,f,h);         
-
-         glEnd();
-
-         glBegin(GL_LINES);
-         glColor3f(.6,0,0);
-         GL::Line(a,b);
-         GL::Line(c,d);
-         GL::Line(e,f);
-         GL::Line(g,h);
-         GL::Line(a,c);
-         GL::Line(c,e);
-         GL::Line(g,a);
-         GL::Line(b,d);
-         GL::Line(d,f);
-         GL::Line(f,h);
-         GL::Line(h,b);
-         glEnd();
-
-      }
-   }
+    if (s.bDrawMotif){
+     for (auto& i : groupB){
+        Draw(i,0,1,0);
+     } 
     }
 
+    int w = s.cellsWidth;
+    int h = s.cellsHeight;
+    //Mesh mesh =  Mesh::Sphere();
+    auto mesh = s.bSphere ? SphereMesh(w,h) : CylinderMesh(w,h,1,s.totalHeight);
+    
+
+    HEGraph<Vertex> graph;
+
+    for (int i=0;i<mesh.size();++i){
+       auto pt =  Round::point(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
+       Pair pair;
+      for (int j =0;j<groupB.size();++j){
+       auto dist = Round::sqd( Round::location(groupB[j]), pt );
+       auto wt = 1.0/(dist+.01);
+       pair += groupB[j] * wt;
+      }
+      auto npt = Round::location( pt.spin( Gen::boost(pair * s.amt) ) );
+      mesh[i].Pos = Vec3f(npt[0],npt[1],npt[2]);
+    }
+
+
+    graph.UV(w,h,mesh, true);//.vertex());
+
+   for (auto& i : graph.node()){
+   
+     auto va = i->data().Pos;
+     auto vb = i->edge -> a().Pos;
+     auto vc = i->edge -> next -> a().Pos;
+     Vec3f normal =(vb-va).cross(vc-va).unit() ;//(mesh[i+2].Pos - mesh[i].Pos).cross( mesh[i+1].Pos - mesh[i].Pos).unit();
+   
+     i->data().Norm = normal;
+   }
+    
+
+    Draw(graph, .2, .6,.6);
+
+ //   mesh.drawElements();
+
+ //   mesh.mode(GL::L);
+    
+ //   glColor3f(1,0,0);
+ //   mesh.drawElements();
 
    }
 
@@ -285,6 +297,7 @@ struct MyApp : App {
   Point mouse = Round::null(1,1,1);;
 
   float latticetype;
+  float lineWidth;
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
@@ -306,7 +319,7 @@ struct MyApp : App {
     gui(s.pbar,"pbar");                    // rotational?
     gui(s.q,"q",0,10);
     gui(s.qbar,"qbar");
-
+    gui(s.bSphere,"bSphere");
     gui(s.angleB,"b incline", -PI,PI);     //clinics
     gui(s.angleC,"c incline",-PI,PI);
     gui(s.xratio, "xratio",1,100);         //scaling
@@ -336,6 +349,9 @@ struct MyApp : App {
     gui(s.bDrawGlides,"bDrawGlides");
     gui(s.bDrawScrews,"bDrawScrews");
 
+    gui(s.lightX, "lightX",-10,10);
+    gui(s.lightY, "lightY",-10,10);
+
     gui(s.bDrawCell,"bDrawCell");
     gui(s.bDrawMotif,"bDrawMotif");
     gui(s.bDrawDiamond,"bDrawDiamond");
@@ -343,10 +359,14 @@ struct MyApp : App {
     gui(s.bLights,"bLights");
     gui(s.alpha, "alpha");
     gui(s.width,"width");
-    gui(s.radius,"radius");
+    gui(s.radius,"radius",-10,10);
     gui(s.screwIterStart,"screwIterStart",0,-10);
     gui(s.screwIter,"screwIter",0,10);
     gui(s.cellXoffset,"cellXoffset",-10,10);
+    gui(lineWidth,"lineWidth",0,10);
+    gui(s.cellsWidth,"cellswidth",10,50);
+    gui(s.cellsHeight,"cellsheight",10,50);
+    gui(s.totalHeight,"totalHeight",1,10);
 
     s.xratio = s.yratio = s.zratio =1;
     s.p=3;s.q=3;
@@ -391,8 +411,11 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
+    glLineWidth(lineWidth);
+    gl2psLineWidth(lineWidth);
+
     if (bSetMouse) mouse = calcMouse3D();
-    scene.camera.lens.bOrtho= bDrawOrtho;
+  //  scene.camera.lens.bOrtho= bDrawOrtho;
 
     drawState(state);      
   }  

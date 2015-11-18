@@ -37,14 +37,24 @@ namespace gfx{
 //  }
   
   template<> void Renderable< cga::Biv,0 >::DrawImmediate(const  cga::Biv& s){
-		double ta = s.norm(); 
+		double ta = fabs(s.norm()); 
 	  bool sn = Op::sn( s ,  cga::Biv::xy * (-1));
-	
+   	
 		glPushMatrix();	
 			gfx::GL::rotate( Op::AA(s).begin() );  
 			gfx::Glyph::DirCircle( ta, sn );
 		glPopMatrix();
   }
+ 
+  template<> void Renderable< cga::Biv,1 >::DrawImmediate(const  cga::Biv& s){
+		double ta = s.norm(); 
+	  bool sn = Op::sn( s ,  cga::Biv::xy * (-1));
+	
+		glPushMatrix();	
+			gfx::GL::rotate( Op::AA(s).begin() );  
+			gfx::Glyph::FillCircle( ta );
+		glPopMatrix();
+  } 
   
   template<> void Renderable< cga::Tnv,0 >::DrawImmediate (const  cga::Tnv& s){
     Renderable< cga::Vec >::DrawImmediate( s.copy< cga::Vec>() );
@@ -66,13 +76,19 @@ namespace gfx{
   }
 
   template<> void Renderable< cga::Circle,0 >::DrawImmediate( const  cga::Circle& s )  {  
-    VSR_PRECISION rad = nga::Round::rad( s );
-    bool im = nga::Round::size(s, false) > 0 ? 1 : 0;  
-     
-    gfx::GL::translate( Op::Pos(s).begin() );
-    gfx::GL::rotate( Op::AA(s).begin() ); 
+    //VSR_PRECISION rad = nga::Round::rad( s );
+    VSR_PRECISION size = nga::Round::size(s, false);
 
-    im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
+    if (size > 10000) Renderable< cga::Line,0>::DrawImmediate( cga::Line(s) );
+    else {
+      bool im = size > 0 ? 1 : 0;
+      VSR_PRECISION rad = sqrt ( fabs ( size ) );      
+     
+      gfx::GL::translate( Op::Pos(s).begin() );
+      gfx::GL::rotate( Op::AA(s).begin() ); 
+
+      im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );  
+    }
   }  
   
   template<> void Renderable< cga::Point,0 >::DrawImmediate (const  cga::Point& s){
@@ -157,6 +173,47 @@ namespace gfx{
          }
        }
   }  
+
+  template<> void Renderable< cga::Pair,1 >::DrawImmediate (const  cga::Pair& s){
+       //Is Imaginary?
+       VSR_PRECISION size = nga::Round::size( s, false );
+
+       //is null?
+       if ( fabs(size) < FPERROR ){
+           GL::translate( nga::Round::loc(s).begin() );
+            Renderable< cga::Vec >::DrawImmediate( -nga::Round::dir(s).copy< cga::Vec>() ); 
+         
+       }else{
+       
+         std::vector< cga::Pnt> pp = nga::Round::split( s );
+
+         VSR_PRECISION ta = nga::Round::size( pp[0], true );   
+                                      
+         if ( fabs(ta) >  FPERROR ) {    
+              cga::Pnt p1 = nga::Round::cen( pp[0] );
+              cga::Pnt p2 = nga::Round::cen( pp[1] );
+             double t = sqrt ( fabs ( ta ) );
+             bool real = size > 0 ? 1 : 0;  
+
+             glPushMatrix();
+             gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]);
+             gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30));// : gfx::Glyph::Sphere(t);  
+             glPopMatrix();
+
+             gfx::Glyph::Point(p1);
+             gfx::Glyph::Point(p2);
+
+             gfx::GL::translate ( p2.begin() );
+             gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30));// : gfx::Glyph::Sphere(t);  
+
+         } else {
+             gfx::Glyph::Point(pp[0]);
+             gfx::Glyph::Point(pp[1]);
+
+         }
+       }
+  }  
+  
   
   template<> void Renderable< cga::DualLine,0 >::DrawImmediate (const  cga::DualLine& s){
        cga::Drv d = nga::Flat::dir( s.undual() );

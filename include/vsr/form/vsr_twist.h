@@ -13,8 +13,84 @@
 
 #include "space/vsr_cga3D_op.h"
 #include "vsr_interp.h"
+#include "vsr_field.h"
 
 namespace vsr { namespace cga {
+
+  /*! Warp field of twists around a bunch of points */
+  class TwistField{
+
+    Field<Dll> mDll = Field<Dll>(2,2,2);
+    vector<Frame> mFrame = vector<Frame>(8);
+
+    vector<Vec> mDistance;
+    
+
+    public:
+
+
+     vector<Frame>& frame() { return mFrame; }
+
+
+     /// Place cube of Frames on corners of a field of points, and register mDistance of points
+     void set(const vector<Pnt>& pnt){
+       mDistance = vector<Vec>( pnt.size() );
+
+       float minx, miny, minz = 200000;
+       float maxx, maxy, maxz = -200000;
+
+       for (auto& i : pnt){
+         if (i[0]< minx) minx = i[0];
+         if (i[1]< miny) miny = i[1];
+         if (i[2]< minz) minz = i[2];
+         
+         if (i[0]> maxx) maxx = i[0];
+         if (i[1]> maxy) maxy = i[1];
+         if (i[2]> maxz) maxz = i[2];
+       }
+
+       float rangex, rangey, rangez;
+       rangex = fabs(maxx - minx); rangey =fabs( maxy-miny); rangez = fabs(maxz-minz);
+
+       for (int i=0;i<pnt.size();++i){
+          mDistance[i][0] = fabs(pnt[i][0] - minx)/rangex; 
+          mDistance[i][1] = fabs(pnt[i][1] - miny)/rangey; 
+          mDistance[i][2] = fabs(pnt[i][2] - maxz)/rangez; 
+       }
+
+
+       mFrame[0].pos(minx, miny, maxz);
+       mFrame[1].pos(minx, miny, minz);
+       mFrame[2].pos(minx, maxy, maxz);
+       mFrame[3].pos(minx, maxy, minz);
+       mFrame[4].pos(maxx, miny, maxz);
+       mFrame[5].pos(maxx, miny, minz);
+       mFrame[6].pos(maxx, maxy, maxz);
+       mFrame[7].pos(maxx, maxy, minz);
+
+     }
+
+     /// Trilinear interpolation of the field of frames on on a range of points
+     vector<Pnt> apply(vector<Pnt>& pnt){
+
+       vector<Pnt> result = vector<Pnt>(pnt.size());
+       
+       for (int i=0;i<mFrame.size();++i){
+        mDll[i] = mFrame[i].dll();
+       }
+       
+       for (int i=0;i<mDistance.size();++i){
+         auto dis = mDistance[i];
+         auto tdll = mDll.vol( dis[0], dis[1], dis[2] ); //get trilinear interp of field 
+
+         result[i] = PAO.spin ( Gen::motor(tdll) );
+        }
+        
+        return result;
+     }
+    
+
+  };
 
 	/*! Decomposed Dual Line (As a Bivector and Direction Vector  to it ) */
 	class Twist{
@@ -89,33 +165,34 @@ namespace vsr { namespace cga {
 			/// Distance from origin
 			double moment() const { return iphi().rnorm(); }
 		
-            /// given a (unit?) line, generate a dll with period and pitch along it
-            Twist& along(const Dll& d, double period, double pitch){
+     /// given a (unit?) line, generate a dll with period and pitch along it
+     Twist& along(const Dll& d, double period, double pitch){
 
-                Dll td = d.runit() * period;
-                
-                Biv tb(td); //tb *= period;             //Drv tv(td);
-                Drv tv(td);
+         Dll td = d.runit() * period;
+         
+         Biv tb(td); //tb *= period;             //Drv tv(td);
+         Drv tv(td);
+     
+         Vec dir = Op::dle(tb);
+         
+         dll(tb, Drv( tv - (dir * pitch).copy<Drv>() ) );
+         
+         return *this;
+         
+     }
             
-                Vec dir = Op::dle(tb);
-                
-                dll(tb, Drv( tv - (dir * pitch).copy<Drv>() ) );
-                
-                return *this;
-                
-            }
-            
-            inline static Dll Along( const Dll& d, double period, double pitch){
-                Dll td = d.runit() * period;
-                
-                Biv tb(td); //tb *= period;             //Drv tv(td);
-                Drv tv(td);
-            
-                Vec dir = Op::dle(tb);
-                Drv drv( tv + ( dir * pitch ).copy<Drv>() );
-                
-                return Dll(tb[0], tb[1], tb[2], drv[0], drv[1], drv[2] );
-            }
+      inline static Dll Along( const Dll& d, double period, double pitch){
+    
+          Dll td = d.runit() * period;
+          
+          Biv tb(td); //tb *= period;             //Drv tv(td);
+          Drv tv(td);
+      
+          Vec dir = Op::dle(tb);
+          Drv drv( tv + ( dir * pitch ).copy<Drv>() );
+          
+          return Dll(tb[0], tb[1], tb[2], drv[0], drv[1], drv[2] );
+      }
         
 			Rot ratio() const { return Gen::ratio( Vec( biv() ), Vec( drv() ) ); }
 			Biv iphi()  const { return Op::dle(biv()) ^ Vec(drv()); }
@@ -204,8 +281,8 @@ namespace vsr { namespace cga {
 			double period( int i ) { return mTwist[i].period(); }	
 			void period( double theta, int i ) { mTwist[i].period(theta); }
 			
-            void pitch(double tx, double ty, double tz) { pitchX(tx); pitchY(ty); pitchZ(tz); }
-            void period(double tx, double ty, double tz) { periodX(tx); periodY(ty); periodZ(tz); }
+      void pitch(double tx, double ty, double tz) { pitchX(tx); pitchY(ty); pitchZ(tz); }
+      void period(double tx, double ty, double tz) { periodX(tx); periodY(ty); periodZ(tz); }
         
 			void pitchX( double theta ) { pitch(theta,0); }   ///< Set Pitch
 			void pitchY( double theta ) { pitch(theta,1); }

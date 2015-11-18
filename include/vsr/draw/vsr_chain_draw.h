@@ -28,7 +28,7 @@ namespace gfx{
    if(bFrame){
     for (int i = 0; i<c.num(); ++i){
         float t=(float)i/c.num();
-        DrawAt(c[i].z(), c[i].pos(), 1-t,0,t);
+        DrawAt(c[i].z(), c[i].pos(), 0,0,t);
         DrawAt(c[i].y(), c[i].pos(), 0,1,t);
       //  DrawAt(c.joint(i).y() * .2, c[i].pos(), 0,1,0);
         //Draw( c[i].cxy(),0,1,0 );
@@ -51,7 +51,7 @@ namespace gfx{
 
   void DrawR(const Frame& f, float r= 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
         
-    static gfx::Mesh ma = gfx::Mesh::Cylinder( .5, 2, 30);
+    static gfx::Mesh ma = gfx::Mesh::Cylinder( .5, 2, 4);
 
       //Frame f = r();
       Rot rot = f.rot();

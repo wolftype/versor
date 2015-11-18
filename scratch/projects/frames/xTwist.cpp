@@ -1,31 +1,28 @@
-#include "vsr_cga3D.h"  
-#include "vsr_cga3D_draw.h" 
-#include "vsr_cga3D_interface.h"  
-#include "vsr_GLVimpl.h"   
-
-#include "vsr_field.h"
+#include "vsr_app.h" 
+#include "form/vsr_field.h"
 
 
 using namespace vsr;
+using namespace vsr::cga;
 
 
 struct MyApp : App {    
    
-	MyApp(Window * win ) : App(win){
-		scene.camera.pos( 0,0,10 ); 
-	}
-
-  virtual void onDraw(){
-	
-	static Field< Frame > f(2,2,2,5); 
-	static Field< Dll > f2(2,2,2,5); 
+	Field< Frame > f = Field<Frame>(2,2,2,5); 
+	Field< Dll > f2 = Field<Dll>(2,2,2,5); 
 
 	int num = 10;
 
-	static Field< Pnt > f3(num+1,num+1,num+1);
+	Field< Pnt > f3 = Field<Pnt>(num+1,num+1,num+1);
+
+
+  virtual void setup(){}
+
+  virtual void onDraw(){
+	
 
 	for (int i = 0; i < f.num(); ++i){
-		Touch(interface, f[i]); 
+	//	Touch(interface, f[i]); 
 		Draw(f[i]);
 		f2[i] = f[i].dll();
 	}  
@@ -56,7 +53,7 @@ struct MyApp : App {
    glBegin(GL_QUADS);
 	for (int i = 0; i < f3.faceVxl().size(); ++i ){
 		Vxl vxl = f3.faceVxl(i);  
-		Biv b = Ro::dir( f3[vxl.a] ^ f3[vxl.b] ^ f3[vxl.c] ).copy<Biv>(); 
+		Biv b = Round::dir( f3[vxl.a] ^ f3[vxl.b] ^ f3[vxl.c] ).copy<Biv>(); 
 		gfx::GL::normal( Op::dle(b).unit().begin() );
 		gfx::GL::Quad( f3[vxl.a],f3[vxl.b], f3[vxl.c], f3[vxl.d]);
 	} 
@@ -70,21 +67,11 @@ struct MyApp : App {
 };
 
 
-MyApp * app;
-
 
 int main(){
                              
-	GLV glv(0,0);	
-
-	Window * win = new Window(500,500,"Versor",&glv);    
-	app = new MyApp( win ); 
-  
-	
-	glv << *app;
-
-	Application::run();
-
+  MyApp app;
+  app.start();
 	return 0;
 
 }

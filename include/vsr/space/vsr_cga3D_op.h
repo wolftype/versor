@@ -235,6 +235,13 @@ namespace vsr{ namespace cga{
         calculates SQUARE ROOT (normalizes 1+R)
    */
    static Bst ratio( const DualSphere& a, const DualSphere& b, bool bFlip = true);
+
+   /*! Get log of transformation at t
+   
+   */
+    static Pair log( const DualSphere& a, const DualSphere& b, VSR_PRECISION t, bool bFlip = true);
+
+
    
    /*! atanh2 function for logarithm of general rotors, with clockwise boolean */
    static Pair atanh2( const Pair& p, VSR_PRECISION cs, bool bCW);
@@ -370,7 +377,11 @@ namespace vsr{ namespace cga{
      static Point point(const Line&, const Point& );
      /// Point on dualline l closest to p
      static Point point(const DualLine&, const Point& );
-     
+     /// Point on plane closest to p
+     static Point point(const Plane&, const Point& );
+     /// Point on dual plane closest to p
+     static Point point(const DualPlane&, const Point& );
+
       
       /*-----------------------------------------------------------------------------
        *  CIRCLES
@@ -630,7 +641,7 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 /// vsr::cga::Line through origin in direction x,y,z
 #define LN(x,y,z) ( vsr::cga::Point(0,0,0,1,.5)^PT(x,y,z)^vsr::cga::Inf(1) )
 /// vsr::cga::DualLine through origin in direction x,y,z
-#define DLN(x,y,z) ( vsr::Op::dl(LN(x,y,z)) )
+#define DLN(x,y,z) ( vsr::cga::Op::dl(LN(x,y,z)) )
 #define PAO vsr::cga::Point(0,0,0,1,0)   ///< vsr::cga::Point At Origin
 #define EP vsr::cga::Dls(0,0,0,1,-.5)    ///< unit vsr::cga::DualSphere at origin: swap with infinity for hyperbolic space
 #define EM vsr::cga::Dls(0,0,0,1,.5)     ///< unit imaginary vsr::cga::DualSphere at origin: swap with infinity for spherical space

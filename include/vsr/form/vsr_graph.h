@@ -949,9 +949,11 @@ namespace vsr{
 
       if (bCloseU){
         for (int j=0;j<h-1;++j){
-          int idxR = ((w-2)*(h-1)+j+1)*6;
+          //int idxR = ((w-2)*(h-1)+j+1)*6;
+          int idxR = ((w-2)*(h-1)+j)*6+5;
           int idxL = j*6;
           graph.close( graph.edge(idxR), *graph.edge(idxL).node);
+          graph.close( graph.edge(-3), *graph.edge(idxL+6).node);
         }
       }
       if (bCloseV){

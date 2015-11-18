@@ -1,89 +1,93 @@
-#include "vsr_cga3D.h"
-#include "vsr_GLVimpl.h" 
-#include "vsr_knot.h"
+#include "vsr_app.h"
+#include "form/vsr_knot.h"
   
 using namespace vsr;
-using namespace glv;  
+using namespace vsr::cga;
    
 struct MyApp : App {
 	
-	float amt, P, Q, dilamt, iter, ecc1, ecc2;  
+	float amt, P, Q, amt2,P2,Q2,iter;  
 	 
 	TorusKnot tkA;
 	TorusKnot tkB;
+
+  Pnt a = Round::null( Vec(2,0,0) );  
+
+  bool bUseBst, bUseDist;
 	
-	virtual void init(Window * win){
-		App::init(win);
-		
+	virtual void setup(){
+
+    bindGLV();
+		gui(amt,"amt",0,10)(P,"P",0,10)(Q,"Q",0,10);
+		gui(amt2,"amt2",0,10)(P2,"P",0,10)(Q2,"Q",0,10);
+    gui(iter,"iter",100,10000);
+    gui(bUseBst,"bUseBst");
+    gui(bUseDist,"bUseDist");
+    
+    amt = .003; 
+
 		tkA = TorusKnot(3,2); 
 		tkB = TorusKnot(3,2);
-		
-		tkA.HF.cir() = CXY(1).translate(0,1,0);		
-		tkB.HF.cir() = CXZ(1).translate(0,-1,0);
-	}
-	
-	virtual void initGui(){
-		gui(amt,"amt",0,10)(P,"P",0,10)(Q,"Q",0,10)(dilamt,"dilamt",-100,100)(iter,"iter",100,10000);
-		gui(ecc1, "ecc1",-1000,1000)(ecc2, "ecc2",-1000,1000);
-		// gui(P, "p",0,10)(Q,"q",0,10);   
-		amt = .003; 
+
+    tkA.HF.cir() = CXZ(1).translate(-1,0,0);		
+		tkB.HF.cir() = CXZ(1).translate(1,0,0);
+
+    objectController.attach(&a);
+    objectController.attach(&tkA.HF.cir());
+    objectController.attach(&tkB.HF.cir());
+
+    bUseBst = true;
+
 	}
 
 	void onDraw(){
      
-                                                          
-		static Pnt a = Ro::null( Vec(2,0,0) ); 
+    
+    if (bSetMouse) a = calcMouse3D();
 		 
-		float twtA = 1.0 / ( Ro::sqd( a, Ro::loc(tkA.HF.cir()) ) + .001 );
-		float twtB = 1.0 / ( Ro::sqd( a, Ro::loc(tkB.HF.cir()) ) + .001 ); 
-		auto tbst = Gen::bst( ( tkA.par() * twtA + tkB.par() * twtB ) * amt );
-		a = Ro::loc( a.spin( tbst ) );
+		float twtA =  bUseDist ?  1.0 / ( Round::sqd( a, Round::loc(tkA.HF.cir()) ) + .001 ) : 1;
+		float twtB =  bUseDist ?  1.0 / ( Round::sqd( a, Round::loc(tkB.HF.cir()) ) + .001 ) : 1; 
+		
+    auto tbst = Gen::bst( ( tkA.par() * twtA * amt + tkB.par() * twtB * amt2) );
+
+    auto tcon = Gen::bst( ( tkA.par() * amt * twtA) ) *  Gen::bst( tkB.par() * amt2 *  twtB );
+ 
+		a = bUseBst ? Round::loc( a.spin( tbst ) ) : Round::loc( a.spin( tcon ) );
 		Draw(a,1,0,0);
 		 
 		Pnt np = a;
-		Touch(interface, a);
-
-		Touch(interface, tkA.HF.cir());
-		Touch(interface, tkB.HF.cir()); 
 		
-		tkA.P = tkB.P = P;
-		tkA.Q = tkB.Q = Q;
+		tkA.P = P; tkB.P = P2;
+		tkA.Q = Q; tkB.Q = Q2;
 
 		Draw(tkA.HF.cir() );                
 		Draw(tkB.HF.cir() );
 		
 		for (int i = 0; i < iter; ++i){ 
+
+      float t = (float)i/iter;
 			
-			float wtA = 1.0 / ( Ro::sqd( np, Ro::loc(tkA.HF.cir()) ) + .001 );
-			float wtB = 1.0 / ( Ro::sqd( np, Ro::loc(tkB.HF.cir()) ) + .001 ); 
+			float wtA = bUseDist ?  1.0 / ( Round::sqd( np, Round::loc(tkA.HF.cir()) ) + .001 ) : 1;
+			float wtB =  bUseDist ?  1.0 / ( Round::sqd( np, Round::loc(tkB.HF.cir()) ) + .001 ) : 1; 
 			 
-			auto bst = Gen::bst( ( tkA.par() * wtA + tkB.par() * wtB ) * amt );  
+			auto bst = Gen::bst( tkA.par() * wtA * amt + tkB.par() * wtB  * amt2 );  
+
+      auto con = Gen::bst( ( tkA.par() * amt* wtA*t) ) *  Gen::bst( tkB.par() * amt2*  wtB *t);
 					
-			np = Ro::loc( np.spin( bst ) );   
+			np = bUseBst ? Round::loc( np.spin( bst ) ) : Round::loc( a.spin( con ) );   
 			
 			Draw(np);
-		}   
-			
+		}   		
 	}
+
 };
                         
-MyApp * myApp;
 
 int main(){
                           
-	
-	GLV glv(0,0);	
-    		        
-	Window * win = new Window(500,500,"Versor",&glv);    
-                          
-	myApp = new MyApp;
-	myApp -> init(win);
-	myApp -> initGui();
-	
-	glv << *myApp;
-
-	Application::run();
-	
+  MyApp app;
+  
+  app.start();	
 	return 0;
 	
 }

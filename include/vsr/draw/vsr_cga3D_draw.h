@@ -93,6 +93,7 @@ namespace gfx{
   template<> void Renderable<cga::Vec,0>::DrawImmediate  (const cga::Vec& s);  
  // template<> void Renderable<cga::V,0ec>::DrawImmediateB (const cga::Vec& s);                        
   template<> void Renderable<cga::Biv,0>::DrawImmediate  (const cga::Biv& s);    
+  template<> void Renderable<cga::Biv,1>::DrawImmediate  (const cga::Biv& s);    
   template<> void Renderable<cga::Drv,0>::DrawImmediate  (const cga::Drv& s); 
   template<> void Renderable<cga::Dlp,0>::DrawImmediate  (const cga::Dlp& s);
   template<> void Renderable<cga::Pln,0>::DrawImmediate  (const cga::Pln& s); 
@@ -101,6 +102,7 @@ namespace gfx{
   template<> void Renderable<cga::Sph,0>::DrawImmediate  (const cga::Sph& s);
   template<> void Renderable<cga::Flp,0>::DrawImmediate  (const cga::Flp& s);
   template<> void Renderable<cga::Par,0>::DrawImmediate  (const cga::Par& s); 
+  template<> void Renderable<cga::Par,1>::DrawImmediate  (const cga::Par& s); 
   template<> void Renderable<cga::Dll,0>::DrawImmediate  (const cga::Dll& s);  
   template<> void Renderable<cga::Lin,0>::DrawImmediate  (const cga::Lin& s);
   template<> void Renderable<cga::Tnv,0>::DrawImmediate  (const cga::Tnv& t);

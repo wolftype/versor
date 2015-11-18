@@ -262,8 +262,8 @@ struct  Spherical : public Joint {
       
       /// Dual Plane of rotation of kth joint (translated by link rejection from yz)
       Dlp nextPlane(int k) const {
-        auto rj = Op::rj( link(k).vec(), Biv::xy );
-        return mFrame[k].dxy().translate(rj);
+        Vec rj = Op::rj( link(k).vec(), Biv::xy );
+        return mFrame[k].dxy().translate(rj.spin(mFrame[k].rot()));
       }
 
       /// see next version Dual Plane of rotation of k-1th joint (translated by link rejection from yz)
@@ -274,7 +274,7 @@ struct  Spherical : public Joint {
 //      }
 
       /// Dual Plane of rotation of k-1th joint (translated by link rejection from yz)
-      Dlp prevPlane(int k) const {
+      Dlp prevPlane_(int k) const {
         Vec rj = Op::rj( link(k-1).vec(), Biv::xy );
         auto normal = Vec::z.spin( !link(k-1).rot() ); //<-- "undo" orientation of z normal
         auto nnorm = normal.spin( mFrame[k].rot() * !mJoint[k].rot() );
@@ -282,7 +282,7 @@ struct  Spherical : public Joint {
       }
 
       //testing
-      Dlp prevPlane_(int i) const {
+      Dlp prevPlane(int i) const {
         
         //rotation in terms of prev frame
         //offset of link
@@ -291,30 +291,50 @@ struct  Spherical : public Joint {
         auto adjustedRot = prevRot(i);
         auto normal = Vec::z.spin( adjustedRot); 
         
-        return DualPlane(normal).translate(Vec(mFrame[i].pos()) - rj);
+        return DualPlane(normal).translate(Vec(mFrame[i].pos()) - rj.spin(adjustedRot));
+
+      }
+
+      Rot prevRot(int i) const {
+        // direction from prev frame
+        auto dir = Vec(mFrame[i].pos()-mFrame[i-1].pos()).unit();
+        //unit projection of direction onto local xy
+        Vec pj = Op::project( dir, mFrame[i].xy() ).unit();
+
+        //Rot unlink = !mFrame.link(i-1).rot();
+        Rot localunlink = mFrame[i].rot() * !link(i-1).rot();
+      
+        //at origin xy
+        Vec opj = pj.spin(!localunlink);
+        Rot rel = Gen::ratio( link(i-1).vec().unit(), opj );
+
+        //back to world space
+        return localunlink * rel;
 
       }
 
       /// based on unit direction between frames..
-      Rot prevRot(int i) const {
+      Rot prevRot_(int i) const {
         // direction from prev frame
         auto dir = Vec(mFrame[i].pos()-mFrame[i-1].pos()).unit();
+
+
         //unit projection of direction onto xy
         Biv txy = mFrame[i].xy();
         Vec pj = Op::project( dir, txy ).unit();
-        
+
         // joint un-rotation
         Vec ty = mFrame[i].y();
         Rot rot = Gen::ratio( ty, pj );
 
-        auto adjustedRot =  rot * mFrame[i].rot() * !link(i-1).rot();
+        auto adjustedRot = rot * mFrame[i].rot() * !link(i-1).rot();
         return adjustedRot;
 
       }
       
       /// Dual Circle Centered at Joint K Going Through Joint K-1 (in plane of rotation)
-      Circle prevCircle_(int k) const {  
-        return (prevSphere(k) ^ prevPlane_(k)).dual();
+      Circle prevCircle(int k) const {  
+        return (prevSphere(k) ^ prevPlane(k)).dual();
       }
 
       
@@ -324,8 +344,8 @@ struct  Spherical : public Joint {
       }
 
       /// Dual Circle Centered at Joint K Going Through Joint K-1 (in plane of rotation)
-      Circle prevCircle(int k) const {  
-        return (prevSphere(k) ^ prevPlane(k)).dual();
+      Circle prevCircle_(int k) const {  
+        return (prevSphere(k) ^ prevPlane_(k)).dual();
       }
 
       /// Sphere at Point p through Joint K
@@ -470,8 +490,11 @@ struct  Spherical : public Joint {
                
                  // to constrain position, we must know previous rotation
                  auto rota = prevRot(i);
+
+                 auto cir = prevCircle(i);
+                 auto sph = Round::surround(cir);
                  
-                 mFrame[i-1].pos() = Construct::point(mFrame[i].bound(), -Vec::y.spin(rota) );
+                 mFrame[i-1].pos() = Construct::point(sph, -Vec::y.spin(rota) );
  
                  mFrame[i-1].rot() = rota;
 
@@ -483,8 +506,14 @@ struct  Spherical : public Joint {
            
                //4.work forwards
                for (int i=begin+1;i<=end;++i){
+              
                  mFrame[i].pos() = Constrain::PointToCircle( mFrame[i].pos(), nextCircle(i-1) );
-                 mFrame[i-1].rot() = Gen::ratio( mFrame[i-1].y(), Vec(mFrame[i].pos() - mFrame[i-1].pos()).unit() ) * mFrame[i-1].rot();
+
+                 auto target = ( mFrame[i].vec() - mFrame[i-1].vec() ).unit();         //global target direction
+                 auto linkRot = Gen::ratio(Vec::y,  mLink[i-1].vec().unit() );           //what link position contributes...
+                 auto trot = mFrame[i-1].rot() * linkRot;
+                 mFrame[i-1].rot() = Gen::ratio( Vec::y.spin(trot), target ) * mFrame[i-1].rot(); 
+                // mFrame[i-1].rot() = Gen::ratio( mFrame[i-1].y(), Vec(mFrame[i].pos() - mFrame[i-1].pos()).unit() ) * mFrame[i-1].rot();
                  mFrame[i].rot() = mFrame[i-1].rot() * mLink[i-1].rot();
                }
 
@@ -492,7 +521,7 @@ struct  Spherical : public Joint {
                 iter++;
               }
 
-              cout << "error: " << terr << " iter: " << iter << endl;;
+            //  cout << "error: " << terr << " iter: " << iter << endl;;
 
               calcJoints();
             }
@@ -511,8 +540,9 @@ struct  Spherical : public Joint {
                   auto target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();         //global target direction
                   auto linkRot = Gen::ratio(Vec::y,  mLink[i].vec().unit() );            //what link position contributes...
                     
-                  //target w.r.t. origin
-                  target = target.spin( !linkRot * !ry );
+                  //target w.r.t. origin is this same as !(ry*linkRot) ?
+                  //target = target.spin( !linkRot * !ry );
+                  target = target.spin( !(ry*linkRot) );
   
                   auto adjustedRot = Gen::ratio( Vec::y, target );
 
@@ -524,7 +554,7 @@ struct  Spherical : public Joint {
             }   
       
       /// Derive New Relative Link Frames from current Positions 
-      /// @ param bOrientation: whether to consider current orientation of frames when reverse engineering links
+      /// @ param bOrientation: whether to consider current z orientation of frames when reverse engineering links
       void calcLinks(bool bOrientation =false){
 
         if (!bOrientation){

@@ -71,7 +71,7 @@ struct MyApp : App {
     theta3=theta0; theta4=theta1; theta5=theta2;
 
     float R[] = {R0,R1,R2,R3,R4,R5};
-    float theta[] = {theta0,theta1,theta2,theta3,theta4,  theta5};
+    float theta[] = {theta0,theta1,theta2,theta3,theta4,theta5};
     for (int i=0;i<6;++i){
       auto rot =  Gen::rot( Biv::xz * theta[i]);
       chain.link(i).pos( Vec(0,3,0) + Vec(0,0,R[i]) );//.spin(rot) );
@@ -98,7 +98,8 @@ struct MyApp : App {
   void onDraw(){
     DrawR(chain);
     Draw(chain);
-    auto s1 = chain.nextDls(1);
+
+    auto s1 = chain.nextSphere(1);
     auto p1 = chain.nextPlane(1);
     auto c1 = chain.nextCircle(1);
    
@@ -106,32 +107,32 @@ struct MyApp : App {
     auto c3 = chain.nextCircle(3);
     auto c4 = chain.nextCircle(4);
 
-    Draw(c2,0,0,1);
-    Draw(c3,0,0,1);
-    Draw(c4,0,0,1);
+   // Draw(c2,0,0,1);
+   // Draw(c3,0,0,1);
+   // Draw(c4,0,0,1);
     
     Draw( c1,0,1,0 );
-    Draw( s1,1,0,0,.2 );
+   // Draw( s1,1,0,0,.2 );
 
-    auto s5 = chain.prevDls(5);
+    auto s5 = chain.prevSphere(5);
     auto p5 = chain.prevPlane(5);
     auto c5 = chain.prevCircle(5);
 
     auto dlp = Dlp(Round::sur(c5) - Round::sur(c1));
-    Draw(dlp,1,1,0);
+  //  Draw(dlp,1,1,0);
 
-    auto con = Gen::ratio( c1, c5 );
-    auto con2 = Gen::con( Gen::log(con), .5 );
-    Draw( Line(c1.spin(con2)),0,1,0); 
+  //  auto con = Gen::ratio( c1, c5 );
+  //  auto con2 = Gen::con( Gen::log(con), .5 );
+  //  Draw( Line(c1.spin(con2)),0,1,0); 
 
 
-    Draw( p5,1,1,0 );
+  //  Draw( p5,1,1,0 );
     Draw( c5,0,1,0 );
-    Draw( s5,1,0,0,.2 );
+  //  Draw( s5,1,0,0,.2 );
 
     //inverses
 
-    Rot r1 =  !chain.link(4).rot() * chain[5].rot();
+    //Rot r1 =  !chain.link(4).rot() * chain[5].rot();
 
 
 

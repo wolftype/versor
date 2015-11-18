@@ -163,6 +163,8 @@ struct MyApp : App {
     auto tan3b = Tangent::at( sphA.undual(), pb ).dual();
     auto tan1a = Tangent::at( cir_top, pa );
 
+    //tan3a.print();
+
     //plunge!
     auto pd = Construct::pointA( ((sphB^tan3a).dual() ^ sphB).dual() );
     auto pc = Construct::pointA( ((sphB^tan3b).dual() ^ sphB).dual() );

@@ -1,12 +1,12 @@
-  /*
+/*
  * =====================================================================================
  *
- *       Filename:  xConstructions.cpp
+ *       Filename:  xKnotDebug.cpp
  *
- *    Description:  scratch pad for constructions
+ *    Description:  
  *
  *        Version:  1.0
- *        Created:  07/20/2015 19:13:26
+ *        Created:  10/19/2015 13:46:01
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,6 +15,7 @@
  *
  * =====================================================================================
  */
+
 
 
 #include "vsr_app.h"  
@@ -31,7 +32,7 @@ struct MyApp : App {
   Point point;
   bool bSetMouse=true;
 
-   Frame f;
+      Frame f;
 
 
   float amt,amt1,amt2,radius,iter;
@@ -82,27 +83,47 @@ struct MyApp : App {
     if (bSetMouse) point = calcMouse3D();
 
 
-    for (int i =0;i<10;++i){
-      float t= (float)i/10;
-      auto flp =(point^Inf(1));
-      auto D =  flp*sinh(t/2) + cosh(t/2);//Gen::dil(point,t*amt);
+    auto cir = Round::produce( Construct::sphere(0,0,0,-radius), Biv::xz );//CXZ(1);
+    auto dll = (Inf(1) <= cir).runit();
 
-      auto c= CXY(1).spin(D);
-      Draw(c,t,0,1-t);
+    Draw(cir,.6,1,.3);
+    Draw(dll,.2,.2,.2);  //  gl2psLineWidth(1);
+
+    gl2psPointSize(10);
+    Draw(point,.6,.1,.1);
+    Point p = point;
+
+    vector<Cir> cirs;
+    vector<Pnt> pnts;
+
+    float mult = (amt1*amt2) / (amt*Round::size(cir,false) );
+    for (int i =1;i <(int)iter;++i){
+       float t = PI * amt / iter;
+       auto par = (cir.dual().runit() * t * amt2) + (dll*t * amt1);
+       p = Round::loc( p.spin( Gen::bst(par) ) );// / (!FERROR(rad)?rad:1) ) );
+       Draw( p,.6*(1-t),.1,.1 );
 
     }
 
-    auto va = Vec(.2,3,0).unit();
-    auto vb = Vec(.8,0,2).unit();
+//  for (int i =0;i <(int)iter;++i){
+//     float t = (float)i/iter * PI *amt;// * (amt1*amt2/iter);
+//     auto parA = (cir.dual() * t * amt2);
+//     auto parB = (dll*t * amt1);
+//     p = ( point.spin( Gen::bst(parB) * Gen::bst(parA) ) );// / (!FERROR(rad)?rad:1) ) );
+//     p = p/p[3];
+//     Draw( p,0,1,0 );
+//  }
 
-    auto R = va*vb;//Gen::rot(va^vb);
 
-   // cout << R << endl;
-    cout << !R << endl;
-    cout << ~R << endl;
+    if (bReset) {
+      DrawB(cir.dual(),0,.3,.8,.3);
+      if (Round::size(cir)<0) Draw( Construct::sphere(0,0,0,-radius),0,3,.8,.3);
+    }
 
-    
+   // auto tmp = Round::axis(cir);
+   // cir.print();
 
+//
   }
   
 };

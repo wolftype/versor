@@ -1,3 +1,5 @@
+//Not very interesting
+
 #include "vsr_app.h"
 #include "form/vsr_knot.h"
 #include "form/vsr_twist.h"

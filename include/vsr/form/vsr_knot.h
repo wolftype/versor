@@ -53,7 +53,7 @@ struct TorusKnot  {
     TorusKnot& add(const Cir& c){
         cir.push_back(c); return *this;
     }    
-//    int num() { return pnt.size(); }
+    
     int iter() { 
         return ( P == 0 || Q == 0 ) ?  1.0/amt : P * Q / (amt * Round::size(HF.cir(), false) );
     }
@@ -78,19 +78,17 @@ struct TorusKnot  {
     Pnt np = p; 
     Bst tbst = bst();
     int tnum = iter();
-    
+    add(np); 
     for (int i = 0; i < tnum; ++ i ){
       np = Round::loc( np.sp( tbst ) );  
       add(np);
     }
               
     //Tube Neighborhood  
-    for (int i = 0; i < tnum; ++i ){ 
-      //double t = -1 + 2.0 * i/ tnum;
-      //double tt = 1 + t * t;
-      int idx = i < tnum -1 ? i + 1 : 0;  
+    for (int i = 0; i <= tnum; ++i ){ 
+      int idx = i < tnum ? i + 1 : 0;  
       Par tpar = pnt[i] ^ pnt[idx];
-      Cir c = tpar.dual();//.dil(tk.pnt[i], );
+      Cir c = tpar.dual();
       add ( c );
     }
   }
@@ -109,11 +107,9 @@ struct TorusKnot  {
 
     //Tube Neighborhood  
     for (int i = 0; i < tnum; ++i ){ 
-      //double t = -1 + 2.0 * i/ tnum;
-      //double tt = 1 + t * t;
       int idx = i < tnum -1 ? i + 1 : 0;  
       Par tpar = pnt[i] ^ pnt[idx];
-      Cir c = tpar.dual();//.dil(tk.pnt[i], );
+      Cir c = tpar.dual();
       add ( c );
     }    
         

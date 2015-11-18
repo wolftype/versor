@@ -780,18 +780,19 @@ struct Euc{
    
     /*!
      * Split a point pair
-     * @param Point Pair
-     * @param bool which one
+     * @param Point Pair p- ^ p+
+     * @param bool which one (true returns p+)
+       @todo "true" argument should return first, not second, point
      * */
     template<class A> 
     static GAPnt<A> 
-    split(const GAPar<A>& pp, bool bFirst){
+    split(const GAPar<A>& pp, bool bSecond){
         
         VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
         
         auto d = GAInf<A>(-1) <= pp;
         
-        GABst<A> bst = pp + ( bFirst ? r : -r ); 
+        GABst<A> bst = pp + ( bSecond ? r : -r ); 
         
         return ( ( bst ) / d ).template cast< GAPnt<A> >();  
 

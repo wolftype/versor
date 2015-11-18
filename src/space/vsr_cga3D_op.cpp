@@ -191,6 +191,15 @@ namespace cga {
     return FERROR(n) ? Bst() : (tbst+1)/n;
    }
 
+    /*! Generate Simple Boost rotor from ratio of two dual spheres
+    */
+   Pair Gen::log( const DualSphere& a, const DualSphere& b, VSR_PRECISION t, bool bFlip){
+    Bst tbst = (b/a).runit();
+    //if (tbst[0]<0) 
+    if (bFlip) tbst = -tbst; //restrict to positive <R>
+    return Gen::log(tbst) * -t/2.0;
+   }
+
   /*! atanh2 function for logarithm of general rotors*/
    Pair Gen::atanh2( const Pair& p, VSR_PRECISION cs, bool bCW){
       VSR_PRECISION norm=1;
@@ -231,6 +240,7 @@ namespace cga {
     auto sph2 = sph.wt();
 
 
+    //orthogonal circles have infinity of roots
     if ( FERROR( sca2 - sph2) ) {
      // printf("infinity of roots . . .  \n");
       auto rotneg = (-trot) + 1;
@@ -238,8 +248,10 @@ namespace cga {
       Vec vec;
 
       auto sizeB = nga::Round::size(b,false);
-      if ( sizeB < 1000 && !FERROR(sizeB) ) vec = Vec( Round::location(b) - Round::location(a) ).unit();
-      else vec = Round::vec(a,theta).unit();    
+      //if circle is orthogonal
+      if ( sizeB < 1000 && !FERROR(sizeB) ) vec = Vec( Round::location(a) - Round::location(b) ).unit();
+      //or if one is axis of the other
+      else vec = Round::vec(a,-theta).unit();    
 
       auto dls = sph.dual();
       
@@ -300,13 +312,13 @@ namespace cga {
       if ( FERROR(wt) ) {
           if ( FERROR(h2[0]) ){
            // cout << h2 << endl;
-          //  printf("no real splitting going on\n"); //<-- i.e. interpolation of null point pairs
+         //   cout << "no real splitting going on" << endl; //<-- i.e. interpolation of null point pairs
             res.push_back(par);
            // res.push_back(Par());
             return res;
           } else {
-          //  printf("(adding random value and retrying)");
-            static Pair dp(.0001,.0006,.0004,.0002,.0008,.0006,.0003,.0007,.0001,.0001);
+          //  cout << "(adding random value and retrying)" << endl;
+            static Pair dp(.001,.006,.004,.002,.008,.006,.003,.007,.001,.001);
             return split( par + dp);
           }
       }
@@ -506,6 +518,15 @@ namespace cga {
         return Round::null ( Flat::location( dll, p, true ) ); 
       }
      
+     /// Point on plane closest to p
+      Point Construct::point(const Plane& plane, const Point& p){
+        return Round::null( Flat::location( plane, p, false ) );
+      }
+     /// Point on dual plane closest to p
+      Point Construct::point(const DualPlane& dlp, const Point& p){
+        return Round::null( Flat::location( dlp, p, true) );
+      }
+
       /*-----------------------------------------------------------------------------
        *  CIRCLES
        *-----------------------------------------------------------------------------*/

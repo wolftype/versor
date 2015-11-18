@@ -38,7 +38,12 @@ struct App : public gfx::GFXAppGui {
   vsr::cga::Point mMouse3D;
   vsr::cga::Line mMouseRay;
 
+  /*! @todo move output settings to separate io header  */
   bool bShadedOutput = false; ///< default for output
+  bool bSortOutput   = true;  ///< default 
+  bool bOffsetOutput       = false; 
+  bool bOccludeOutput      = false;
+  bool bSetMouse;
 
   vsr::cga::Point calcMouse3D(float z=.99){
 
@@ -62,6 +67,8 @@ struct App : public gfx::GFXAppGui {
   
   /// Called when a keyboard key is pressed
   virtual void onKeyDown(const gfx::Keyboard& k){
+    
+   // Frame f;
     switch(k.code){
       case 'v':
         printf("v\n"); 
@@ -70,7 +77,53 @@ struct App : public gfx::GFXAppGui {
         gl2ps();
         scene.pop(true);
         GL::disablePreset();
+        break;
+
+      case 's':
+        bSetMouse = !bSetMouse;
+        break;
+ //     case  '0':
+ //   
+ //      f.pos( PT(0,0,5) );
+ //      f.orient( Vec(0,0,0), false );
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      break;
+
+ //     case  '1':
+ //      f.pos( PT(-5,0,0) );
+ //      f.orient( Vec(0,0,0), false );
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      
+ //      break;
+ //     case  '2':
+ //      f.pos( PT(5,0,0) );
+ //      f.orient( Vec(0,0,0), false );
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      break;
+ //     case  '3':
+ //      f.pos( PT(0,5,0) );
+ //      f.orient( Vec(0,0,0), false );
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      break;
+ //     case  '4':
+ //      f.pos( PT(0,-5,0) );
+ //      f.orient( Vec(0,0,0), false );
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      break;
+ //     case  '5':
+ //      f.pos( PT(0,0,-5) );
+ //      f.orient( Vec(0,0,0), false);
+
+ //      scene.camera.set( f.pos(), f.quat() );
+ //      break;
+
     }
+
   } 
 
 
@@ -94,22 +147,26 @@ struct App : public gfx::GFXAppGui {
 
          buffsize += 1024*1024;
 
-         if (bShadedOutput){
-         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_EPS, GL2PS_SIMPLE_SORT, //NO_SORT
-                         GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_SIMPLE_LINE_OFFSET | GL2PS_OCCLUSION_CULL, //
-                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
-         } else {
-         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_PDF, GL2PS_NO_SORT,
-                         GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_OCCLUSION_CULL, //
-                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
-         }
-
          gl2psEnable(GL2PS_BLEND);
          gl2psBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
          gl2psPointSize(10);
          gl2psLineWidth(1);
 
-
+         if (bShadedOutput){
+         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_EPS, bSortOutput ? GL2PS_SIMPLE_SORT : GL2PS_NO_SORT, //NO_SORT
+                         GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_SIMPLE_LINE_OFFSET | GL2PS_OCCLUSION_CULL, //
+                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
+         } 
+//         else {
+//         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_PDF, GL2PS_NO_SORT,
+//                         GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_OCCLUSION_CULL, 
+//                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
+//         } 
+        else {
+        gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_PDF, bSortOutput ? GL2PS_SIMPLE_SORT : GL2PS_NO_SORT,
+                        GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | (bOffsetOutput ? GL2PS_SIMPLE_LINE_OFFSET : 0) | GL2PS_TIGHT_BOUNDING_BOX | (bOccludeOutput ? GL2PS_OCCLUSION_CULL : 0), //
+                        GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
+        }
           
           //DRAW 
           onDraw();
