@@ -346,10 +346,18 @@ namespace vsr{
         for (int i = 0; i < Num; ++i){ (*this)[i] *= f; }
         return *this;
       }  
+     
+      //causing problems if not templated
+     // template<class T> 
+     // auto operator + (T a) const -> decltype( algebra::sumv( a,  *this) )  {
+     //   return algebra::sumv(a, *this); 
+     // }   
+         MultivectorB<typename ICat< typename NotType< Basis<0>, basis_type >::Type, Basis<0> >::Type>
+         operator + ( VSR_PRECISION a) const {
+           typedef MultivectorB<typename ICat< typename NotType< Basis<0>, basis_type >::Type, Basis<0> >::Type> Ret;
+           return algebra::sum( Ret(a) , this->template cast<Ret>() );
+         }
       
-      auto operator + (VSR_PRECISION a) const -> decltype( algebra::sumv( a,  *this) )  {
-        return algebra::sumv(a, *this); 
-      }   
     
       static Multivector x,y,z,xy,xz,yz;
 
