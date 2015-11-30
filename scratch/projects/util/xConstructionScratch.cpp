@@ -19,6 +19,7 @@
 
 #include "vsr_app.h"  
 #include <vsr/form/vsr_twist.h> 
+#include "form/vsr_rigid.h"
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -26,7 +27,7 @@ using namespace vsr::cga;
 struct MyApp : App {
  
   //Some Variables
-  bool bReset = false;
+  bool bReset,bFlip = false;
 
   Point point;
   bool bSetMouse=true;
@@ -44,7 +45,7 @@ struct MyApp : App {
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
-    gui(bReset);
+    gui(bReset)(bFlip);
     gui(amt,"amt",-10,10);
     gui(amt1,"amt1",-1000,1000);
     gui(amt2,"amt2",-1000,1000);
@@ -78,30 +79,30 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    
-    if (bSetMouse) point = calcMouse3D();
+    point = calcMouse3D();
+//      auto sa = Construct::sphere(-3,0,0,1); 
+//      auto sb = Construct::sphere(2,0,0,.2);
+//      Draw(sa);
+//      //Draw(sb);
+//      
+//      auto ratio = Gen::ratio(sa,sb, bReset);//.runit();
+//      Pair log = Gen::log(ratio, bFlip);
+//    //  Draw(sa.spin(ratio) );
+//     // auto log = Gen::log( (sb/sa).runit(), bReset) * -.5;
+//      
+//      for (int i=0;i<=10;++i){
+//        float t= (float)i/10;
+//        //Pair log = Pair(Tnv(0,1,0)) * t;
+//        auto bst = Gen::bst(log*-t); 
+//        Draw( sa.spin(bst),t,0,1-t,.2);
+//      }
 
+        auto c = f.cxy();
+        Vec pj = Op::pj( Vec(Round::location(c) - point), Round::carrier(c) ).unit() ;
 
-    for (int i =0;i<10;++i){
-      float t= (float)i/10;
-      auto flp =(point^Inf(1));
-      auto D =  flp*sinh(t/2) + cosh(t/2);//Gen::dil(point,t*amt);
+        Draw (Constrain::PointToCircle(point, c), 1,0,0 );
 
-      auto c= CXY(1).spin(D);
-      Draw(c,t,0,1-t);
-
-    }
-
-    auto va = Vec(.2,3,0).unit();
-    auto vb = Vec(.8,0,2).unit();
-
-    auto R = va*vb;//Gen::rot(va^vb);
-
-   // cout << R << endl;
-    cout << !R << endl;
-    cout << ~R << endl;
-
-    
+        Draw( Construct::point( Round::surround(c), -pj ), 0, 1,0);
 
   }
   

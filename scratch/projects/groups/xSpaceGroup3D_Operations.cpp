@@ -21,6 +21,7 @@
 #include "form/vsr_group.h"
 #include "form/vsr_field.h"
 #include "form/vsr_graph.h"
+#include "form/vsr_twist.h"
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -140,6 +141,9 @@ struct State{
   float cellsWidth, cellsHeight;
   float totalHeight;
 
+  float period, pitch;
+  bool bUseMotor;
+
   //drawing
   bool bDrawRoots,bDrawVectors,bDrawScrews, bDrawGlides, bDrawCell, bDrawMotif, bDrawDiamond, bLights;
   float alpha,radius,width,screwIterStart, screwIter, cellXoffset;
@@ -223,12 +227,16 @@ void drawState(State * state){
 
     }
     
-    auto tcir = Round::produce( Round::sphere(s.point, -s.radius), Vec::y.rot(Biv::xy * s.angleB) );
-    vector<Pair> cir;
-    cir.push_back( tcir ); 
+    auto tpair = Round::produce( Round::sphere(s.point, -s.radius), Vec::y.rot(Biv::xy * s.angleB) );
+    vector<Pair> pair;
+    pair.push_back( tpair ); 
    
-    auto groupA = sg.apply( cir );
+    auto groupA = sg.apply( pair );
     auto groupB = sg.hang( groupA , s.numX,s.numY,s.numZ);
+
+    auto tdll = Twist::Along( (tpair ^ Inf(1)).dual(), s.period, s.pitch);
+    auto tmp = sg.apply( tdll );
+    auto groupC = sg.hang( tmp, s.numX, s.numY, s.numZ);
 
     if (s.bDrawMotif){
      for (auto& i : groupB){
@@ -246,14 +254,19 @@ void drawState(State * state){
 
     for (int i=0;i<mesh.size();++i){
        auto pt =  Round::point(mesh[i].Pos[0], mesh[i].Pos[1], mesh[i].Pos[2]);
-       Pair pair;
+       Pair pair; 
+       DualLine dll;
       for (int j =0;j<groupB.size();++j){
        auto dist = Round::sqd( Round::location(groupB[j]), pt );
        auto wt = 1.0/(dist+.01);
        pair += groupB[j] * wt;
+       dll += groupC[j] * wt;
       }
+
       auto npt = Round::location( pt.spin( Gen::boost(pair * s.amt) ) );
-      mesh[i].Pos = Vec3f(npt[0],npt[1],npt[2]);
+      auto mpt = pt.spin( Gen::motor( dll * s.amt) );
+      mesh[i].Pos = s.bUseMotor ? Vec3f(mpt[0],mpt[1],mpt[2]) : Vec3f(npt[0],npt[1],npt[2]);
+
     }
 
 
@@ -367,6 +380,9 @@ struct MyApp : App {
     gui(s.cellsWidth,"cellswidth",10,50);
     gui(s.cellsHeight,"cellsheight",10,50);
     gui(s.totalHeight,"totalHeight",1,10);
+    gui(s.period, "period",-100,100);
+    gui(s.pitch, "pitch",-100,100);
+    gui(s.bUseMotor,"usemotor");
 
     s.xratio = s.yratio = s.zratio =1;
     s.p=3;s.q=3;

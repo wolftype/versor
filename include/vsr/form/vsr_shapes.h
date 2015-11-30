@@ -27,6 +27,43 @@ namespace vsr{ namespace cga {
   using gfx::Vec3f;
 
   struct Shape {
+
+
+      /// currently returns vector<Vertex> maybe return a Mesh?
+      static vector<Vertex> Sphere(float radius=1, int w=20, int h=20){
+      
+      
+        vector<Vertex> v;
+      
+        for (int i = 0;i<w;++i){
+          for (int j=0;j<h;++j){
+            auto tu = (float)i/w * TWOPI;
+            auto tv = -PIOVERTWO + (float)j/h * PI;
+            auto rot = Gen::rot(tu,tv);    
+            v.push_back(  Vec3f( Vec::x.spin(rot) * radius )  );         
+          }
+        }
+      
+        return v;
+      }
+      
+      
+      static vector<Vertex> Cylinder(int w=20, int h=20, float radius = 1.0, float height = 2.0){
+      
+      
+        vector<Vertex> v;
+      
+        for (int i = 0;i<w;++i){
+          for (int j=0;j<h;++j){
+            auto tu = (float)i/w * PI;
+            auto tv = -height/2.0 + (float)j/h * height;
+            auto rot = Gen::rot( Biv::xz * tu);    
+            v.push_back(  Vec3f( Vec::x.spin(rot) * radius ) + Vec3f(0,tv,0));         
+          }
+        }
+      
+        return v;
+      }    
   
     /// A Torus Mesh
     static inline Mesh Torus( double rad = 1.0, int slices =20, int stacks=20){

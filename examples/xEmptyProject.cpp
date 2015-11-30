@@ -13,6 +13,7 @@ struct MyApp : App {
   float amt1 = 0;
   float amt2 = 0;
 
+
   Point mouse;
 
   /*-----------------------------------------------------------------------------
@@ -32,22 +33,14 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
   
-    if (bMouseSet) mouse = calcMouse3D();
+    mouse = calcMouse3D();
+
+   }
 
   }
 
 
-  /*-----------------------------------------------------------------------------
-   *  Keyboard control (hit 's' to toggle mouse tracking)
-   *-----------------------------------------------------------------------------*/
-  void onKeyDown(const gfx::Keyboard& k){
-    switch (k.code){
-      case 's': bMouseSet = !bMouseSet;
-    }
 
-    /// Default
-    App:onKeyDown(k);
-  }
 
   
 };

@@ -27,11 +27,37 @@ namespace vsr { namespace cga {
 /// Frame Tangent to Surface
 struct TangentFrame{
 
-  Frame frame;
-  Sphere sphere[3];   ///< sphere through next point
+  Frame frame;        ///< perhaps eliminate this
+
+  Sphere sphere[3];   ///< sphere through next point with tangents as below
   Circle circle[3];   ///< circle through next point
   Pair tan[3];
   Circle bitan[3];
+
+  TangentFrame(){
+    Frame f;
+    frame.pos() = f.pos();;
+    bitan[0] = f.tx().dual();
+    bitan[1] = f.ty().dual();
+    bitan[2] = f.tz().dual();
+     
+    for (int j=0;j<3;++j){
+      tan[j] = bitan[j].undual();
+    }    
+  }
+
+  TangentFrame( const Frame& f ){
+    frame.pos() = f.pos();
+    bitan[0] = f.tx().dual();
+    bitan[1] = f.ty().dual();
+    bitan[2] = f.tz().dual();
+    for (int j=0;j<3;++j){
+      tan[j] = bitan[j].undual();
+    }      
+  }
+  TangentFrame( const Point&p, const TangentFrame tf) {
+    set(p,tf);
+  }
 
   // Calculate Edges as intersections of constant coordinates
   void calcCurves(){
@@ -39,6 +65,127 @@ struct TangentFrame{
     circle[1] = (sphere[0].dual() ^ sphere[2].dual()).dual();
     circle[2] = (sphere[0].dual() ^ sphere[1].dual()).dual();
   }
+
+  void set( const Point& p, const TangentFrame tf ){
+     frame.pos() = p;
+     for (int j=0;j<3;++j){
+        sphere[j] = tf.bitan[j] ^ p;
+        bitan[j] = Tangent::at( sphere[j], frame.pos() );
+        tan[j] = bitan[j].undual();
+     }
+  }
+
+  Drv xdir(){ return -Round::direction(tan[0]); }
+  Drv ydir(){ return -Round::direction(tan[1]); }
+  Drv zdir(){ return -Round::direction(tan[2]); }
+
+  Bst xcurve(float amt){
+    return Gen::bst(tan[0]*amt);
+  }
+  Bst ycurve(float amt){
+    return Gen::bst(tan[1]*amt);
+  }
+  Bst zcurve(float amt){
+    return Gen::bst(tan[2]*amt);
+  }
+  Bst xycurve(float amtX, float amtY){
+    return Gen::bst( tan[0]*amtX + tan[1]*amtY );// + tan[2] *amtZ);
+  }
+  Bst xzcurve(float amtX, float amtZ){
+    return Gen::bst( tan[0]*amtX + tan[2]*amtZ );// + tan[2] *amtZ);
+  }
+  Bst yzcurve(float amtY, float amtZ){
+    return Gen::bst( tan[1]*amtY + tan[2]*amtZ );// + tan[2] *amtZ);
+  }
+  
+  DualSphere xsurface( const Bst& b ){ 
+   return DualSphere( Round::carrier(bitan[0].dual() ).spin(b));
+  }
+  DualSphere ysurface( const Bst& b ){ 
+   return DualSphere( Round::carrier(bitan[1].dual() ).spin(b));
+  }
+  DualSphere zsurface( const Bst& b ){ 
+   return DualSphere( Round::carrier(bitan[2].dual() ).spin(b));
+  }
+  
+  DualSphere xsurface( float amt ) { 
+    return DualSphere( Round::carrier(bitan[0]).dual() ).spin(xcurve(amt));    
+  }
+
+  DualSphere ysurface( float amt ){
+    return DualSphere( Round::carrier(bitan[1]).dual() ).spin(ycurve(amt));        
+  }
+
+  DualSphere zsurface( float amt ){
+    return DualSphere( Round::carrier(bitan[2]).dual() ).spin(zcurve(amt));        
+  }
+
+  Point point() const { return Round::location(tan[0]); }
+  Point xpoint(float amt){ return point().translate(xdir()*amt); }
+  Point ypoint(float amt){ return point().translate(ydir()*amt); }
+  Point zpoint(float amt){ return point().translate(zdir()*amt); }
+
+  TangentFrame zbend(float amtX, float amtY,float dist =1){
+    auto bst = xycurve(amtX,amtY); 
+    auto pt = Round::location( zpoint(dist).spin(bst) );
+    return TangentFrame(pt, *this);
+  }
+
+  TangentFrame xbend(float amtY, float amtZ,float dist =1){
+    auto bst = yzcurve(amtY,amtZ); 
+    auto pt = Round::location( xpoint(dist).spin(bst) );
+    return TangentFrame(pt, *this);
+  }
+
+  TangentFrame ybend(float amtX, float amtZ,float dist =1){
+    auto bst = xzcurve(amtX,amtZ); 
+    auto pt = Round::location( ypoint(dist).spin(bst) );
+    return TangentFrame(pt, *this);
+  }
+
+  TangentFrame xclose(float amt, const Point& pa, const Point& pb){
+    return circleClose( xsurface(amt), pa, pb);
+  }
+  TangentFrame yclose(float amt, const Point& pa, const Point& pb){
+    return circleClose( ysurface(amt), pa, pb);
+  }
+  TangentFrame zclose(float amt, const Point& pa, const Point& pb){
+    return circleClose( zsurface(amt), pa, pb);
+  }
+  TangentFrame close(const TangentFrame& ta, const TangentFrame& tb, const TangentFrame& tc, const TangentFrame& td){
+    
+    auto pt = point();
+
+    auto cir = pt ^ ta.point() ^ tb.point();
+    auto cir2 = pt ^ tc.point() ^ td.point();
+
+    auto pair = (Round::surround(cir) ^ cir2.dual()).dual();
+
+    auto tpa = Construct::pointA(pair);
+    auto tpb = Construct::pointB(pair);
+
+    auto p1 = FERROR( (pt <= tpa).wt() ) ? tpb : tpa;
+
+    return TangentFrame(p1, *this);
+
+  }
+
+  TangentFrame circleClose( const DualSphere& s, const Point& pa, const Point& pb ){
+    
+    auto pt = point();
+    auto cir = pt ^ pa ^ pb;
+    auto pair = (s ^ cir.dual()).dual();
+
+    auto tpa = Construct::pointA(pair);
+    auto tpb = Construct::pointB(pair);
+
+    auto p1 = FERROR( (pt <= tpa).wt() ) ? tpb : tpa;
+
+    return TangentFrame(p1, *this);
+
+  }
+//  TangentFrame circl
+
 };
 
 /**
@@ -49,6 +196,10 @@ struct Contact{
   Point point;
   Pair tnv;
   DualSphere sphere;
+
+  Contact(const Point& p, const DualPlane& dlp) 
+  : point(p), sphere(dlp), tnv( (p <= dlp.dual()).dual() )
+  {}
 
   Contact(const Point& p, const DualSphere& s) 
   : point(p), sphere(s), tnv( Tangent::at(s.undual(), p).dual() )
@@ -66,7 +217,15 @@ struct Contact{
     tnv = Tangent::at(target.undual(), point).dual();
   }
 
+  Cir bitan() const { return tnv.dual(); }
+  Vec vec() const { return -Round::direction(tnv).copy<Vec>().unit(); }
+  Biv biv() const { return vec().dual(); } 
 
+
+};
+
+struct TFrame {
+  Contact contact[3];
 };
 
 
@@ -83,6 +242,31 @@ struct CyclideQuad{
     pos(a,b,c,d);
   }
 
+  CyclideQuad( const Contact& a, const Contact& b, const Contact& c, const Contact& d, float spin = 0 ){
+    set(a,b,c,d,spin);
+  }
+
+  CyclideQuad( const TangentFrame& ta, const TangentFrame& tb, const TangentFrame& tc, const TangentFrame& td){
+    tframe[0] = ta; tframe[1] = tb; tframe[2]=tc, tframe[3]=td; 
+    frame(ta, false, false, false, false, 0);
+    log();
+  }
+
+  void set( const Contact& a, const Contact& b, const Contact& c, const Contact& d, float spin = 0 ){
+    pos(a.point, b.point,c.point,d.point);
+
+    
+    Rot rot = Gen::ratio( Vec::z, a.vec() );
+    Rot rot2 = Gen::rot( Biv::xy.spin(rot) * spin );//Gen::ratio( Vec::x.spin(rot), Vec(Op::pj( Vec(b.point - a.point), a.biv() ) ).unit() );
+   // ;
+     
+    frame (TangentFrame(Frame(a.point, rot2) ), false, false, false, false, 0);
+
+    log();
+
+  }
+
+
   void pos( const Point& a, const Point& b, const Point& c, const Point& d){
     tframe[0].frame.pos() = a;
     tframe[1].frame.pos() = b;
@@ -93,12 +277,22 @@ struct CyclideQuad{
   Pair mLogU, mLogV;      ///<-- two bivectors
   Pair mLogNu, mLogNv;    ///<-- two more (normals)
 
+  Pair mLogXu;
+  Pair mLogXv;
+  Pair mLogYu;
+  Pair mLogYv;
+ // Pair mLogSDX;
+
   DualSphere commonSphere(){
       return (mLogU ^ mLogV).dual();
   }
 
+  Circle circle() const{
+      return tframe[0].frame.pos() ^ tframe[1].frame.pos() ^ tframe[2].frame.pos();
+  }
 
-  //from some input, either flipx or y, either on corner or continuous, 90 or -90, attach at ..)
+
+  //attach to, flipx of it, flipy of it, corner or continuous, 90 or -90, attach at ..)
   void frame(const TangentFrame& f, bool bFlipX, bool bFlipY, bool bCorner, bool bNeg, int begin){
 
     if (bCorner){
@@ -157,8 +351,6 @@ struct CyclideQuad{
     tframe[0].bitan[1] = tframe[0].frame.ty().dual();
     tframe[0].bitan[2] = tframe[0].frame.tz().dual();
 
-    
-
     for (int j=0;j<3;++j){
      tframe[0].sphere[j] = tframe[0].bitan[j] ^ tframe[1].frame.pos();
      tframe[0].tan[j] = tframe[0].bitan[j].undual();
@@ -185,9 +377,21 @@ struct CyclideQuad{
   }  
 
   // Which direction to interpolate
+  bool altXv(){
+    auto dotU =  ( tframe[0].frame.pos() <= tframe[1].sphere[0].dual() )[0];
+    return dotU < 0;
+  }  
+
+  // Which direction to interpolate
   bool altV(){
     auto dotV =  ( tframe[0].frame.pos() <= tframe[1].sphere[1].dual() )[0];
     return dotV < 0;
+  }  
+
+  // Which direction to interpolate
+  bool altYu(){
+    auto dotU =  ( tframe[0].frame.pos() <= tframe[2].sphere[1].dual() )[0];
+    return dotU < 0;
   }  
 
   bool altWU(){
@@ -206,9 +410,15 @@ struct CyclideQuad{
   void log(){
       mLogU = Gen::log( Gen::ratio(tframe[0].sphere[0].dual(), tframe[2].sphere[0].dual(), true ), altU() );
       mLogV = Gen::log( Gen::ratio(tframe[3].sphere[1].dual(), tframe[1].sphere[1].dual(), true ), altV() );
+      
+      mLogXv = Gen::log( Gen::ratio(tframe[3].sphere[0].dual(), tframe[1].sphere[0].dual(), true ), altXv() );
+      mLogYu =Gen::log( Gen::ratio(tframe[0].sphere[1].dual(), tframe[2].sphere[1].dual(), true ), altYu() );
+
+      logZ();
   }
 
   void logZ(){
+      
       mLogNu = Gen::log( Gen::ratio( tframe[0].sphere[2].dual(), tframe[2].sphere[2].dual(),true ), altWU() );
       mLogNv = Gen::log( Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), altWV() );
   }
@@ -219,8 +429,10 @@ struct CyclideQuad{
   // Simple Rotor in V direction 
   Bst xfv( VSR_PRECISION v ) const { return Gen::bst(mLogV * -v ); }
 
-  Bst xfwu( VSR_PRECISION wu ){ return Gen::bst(mLogNu * -wu ); }
-  Bst xfwv( VSR_PRECISION wv ){ return Gen::bst(mLogNv * -wv ); }
+  Bst xfwu( VSR_PRECISION wu ) const { return Gen::bst(mLogNu * -wu ); }
+  Bst xfwv( VSR_PRECISION wv ) const { return Gen::bst(mLogNv * -wv ); }
+  Bst xfxv( VSR_PRECISION amt) const { return Gen::bst(mLogXv * -amt); }
+  Bst xfyu( VSR_PRECISION amt) const { return Gen::bst(mLogYu * -amt); }
   
   Pair ortho(VSR_PRECISION u, VSR_PRECISION v){
       return tframe[0].sphere[2].dual().spin( xfwu(u) ) ^ tframe[3].sphere[2].dual().spin( xfwv(v) ); 
@@ -230,7 +442,11 @@ struct CyclideQuad{
   Con xf( VSR_PRECISION u, VSR_PRECISION v) const { return xfv(v) * xfu(u); }
 
   // Evaluate conformal rotor at u,v, w
-  Con xf( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) { return xfwv(u) * xfwu(v) * xf(u,v); }
+  Con xf( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) const { return xfwv(u) * xfwu(v) * xf(u,v); }
+
+  // Evaluate xz
+  Con xfxz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfu(u); }
+  Con xfyz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfyu(u); }
 
 
   Circle cirU( VSR_PRECISION u) { return tframe[0].circle[1].spin( xfu(u) ); }
@@ -261,6 +477,27 @@ struct CyclideQuad{
   T apply( const T& t, VSR_PRECISION u, VSR_PRECISION v) const {
     return t.spin( xf(u,v) );
   }
+  /// Apply conformal rotor to a type T at u,v
+  template<class T>
+  T applyXZ( const T& t, VSR_PRECISION u, VSR_PRECISION v) const {
+    return t.spin( xfxz(u,v) );
+  }
+  /// Apply conformal rotor to a type T at u,v
+  template<class T>
+  T applyYZ( const T& t, VSR_PRECISION u, VSR_PRECISION v) const {
+    return t.spin( xfyz(u,v) );
+  }
+
+  /// Apply conformal rotor to a point at u,v
+  Point evalXZ( VSR_PRECISION u, VSR_PRECISION v) const {
+    return Round::loc( tframe[0].frame.pos().spin( xfxz(u,v) ) );
+  }
+  /// Apply conformal rotor to a point at u,v
+  Point evalYZ( VSR_PRECISION u, VSR_PRECISION v) const {
+    return Round::loc( tframe[0].frame.pos().spin( xfyz(u,v) ) );
+  }
+
+
 
   Vec evalNormal( VSR_PRECISION u, VSR_PRECISION v){
     auto tan = apply( tframe[0].tan[2], u,v);
@@ -274,9 +511,11 @@ struct CyclideQuad{
   }
 
   /// Apply conformal rotor to a point at u,v amt w
-  Point eval( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) {
+  Point eval( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) const {
     return Round::loc( tframe[0].frame.pos().spin( xf(u,v,w) ) );
   }
+
+  
  
  
   
@@ -303,8 +542,7 @@ struct CircularNet {
     switch( edge ){
       case 0: 
       {
-        bool bFlipX = false; bool bFlipY = false;
-        bFlipX = true;
+        bool bFlipX = true; bool bFlipY = false;
         auto cd = Contact( cyc.tframe[0].frame.pos(), cyc.tframe[0].sphere[2].undual() );
         if (bNeg) cd.tnv *= -1;
         auto ca = Contact( cd, sphere );
@@ -319,8 +557,7 @@ struct CircularNet {
       }
       case 1: 
       {
-        bool bFlipX = false; bool bFlipY = false;
-        bFlipY = true;
+        bool bFlipX = false; bool bFlipY = true;
         auto ca = Contact( cyc.tframe[1].frame.pos(), cyc.tframe[0].sphere[2].undual() );
         auto cb = Contact( ca, sphere );
         auto cd = Contact( cyc.tframe[2].frame.pos(), cyc.tframe[2].sphere[2].undual() );
@@ -333,8 +570,7 @@ struct CircularNet {
       }
       case 2: 
       {
-        bool bFlipX = false; bool bFlipY = false;
-        bFlipX = true;
+        bool bFlipX = true; bool bFlipY = false;
         auto ca = Contact( cyc.tframe[3].frame.pos(), cyc.tframe[2].sphere[2].undual() );
         auto cd = Contact( ca, sphere );
         auto cb = Contact( cyc.tframe[2].frame.pos(), cyc.tframe[2].sphere[2].undual() );

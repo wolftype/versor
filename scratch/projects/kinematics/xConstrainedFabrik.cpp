@@ -39,7 +39,7 @@ struct MyApp : App {
   Point point;
 
   bool bTrack = true;
-  bool bDrawChainR,bDrawChainRot,bDrawChainProj = false;
+  bool bDrawChainR,bDrawChainRot,bDrawChainProj,bFK = false;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -56,6 +56,7 @@ struct MyApp : App {
     gui(bDrawChainR,"bDrawChainR");
     gui(bDrawChainRot,"bDrawChainRot");
     gui(bDrawChainProj,"bDrawChainProj");
+    gui(bFK);
 
     //reset chain
     reset();    
@@ -95,13 +96,7 @@ struct MyApp : App {
       point = calcMouse3D();
       //adjust amt variable to adjust error threshold
       chain.constrainedFabrik(point,chain.num()-1,0,amt);
-      chain.fk();
-     } else {
-       //chain.joint(0).rot() = Gen::rot( Biv::xy * amt );
-       //chain.joint(1).rot() = Gen::rot( Biv::xy * amt2);
-       //chain.joint(2).rot() = Gen::rot( Biv::xy * amt3 );
-       //if (bReset) chain.fk();
-
+      if (bFK)  chain.fk();
      }
     
      Draw( Construct::sphere( Frame( chain[chain.num()-1].mot() * chain.link(chain.num()-1).mot() ).pos(),.2),1,0,0); 
@@ -113,10 +108,12 @@ struct MyApp : App {
 
      //Draw circle of rotation of each joint
      for (int i=1;i<chain.num();++i){
-        Draw( chain.prevCircle(i),1,0,0); 
-     }
+       // Draw( chain.prevCircle(i),1,0,0); 
+       // Draw( chain.nextCircle(i),0,1,0); 
 
-     
+       auto s = chain[i].z() <= chain[i-1].z();
+       if ( !FERROR(s[0])) cout << i << " " << s[0] << endl;
+     }
 
 
      for (int i=1;i<chain.num();++i){
@@ -131,8 +128,7 @@ struct MyApp : App {
 
         // joint rotation
         Vec ty = chain[i].y();
-        Rot rot = Gen::ratio(  pj,ty );
-
+        Rot rot = Gen::ratio(pj,ty);
       
         if (bDrawChainRot){
          auto biv = Gen::log(rot);
@@ -140,19 +136,7 @@ struct MyApp : App {
           float t = (float)j/10;
           DrawAt( pj.rotate(-biv*t), chain[i].pos(), 1-t,t,1-t);
          }
-        }
-
-        
-        //get bxy of frame (minus link)
-        auto adjustedRot = chain.prevRot(i);// !rot * chain[i].rot() * !chain.link(i-1).rot();
-        Frame tmp; tmp.rot() = adjustedRot;
-
-        auto normal = tmp.z();//Vec::y.spin( adjustedRot); 
-        auto y = tmp.y();
-
-      //  DrawAt( normal, chain[i].pos(),0,0,1 );
-      //  DrawAt( y, chain[i].pos(),0,1,1 );
-                
+        }                
 
      }
   }

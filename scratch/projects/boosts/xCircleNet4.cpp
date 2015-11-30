@@ -121,6 +121,9 @@ struct CyclideDraw{
   bool bDrawCyclide = true;
   bool bDrawPlunge = false;
   bool bDrawSurface = true;
+  bool bDrawXYSurface = true;
+  bool bDrawYZSurface = false;
+  bool bDrawXZSurface = false;
   bool bDrawNormals = false;
 
   void init(int w, int h){
@@ -129,7 +132,7 @@ struct CyclideDraw{
     graph.UV( width+1,height+1,mesh); 
   }
 
-   void draw(const CyclideQuad& cyclide){
+   void draw(const CyclideQuad& cyclide, int surf =0){
 
      if (width==0) init(20,20);
 
@@ -147,13 +150,27 @@ struct CyclideDraw{
        for (int j =0;j<=height;j++){ 
          auto tv = (float)j/height;
         
-         auto np = cyclide.eval(tu,tv);
-         auto tan = cyclide.apply( cyclide.tframe[0].tan[2], tu,tv);
+         Point np;
+         Pair tan;
+         switch(surf){
+          case 0:
+            np = cyclide.eval(tu,tv);
+            tan = cyclide.apply( cyclide.tframe[0].tan[2], tu,tv);
+            break;
+          case 1:
+             np = cyclide.evalXZ(tu,tv);
+             tan = cyclide.applyXZ( cyclide.tframe[0].tan[2], tu,tv);
+             break;
+          case 2:
+             np = cyclide.evalYZ(tu,tv);
+             tan = cyclide.applyYZ( cyclide.tframe[0].tan[2], tu,tv);
+             break;
+         }
 
          int idx = i*(height+1) + j;
          mesh[idx].pos = np;
          mesh[idx].normal = -Round::dir(tan).copy<Vec>().unit();
-      }
+       }
       }
      }
 
@@ -207,6 +224,8 @@ struct MyApp : App {
   float lightX, lightY, lightZ ;
  
   bool bAddLeft,bAddFront,bAddBottom,bAddTop;
+
+  bool bFlipLeft, bFlipFront, bFlipBottom, bFlipTop,bFlipLog;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -220,10 +239,11 @@ struct MyApp : App {
     gui(camt2, "camt2",-PI,PI);
     gui(camt3, "camt3",-PI,PI);
 
-    gui(bAddLeft,"bAddLeft");
-    gui(bAddFront,"bAddFront");
-    gui(bAddBottom,"bAddBottom");
-    gui(bAddTop,"bAddTop");
+    gui(bAddLeft,"bAddLeft"); gui(bFlipLeft,"bFlipLeft");
+    gui(bAddFront,"bAddFront");  gui(bFlipFront,"bFlipFront");
+    gui(bAddBottom,"bAddBottom");  gui(bFlipBottom,"bFlipBottom");
+    gui(bAddTop,"bAddTop");  gui(bFlipTop,"bFlipTop");
+    gui(bFlipLog,"bFlipLog");
 
     gui(bDrawA, "circles")(bDrawB, "surface")(bDrawC,"const_coord")(bDrawD, "edges")(bDrawE,"z");//(bDrawF)(bDrawNormal);
     gui(bDrawCircleNet,"bDrawCircleNet");
@@ -257,8 +277,8 @@ struct MyApp : App {
 
     fa.pos(0,3,0);
     fb.pos(0,0,0);
-    fc.pos(2,3,-2);
-    fd.pos(-2,3,-2);
+    fc.pos(2,3,0);
+    fd.pos(-2,3,0);
     fe.pos(0,6,0);
     ff.pos(0,-3,0);
     fb.scale(2);
@@ -337,7 +357,7 @@ struct MyApp : App {
     //Add Base Cyclide to Circular Net
     CircularNet net(cyclide);
 
-    //add spheres to net idx, side b, whether it is a corner?
+    //add spheres to net idx, side b, whether it is a corner? (false if smooth)
     if (bSmooth){
         net.addAt(sphC, 0, 1, false);
         if (bAddBottom)  {
@@ -365,7 +385,7 @@ struct MyApp : App {
      auto sphTop = (net[1][1].bitan[1] ^ Round::location(sphD)).undual();
      
      if (bAddTop) {
-       net.addAt( sphTop, 0, 0, true);
+       net.addAt( sphTop, 0, 0, true,bFlipTop);
 
      
        //record some circles to calculate fourth corner    
@@ -384,7 +404,7 @@ struct MyApp : App {
 
        if (bAddLeft) net.addAt(sphLeft, 0, 3, true);
        if (bAddBottom)  net.addAt(sphBottom, 0, 2, true);
-       if (bAddFront) net.addAt(sphFront, 2, 0, true,true );
+       if (bAddFront) net.addAt(sphFront, 2, 0, true,bFlipFront);
 
        //Draw these sphere coordinates
        if (bDrawSpheresAround){
@@ -430,23 +450,36 @@ struct MyApp : App {
 
 if (net.mCyclide.size() > 3 ){
 
-    for (int i =0;i<10;++i){
-      auto tu = (float)i/10;
-      for (int j=0;j<10;++j){
-        auto tv = (float)j/10;
-       
-        auto p = net[1].eval(tu,tv);
-        auto sph1 = net[1].apply( net[1][0].sphere[2], tu, tv);
-        auto sph2 = net[3].apply( net[3][0].sphere[2], tu, 1-tv);
-        auto zlog = Gen::log((sph2/sph1).runit()) * .5;
-        for (int k=0;k<10;++k){
-            auto tw = (float)k/10;
-            //auto zbst = net[1].xfv(tw);
-            auto np = Round::location(p.spin( Gen::bst(zlog*tw) ) );
-            Draw (np,1,0,0);
-        }
-      }
-    }
+//    for (int i =0;i<=10;++i){
+//      auto tu = (float)i/10;
+//      auto sph1u = net[0].apply( net[0][0].sphere[2], tu, 0);
+//      auto sph2u = net[3].apply( net[3][0].sphere[2], 1-tu, 0);
+//      auto zlogu = Gen::log( (sph2u/sph1u).runit(), bFlipLog) * -.5;
+//
+//
+//      for (int j=0;j<=10;++j){
+//        auto tv = (float)j/10;
+//        auto sph1v = net[0].apply( net[0][3].sphere[2], 0, tv);
+//        auto sph2v = net[3].apply( net[3][3].sphere[2], 0, tv);
+//        auto zlogv = Gen::log( (sph2v/sph1v).runit() ) * -.5;
+//
+//       // auto bst = Gen::bst(zlogu
+//        auto p = net[0].eval(tu,tv);
+//      //  auto zlog = Gen::log((sph2/sph1).runit()) * .5;
+//       for (int k=0;k<=10;++k){
+//           auto tw = (float)k/10;
+//           //auto zbst = net[1].xfv(tw);
+//         //  if (i==0 || i==10 || j==0 || j==10){
+//           auto np = Round::location(p.spin( Gen::bst(zlogu*tw) ) );
+//           Draw (np,1,0,0);
+//         //  }  
+//       }
+//      }
+//      if (i==0 || i==10 ) {
+//        Draw(sph2u, 0, 1,0, .1);
+//        Draw(sph1u, 1, 1,0, .1);
+//        }
+//    }
   
 }
 

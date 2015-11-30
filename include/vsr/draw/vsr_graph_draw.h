@@ -99,4 +99,30 @@ namespace gfx{
 
    };
 
+
+   /// Checkboard mesh (fed Shape::Sphere or Shape::Cylinder )
+   template<> 
+   void Renderable<vsr::HEGraph<Vertex>>::DrawImmediate( const vsr::HEGraph<Vertex>& graph){
+     glBegin(GL_TRIANGLES);
+     int iter =0;
+     bool bChecker = false;
+     for (auto& i : graph.face()){
+          iter++;
+          float t = (float)iter/graph.face().size(); 
+          auto& a = i->a();
+          auto& b = i->b();
+          auto& c = i->c(); 
+          glColor3f(bChecker,bChecker,bChecker);
+          GL::normal( a.Norm[0], a.Norm[1],a.Norm[2]);//.begin() );
+          GL::vertex( a.Pos[0], a.Pos[1], a.Pos[2] );
+          GL::normal( b.Norm[0], b.Norm[1], b.Norm[2] );
+          GL::vertex( b.Pos[0], b.Pos[1], b.Pos[2] );
+          GL::normal( c.Norm[0], c.Norm[1], c.Norm[2] );
+          GL::vertex( c.Pos[0], c.Pos[1], c.Pos[2] );
+          if (!(iter&1)) bChecker = !bChecker;
+     }
+     glEnd();
+     
+  }   
+
 } //gfx::
