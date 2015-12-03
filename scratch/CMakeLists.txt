@@ -14,8 +14,13 @@ project(VERSORSCRATCH)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
 
-#OPTIONAL ADD GFX AS SUBDIRECTORY TO BUILD GRAPHICS DEMOS
-add_subdirectory(../ext/gfx gfxbuild)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../ext/gfx/cmake/modules")
+
+  #GLV should be optional
+  if(NOT GLV_INCLUDE_DIR)
+    set(GLV_INCLUDE_DIR “${CMAKE_SOURCE_DIR}/../ext/glv”)
+  endif()
+  find_package(GLV)
 
 #GET INCLUDE DIRECTORIES, LINK DIRECTORIES, AND LINKED LIBS
 get_property(GFX_LIBRARIES GLOBAL PROPERTY GFX_LIBRARIES)
@@ -24,10 +29,21 @@ get_property(GFX_LINK_DIR GLOBAL PROPERTY GFX_LINK_DIR)
 
 
 #PROJECT INCLUDE AND LINK
+
+
 include_directories(${PROJECT_SOURCE_DIR}/../ )
-include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/)
-include_directories(${PROJECT_SOURCE_DIR}/../include/)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/space)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/draw)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/util)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/detail)
+include_directories(${CMAKE_SOURCE_DIR}/../vsr/z_deprecated)
 include_directories(${GFX_INCLUDE_DIR})
+
+include_directories(${GLV_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/../ext/glv)
+include_directories(${CMAKE_SOURCE_DIR}/../ext/gfx)
+
 
 link_directories(${PROJECT_SOURCE_DIR}/../build/)
 link_directories(${GFX_LINK_DIR})
