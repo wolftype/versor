@@ -37,7 +37,6 @@ struct MyApp : App {
 
    }
 
-  }
 
 
 
