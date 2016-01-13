@@ -80,7 +80,7 @@ void drawState(State * state){
      sg.angleB(s.angleB);
      sg.angleC(s.angleC);
      
-     sg.print();    
+     //sg.print();    
 
      Vec v(0,0,0);
 
@@ -201,12 +201,13 @@ void drawState(State * state){
 
       } else {
       float phi = PIOVERTWO * s.width;
+      auto angle = Gen::rot( Biv::xy * s.angleB);
       for (int i=0;i<4;++i){
         float t = (float)TWOPI * i/4.0;
         auto rota = Gen::rot(t,-phi);
         auto rotb = Gen::rot(t,phi);
-        pnt.push_back( Construct::point(dls, Vec::x.spin( rota ) ) );
-        pnt.push_back( Construct::point(dls, Vec::x.spin( rotb ) ) );
+        pnt.push_back( Construct::point(dls, Vec::x.spin( angle * rota ) ) );
+        pnt.push_back( Construct::point(dls, Vec::x.spin( angle * rotb ) ) );
 
       }
 

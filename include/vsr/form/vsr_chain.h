@@ -274,11 +274,16 @@ struct  Spherical : public Joint {
 //      }
 
       /// Dual Plane of rotation of k-1th joint (translated by link rejection from yz)
-      Dlp prevPlane_(int k) const {
-        Vec rj = Op::rj( link(k-1).vec(), Biv::xy );
-        auto normal = Vec::z.spin( !link(k-1).rot() ); //<-- "undo" orientation of z normal
-        auto nnorm = normal.spin( mFrame[k].rot() * !mJoint[k].rot() );
-        return DualPlane(nnorm).translate( Vec(mFrame[k].pos()) - rj);
+      Dlp prevPlane_(int i) const {
+        
+        Vec rj = Op::rj( link(i-1).vec(), Biv::xy );
+        
+        auto adjustedRot = prevRot_(i);
+        auto normal = Vec::z.spin( adjustedRot); 
+        
+        return DualPlane(normal).translate(Vec(mFrame[i].pos()) - rj.spin(adjustedRot));
+
+
       }
 
       //testing
@@ -299,22 +304,10 @@ struct  Spherical : public Joint {
         
         // direction from prev frame
         auto dir = Vec(mFrame[i].pos()-mFrame[i-1].pos()).unit();
-        // link contribution
-       // auto linkRot = Gen::ratio(Vec::y,  mLink[i-1].vec().unit() );  
-        
-        //Onto origin xy
+
         Vec ty = Op::project( mLink[i-1].vec().unit().spin( !mLink[i-1].rot() ), Biv::xy).unit();        
 
-   //     auto roty = Gen::ratio( Vec::y, ty );
-        //projection of dir onto unlink
-//        Vec pj = Op::project( dir, mFrame[i].xy() ).unit().spin( !mFrame[i].rot() );
-        //Dir onto origin xy
         Vec pj = Op::project( dir.spin( !mFrame[i].rot() ), Biv::xy ).unit();
-
-
-    //    auto rotpj = Gen::ratio( Vec::y, pj );
-
-     //   auto lrel = Gen::ratio( ty, pj );
 
         auto rel = Gen::ratio( ty, pj);//Gen::ratio( pjlink, pjunrot );
        // auto lrel = Gen::ratio ( mFrame[i].y(), Vec::y.spin(rel) );
@@ -324,20 +317,15 @@ struct  Spherical : public Joint {
 
       /// based on unit direction between frames..
       Rot prevRot_(int i) const {
-        // direction from prev frame
-        auto dir = Vec(mFrame[i].pos()-mFrame[i-1].pos()).unit();
+        
+        auto dir = Vec(mFrame[i].pos()).unit();
+        Vec ty = Op::project( mLink[i-1].vec().unit().spin( !mLink[i-1].rot() ), Biv::xy).unit();        
 
-
-        //unit projection of direction onto xy
-        Biv txy = mFrame[i].xy();
-        Vec pj = Op::project( dir, txy ).unit();
-
-        // joint un-rotation
-        Vec ty = mFrame[i].y();
-        Rot rot = Gen::ratio( ty, pj );
-
-        auto adjustedRot = rot * mFrame[i].rot() * !link(i-1).rot();
-        return adjustedRot;
+        Vec pj = Op::project( dir.spin( !mFrame[i].rot() ), Biv::xy ).unit();
+ 
+        auto rel = Gen::ratio( ty, pj);//Gen::ratio( pjlink, pjunrot );
+       // auto lrel = Gen::ratio ( mFrame[i].y(), Vec::y.spin(rel) );
+        return  mFrame[i].rot() * rel * !mLink[i-1].rot();  
 
       }
       
@@ -480,85 +468,112 @@ struct  Spherical : public Joint {
 
               calcJoints();
             }
-            
+           
+           
+           struct PC{
+              Point pnt; Circle cir; Frame frame;
+           };
 
             /// Constrain to xy plane of rotation (in progress)
-            void constrainedFabrik(const Pnt& target, int end, int begin, double err = .001){
+            vector<PC>  constrainedFabrik(const Pnt& target, int end, int begin, double err = .001, float xyoff=0, float xzoff=0){
+
+              vector<PC> tres;
 
               double terr = Round::sqd( mFrame[end].pos(), target);
 
-               Point base = mFrame[begin].pos();
+              Point base = mFrame[begin].pos();
 
               //repeat until err minimized or iterations maxed
-              int iter =0;
+              Point tmpEndA = Construct::point(0,0,0);
+              Point tmpEndB = Construct::point(1,0,0);
+              int iter =0; bool bSwitch = false; 
               while( terr>err && iter<21 ){
+                
+                //0. deadlock? (figure 14 of "Extended Fabrik" paper) 
+ 
+                bool bDeadlock = false;
+                
+                if (bSwitch) tmpEndA = mFrame[end].pos();
+                else tmpEndB = mFrame[end].pos();
+                bSwitch = !bSwitch;
+                auto dist = Round::dist(tmpEndA, tmpEndB);
+
+                //cout << "dist: " << dist << endl;
+                if (dist < err ) {
+                  cout << "deadlock at " << iter << endl;
+                  bDeadlock = true;
+                }
+                
+
                 //1.place end at target
                 mFrame[end].pos() = target;
+
+                mFrame[end].rot() = mFrame[end].rot() * Gen::rot( Biv::xz * xzoff * iter ); //*************
+                tres.push_back( { mFrame[end].pos(), prevCircle(end), mFrame[end] } );
+
                 //2.work backwards, constraining position AND orientation
                for (int i=end;i>begin;--i){
                
                  // to constrain position, we must know previous rotation
                  auto rota = prevRot(i);
 
-                 auto cir = prevCircle(i);
-                 auto sph = Round::surround(cir);
-                 
-                 mFrame[i-1].pos() = Construct::point(sph, -Vec::y.spin(rota) );
- 
+                 auto tmpPos = mFrame[i-1].pos();
+                 mFrame[i-1].pos() = Constrain::PointToCircle( mFrame[i-1].pos(), prevCircle(i) );
+
                  mFrame[i-1].rot() = rota;
+                 
+                 if (i==end) tres.push_back( { mFrame[i-1].pos(), CXY(0), mFrame[i-1] } );
 
                }
           
           
-             //  if (iter==20) break; 
-               //3.place beginning at base and constain rotation;
-              mFrame[begin].pos() = base;
-              mFrame[begin].rot() = Rot(1,0,0,0);
-         
               //4. work forwards
-              Rot ry(1);
+              Rot ry = mBaseFrame.rot();
               if (begin>0) ry = mFrame[begin-1].rot() * mLink[begin-1].rot(); //check
+
+              //3.place beginning at base 
+              mFrame[begin].pos() = base;
+
+              if (bDeadlock){
+                mFrame[begin].rot() = ry * Gen::rot( Biv::xy * xyoff );//* iter ); //*************
+                mFrame[begin+1].pos() = PAO.spin( mFrame[begin].mot() * mLink[begin].mot() );
+              }
+               
               for (int i=begin; i<=end; ++i){
                   
-                  auto target = Vec::y;
+                  auto ytarget = Vec::y;
                   mFrame[i].rot() = ry;
                  
                   int next = i+1;
                   if (next<=end){
                     mFrame[next].pos() = Constrain::PointToCircle( mFrame[next].pos(), nextCircle(i) );
-                    
-                    target = ( mFrame[next].vec() - mFrame[i].vec() ).unit();
-                    target = Op::pj( target, mFrame[i].xy() ).unit();
-                    target = target.spin(!ry);
+                    ytarget = ( mFrame[next].vec() - mFrame[i].vec() ).unit();   
+                    ytarget = Op::pj( ytarget, mFrame[i].xy() ).unit();
+                  }
+                  else { 
+                    ytarget = Op::pj( Vec::y, mFrame[i].xy() ).unit();
                   }
                   
-                  auto adjustedRot = Gen::ratio( Vec::y, target );
+                  ytarget = ytarget.spin(!ry);
+                    
+                  auto adjustedRot = Gen::ratio( Vec::y, ytarget );
                   mFrame[i].rot() = ry * adjustedRot;
                   ry = ry * adjustedRot * mLink[i].rot();
+               //   tres.push_back( {mFrame[i].pos(), CXZ(1), mFrame[i]} );
+
                 
               }
               
-         //   //4.work forwards
-         //     for (int i=begin+1;i<=end;++i){
-         //    
-         //       mFrame[i].pos() = Constrain::PointToCircle( mFrame[i].pos(), nextCircle(i-1) );
-
-         //       auto target = ( mFrame[i].vec() - mFrame[i-1].vec() ).unit();         //global target direction
-         //      // target = Op::pj( target, mFrame[i-1].xy() ).unit();
-         //      // target = target.spin( );
-         //       
-         //       auto linkRot = Gen::ratio(Vec::y,  mLink[i-1].vec().unit() );           //what link position contributes...
-         //       auto trot = mFrame[i-1].rot() * linkRot;
-         //       mFrame[i-1].rot() = Gen::ratio( Vec::y.spin(trot), target ) * mFrame[i-1].rot(); 
-         //       mFrame[i].rot() = mFrame[i-1].rot() * mLink[i-1].rot();
-         //     }
 
                 terr = Round::sqd( mFrame[end].pos(), target);
                 iter++;
               }
 
-
+              cout << iter << endl;
+              
               calcJoints(begin);
+
+              return tres;
             }
 
 
@@ -566,7 +581,7 @@ struct  Spherical : public Joint {
             /// Currently assumes that positions have ALREADY been calculated with any constraints in mind
             void calcJoints(int start = 0, bool bLoop=false){
 
-                Rot ry(1);
+                Rot ry = mBaseFrame.rot();
                 if (start != 0) ry = mFrame[start-1].rot() * mLink[start-1].rot();
                 
                 for (int i = start; i < (bLoop ? mNum : mNum-1); ++i){

@@ -80,29 +80,11 @@ struct MyApp : App {
   void onDraw(){
 
     point = calcMouse3D();
-//      auto sa = Construct::sphere(-3,0,0,1); 
-//      auto sb = Construct::sphere(2,0,0,.2);
-//      Draw(sa);
-//      //Draw(sb);
-//      
-//      auto ratio = Gen::ratio(sa,sb, bReset);//.runit();
-//      Pair log = Gen::log(ratio, bFlip);
-//    //  Draw(sa.spin(ratio) );
-//     // auto log = Gen::log( (sb/sa).runit(), bReset) * -.5;
-//      
-//      for (int i=0;i<=10;++i){
-//        float t= (float)i/10;
-//        //Pair log = Pair(Tnv(0,1,0)) * t;
-//        auto bst = Gen::bst(log*-t); 
-//        Draw( sa.spin(bst),t,0,1-t,.2);
-//      }
 
-        auto c = f.cxy();
-        Vec pj = Op::pj( Vec(Round::location(c) - point), Round::carrier(c) ).unit() ;
+    
+    auto pl = point ^ (Biv::xy * amt + Biv::xz * amt1) ^ Inf(1);
 
-        Draw (Constrain::PointToCircle(point, c), 1,0,0 );
-
-        Draw( Construct::point( Round::surround(c), -pj ), 0, 1,0);
+    Draw(pl);
 
   }
   

@@ -17,13 +17,13 @@
  * =====================================================================================
  */
 
-#include "vsr_cga3D_app.h"
-#include "vsr_root.h"
-#include "vsr_group.h"
-#include "vsr_hull.h"
+#include "vsr_app.h"
+#include "form/vsr_root.h"
+#include "form/vsr_group.h"
+#include "form/vsr_hull.h"
 
-#include "vsr_generic_draw.h"
-#include "vsr_graph_draw.h"
+#include "draw/vsr_generic_draw.h"
+#include "draw/vsr_graph_draw.h"
 
 using namespace vsr;
 

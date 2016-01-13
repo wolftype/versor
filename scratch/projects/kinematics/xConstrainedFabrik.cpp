@@ -39,7 +39,10 @@ struct MyApp : App {
   Point point;
 
   bool bTrack = true;
-  bool bDrawChainR,bDrawChainRot,bDrawChainProj,bFK = false;
+  bool bDrawChainR,bDrawChainRot,bDrawChainProj,bFK,bDrawCalc = false;
+  float begin;
+  float rotXY;
+  float rotXZ;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -48,7 +51,10 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100);
+    gui(rotXY,"rotXY",-2,2);
+    gui(rotXZ,"rotXZ",-2,2);
     //gui(amt2,"amt2",-100,100)(amt3,"amt3",-100,100);
+    gui(begin,"begin",0,2);
     gui(bReset,"bReset")(linewidth,"linewidth",1,10);
     gui(linkLength,"linkLength",0,10);
     gui(linkOffset,"linkOffset",0,10);
@@ -56,12 +62,16 @@ struct MyApp : App {
     gui(bDrawChainR,"bDrawChainR");
     gui(bDrawChainRot,"bDrawChainRot");
     gui(bDrawChainProj,"bDrawChainProj");
+    gui(bDrawCalc,"bDrawCalc");
     gui(bFK);
 
+    begin=0;
     //reset chain
     reset();    
 
     amt = .001;
+
+    mColor.set(.9,.9,.9);
   }
 
   void onKeyDown( const gfx::Keyboard& k){
@@ -75,11 +85,16 @@ struct MyApp : App {
     chain.reset();
     
     //set up relative links (90 degree rotation)
-    for (int i =0;i<chain.num();++i){
+    chain.link(0).pos(0,linkOffset, linkLength);
+    chain.link(0).rot() = Gen::rot( Biv::yz * PIOVERFOUR );
+
+    for (int i =1;i<chain.num();++i){
       chain.link(i).rot() = Gen::rot( Biv::xz * PIOVERFOUR);
       chain.link(i).pos(0,linkLength,linkOffset);
       chain[i].scale() = frameScale;
     }
+
+    //chain.joint(0).rot() = Gen::rot( Biv::xy * rotXY * PI);
     chain.fk();
   }
 
@@ -90,16 +105,23 @@ struct MyApp : App {
 
     glLineWidth(linewidth);
 
-     if (bTrack){
-      if (bReset) reset();
+    if (bReset) reset();
 
-      point = calcMouse3D();
-      //adjust amt variable to adjust error threshold
-      chain.constrainedFabrik(point,chain.num()-1,0,amt);
-      if (bFK)  chain.fk();
-     }
+    if (bTrack) point = calcMouse3D();
+      //adjust amt variable to adjust error threshold      
+    auto res =  chain.constrainedFabrik(point,chain.num()-1,(int)begin,amt, rotXY, rotXZ);
+    if (bFK)  chain.fk();
+
+      if (bDrawCalc){
+       for (int i=0;i<res.size();++i){
+          float t = (float)i/res.size();
+          Draw(res[i].pnt, t,.2,1-t);
+          Draw(res[i].cir, 1,1-t,.2);
+          Draw(res[i].frame);
+       }
+      }
     
-     Draw( Construct::sphere( Frame( chain[chain.num()-1].mot() * chain.link(chain.num()-1).mot() ).pos(),.2),1,0,0); 
+    // Draw( Construct::sphere( Frame( chain[chain.num()-1].mot() * chain.link(chain.num()-1).mot() ).pos(),.2),1,0,0); 
      Draw(chain,false,true,.2,.2,.2);
 
      if(bDrawChainR){
@@ -107,12 +129,9 @@ struct MyApp : App {
      }
 
      //Draw circle of rotation of each joint
-     for (int i=1;i<chain.num();++i){
-       // Draw( chain.prevCircle(i),1,0,0); 
-       // Draw( chain.nextCircle(i),0,1,0); 
+     for (int i=0;i<chain.num();++i){
+        Draw( chain.nextCircle(i),0,1,0); 
 
-       auto s = chain[i].z() <= chain[i-1].z();
-       if ( !FERROR(s[0])) cout << i << " " << s[0] << endl;
      }
 
 
@@ -139,6 +158,7 @@ struct MyApp : App {
         }                
 
      }
+     Draw( Construct::sphere( point, .1), 1,0,0,.1);
   }
   
 };
