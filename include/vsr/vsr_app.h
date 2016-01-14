@@ -17,7 +17,6 @@
  */
 
 
-
 #ifndef  vsr_app_INC
 #define  vsr_app_INC
 

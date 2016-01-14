@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_cga3D_render.h
  *
- *    Description:  advanced graphics pipelin
+ *    Description:  advanced graphics programmable pipeline
  *
  *        Version:  1.0
  *        Created:  01/19/2015 18:02:48
@@ -20,8 +20,6 @@
 #ifndef  vsr_cga3D_render_INC
 #define  vsr_cga3D_render_INC
 
-
-//#include "gfx/gfx_glyphs.h"
 #include "gfx/gfx_render.h"
 
 #include "space/vsr_cga3D_op.h"

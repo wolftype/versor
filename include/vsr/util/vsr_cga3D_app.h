@@ -20,7 +20,7 @@
 #ifndef  vsr_cga3D_app_INC
 #define  vsr_cga3D_app_INC
 
-#include "space/vsr_cga3D_op.h"               //<-- conformal 3D types and basic
+#include "space/vsr_cga3D_op.h"               //<-- conformal 3D types and basic operations
 
 #include "draw/vsr_cga3D_draw.h"              //<-- fixed pipeline draw routines
 #include "draw/vsr_cga3D_render.h"            //<-- programmable pipeline draw routines
@@ -52,7 +52,7 @@ struct App : public gfx::GFXAppGui {
     
     auto p = scene.unproject( io().pos(z) ); //vd.projectMid;
 
-    Vec tz (tv[0], tv[1], tv[2] );
+    cga::Vec tz (tv[0], tv[1], tv[2] );
 
     mMouse2D =  vsr::cga::Construct::point(p[0],p[1],0);
     mMouse3D =  vsr::cga::Construct::point(p[0],p[1],p[2]);

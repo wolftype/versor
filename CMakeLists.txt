@@ -18,6 +18,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/include/vsr)
+include_directories(${PROJECT_SOURCE_DIR}/include/vsr/detail)
+include_directories(${PROJECT_SOURCE_DIR}/include/vsr/space)
+include_directories(${PROJECT_SOURCE_DIR}/include/vsr/form)
+include_directories(${PROJECT_SOURCE_DIR}/include/vsr/draw)
+include_directories(${PROJECT_SOURCE_DIR}/include/vsr/util)
 
 file(GLOB core src/space/*.cpp)
 

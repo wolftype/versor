@@ -112,14 +112,9 @@ namespace gfx{
   
 
   template<> void Renderable<Field<cga::Vec>,0>::DrawImmediate( const Field<cga::Vec>& f);
-  //template<> void ImmediateB( const Field<cga::Vec>& f);
   template<> void Renderable<Field<cga::Sca>,0>::DrawImmediate( const Field<cga::Sca>& f);
   template<> void Renderable<Field<cga::Tnv>,0>::DrawImmediate( const Field<cga::Tnv>& f);
   template<> void Renderable<Field<cga::Frame>,0>::DrawImmediate( const Field<cga::Frame>& f);
-//   #ifdef GFX_IMMEDIATE_MODE
-  
-
-//#endif
 
   
 } //gfx::

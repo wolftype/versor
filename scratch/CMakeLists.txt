@@ -25,8 +25,13 @@ get_property(GFX_LINK_DIR GLOBAL PROPERTY GFX_LINK_DIR)
 
 #PROJECT INCLUDE AND LINK
 include_directories(${PROJECT_SOURCE_DIR}/../ )
-include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/)
 include_directories(${PROJECT_SOURCE_DIR}/../include/)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/detail)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/space)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/form)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/draw)
+include_directories(${PROJECT_SOURCE_DIR}/../include/vsr/util)
 include_directories(${GFX_INCLUDE_DIR})
 
 link_directories(${PROJECT_SOURCE_DIR}/../build/)

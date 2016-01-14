@@ -18,11 +18,14 @@ A (fast) Generic C++ library for Geometric Algebras, including Euclidean, Projec
 ---
 ### Currently tested on Linux and Mac OS X ###
 
-[Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu) 
+[Homepage (versor.mat.ucsb.edu)](http://versor.mat.ucsb.edu)
+ 
+[Documentation](http://wolftype.github.io/versor/devel/html/)
+
+[Combinatorics Cheat Sheet](http://versor.mat.ucsb.edu/masters_appendix.pdf) 
 
 [Bibtex (for referencing this work in your paper)](http://versor.mat.ucsb.edu/bibtex.txt)
 
-[Reference Documentation](http://wolftype.github.io/versor/devel/html/)
 
 **Versor** is a C++ Library for **Geometric Algebra**, sometimes called **Clifford Algebra**, a system for encoding geometric concepts numerically.
 
@@ -39,7 +42,7 @@ Lead Developer: Pablo Colapinto
 ## CONTENTS: ##
 
 * [Recent Changes](#recentchanges)                               
-* [Quickstart](#quickstart)   
+* [Compilation](#compilation)   
 * [Introduction](#introduction)
 * [Generators](#generators) 
 * [What the Point is](#whatthepointis)
@@ -66,9 +69,17 @@ Some major revisions have been enacted that change the API.
 
 ## LINKS: ##
 
-[Download and Installation](http://versor.mat.ucsb.edu/INSTALL.html) 	| 	[Cheat Sheet](http://versor.mat.ucsb.edu/masters_appendix.pdf) 	| 	[Mailing List](http://lists.create.ucsb.edu/mailman/listinfo/versor) | [Master's Thesis](http://wolftype.com/versor/colapinto_masters_final_02.pdf) | [Presentation on Implementation Details](https://www.youtube.com/watch?v=W4p-e-g37tg)
+[Mailing List](http://lists.create.ucsb.edu/mailman/listinfo/versor) | [AlloSphere Research Group](http://www.allosphere.ucsb.edu/)
 
-[versor.js](http://github.com/weshoke/versor.js) | [AlloSphere Research Group](http://www.allosphere.ucsb.edu/)          
+## PUBS: ##
+
+See also my page at [Academia.edu](https://ucsb.academia.edu/PabloColapinto)
+
+My disseration, [Articulating Space](http://versor.mat.ucsb.edu/ArticulatingSpace.pdf), introduces geometric algebra and explores applications to parametric design. My [Master's Thesis](http://wolftype.com/versor/colapinto_masters_final_02.pdf) before it, serves as an introduction as well.
+
+At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Details](https://www.youtube.com/watch?v=W4p-e-g37tg)
+
+        
 
 
 	As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection.  
@@ -93,10 +104,11 @@ Some major revisions have been enacted that change the API.
 * [versor.js](http://www.github.com/weshoke/versor.js) A javascript port of this library
 
 
-QUICKSTART
+COMPILATION
 ---
 
-Please see also the [INSTALL](http://versor.mat.ucsb.edu/INSTALL.html) guide.  For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want'glew.  See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
+For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.  
+See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
 
 	git clone git://github.com/wolftype/versor.git 
  
@@ -106,15 +118,13 @@ You'll need to initialize the submodules to build any graphics examples:
 	git submodule init
 	git submodule update
 	
-To build with graphics capabilities
+To build all examples
 
 	./buildAll.sh
 
-To build math only 
+To build library only
 
 	./build.sh
-     
-If this doesn't work, please consult the [Troubleshooting](#TROUBLESHOOTING) section below, or post as an issue on github.
 
 
 Use Cases

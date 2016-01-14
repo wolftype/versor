@@ -31,14 +31,6 @@
 namespace gfx{    
    
   using namespace vsr;
-  using vsr::cga::Pnt; 
-  using vsr::cga::Point; 
-  using vsr::cga::Frame; 
-  using vsr::cga::Vec; 
-  using vsr::cga::Dll; 
-  using vsr::cga::Drv; 
-  using vsr::cga::Rot; 
-  using vsr::cga::Gen;
 
   //FOR ALL ROUND MULTIVECTOR TYPES:
   template<class A>  
@@ -49,7 +41,7 @@ namespace gfx{
 
   /// FOR FRAMES
   template<>  
-  Vec3f ObjectController :: ObjectPtr<Frame> :: worldPosition(){
+  Vec3f ObjectController :: ObjectPtr<cga::Frame> :: worldPosition(){
     auto p = mAddress->pos();
     return Vec3f(p[0],p[1],p[2]);
   }
@@ -65,7 +57,7 @@ namespace gfx{
       A& ps = tObject;
 
       //Center of Defining Sphere   
-      Pnt pnt = cga::Round::loc(ts); //was pos
+      cga::Pnt pnt = cga::Round::loc(ts); //was pos
               
       //2D coordinates of Defining Sphere
       Vec3f sc = i->mScene->project(pos);  
@@ -81,7 +73,7 @@ namespace gfx{
                   //Drag towards or away from element . . . 
                   int neg = (tm1.len() > tm2.len()) ? 1 : -1; 
                   float amt =  i->io().drag().len() * neg;
-                  auto tsd = Gen::dil( pnt, amt);
+                  auto tsd = cga::Gen::dil( pnt, amt);
 
                   ts = ps.sp( tsd );
 
@@ -96,7 +88,7 @@ namespace gfx{
               case 'r': //ROTATE 
               {    
                   auto b = i->axisCat();
-                  Dll td = pnt <= (Drv(b[0], b[1], b[2]).dual() );
+                  cga::Dll td = pnt <= (cga::Drv(b[0], b[1], b[2]).dual() );
                   ts = ps.mot( td );
                   break;
               }
@@ -112,15 +104,15 @@ namespace gfx{
 
 
     template<>
-    void ObjectController :: ObjectPtr<Frame> :: transform() {
+    void ObjectController :: ObjectPtr<cga::Frame> :: transform() {
      
       //Address of State
-      Frame& ts = *mAddress;
+      cga::Frame& ts = *mAddress;
       //Temp Stored State
-      Frame& ps = tObject;
+      cga::Frame& ps = tObject;
 
       //Center  
-      Pnt pnt = ps.pos();
+      cga::Pnt pnt = ps.pos();
               
       //2D coordinates of Defining Sphere
       Vec3f sc = i->mScene->project(pos);  
@@ -149,7 +141,7 @@ namespace gfx{
           case 'r': //ROTATE 
           {    
               auto b = i->axisCat();
-              Rot tr = Gen::rot( Vec(b[0],b[1],b[2]).duale() );
+              cga::Rot tr = cga::Gen::rot( cga::Vec(b[0],b[1],b[2]).duale() );
               ts.rot() = tr * ps.rot();
               break;
           }

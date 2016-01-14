@@ -6,8 +6,6 @@
 
 namespace vsr{ namespace cga2D { 
   
-//  namespace types {
-
 
     //2D CONFORMAL 
    // typedef Ne<4,1> e1; 
@@ -20,15 +18,15 @@ namespace vsr{ namespace cga2D {
     typedef NTri<4> Tri; 
     typedef NRot<4> Rot;
     
-    typedef NOri<4> Ori; //Origin
-    typedef NInf<4> Inf; //Infinity
-    typedef NMnk<4> Mnk; //E Plane
-    typedef NPss<4> Pss; //E Plane
+    typedef NOri<4> Ori;   //Origin
+    typedef NInf<4> Inf;   //Infinity
+    typedef NMnk<4> Mnk;   //E Plane
+    typedef NPss<4> Pss;   //E Plane
     
-    typedef NPnt<4> Pnt; 	 //Homogenous Point in 3D  
-    typedef Pnt Dls; 		 //Dual Sphere    
+    typedef NPnt<4> Pnt;   //Homogenous Point in 3D  
+    typedef Pnt Dls; 		   //Dual Sphere    
     
-    typedef NPar<4> Par;	 //Point Pair
+    typedef NPar<4> Par;   //Point Pair
     typedef NCir<4> Cir;	 //Circle
     typedef NSph<4> Sph;	 //Sphere
                         	
@@ -86,22 +84,19 @@ namespace vsr{ namespace cga2D {
     typedef  Dil Dilator;
     typedef  Tsd TranslatedDilator;
 
- // } //types::      
-
-  //using namespace vsr::cga2D::types;
-                     
-  template<class V>
-  inline Point point(const V& v){
-	  return nga::Round::null( v[0], v[1]  );
-  }
+   //move to Construct::                   
+    template<class V>
+    inline Point point(const V& v){
+	    return nga::Round::null( v[0], v[1]  );
+    }
   
-  Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
-	  return nga::Round::dls( Vec(x,y), rad ); 
-  }
+    Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
+	    return nga::Round::dls( Vec(x,y), rad ); 
+    }
 
-  Pair meet( const Line& lin, const Circle& cir){
-	  return ( lin.dual() ^ cir.dual() ).dual();
-  }
+    Pair meet( const Line& lin, const Circle& cir){
+	    return ( lin.dual() ^ cir.dual() ).dual();
+    }
 
 } } // vsr::cga2D
 
