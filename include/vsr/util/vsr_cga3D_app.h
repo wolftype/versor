@@ -38,6 +38,8 @@ struct App : public gfx::GFXAppGui {
   vsr::cga::Point mMouse3D;
   vsr::cga::Line mMouseRay;
 
+ // using vsr::cga::Gen;
+
   /*! @todo move output settings to separate io header  */
   bool bShadedOutput = false; ///< default for output
   bool bSortOutput   = true;  ///< default 

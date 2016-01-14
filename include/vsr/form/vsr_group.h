@@ -19,7 +19,7 @@ replaces vsr_pointGroup.h
  
 using std::vector;
 
-namespace vsr{
+namespace vsr{ 
 
 /// Simple Reflection Group (no translating or gliding spinors)
 template<class V>
@@ -199,18 +199,18 @@ struct SpaceGroup2D : PointGroup2D<V> {
       if (ga) { //replace first mirror
         this->ops.clear();
        // this->ops.push_back(this->b);
-        this->gops.push_back( this->a * Gen::trs( Vec::y * .5) ); 
+        this->gops.push_back( this->a * nga::Gen::trs( Vec::y * .5) ); 
       }        
     } else if (p<4){ 
       //Glide Reflections
       if (ga) { //replace first mirror
         this->ops.clear();
         this->ops.push_back(this->b);
-        this->gops.push_back( this->a * Gen::trs(this->b * .5) ); 
+        this->gops.push_back( this->a * nga::Gen::trs(this->b * .5) ); 
       }    
       if (gb) { //replace second mirror
         this->ops.pop_back();
-        this->gops.push_back( this->b * Gen::trs(this->a * .5) ); 
+        this->gops.push_back( this->b * nga::Gen::trs(this->a * .5) ); 
       }
     } else {
       if (p==4){
@@ -219,7 +219,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
           this->ops.clear();
           this->ops.push_back(this->b.unit());
           this->ops.push_back(this->b.reflect(this->a).unit());
-          this->gops.push_back( this->a * Gen::trs((this->b - this->a) * .5) ); 
+          this->gops.push_back( this->a * nga::Gen::trs((this->b - this->a) * .5) ); 
         }
       }
       if (p==6){
@@ -822,19 +822,19 @@ struct SpaceGroup3D : PointGroup3D<V> {
   
         if (mGlide.a.type != None)  {
             replaceReflection.push_back(0);
-            auto trs = Gen::trs( glideA()* .5 );
+            auto trs = nga::Gen::trs( glideA()* .5 );
             this->gops[0] = this->a * trs;
         }
     
         if(mGlide.b.type != None){      
             replaceReflection.push_back(1);
-            auto trs = Gen::trs( glideB()* .5 );
+            auto trs = nga::Gen::trs( glideB()* .5 );
             this->gops[1] = this->b * trs;
          }          
       
         if(mGlide.c.type != None){
             replaceReflection.push_back(2);
-            auto trs = Gen::trs( glideC()* .5 );
+            auto trs = nga::Gen::trs( glideC()* .5 );
             this->gops[2] = this->c * trs;
          }             
 
@@ -855,7 +855,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
           replaceRotation.push_back(0);
           auto vec = mC_dir * (float)mScrew.a/this->mSym.p;
 
-          auto scr = this->sops[0] * Gen::trs( vec );
+          auto scr = this->sops[0] * nga::Gen::trs( vec );
           this->scrops[0] = scr;
         }
 
@@ -892,7 +892,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
           //switcher
           float ratio = (float)mScrew.ab/this->mSym.p;
           auto vec = mC_dir * ratio;
-          auto scr = this->sops[0] * Gen::trs( vec );
+          auto scr = this->sops[0] * nga::Gen::trs( vec );
           
           //possible trans of scr
           if (mScrew.ab_trs){
@@ -915,7 +915,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
             vec = (mA_dir - mB_dir) * ratio;
           }
          
-          auto scr = this->sops[1] * Gen::trs( vec );
+          auto scr = this->sops[1] * nga::Gen::trs( vec );
 
           //possible trans of scr
           if (mScrew.bc_trs){
@@ -934,7 +934,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
            //switcher
            // auto vec = this->a * mRatio[0] * mScrew.b;
            auto vec = mB_dir * .25;
-           auto scr = this->sops[2] * Gen::trs( vec );
+           auto scr = this->sops[2] * nga::Gen::trs( vec );
            this->scrops[2] = scr;
 
          // this->scrops[1] = tmp;
@@ -960,8 +960,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
     void setCell(){
 
        if (this->is33()){
-         auto rota = Gen::ratio( this->a, Vec(1,0,-1).unit() );
-         auto rotb = Gen::ratio( this->c.spin(rota), Vec(-1,0,-1).unit() );
+         auto rota = nga::Gen::ratio( this->a, Vec(1,0,-1).unit() );
+         auto rotb = nga::Gen::ratio( this->c.spin(rota), Vec(-1,0,-1).unit() );
          auto rot = rotb*rota;
          this->a = this->a.spin(rot);
          this->b = this->b.spin(rot);
@@ -1281,26 +1281,26 @@ struct SpaceGroup3D : PointGroup3D<V> {
       return res;
     }
 
-    /// a std::vector of Points representing cell positions of a single lattice
-    vector<Point> cellPositions(){
-      
-      vector<Point> res;
-    //  switch( ){
-    //    case Primitive:
-
-    //     break;
-    //    case Body:
-    //      break;
-    //    case SingleFace:
-    //      break;
-    //    case Face:
-    //      break;
-    //    case Rhombic:
-    //      break;
-    //  }
-
-      return res;
-    }
+//    /// a std::vector of Points representing cell positions of a single lattice
+//    vector<cga::Point> cellPositions(){
+//      
+//      vector<cga::Point> res;
+//    //  switch( ){
+//    //    case Primitive:
+//
+//    //     break;
+//    //    case Body:
+//    //      break;
+//    //    case SingleFace:
+//    //      break;
+//    //    case Face:
+//    //      break;
+//    //    case Rhombic:
+//    //      break;
+//    //  }
+//
+//      return res;
+//    }
 
 };
 
