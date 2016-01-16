@@ -85,18 +85,18 @@ namespace vsr{ namespace cga2D {
     typedef  Tsd TranslatedDilator;
 
    //move to Construct::                   
-    template<class V>
-    inline Point point(const V& v){
-	    return nga::Round::null( v[0], v[1]  );
-    }
-  
-    Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
-	    return nga::Round::dls( Vec(x,y), rad ); 
-    }
+ //   template<class V>
+ //   inline Point point(const V& v){
+ //     return nga::Round::null( v[0], v[1]  );
+ //   }
+ // 
+ //   Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
+ //     return nga::Round::dls( Vec(x,y), rad ); 
+ //   }
 
-    Pair meet( const Line& lin, const Circle& cir){
-	    return ( lin.dual() ^ cir.dual() ).dual();
-    }
+ //   Pair meet( const Line& lin, const Circle& cir){
+ //     return ( lin.dual() ^ cir.dual() ).dual();
+ //   }
 
 } } // vsr::cga2D
 

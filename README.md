@@ -107,7 +107,7 @@ At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Det
 COMPILATION
 ---
 
-For this version you need C++11 support (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.  
+For this version you need C++11 support, which is now common (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.  
 See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
 
 	git clone git://github.com/wolftype/versor.git 
@@ -118,14 +118,27 @@ You'll need to initialize the submodules to build any graphics examples:
 	git submodule init
 	git submodule update
 	
-To build all examples
-
-	./buildAll.sh
-
-To build library only
+To build library and all programs in /examples:
 
 	./build.sh
 
+To build library only without examples:
+
+	./build.sh --lib
+
+To build library without graphics:
+
+	./build.sh --math
+
+To compile and run programs in scratch/projects:
+
+	./run.sh scratch/projects/<folder>/<filename>
+
+Adding "configure" to the end of the above command first re-runs cmake in order to add "filename" to its list of targets. For instance, to build and run programs you have written (e.g. in some folder called scratch/projects/user/), you can first write:
+
+	./run.sh scratch/projects/user/<filename> --configure
+	
+This need only happen once when you create a new file. Thereafter you can run your file without adding "configure" to the end
 
 Use Cases
 ---

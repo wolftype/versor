@@ -14,7 +14,7 @@ cd scratch/build
 
 rm bin/$TARGET
 
-if [ $2 = "configure" ]; then
+if [ $2 = "--configure" ] || [ $2 = "-c" ]; then
   cmake ..
 fi
 

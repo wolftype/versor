@@ -28,9 +28,7 @@
 #include "util/vsr_cga3D_control.h"           //<-- interface controls (mouse and keyboard)
 #include "gfx/util/gfx_glv_app.h"             //<-- an app class with built-in gui
 
-//GL2PS
-#include "gl2ps/gl2ps.h"
-
+#include "gfx/gfx_postscript.h"
 
 struct App : public gfx::GFXAppGui {  
 
@@ -38,13 +36,8 @@ struct App : public gfx::GFXAppGui {
   vsr::cga::Point mMouse3D;
   vsr::cga::Line mMouseRay;
 
- // using vsr::cga::Gen;
-
-  /*! @todo move output settings to separate io header  */
-  bool bShadedOutput = false; ///< default for output
-  bool bSortOutput   = true;  ///< default 
-  bool bOffsetOutput       = false; 
-  bool bOccludeOutput      = false;
+  gfx::PostScript ps;
+  
   bool bSetMouse;
 
   vsr::cga::Point calcMouse3D(float z=.99){
@@ -76,7 +69,7 @@ struct App : public gfx::GFXAppGui {
         printf("v\n"); 
         GL::enablePreset();
         scene.push(true);
-        gl2ps();
+         ps.print(*this);
         scene.pop(true);
         GL::disablePreset();
         break;
@@ -84,6 +77,20 @@ struct App : public gfx::GFXAppGui {
       case 's':
         bSetMouse = !bSetMouse;
         break;
+
+
+    }
+
+  } 
+  
+
+};
+
+#endif   /* ----- #ifndef vsr_cga3D_app_INC  ----- */
+
+
+
+
  //     case  '0':
  //   
  //      f.pos( PT(0,0,5) );
@@ -123,64 +130,3 @@ struct App : public gfx::GFXAppGui {
 
  //      scene.camera.set( f.pos(), f.quat() );
  //      break;
-
-    }
-
-  } 
-
-
-   void gl2ps(){
-      static int id = 0;
-      stringstream os; os << "output_" << id << (bShadedOutput ? ".eps" : ".pdf");
-      id++;
-      
-      FILE *fp;
-      int state = GL2PS_OVERFLOW, buffsize = 0;
-      
-      string name = os.str();
-      fp = fopen(name.c_str(), "wb");
-      
-      printf("writing %s to %s\n", os.str().c_str(), name.c_str() );
-      GLint tv[4];
-      glGetIntegerv(GL_VIEWPORT, tv);
-      
-      
-      while(state == GL2PS_OVERFLOW){
-
-         buffsize += 1024*1024;
-
-         gl2psEnable(GL2PS_BLEND);
-         gl2psBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-         gl2psPointSize(10);
-         gl2psLineWidth(1);
-
-         if (bShadedOutput){
-         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_EPS, bSortOutput ? GL2PS_SIMPLE_SORT : GL2PS_NO_SORT, //NO_SORT
-                         GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_SIMPLE_LINE_OFFSET | GL2PS_OCCLUSION_CULL, //
-                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
-         } 
-//         else {
-//         gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_PDF, GL2PS_NO_SORT,
-//                         GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | GL2PS_TIGHT_BOUNDING_BOX | GL2PS_OCCLUSION_CULL, 
-//                         GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
-//         } 
-        else {
-        gl2psBeginPage("test", "gl2psTestSimple", tv , GL2PS_PDF, bSortOutput ? GL2PS_SIMPLE_SORT : GL2PS_NO_SORT,
-                        GL2PS_NO_PS3_SHADING | GL2PS_BEST_ROOT | (bOffsetOutput ? GL2PS_SIMPLE_LINE_OFFSET : 0) | GL2PS_TIGHT_BOUNDING_BOX | (bOccludeOutput ? GL2PS_OCCLUSION_CULL : 0), //
-                        GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.eps");
-        }
-          
-          //DRAW 
-          onDraw();
-          
-          state = gl2psEndPage();
-      }
-      
-      fclose(fp);
-      printf("Done!\n");
-  }
-  
-
-};
-
-#endif   /* ----- #ifndef vsr_cga3D_app_INC  ----- */

@@ -1,12 +1,12 @@
-  /*
+/*
  * =====================================================================================
  *
- *       Filename:  xConstructions.cpp
+ *       Filename:  xCGA2d.cpp
  *
- *    Description:  scratch pad for constructions
+ *    Description:  2D conformal geometric algebra 
  *
  *        Version:  1.0
- *        Created:  07/20/2015 19:13:26
+ *        Created:  01/13/2016 14:04:01
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -17,26 +17,25 @@
  */
 
 
-#include "vsr_app.h"  
-#include <vsr/form/vsr_twist.h> 
-#include "form/vsr_rigid.h"
+#include "vsr_app.h"   
+#include "vsr_cga2D.h"
+#include "vsr_cga2D_draw.h"
 
 using namespace vsr;
-using namespace vsr::cga;
+using namespace vsr::cga2D;
 
 struct MyApp : App {
  
   //Some Variables
-  bool bReset,bFlip = false;
+  bool bToggle = false;
+  bool bSet = false;
+  bool bMouseSet = false;
+  
+  float amt1 = 0;
+  float amt2 = 0;
 
-  Point point;
-  bool bSetMouse=true;
 
-   Frame f;
-
-
-  float amt,amt1,amt2,radius,iter;
-
+  Point mouse;
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
@@ -45,49 +44,34 @@ struct MyApp : App {
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
-    gui(bReset)(bFlip);
-    gui(amt,"amt",-10,10);
-    gui(amt1,"amt1",-1000,1000);
-    gui(amt2,"amt2",-1000,1000);
-    gui(iter,"iter",-1000,1000);
-    gui(radius,"radius",-10,1);
-    
-    objectController.attach(&f);
-    ps.bShadedOutput = false;
-
-    amt = -PI;
-    amt1 = 1;
-    amt2 = 1;
-    iter=100;
-
+    gui(amt1,"amt1",-100,100)(amt2,"amt2",-100,100)(bToggle,"bToggle")(bSet,"bSet");
     
   }
 
-
-  void onKeyDown(const gfx::Keyboard& k){
-    
-    switch (k.code){
-      case 's':
-        bSetMouse = !bSetMouse;
-    }
-
-    App::onKeyDown(k);
-   }
 
   /*-----------------------------------------------------------------------------
    *  Draw Routines 
    *-----------------------------------------------------------------------------*/
   void onDraw(){
+  
+    mouse = calcMouse3D();
 
-    point = calcMouse3D();
+    auto pnt = Construct::point(0,1);
 
-    cout << point * point << endl;
-    point[3] = amt;
+    Draw(pnt);
 
-    auto s = point * point;
+    auto cir = Construct::circle( pnt, amt1);
 
-    cout << s << endl;
-  }
+    Draw(cir,1,0,0);
+
+
+
+   }
+
+
+
+
+
   
 };
 
