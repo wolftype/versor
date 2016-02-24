@@ -174,7 +174,7 @@ namespace vsr { namespace cga {
      * @param pp Point Pair
      * @param bFirst which one to return
      * */
-     Point Round::split(const Pair& pp, bool bFirst) { return vsr::nga::Round::split(pp,bFirst);}
+     Point Round::split(const Pair& pp, bool bSecond) { return vsr::nga::Round::split(pp,bSecond);}
      
    /*! Direction of a Pair 
         @ingroup direction

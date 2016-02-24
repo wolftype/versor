@@ -3,7 +3,7 @@
  *
  *       Filename:  xCircleNet5.cpp
  *
- *    Description:  circle nets from curvx and curvy
+ *    Description:  Triply Orthogonal six-sphere coordinate system and warping
  *
  *        Version:  1.0
  *        Created:  11/16/2015 15:46:06

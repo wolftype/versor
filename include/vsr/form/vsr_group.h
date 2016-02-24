@@ -435,10 +435,10 @@ struct PointGroup3D : Group<V> {
 
       //2. ... to rotate the yx plane ...
       auto bivA = (a ^ c).rot( a.duale() * tC / 2.0 );
-      auto bivC = (a ^ c).rot( c.duale() * tA / 2.0 );
+      auto bivC = (a ^ c).rot( c.duale() * tA / 2.0 );//changed
 
       //3. ... and find b via coincidence of planes ...
-      b = (bivA.duale() ^ bivC.duale()).duale().unit() * ( is33() ? 1 : -1 ); //note neg!
+      b = (bivA.duale() ^ bivC.duale()).unduale().unit()  * ( is33() ? -1 : 1 ); //note neg!
 
       setOps();
 

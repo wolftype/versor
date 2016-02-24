@@ -35,6 +35,8 @@ namespace gfx{
 
 using vsr::cga::CyclideQuad;
 using vsr::cga::Round;
+using vsr::cga::Vec;
+using vsr::cga::Point;
 
 struct CyclideMeshData{
   Vec pos;

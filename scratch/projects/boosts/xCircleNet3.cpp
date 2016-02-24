@@ -134,7 +134,7 @@ struct MyApp : App {
     bFlipX = 1;
     xfu = xfv = 1;
 
-    bShadedOutput = false;
+    ps.bShadedOutput = false;
     fnum=4;
 
     amt3 = 3;

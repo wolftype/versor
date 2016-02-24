@@ -218,7 +218,8 @@ namespace vsr{ namespace cga {
       return boost( Gen::bst(p) );
     }
 
-    /// Boost by boost, renormalize, and return this
+    /// Boost by boost, renormalize, and return this 
+    /// @todo rotate tangent frame
     Frame& Frame::boost( const Bst& b){
       mPos = Round::loc( mPos.spin(b) );
       mRot = mRot.spin(b);

@@ -3,7 +3,7 @@
  *
  *       Filename:  xCircleNet.cpp
  *
- *    Description:  circle net (a net of contact elements -- see bobenko)
+ *    Description:  circle net (a net of contact elements)
  *
  *        Version:  1.0
  *        Created:  06/16/2015 19:31:58
@@ -70,7 +70,7 @@ struct MyApp : App {
     gui(bFlipX,"flipX")(bFlipY,"flipY")(bFlipTx,"bFlipTx")(bFlipTy,"bFlipTy")(bDrawForward,"bDrawForward");
     gui(bDrawA)(bDrawB)(bDrawC)(bDrawD)(bDrawE)(bDrawF)(bDrawNormal);
     gui(bDrawEdges,"bDrawEdges");
-    gui(bShadedOutput, "shaded output");
+    gui(ps.bShadedOutput, "shaded output");
     
     fa.rot( Biv::yz * PIOVERFOUR/2.0 + Biv::xz * .01 );
 
@@ -101,10 +101,10 @@ struct MyApp : App {
     //GREEN NET
     Draw(net.cxy(),.2,0,0);
 
-    fa.pos() = point( net.cxy(), posA*TWOPI);
-    fb.pos() = point( net.cxy(), posB*TWOPI);
-    fc.pos() = point( net.cxy(), posC*TWOPI);
-    fd.pos() = point( net.cxy(), posD*TWOPI);
+    fa.pos() = Construct::point( net.cxy(), posA*TWOPI);
+    fb.pos() = Construct::point( net.cxy(), posB*TWOPI);
+    fc.pos() = Construct::point( net.cxy(), posC*TWOPI);
+    fd.pos() = Construct::point( net.cxy(), posD*TWOPI);
 
 //    auto ta = fa.cxy(); 
 //    auto tb = fb.cxy(); 
@@ -177,10 +177,10 @@ struct MyApp : App {
     Dlp bisectC = fc.pos() - fd.pos();
     Dlp bisectD = fd.pos() - fa.pos();
 
-    auto midpointA = pointB(( bisectA ^ sa.dual()).dual());
-    auto midpointB = pointB(( bisectB ^ sb.dual()).dual());
-    auto midpointC = pointA(( bisectC ^ sc.dual()).dual());
-    auto midpointD = pointB(( bisectD ^ sd.dual()).dual());
+    auto midpointA = Construct::pointB(( bisectA ^ sa.dual()).dual());
+    auto midpointB = Construct::pointB(( bisectB ^ sb.dual()).dual());
+    auto midpointC = Construct::pointA(( bisectC ^ sc.dual()).dual());
+    auto midpointD = Construct::pointB(( bisectD ^ sd.dual()).dual());
 
   //  Draw( midpointA, 1,1,0);
   //  Draw( midpointB, 1,1,0);

@@ -24,13 +24,13 @@
 namespace vsr { namespace cga {
 
 
-/// Frame Tangent to Surface
+/// 3D Frame of Tangent Vectors (Point Pairs) @todo inherit from cga::Frame
 struct TangentFrame{
 
   Frame frame;        ///< perhaps eliminate this
 
   Sphere sphere[3];   ///< sphere through next point with tangents as below
-  Circle circle[3];   ///< circle through next point
+  Circle circle[3];   ///< circle through next point (unneeded)
   Pair tan[3];
   Circle bitan[3];
 
@@ -42,7 +42,7 @@ struct TangentFrame{
     bitan[2] = f.tz().dual();
      
     for (int j=0;j<3;++j){
-      tan[j] = bitan[j].undual();
+      tan[j] = bitan[j].undual(); // swap duality here
     }    
   }
 
@@ -52,9 +52,11 @@ struct TangentFrame{
     bitan[1] = f.ty().dual();
     bitan[2] = f.tz().dual();
     for (int j=0;j<3;++j){
-      tan[j] = bitan[j].undual();
+      tan[j] = bitan[j].undual(); // ditto
     }      
   }
+
+  /// Construct from position and relative TangentFrame
   TangentFrame( const Point&p, const TangentFrame tf) {
     set(p,tf);
   }
@@ -66,6 +68,7 @@ struct TangentFrame{
     circle[2] = (sphere[0].dual() ^ sphere[1].dual()).dual();
   }
 
+  /// Set from position and relative TangentFrame
   void set( const Point& p, const TangentFrame tf ){
      frame.pos() = p;
      for (int j=0;j<3;++j){
@@ -75,71 +78,92 @@ struct TangentFrame{
      }
   }
 
-  Drv xdir(){ return -Round::direction(tan[0]); }
-  Drv ydir(){ return -Round::direction(tan[1]); }
-  Drv zdir(){ return -Round::direction(tan[2]); }
+  Drv xdir(){ return -Round::direction(tan[0]); } ///< get x DirectionVector
+  Drv ydir(){ return -Round::direction(tan[1]); } ///< get y DirectionVector
+  Drv zdir(){ return -Round::direction(tan[2]); } ///< get z DirectionVector
 
+  /// Generate Boost Relative to x TangentVector (null Pair)
   Bst xcurve(float amt){
     return Gen::bst(tan[0]*amt);
   }
+  /// Generate Boost Relative to y TangentVector (null Pair)
   Bst ycurve(float amt){
     return Gen::bst(tan[1]*amt);
   }
+  /// Generate Boost Relative to z TangentVector (null Pair)
   Bst zcurve(float amt){
     return Gen::bst(tan[2]*amt);
   }
+  
+  /// Generate Boost Relative to x and y TangentVector (null Pair)
   Bst xycurve(float amtX, float amtY){
     return Gen::bst( tan[0]*amtX + tan[1]*amtY );// + tan[2] *amtZ);
   }
+  /// Generate Boost Relative to x and z TangentVector (null Pair)
   Bst xzcurve(float amtX, float amtZ){
     return Gen::bst( tan[0]*amtX + tan[2]*amtZ );// + tan[2] *amtZ);
   }
+  /// Generate Boost Relative to y and z TangentVector (null Pair)
   Bst yzcurve(float amtY, float amtZ){
     return Gen::bst( tan[1]*amtY + tan[2]*amtZ );// + tan[2] *amtZ);
   }
-  
+
+  /// x = Constant Coordinate Surface from Boost generator 
   DualSphere xsurface( const Bst& b ){ 
    return DualSphere( Round::carrier(bitan[0].dual() ).spin(b));
   }
+  /// y = Constant Coordinate Surface from Boost generator 
   DualSphere ysurface( const Bst& b ){ 
    return DualSphere( Round::carrier(bitan[1].dual() ).spin(b));
   }
+  /// z = Constant Coordinate Surface from Boost generator 
   DualSphere zsurface( const Bst& b ){ 
    return DualSphere( Round::carrier(bitan[2].dual() ).spin(b));
   }
   
+  /// x = Constant Coordinate Surface from curvature scalar 
   DualSphere xsurface( float amt ) { 
     return DualSphere( Round::carrier(bitan[0]).dual() ).spin(xcurve(amt));    
   }
 
+  /// y = Constant Coordinate Surface from curvature scalar 
   DualSphere ysurface( float amt ){
     return DualSphere( Round::carrier(bitan[1]).dual() ).spin(ycurve(amt));        
   }
 
+  /// z = Constant Coordinate Surface from curvature scalar 
   DualSphere zsurface( float amt ){
     return DualSphere( Round::carrier(bitan[2]).dual() ).spin(zcurve(amt));        
   }
 
+  /// Get position of TangentFrame
   Point point() const { return Round::location(tan[0]); }
+  
+  /// Point along x direction
   Point xpoint(float amt){ return point().translate(xdir()*amt); }
+  /// Point along y direction
   Point ypoint(float amt){ return point().translate(ydir()*amt); }
+  /// Point along z direction
   Point zpoint(float amt){ return point().translate(zdir()*amt); }
 
-  TangentFrame zbend(float amtX, float amtY,float dist =1){
-    auto bst = xycurve(amtX,amtY); 
-    auto pt = Round::location( zpoint(dist).spin(bst) );
-    return TangentFrame(pt, *this);
-  }
-
+  /// TangentFrame yzcurved 
   TangentFrame xbend(float amtY, float amtZ,float dist =1){
     auto bst = yzcurve(amtY,amtZ); 
     auto pt = Round::location( xpoint(dist).spin(bst) );
     return TangentFrame(pt, *this);
   }
 
+  /// TangentFrame xzcurved 
   TangentFrame ybend(float amtX, float amtZ,float dist =1){
     auto bst = xzcurve(amtX,amtZ); 
     auto pt = Round::location( ypoint(dist).spin(bst) );
+    return TangentFrame(pt, *this);
+  }
+  
+  /// TangentFrame xycurved 
+  TangentFrame zbend(float amtX, float amtY,float dist =1){
+    auto bst = xycurve(amtX,amtY); 
+    auto pt = Round::location( zpoint(dist).spin(bst) );
     return TangentFrame(pt, *this);
   }
 
@@ -170,12 +194,14 @@ struct TangentFrame{
 
   }
 
+  /// Given a sphere and two points, make a circle with the two points and find its intersection with sphere
   TangentFrame circleClose( const DualSphere& s, const Point& pa, const Point& pb ){
     
     auto pt = point();
     auto cir = pt ^ pa ^ pb;
     auto pair = (s ^ cir.dual()).dual();
 
+    /// @todo speed up this extraction
     auto tpa = Construct::pointA(pair);
     auto tpb = Construct::pointB(pair);
 
@@ -184,68 +210,84 @@ struct TangentFrame{
     return TangentFrame(p1, *this);
 
   }
-//  TangentFrame circl
 
 };
 
 /**
-* @brief normal tangent vector at point of sphere
+* @brief Contact encapsulates a normal tangent vector at a point on a sphere
+
+  contains a DualSphere, a Point position on the sphere, 
+  and a null Pair tangent vector specifying the normal on
+  the sphere at that point.
 */
 struct Contact{
   
+  DualSphere sphere;
   Point point;
   Pair tnv;
-  DualSphere sphere;
 
+  /// Construct from Point and DualPlane
   Contact(const Point& p, const DualPlane& dlp) 
   : point(p), sphere(dlp), tnv( (p <= dlp.dual()).dual() )
   {}
 
+  /// Construct from Point and DualSphere
   Contact(const Point& p, const DualSphere& s) 
   : point(p), sphere(s), tnv( Tangent::at(s.undual(), p).dual() )
   {}
 
+  /// Construct from Point on some other source sphere and some target sphere
+  /// (makes orthogonal plunge into target sphere)
   Contact(const Point& p, const DualSphere& source, const DualSphere& target) 
   : sphere(target) {
-    auto tnvsource =  Tangent::at(source.undual(), p).dual();
+    auto tnvsource =  Tangent::at(source.undual(), p).dual(); // A Point Pair
     point = Construct::pointA( ( (target^tnvsource).dual() ^ target).dual() );
     tnv = Tangent::at(target.undual(), point).dual();
   }
 
+  /// Construct from another contact and a target 
   Contact( const Contact& source, const DualSphere& target) : sphere(target) {
     point = Construct::pointA( ( ( target^source.tnv).dual() ^ target).dual() );
     tnv = Tangent::at(target.undual(), point).dual();
   }
 
-  Cir bitan() const { return tnv.dual(); }
+  /// Get undualized tangentbivector (circle)
+  Cir bitan() const { return tnv.dual(); } //*** dualization changed ***/
+  /// Get Vector direction of TangentVector
   Vec vec() const { return -Round::direction(tnv).copy<Vec>().unit(); }
-  Biv biv() const { return vec().dual(); } 
-
+  /// Get Bivector dual of vector direction
+  Biv biv() const { return vec().dual(); }  //*** dualization changed ***/
 
 };
 
-struct TFrame {
-  Contact contact[3];
-};
 
 
-/// Cylclidic Net (four tangent frames)
+/// Cyclide Principal Patch (four tangent frames)
+/// @todo rename to just Cyclide
 struct CyclideQuad{
 
-  TangentFrame tframe[4]; ///<-- four frames
+  /// Four TangentFrames
+  TangentFrame tframe[4];
 
+  /// Get/Set ith TangentFrame
   TangentFrame& operator [] (int idx) { return tframe[idx]; }
+  /// Get ith TangentFrame
   TangentFrame operator [] (int idx) const { return tframe[idx]; }
 
+  /// Default Constructor
   CyclideQuad(){}
+
+  /// Construct from four Point positions
   CyclideQuad(const Point& a, const Point& b, const Point& c, const Point& d){
     pos(a,b,c,d);
   }
 
+  /// Construct from four Contact elements, and a rotation
   CyclideQuad( const Contact& a, const Contact& b, const Contact& c, const Contact& d, float spin = 0 ){
     set(a,b,c,d,spin);
   }
 
+  /// Construct from four TangentFrames elements
   CyclideQuad( const TangentFrame& ta, const TangentFrame& tb, const TangentFrame& tc, const TangentFrame& td){
     tframe[0] = ta; tframe[1] = tb; tframe[2]=tc, tframe[3]=td; 
     frame(ta, false, false, false, false, 0);
@@ -257,9 +299,8 @@ struct CyclideQuad{
 
     
     Rot rot = Gen::ratio( Vec::z, a.vec() );
-    Rot rot2 = Gen::rot( Biv::xy.spin(rot) * spin );//Gen::ratio( Vec::x.spin(rot), Vec(Op::pj( Vec(b.point - a.point), a.biv() ) ).unit() );
-   // ;
-     
+    Rot rot2 = Gen::rot( Biv::xy.spin(rot) * spin );
+         
     frame (TangentFrame(Frame(a.point, rot2) ), false, false, false, false, 0);
 
     log();
@@ -274,25 +315,26 @@ struct CyclideQuad{
     tframe[3].frame.pos() = d;
   }
   
-  Pair mLogU, mLogV;      ///<-- two bivectors
+  Pair mLogU, mLogV;      ///<-- Pair of tensors 
   Pair mLogNu, mLogNv;    ///<-- two more (normals)
 
   Pair mLogXu;
   Pair mLogXv;
   Pair mLogYu;
   Pair mLogYv;
- // Pair mLogSDX;
 
+  /// unused CommonSphere 
   DualSphere commonSphere(){
       return (mLogU ^ mLogV).dual();
   }
 
+  /// Circle foundation of principal patch
   Circle circle() const{
       return tframe[0].frame.pos() ^ tframe[1].frame.pos() ^ tframe[2].frame.pos();
   }
 
-
-  //attach to, flipx of it, flipy of it, corner or continuous, 90 or -90, attach at ..)
+  /// set by attaching to TangentFrame f, 
+  /// set booleans: flipx, flipy, corner or continuous, 90 or -90, attach at idx of f)
   void frame(const TangentFrame& f, bool bFlipX, bool bFlipY, bool bCorner, bool bNeg, int begin){
 
     if (bCorner){
@@ -343,7 +385,7 @@ struct CyclideQuad{
 
   }
 
-  // Calculate frame positions
+  /// Calculate frame positions (calcFrame())
   void frame(){
 
     //FIRST ONE
@@ -406,7 +448,7 @@ struct CyclideQuad{
 
   }
       
-  // Calculate logs
+  /// Calculate logs based on ratios of constant coordinate surface spheres
   void log(){
       mLogU = Gen::log( Gen::ratio(tframe[0].sphere[0].dual(), tframe[2].sphere[0].dual(), true ), altU() );
       mLogV = Gen::log( Gen::ratio(tframe[3].sphere[1].dual(), tframe[1].sphere[1].dual(), true ), altV() );
@@ -423,34 +465,36 @@ struct CyclideQuad{
       mLogNv = Gen::log( Gen::ratio( tframe[3].sphere[2].dual(), tframe[1].sphere[2].dual(),true ), altWV() );
   }
   
-  // Simple Rotor in U direction 
+  /// Generate simple Rotor in U direction 
   Bst xfu( VSR_PRECISION u ) const { return Gen::bst(mLogU * -u ); }
   
-  // Simple Rotor in V direction 
+  /// Generate simple Rotor in V direction 
   Bst xfv( VSR_PRECISION v ) const { return Gen::bst(mLogV * -v ); }
 
   Bst xfwu( VSR_PRECISION wu ) const { return Gen::bst(mLogNu * -wu ); }
   Bst xfwv( VSR_PRECISION wv ) const { return Gen::bst(mLogNv * -wv ); }
   Bst xfxv( VSR_PRECISION amt) const { return Gen::bst(mLogXv * -amt); }
   Bst xfyu( VSR_PRECISION amt) const { return Gen::bst(mLogYu * -amt); }
-  
+ 
+  /// @todo unknown use, possibly eliminate 
   Pair ortho(VSR_PRECISION u, VSR_PRECISION v){
       return tframe[0].sphere[2].dual().spin( xfwu(u) ) ^ tframe[3].sphere[2].dual().spin( xfwv(v) ); 
   }
 
-  // Evaluate conformal rotor at u,v
+  /// Generate compound conformal rotor at u,v
   Con xf( VSR_PRECISION u, VSR_PRECISION v) const { return xfv(v) * xfu(u); }
 
-  // Evaluate conformal rotor at u,v, w
-  Con xf( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) const { return xfwv(u) * xfwu(v) * xf(u,v); }
+  /// Generate compound conformal rotor at u,v, w @todo eliminate
+  //Con xf( VSR_PRECISION u, VSR_PRECISION v, VSR_PRECISION w) const { return xfwv(u) * xfwu(v) * xf(u,v); }
 
-  // Evaluate xz
-  Con xfxz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfu(u); }
-  Con xfyz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfyu(u); }
+  /// Generate compound conformal rotor 
+  //Con xfxz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfu(u); }
+  //Con xfyz( VSR_PRECISION u, VSR_PRECISION v ) const { return xfwv(v) * xfyu(u); }
 
 
   Circle cirU( VSR_PRECISION u) { return tframe[0].circle[1].spin( xfu(u) ); }
   Circle cirV( VSR_PRECISION v) { return tframe[3].circle[0].spin( xfv(v) ); }  
+ 
   Circle cirW( VSR_PRECISION u, VSR_PRECISION v){
     auto p = eval(u,v); 
     auto parA = p <= mLogU; // dual sphere
@@ -497,13 +541,11 @@ struct CyclideQuad{
     return Round::loc( tframe[0].frame.pos().spin( xfyz(u,v) ) );
   }
 
-
-
+  // Get normal at u,v 
   Vec evalNormal( VSR_PRECISION u, VSR_PRECISION v){
     auto tan = apply( tframe[0].tan[2], u,v);
     return -Round::direction( tan ).copy<Vec>().unit();
   }
-
   
   /// Apply conformal rotor to a point at u,v
   Point eval( VSR_PRECISION u, VSR_PRECISION v) const {
@@ -515,18 +557,19 @@ struct CyclideQuad{
     return Round::loc( tframe[0].frame.pos().spin( xf(u,v,w) ) );
   }
 
-  
- 
- 
-  
 
 };
 
+
+/**
+* @brief A net of cyclide principal patches
+*/
 struct CircularNet {
 
-  //CyclideDraw cyclideDraw;
+  /// std::vector of CyclideQuads;
   vector<CyclideQuad> mCyclide;
 
+  /// Number of Cyclides in Net
   int size() { return mCyclide.size(); }
 
   CircularNet( const CyclideQuad& c ){
@@ -605,12 +648,6 @@ struct CircularNet {
     }
   }
 
-//  void draw(){
-//    for (auto& i : mCyclide){
-//      i.log();
-//      cyclideDraw.draw(i);
-//    }
-//  }
 
 };
 

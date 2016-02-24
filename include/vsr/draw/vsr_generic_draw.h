@@ -1,9 +1,8 @@
-/*
-	
-	Pablo Colapinto
-	VSR2.0
-   
-	NO METRIC ASSUMED . . . 
+/*!
+  @file Generic Draw Routines
+
+  @todo reexmine namespacing and Renderable<> from external GFX lib
+
 */
 
 #ifndef VSR_GENERIC_DRAW_H_INCLUDED
@@ -15,7 +14,7 @@
 
 namespace vsr{ 
 
-  namespace generic{
+  namespace nga{
 	               
   template<class A>
 	GARot<A> AA( const GAVec<A>& s){
@@ -180,7 +179,7 @@ namespace vsr{
 		glPushMatrix(); 
 		glNormal3f(0,0,1);
 		glColor4f(r,g,b,a);
-		 generic::Immediate(s);
+		 Immediate(s);
 		glPopMatrix();
 	}
 
@@ -189,7 +188,7 @@ namespace vsr{
 		glPushMatrix(); 
 		glNormal3f(0,0,1);
 		glColor4f(r,g,b,a);
-			generic::ImmediateB(s);
+			ImmediateB(s);
 		glPopMatrix();
 	}
 
@@ -200,7 +199,7 @@ namespace vsr{
     glTranslatef( p[0], p[1], p[2] ); 
 		glNormal3f(0,0,1);
 		glColor4f(r,g,b,a);
-			generic::Immediate(s);
+			Immediate(s);
 		glPopMatrix();
 	}
 
@@ -211,7 +210,7 @@ namespace vsr{
     glTranslatef( p[0], p[1], p[2] ); 
 		glNormal3f(0,0,1);
 		glColor4f(r,g,b,a);
-			generic::ImmediateB(s);
+			ImmediateB(s);
 		glPopMatrix();
 	}
   

@@ -256,10 +256,10 @@ struct MyApp : App {
     gui(bDrawNormals,"bDrawNormals");
     
     gui(linewidth,"linewidth",.1,10);
-    gui(bShadedOutput, "bshaded"); 
-    gui(bSortOutput, "bsorted"); 
-    gui(bOccludeOutput, "bOcclude"); 
-    gui(bOffsetOutput, "bOffset"); 
+    gui(ps.bShadedOutput, "bshaded"); 
+    gui(ps.bSortOutput, "bsorted"); 
+    gui(ps.bOccludeOutput, "bOcclude"); 
+    gui(ps.bOffsetOutput, "bOffset"); 
     gui(alpha,"alpha");
     gui(lightX, "lightX",-10,10);
     gui(lightY, "lightY",-10,10);
