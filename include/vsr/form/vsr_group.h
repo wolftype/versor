@@ -1,10 +1,35 @@
 /*
+ * =====================================================================================
+ *
+ *       Filename: vsr_group.h
+ *
+ *        Version:  1.0
+ *        Created:  04/30/2015 15:30:13
+ *       Revision:  none
+ *
+ *         Author:  Pablo Colapinto (), gmail->wolftype
+ *   Organization:  wolftype
+ *
+ * =====================================================================================
+ */
 
-Generic Group 
+/*!
+
+@file
+
+Point and Space Groups in 2D and 3D
+
+Groups are defined generically on reflection pin type T, so
+the techniques could theoretically be extended to build hyperbolic groups 
+that reflect over circles and spheres.
+
+Examples that use this:
+
+groups/xSpaceGroup3D.cpp
             
-see also vsr_root.h for generating reflection groups
+@sa vsr_root.h for generating reflection groups
 
-replaces vsr_pointGroup.h 
+@todo fix up SpaceGroup2D so that it is as complete as SpaceGroup3D 
 
 */
   
@@ -21,15 +46,17 @@ using std::vector;
 
 namespace vsr{ 
 
-/// Simple Reflection Group (no translating or gliding spinors)
+/// Simple Reflection group templated on Pin Type (no translating or gliding spinors)
+/// @todo make class with private member mOps
 template<class V>
 struct SimpleGroup{
    vector<V> ops;                       ///< Pin Operators (Vec, etc)
 
    SimpleGroup() {}
-   SimpleGroup( vector<V> v ) : ops(v) {} ///< Instantiate with unit length pin group
+   SimpleGroup( vector<V> v ) : ops(v) {} ///< Instantiate with pin group
  
-    /// Applies all operators on p motif and returns results
+    /// Applies all std::vector<V> operators onto p motif and returns results
+    /// as std::vector<T>
 	  template<class T>
     vector<T> operator()(const T& p){
         vector<T> res;
@@ -44,23 +71,16 @@ struct SimpleGroup{
 };
 
 
-///// Abstract Odd Operator
-//struct OddSymmetryOperator{
-//  
-//   template<class T>
-//   T apply(const T& t);
-//};
-
 /// A Group of Operations called with group( sometype t ) or group( vector<sometype> t)
 /// V are  versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
-/// NOTE this is overshadowed by the pointgroup3d, which handles its own operator ()
+/// NOTE this is overloaded by the PointGroup3D, which handles its own operator ()
+/// @todo 
 template< class V >
 struct Group {
 
-  int numSimple; ///< number of simple roots used to generate group
+  int numSimple; ///< The number of simple roots used to generate group
 
   /// Trs is the translator type of whatever conformal metric we are in
-  //typedef typename V::template BType< typename V::Mode::Trs > Trs; 
   using Trs = typename V::space::translator;
   using GlideType = decltype(V()*Trs());
   using ScrewType = decltype(V()*V()*Trs());
@@ -75,7 +95,7 @@ struct Group {
    Group( vector<V> v ) : ops(v) {}
 
     /// Applies all operators on p motif and returns results
-    // Note this is overloaded in PointGroups, which use a "seed-based recording" approach
+    /// Note this is overloaded in PointGroups, which use a "seed-based recording" approach
 	  template<class T>
     vector<T> operator()(const T& p){
           vector<T> res;
@@ -129,12 +149,10 @@ struct Group {
       return res;
     }
 
-
-
 }; 
 
-//A 2d point group at the origin . . . 
-//////V is the reflection type of the point group (e.g. Vec)
+/// A 2D Point Group at the origin
+/// Templated on V, the reflection type of the point group (e.g. Vec or DualPlane)
 template< class V > 
 struct PointGroup2D : Group<V> {
   
@@ -147,7 +165,7 @@ struct PointGroup2D : Group<V> {
 
     PointGroup2D(int p, bool pin = true) : mP(p), bPin(pin) {
        a = V::x;
-       b = V::x.rot( Biv::xy * PIOVERTWO/p );
+       b = V::x.rot( Biv::xy * -PIOVERTWO/p );
        calcOps(a.unit(), b.unit());
    }
 
@@ -168,9 +186,9 @@ struct PointGroup2D : Group<V> {
 
 };
 
-//a pointgroup + a lattice formed by translating along the generators a and b
-//we generate the point group calcOps() and then replace by glide reflections if called for
-//To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
+///  A PointGroup2D along with a lattice formed by translating along the generators a and b
+///  we generate the point group calcOps() and then replace by glide reflections if called for
+///  To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
 template<class V > 
 struct SpaceGroup2D : PointGroup2D<V> {
   
@@ -214,7 +232,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
       }
     } else {
       if (p==4){
-        this->b = this->a + (this->a).rot( Biv::xy * PIOVERTWO/2);
+        this->b = this->a + (this->a).rot( Biv::xy * -PIOVERTWO/2);
         if(ga){
           this->ops.clear();
           this->ops.push_back(this->b.unit());
@@ -223,7 +241,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
         }
       }
       if (p==6){
-        this->b = this->a + this->a.rot( Biv::xy * PIOVERTWO/3);
+        this->b = this->a + this->a.rot( Biv::xy * -PIOVERTWO/3);
       }
     }
   
@@ -303,61 +321,63 @@ struct SpaceGroup2D : PointGroup2D<V> {
 };
 
 
-/// ND lattice, on a metric specified by V's type.  Not a group, but a group can be made from it
-template< int DIM, class V >
-struct Lattice {
-
-    static const int Dim = DIM;
-
-    //GET VEC "B" TYPE OF TYPE V's AMBIENT METRIC ("MODE")
-    typedef typename V::template BType< typename V::Mode::Vec > Vec;
-    typedef typename V::template BType< typename V::Mode::Biv > Biv;
-
-    Vec vec[ DIM ];
-
-    Vec& operator[](int idx) { return vec[idx]; }
-    Vec operator[](int idx) const { return vec[idx]; }
-
-    Vec at() { return Vec(); }
-
-    template<class ... T>
-    Vec at( int x, T...v ){
-        int idx = DIM - ( sizeof...(v) + 1 );
-        return vec[idx] * x + at(v...);
-    }
-
-    /// END case
-    void set(){}
-    /// Recursively set each idx 
-    template<class ... T>
-    void set(int x, T ... xs){
-      using TE = typename V::template BType< typename V::Mode::template e< ( DIM - ( sizeof...(T) )) > >;
-      int idx = DIM - ( sizeof...(T) + 1);
-      Biv biv = V::x ^ TE(1);
-      vec[idx] = V::x.rot( biv * PIOVERTWO/x );
-
-      set(xs...);
-    }
+///// ND lattice, on a metric specified by V's type.  Not a group, but a group can be made from it
+//template< int DIM, class V >
+//struct Lattice {
+//
+//    static const int Dim = DIM;
+//
+//    //GET VEC "B" TYPE OF TYPE V's AMBIENT METRIC ("MODE")
+//    typedef typename V::template BType< typename V::Mode::Vec > Vec;
+//    typedef typename V::template BType< typename V::Mode::Biv > Biv;
+//
+//    Vec vec[ DIM ];
+//
+//    Vec& operator[](int idx) { return vec[idx]; }
+//    Vec operator[](int idx) const { return vec[idx]; }
+//
+//    Vec at() { return Vec(); }
+//
+//    template<class ... T>
+//    Vec at( int x, T...v ){
+//        int idx = DIM - ( sizeof...(v) + 1 );
+//        return vec[idx] * x + at(v...);
+//    }
+//
+//    /// END case
+//    void set(){}
+//    /// Recursively set each idx 
+//    template<class ... T>
+//    void set(int x, T ... xs){
+//      using TE = typename V::template BType< typename V::Mode::template e< ( DIM - ( sizeof...(T) )) > >;
+//      int idx = DIM - ( sizeof...(T) + 1);
+//      Biv biv = V::x ^ TE(1);
+//      vec[idx] = V::x.rot( biv * PIOVERTWO/x );
+//
+//      set(xs...);
+//    }
+//    
+//    /// Feed in a list of ratios 
+//    template<class ... T>
+//     Lattice(int x, T ... xs) {
+//        vec[0] = V::x;
+//        set(x,xs...);      
+//    }
+//
+//};
     
-    /// Feed in a list of ratios 
-    template<class ... T>
-     Lattice(int x, T ... xs) {
-        vec[0] = V::x;
-        set(x,xs...);      
-    }
-
-};
-    
 
 
-
+/// A 3D Point Group at the Origin, templated on V, the reflection pin operator type (e.g. cga::Vec)
 template<class V>
 struct PointGroup3D : Group<V> {
 
+    /// specifies type of operator, index into operation list, and index of input
     struct OpIdx{
       int type, opIdx, resIdx;
     };
 
+    /// Print out operations
     stringstream opStream(const OpIdx& i){
        stringstream s;
 
@@ -392,9 +412,9 @@ struct PointGroup3D : Group<V> {
     using GlideType = typename Group<V>::GlideType;
     using ScrewType = typename Group<V>::ScrewType;
 
-    V a, b, c;            ///< root versors
+    V a, b, c;            ///< unit length root versors
 
-    int mNumGen;          ///< number of generators
+    int mNumGen;          ///< the number of generators
 
     vector<OpIdx> opIdx;  ///< given a seed vector, store all transformations here.
 
@@ -402,23 +422,62 @@ struct PointGroup3D : Group<V> {
     /// Symmetry point group data
     struct Sym{
       int p,q;
-    };
-    Sym mSym;
+    } mSym;
+
+    /// Bar data
+    struct Bar{
+      bool a, b, ab;
+    } mBar;
     
+    /// Returns true if we are dealing with the special case of p=3 and q=3
     bool is33(){
       return (mSym.p==mSym.q) && (mSym.p==3);
     }
 
-    //must satisfy dicycle ab^p = bc^q = ac^2
+    PointGroup3D(){};
+    
+    /// must satisfy dicycle ab^p = bc^q = ac^2
     PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) 
     : mSym{p,q}
     {
+      set(p,q,abar,bbar,abbar);
+    }
+
+    void set(int p, int q, bool abar=false, bool bbar=false, bool abbar=false){
+     
+      mSym = {p,q}; 
+      mBar = {abar, bbar, abbar};
+      /// Clear all data
+      opIdx.clear();
       
       //0. a and c are at 90 degrees, must find b...
       a = V::x;
       c = V::y;
       
       //1. employ the good old spherical trig cosine rule ...
+      // there is a simpler way, below, but needs be worked out for is33()
+
+     //1. employ reduced version of good old spherical trig cosine rule ...
+//     double tp = PI/p;
+//     double tq = PI/q;
+//
+//     double ca = cos(tq);
+//     double sa = sin(tq);
+//     double cc = cos(tp);
+//     double sc = sin(tp);
+//
+//     //reduced (because tb is contrained to PIOVERTWO)
+//     double tA = acos( ca/sc );
+//     double tC = acos( cc/sa );
+//
+//     //2. ... to rotate the yx plane ...
+//     auto bivA = (a ^ c).rot( a.unduale() * -tA / 2.0 );//changed
+//     auto bivC = (a ^ c).rot( c.unduale() * tC / 2.0 );
+//
+//
+//     b = (bivA.duale() ^ bivC.duale()).duale().unit() * ( is33() ? -1 : 1 ); //note neg!
+//
+      //old way
       double tb = PIOVERTWO;
       double ta = is33() ? -PI/(int)p : PI/(int)p;
       double tc = is33() ? PI/(int)q : -PI/(int)q;
@@ -434,8 +493,8 @@ struct PointGroup3D : Group<V> {
       double tC = acos( (cc-(ca*cb))/(sa*sb) );
 
       //2. ... to rotate the yx plane ...
-      auto bivA = (a ^ c).rot( a.duale() * tC / 2.0 );
-      auto bivC = (a ^ c).rot( c.duale() * tA / 2.0 );//changed
+      auto bivA = (a ^ c).rot( a.duale() * -tC / 2.0 );
+      auto bivC = (a ^ c).rot( c.duale() * -tA / 2.0 );//changed
 
       //3. ... and find b via coincidence of planes ...
       b = (bivA.duale() ^ bivC.duale()).unduale().unit()  * ( is33() ? -1 : 1 ); //note neg!
@@ -443,13 +502,13 @@ struct PointGroup3D : Group<V> {
       setOps();
 
 
-      if (!abar && !bbar && !abbar ){                   //Case of only reflections. easy!
+      if (!abar && !bbar && !abbar ){                    // Case of only reflections. easy!
          opIdx= {  {0,0,0}, {0,1,0}, {0,2,0} };
-       } else if (abbar){                               // Case of roto-reflection
+       } else if (abbar){                                // Case of roto-reflection
          opIdx = { {2,0,0} };                            
        } else if ( abar && bbar ) { 
          opIdx = { {1,0,0}, {1,1,0} };
-       } else if (abar){                                 //Case of only one or other are cyclic
+       } else if (abar){                                 // Case of only one or other are cyclic
          opIdx = { {0,2,0},{1,0,0} };          
        } else if (bbar){
          opIdx = { {0,0,0},{1,1,0} };
@@ -462,6 +521,8 @@ struct PointGroup3D : Group<V> {
 
     }
 
+
+    /// Store set of operating versors
     void setOps(){
       this->ops = {a,b,c};
       this->sops = {a*b, b*c, a*c}; 
@@ -472,7 +533,6 @@ struct PointGroup3D : Group<V> {
 
     void seed(const Vec& vec=Vec(.213,.659,1.6967).unit() ){
 
-        //opIdx.clear();
         vector<Vec> tv;
         tv.push_back(vec);
         Vec tmp;
@@ -540,7 +600,7 @@ struct PointGroup3D : Group<V> {
  
     /// apply to a std::vector and striate results
     template<class T>
-    vector<T> apply(const vector<T>& p){
+    vector<T> apply(const vector<T>& p) const{
       vector<T> res( (opIdx.size()+1) * p.size() );
       int ii=0;
       for (auto& i : p){
@@ -558,7 +618,7 @@ struct PointGroup3D : Group<V> {
     
     // apply transformation group to a multivector T
     template<class T>
-    vector<T> apply(const T& p){
+    vector<T> apply(const T& p) const{
             
       vector<T> res;
       res.push_back(p);
@@ -599,6 +659,8 @@ struct PointGroup3D : Group<V> {
 };
 
 
+/// 3D space group, templated on mirror type (e.g. cga::Vec )
+// avoid 6.3 5.3 
 template<class V>
 struct SpaceGroup3D : PointGroup3D<V> {
 
@@ -664,6 +726,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
       dirC(); lengthC();
     }
 
+    SpaceGroup3D(){}
     
     /**
     * @brief 3D SpaceGroup Generator
@@ -686,16 +749,19 @@ struct SpaceGroup3D : PointGroup3D<V> {
       Glide glide = Glide(),
       Screw screw = {0,0,0,0,0,0}
       ) 
-      : 
-      PointGroup3D<V>(p,q,abar,bbar,abbar),
-      //mSym{p,q},
-      mLattice(lattice),
-      mRatio(ratio),
-      mGlide(glide),
-      mScrew(screw)
       {
-        init();
+        set(p,q,abar,bbar,abbar,lattice,ratio,glide,screw);
       }
+
+    void set( int p, int q, bool abar, bool bbar, bool abbar, Lattice lattice, Vec ratio, Glide glide, Screw screw){
+      
+      PointGroup3D<V>::set(p,q,abar,bbar,abbar);
+      mLattice = lattice;
+      mRatio = ratio;
+      mGlide = glide;
+      mScrew = screw;
+      init();
+    }
 
     void print(){
          if (this->is33()) printf("33\n");

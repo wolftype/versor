@@ -125,4 +125,32 @@ namespace gfx{
      
   }   
 
+
+/// Immediate Draw of HalfEdge Graph of PositionNormal
+template<>
+   void Renderable<vsr::HEGraph<VertexPosition>,0>::DrawImmediate( const vsr::HEGraph<VertexPosition>& graph){
+     glBegin(GL_TRIANGLES);
+     for (auto& i : graph.face()){
+          auto& a = i->a();
+          auto& b = i->b();
+          auto& c = i->c();
+          //glColor4f(.2,1,.2,.7);
+          GL::normal( a.Norm );
+          GL::vertex( a.Pos );
+          GL::normal( b.Norm );
+          GL::vertex( b.Pos );
+          GL::normal( c.Norm );
+          GL::vertex( c.Pos );
+     }
+     glEnd();
+  }
+
+///normals
+
+
+  
+
 } //gfx::
+
+namespace vsr{
+} //vsr::

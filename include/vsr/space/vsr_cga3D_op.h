@@ -1,42 +1,42 @@
 
 /*!
- *  @file 
- 
+ *  @file
+
     Common Operations Specific to CGA3D
 
  *-----------------------------------------------------------------------------*/
 
 
 #ifndef CGA3D_OPERATIONS_H_INCLUDED
-#define CGA3D_OPERATIONS_H_INCLUDED  
+#define CGA3D_OPERATIONS_H_INCLUDED
 
-#include <math.h> 
-#include <vector>  
+#include <math.h>
+#include <vector>
 
-#include "vsr_cga3D_types.h"  
+#include "vsr_cga3D_types.h"
 #include "vsr_cga3D_round.h"
 
 #include "detail/vsr_generic_op.h"
-#include "util/vsr_constants.h" 
+#include "util/vsr_constants.h"
 #include "util/vsr_math.h"
 
-namespace vsr{ namespace cga{               
+namespace vsr{ namespace cga{
 
 /*!
  * @defgroup cgaops Operations
    @ingroup cga
 
    Operations for 3D CGA
-   
+
    In many cases (e.g. Gen::rotor ) these just call the @ref generic nga::gen versions,
    however these 3D implementations are compiled into the libvsr.a library.
-   
+
    In some cases (e.g. Gen::motor ) there is no generic equivalent implemented
 
-   \sa @ref generic implementation in the vsr::nga namespace 
+   \sa @ref generic implementation in the vsr::nga namespace
  */
 
-    
+
     /**
     * @brief Extraction of axis-angle orientation and 3D position features from Multivectors
       @ingroup cgaops
@@ -44,79 +44,79 @@ namespace vsr{ namespace cga{
       @todo eliminate redundancy
     */
     struct Op{
-              
-      static Rot AA( const Vec& s);   ///< axis angle from Vec stored in rotor             
-      static Rot AA( const Dlp& s);   ///< axis angle from Dlp stored in rotor 
-      static Rot AA( const Cir& s);   ///< axis angle from Cir stored in rotor 
-      static Rot AA( const Biv& s);   ///< axis angle from Biv stored in rotor 
-      static Vec Pos( const Dlp& s);  ///< Position of Dlp
-      static Pnt Pos( const Cir& s);  ///<      
 
-      template<class A>  
+      static Rot AA( const Vec& s);   ///< axis angle from Vec stored in rotor
+      static Rot AA( const Dlp& s);   ///< axis angle from Dlp stored in rotor
+      static Rot AA( const Cir& s);   ///< axis angle from Cir stored in rotor
+      static Rot AA( const Biv& s);   ///< axis angle from Biv stored in rotor
+      static Vec Pos( const Dlp& s);  ///< Position of Dlp
+      static Pnt Pos( const Cir& s);  ///<
+
+      template<class A>
       static auto dual( const A& a ) RETURNS (
         a.dual()
-      ) 
-    
-      template<class A>  
+      )
+
+      template<class A>
       static auto undual( const A& a ) RETURNS (
         a.undual()
       )
-    
-      template<class A>  
+
+      template<class A>
       static auto duale( const A& a ) RETURNS (
         a.duale()
       )
-       
-      template<class A>  
+
+      template<class A>
       static auto unduale( const A& a ) RETURNS (
         a.unduale()
       )
-      
+
       template<class T> static auto dl( const T& t ) RETURNS ( dual(t) )
       template<class T> static auto udl( const T& t) RETURNS ( udual(t) )
       template<class T> static auto dle( const T& t) RETURNS (duale(t))
       template<class T> static auto udle( const T& t) RETURNS (unduale(t))
-     
-      /// Sign of A with Respect to B 
+
+      /// Sign of A with Respect to B
       template<class A>
       static constexpr bool sign(const A& a, const A& b) {
         return (a / b)[0] > 0 ? 1 : 0;
-      } 
-    
+      }
+
       /// Sign of A with Respect to B (short hand)
-      template<class A> 
+      template<class A>
       static constexpr bool sn(const A& a, const A& b){
         return sign(a,b);
       }
-    
+
       /// Projection of A onto B
       template< class A, class B>
-      static constexpr auto project(const A& a, const B& b) RETURNS ( 
+      static constexpr auto project(const A& a, const B& b) RETURNS (
         (a <= b ) / b
-      ) 
-    
+      )
+
       /// Rejection of A from B
       template< class A, class B>
-      static constexpr auto reject(const A& a, const B& b) RETURNS ( 
+      static constexpr auto reject(const A& a, const B& b) RETURNS (
         (a ^ b ) / b
       )
-    
+
       /// Shorthand Proj and Rejection
       template< class A, class B>
       static constexpr auto pj(const A& a, const B& b) RETURNS ( project(a,b) )
       template< class A, class B>
       static constexpr auto rj(const A& a, const B& b) RETURNS ( reject(a,b) )
 
-      
+
     };
-    
+
 
    /**
    * @brief Generators and Logarithms Optimized for 3D Conformal Geometric Algebra
      @ingroup cgaops
      @sa vsr::nga::Gen for @ref generic implementation details
    */
-   struct Gen{  
+   struct Gen{
 
       /// vsr::cga::Rotor from vsr::cga::Bivector
       static Rot rot( const Biv& b);
@@ -126,15 +126,15 @@ namespace vsr{ namespace cga{
       static Bst bst(const Pair& p);
       /// vsr::cga::Boost from vsr::cga::Pair
       static Bst boost(const Pair& p);
-      /// vsr::cga::Dilator from vsr::cga::Point and amt t 
+      /// vsr::cga::Dilator from vsr::cga::Point and amt t
       static Tsd dil(const Pnt& p, VSR_PRECISION t);
-      /// vsr::cga::Dilator from vsr::cga::Point and amt t 
+      /// vsr::cga::Dilator from vsr::cga::Point and amt t
       static Tsd dilator(const Pnt& p, VSR_PRECISION t);
 
-      /// vsr::cga::Translator from any type 
+      /// vsr::cga::Translator from any type
       template<class A>
       static Trs trs(const A& a) { return nga::Gen::trs(a); }
-      /// vsr::cga::Translator from any type 
+      /// vsr::cga::Translator from any type
       template<class A>
       static Trs translator(const A& a) { return nga::Gen::trs(a); }
       /// vsr::cga::Transversor from any type
@@ -155,7 +155,7 @@ namespace vsr{ namespace cga{
         @param theta in xz plane from (1,0,0) in range [0,PI]
         @param phi in rotated xy plane in range [-PIOVERTWO, PIOVERTWO]
     */
-      static Rot rot(double theta, double phi);                
+      static Rot rot(double theta, double phi);
 
   /*! Generate a vsr::cga::Rotor from Euler angles
       @param yaw in xz plane
@@ -169,30 +169,30 @@ namespace vsr{ namespace cga{
     *-----------------------------------------------------------------------------*/
    /*! Generate a vsr::cga::Motor from a vsr::cga::DualLine Axis
        @param dll a vsr::cga::DualLine generator axis of rotation
-   */  
+   */
     static Mot mot( const Dll& dll);
-    
+
    /*! Generate a vsr::cga::Motor from a vsr::cga::DualLine Axis
         @param dll a vsr::cga::DualLine generator axis of rotation
-   */      
+   */
     static Mot motor( const Dll& dll);
 
-    /*! DualLine generator from a Motor 
+    /*! DualLine generator from a Motor
         @param m a vsr::cga::Motor (a concatenation of rotation and translation)
-    */  
+    */
     static Dll log( const Mot& m);
 
     /*! DualLine generator of Motor That Twists DualLine a to DualLine b by amt t;
-      
+
         @param a DualLine source
         @param b DualLine target
         @param t amt to transform in range [0,1]
 
         @return vsr::cga::Motor
-    */ 
+    */
     static Dll log(const Dll& a, const Dll& b, VSR_PRECISION t = 1.0);
 
-    /*! 
+    /*!
         Generate Motor that twists Dual Line a to Dual Line b;
         @param a DualLine source
         @param b DualLine target
@@ -204,7 +204,7 @@ namespace vsr{ namespace cga{
 
     // Due to overloading, it is also possible to use Motors as Arguments
 
-    /*! 
+    /*!
         Generate Motor that twists Motor a to Motor b;
         @param a vsr::cga::Motor source
         @param b vsr::cga::Motor target
@@ -217,19 +217,19 @@ namespace vsr{ namespace cga{
     /*-----------------------------------------------------------------------------
      *  BOOSTS (Transversions, Conformal Rotors)
      *-----------------------------------------------------------------------------*/
- 
-      /*! Generate a Translated Transversion 
+
+      /*! Generate a Translated Transversion
           @param tnv TangentVector
           @param vec Vector position in space
           @param t scalar amt (typically 0 or 1)
       */
       template <class A, class T>
       static Bst bst(const A& tnv, const Vec& vec, T t){
-          Par s = Par( tnv.template copy<Tnv>() ).sp( nga::Gen::trs(vec) ); 
+          Par s = Par( tnv.template copy<Tnv>() ).sp( nga::Gen::trs(vec) );
           return Gen::bst(s * t);
       }
- 
-      
+
+
 
   /*! Generate Simple Boost rotor from ratio of two dual spheres
         calculates SQUARE ROOT (normalizes 1+R)
@@ -237,63 +237,67 @@ namespace vsr{ namespace cga{
    static Bst ratio( const DualSphere& a, const DualSphere& b, bool bFlip = true);
 
    /*! Get log of transformation at t
-   
+
    */
     static Pair log( const DualSphere& a, const DualSphere& b, VSR_PRECISION t, bool bFlip = true);
 
 
-   
    /*! atanh2 function for logarithm of general rotors, with clockwise boolean */
-   static Pair atanh2( const Pair& p, VSR_PRECISION cs, bool bCW);
-       
+   static Pair atanh2( const Pair& p, VSR_PRECISION cs, bool bCW,  bool bTwoPI=false);
+
+  /*!
+     Get theta of rotation 
+  */
+    static VSR_PRECISION theta( const Bst& b, bool bCW = false, bool bTwoPI = false);
+
    /*! Log of a simple rotor (uses atanh2) */
-   static Pair log( const Bst& b, bool bCW = false);
+   static Pair log( const Bst& b, bool bCW = false, bool bTwoPI=false);
 
    /*!  Generate Conformal Transformation from circle a to circle b
         uses square root method of Dorst et Valkenburg, 2011
    */
    static Con ratio( const Circle& a, const Circle& b, bool bFlip = false, float theta = 0);
-   
+
    /*!  Generate Conformal Transformation from pair a to pair b
         uses square root method of Dorst et Valkenburg, 2011
    */
    static Con ratio( const Pair& a, const Pair& b,bool bFlip = false, float theta = 0);//{ return ratio( a.dual(), b.dual() ); }
-   
+
   /*! Bivector Split
         Takes a general bivector and splits  it into commuting pairs
         will give sinh(B+-)
    */
-   static vector<Pair> split(const Pair& par);   
+   static vector<Pair> split(const Pair& par);
 
   /*! Bivector Split
         Takes a general ROTOR and splits  it into commuting pairs
         will give sinh(B+-)
    */
-   static vector<Pair> split(const Con& con);   
+   static vector<Pair> split(const Con& con);
 
-   
+
    /*! Split Log of General Conformal Rotor */
    static vector<Pair> log( const Con& rot);
 
    /*! Split Log from a ratio of two Circles */
    static vector<Pair> log( const Circle& ca, const Circle& cb, bool bFlip = false, VSR_PRECISION theta = 0);
-   
+
    /*! Split Log from a ratio of two Circles */
    static vector<Pair> log( const Pair& ca, const Pair& cb, bool bFlip = false, VSR_PRECISION theta = 0);
-   
-   
+
+
   /*! General Conformal Transformation from a split log*/
    static Con con( const vector<Pair>& log, VSR_PRECISION amt);
 
   /*! General Conformal Transformation from a split log and two amts (one for each)*/
    static Con con( const vector<Pair>& log, VSR_PRECISION amtA, VSR_PRECISION amtB);
- 
+
 
   /* General Conformal Transformation from two circles */
-   static Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt);   
+   static Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amt);
 
   /* General Conformal Transformation from two circles and two weights */
-   static Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amtA, VSR_PRECISION amtB);   
+   static Con con(  const Circle& ca, const Circle& cb, VSR_PRECISION amtA, VSR_PRECISION amtB);
 
 
     /*!
@@ -326,16 +330,16 @@ namespace vsr{ namespace cga{
 
         if we are in namespace cga we can just write
 
-            Construct::point(x,y,z) 
+            Construct::point(x,y,z)
 
         or to help create a generic generator
 
             Construct::gen( <some bivector element> )
 
-        @ingroup cgaops 
+        @ingroup cgaops
     */
     struct Construct {
-   
+
       /*-----------------------------------------------------------------------------
        *  PAIRS
        *-----------------------------------------------------------------------------*/
@@ -344,13 +348,13 @@ namespace vsr{ namespace cga{
       /// @param s vsr::cga::DualSphere;
       /// @param v vsr::cga::Vec;
       /// @returns vsr::cga::Pair;
-      static Pair pair(const DualSphere& s, const Vec& v);     
-      
+      static Pair pair(const DualSphere& s, const Vec& v);
+
        /*!
        *  \brief Point Pair at x,y,z with direction vec (default Y) and radius r (default 1)
        */
       static Pair pair(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Vec vec = Vec::y, VSR_PRECISION r=1.0);
-     
+
 
       /*-----------------------------------------------------------------------------
        *  POINTS
@@ -364,7 +368,7 @@ namespace vsr{ namespace cga{
       *  \brief  Second point of point pair pp
       */
      static Point pointB(const Pair& pp);
-       
+
      /// Point on Circle at theta t
      static Point point(const Circle& c, VSR_PRECISION t);
      /// Point on Sphere in v direction
@@ -382,31 +386,31 @@ namespace vsr{ namespace cga{
      /// Point on dual plane closest to p
      static Point point(const DualPlane&, const Point& );
 
-      
+
       /*-----------------------------------------------------------------------------
        *  CIRCLES
        *-----------------------------------------------------------------------------*/
-     
+
       /*!
        *  \brief  Circle through three points
        */
       static Circle circle(const Point& a, const Point& b, const Point& c);
- 
+
        /*!
        *  \brief  Circle at point p with radius r, facing direction biv
       */
-      static Circle circle(const Point& p, VSR_PRECISION r, const Biv& biv = Biv::xy);            
+      static Circle circle(const Point& p, VSR_PRECISION r, const Biv& biv = Biv::xy);
       /*!
        *  \brief  Circle at origin in plane of bivector B
        */
       static Circle circle(const Biv& B);
-     
+
       //circle Facing v
       static Circle circle(const Vec& v, VSR_PRECISION r=1.0);
-      
+
       //Circle at x,y,z facing in biv
       static Circle circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, Biv biv = Biv::xy, VSR_PRECISION r=1.0);
- 
+
 
 
       /*-----------------------------------------------------------------------------
@@ -415,7 +419,7 @@ namespace vsr{ namespace cga{
       static Sphere sphere(const Pnt& a, const Pnt& b, const Pnt& c, const Pnt& d);
       static DualSphere sphere(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r=1.0);
       static DualSphere sphere(const Point& p, VSR_PRECISION r=1.0);
-                             
+
 
 
       /*-----------------------------------------------------------------------------
@@ -428,42 +432,42 @@ namespace vsr{ namespace cga{
       static DualPlane plane( const Vec& v, VSR_PRECISION d=0.0);
      ///Direct plane through three points
       static Plane plane(const Pnt& a, const Pnt& b, const Pnt& c);
- 
+
       /*-----------------------------------------------------------------------------
        *  LINES
        *-----------------------------------------------------------------------------*/
- 
+
       /*!
       *  \brief  DualLine axis of circle c
       */
       static DualLine axis(const Cir& c);
-   
+
       ///Direct line through points a and b
       static Line line( const Vec& a, const Vec& b);
-     
+
       ///Direct line through origin
       static Line line( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z );
-      
+
       ///Dual line through origin
       static Line dualLine( VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z );
-      
+
      ///Direct line through two points
       static Line line( const Point& a, const Point& b);
-     ///Direct line through point a in direction b   
+     ///Direct line through point a in direction b
       static Line line( const Point& a, const Vec& b);
-     
-     
-     
+
+
+
      ///Hyperbolic line through two points
       static Circle hline( const Point& a, const Point& b);
      ///Spherical line through two points
       static Circle sline( const Point& a, const Point& b);
 
 
-      
+
       ///Squared Distance between a line and a point
        static VSR_PRECISION distance( const Lin& lin, const Pnt& pnt);
-    
+
 
       #pragma mark COINCIDENCE_FUNCTIONS
 
@@ -482,22 +486,22 @@ namespace vsr{ namespace cga{
       ///normalized and nulled point intersection of line and dual plane
        static Point meet( const Line& lin, const DualPlane&);
       ///normalized and nulled point intersection of dualline and dual plane
-       static Point meet( const DualLine&, const DualPlane&);    
+       static Point meet( const DualLine&, const DualPlane&);
       ///Point intersection of two lines
-       static Point meet( const Line& la, const Line& lb); 
+       static Point meet( const Line& la, const Line& lb);
 
       ///point pair intersection of circle and Dual plane
-       static Pair meet( const Cir& cir, const Dlp& dlp);  
+       static Pair meet( const Cir& cir, const Dlp& dlp);
       ///point pair intersection of circle and Dual sphere
        static Pair meet( const Cir& cir, const Dls& s);
 
        #pragma mark HIT_TESTS
-     
+
        /*!
         *  \brief  hit tests between point and pair (treats pair as an "edge")
         */
        static bool hit(const Point&, const Pair&);
-  
+
       /*!
        *  \brief  hit tests between point and circle (treats circle as "disc")
        */
@@ -516,7 +520,7 @@ namespace vsr{ namespace cga{
        */
       static Point hnorm(const Pnt& p);
 
-      
+
       /*!
        *  \brief  hyperbolic distance between two conformal points
        */
@@ -532,28 +536,28 @@ namespace vsr{ namespace cga{
        *  \brief  hyperbolic spin transformation from pa to pb by amt (0,1)
        */
       static Point hspin(const Pnt& pa, const Pnt& pb, double amt);
-     
-    
+
+
       #pragma mark AFFINE combinations
-      
+
       template<class A, class B>
       static Point affine( const A& a, const B& b, VSR_PRECISION t){
         return (a + (b-a)*t).null();
       }
 };
-     
+
      /*-----------------------------------------------------------------------------
       *  EVALUATION LAMBDAS
       *-----------------------------------------------------------------------------*/
- 
+
     /*!
      *  \brief  Point on line closest to another point v
      */
     auto pointOnLine = []( const Line& lin, const Point& v){
       return Round::null( Flat::loc( lin, v, false) );
-    };    
+    };
 
-    /// a single point on circle c at theta t 
+    /// a single point on circle c at theta t
     auto pointOnCircle = [](const Circle& c, VSR_PRECISION t){
      return Construct::point(c,t);
     };
@@ -571,7 +575,7 @@ namespace vsr{ namespace cga{
     };
     /// a single point on dual sphere s at theta t and phi p
     auto pointOnSphere = [](const DualSphere& s, VSR_PRECISION t, VSR_PRECISION p){
-      return Construct::pointA( pairOnSphere(s,t,p) ).null(); 
+      return Construct::pointA( pairOnSphere(s,t,p) ).null();
     };
     /// many points on sphere (could use map func from gfx::data)
     auto pointsOnSphere = [](const DualSphere& s, int u, int v){
@@ -586,29 +590,29 @@ namespace vsr{ namespace cga{
 
       }
      }
-     return out; 
+     return out;
     };
 
 
-} //cga:: 
+} //cga::
 
 
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::mot( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::Gen::mot(t) );  
-} 
+     return this -> sp ( cga::Gen::mot(t) );
+}
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::motor( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::Gen::mot(t) );  
-} 
+     return this -> sp ( cga::Gen::mot(t) );
+}
 template<class Algebra, class B> template <class A>
 Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,A>& t) const{
-     return this -> sp ( cga::Gen::mot(t) );  
-} 
-    
+     return this -> sp ( cga::Gen::mot(t) );
+}
+
 
 /**
-* @defgroup cgamacros CGA Macros 
+* @defgroup cgamacros CGA Macros
   For making commonly used geometric entities
   @ingroup cgaops
 * @{ */
@@ -654,9 +658,9 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 
 /**  @} */
 
-}    //vsr::                                       
+}    //vsr::
 
-#endif 
+#endif
 
 
 //  template<bool _a, bool _b>
@@ -684,11 +688,9 @@ Multivector<Algebra,B> Multivector<Algebra,B>::twist( const Multivector<Algebra,
 //        return res;
 //      }
 //
-//      
+//
 //
 //    } //topo::
-  
+
 
 //} //cga::
-
-

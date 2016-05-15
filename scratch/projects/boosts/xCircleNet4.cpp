@@ -43,9 +43,9 @@ template<> void Renderable<CyclideQuad>::DrawImmediate(const CyclideQuad& s){
      auto ty = -Round::dir(s.tframe[i].bitan[1].undual()).copy<Vec>().unit();
      auto tz = -Round::dir(s.tframe[i].bitan[2].undual()).copy<Vec>().unit();
 
-     DrawAt( tx, s.tframe[i].frame.pos(), 1,0,0);
-     DrawAt( ty, s.tframe[i].frame.pos(), 0,1,0);
-     DrawAt( tz, s.tframe[i].frame.pos(), 0,0,1);
+     DrawAt( tx, s.tframe[i].pos(), 1,0,0);
+     DrawAt( ty, s.tframe[i].pos(), 0,1,0);
+     DrawAt( tz, s.tframe[i].pos(), 0,0,1);
   }
 }
 
@@ -350,8 +350,8 @@ struct MyApp : App {
 
     //default positions
     cyclide.pos(ca.point, cb.point, cc.point, cd.point); 
-    cyclide.tframe[0].frame.rot() = trotC*trotB*trotA; 
-    cyclide.frame();
+    cyclide.tframe[0].rot() = trotC*trotB*trotA; 
+    cyclide.calcFrame();
     cyclide.log();
 
     //Add Base Cyclide to Circular Net
@@ -389,14 +389,14 @@ struct MyApp : App {
 
      
        //record some circles to calculate fourth corner    
-       auto cirA =  net[0][0].frame.pos() ^ net[0][3].frame.pos() ^ net[2][0].frame.pos();
-       auto cirB =  net[0][3].frame.pos() ^ net[0][2].frame.pos() ^ net[1][2].frame.pos();
-       auto cirC =  net[2][0].frame.pos() ^ net[2][1].frame.pos() ^ net[1][2].frame.pos();
+       auto cirA =  net[0][0].pos() ^ net[0][3].pos() ^ net[2][0].pos();
+       auto cirB =  net[0][3].pos() ^ net[0][2].pos() ^ net[1][2].pos();
+       auto cirC =  net[2][0].pos() ^ net[2][1].pos() ^ net[1][2].pos();
 
        auto par = (cirA.dual() ^ Round::surround(cirB) ).dual();
        auto p4a = Construct::pointA( par );
        auto p4b = Construct::pointB( par );
-       auto p4 = FERROR( (p4a<=net[0][3].frame.pos())[0] ) ? p4b : p4a;
+       auto p4 = FERROR( (p4a<=net[0][3].pos())[0] ) ? p4b : p4a;
 
        auto sphLeft = ( net[2][0].bitan[0] ^ p4).undual();
        auto sphBottom = ( net[1][2].bitan[1] ^ p4 ).undual();
@@ -530,7 +530,7 @@ if (net.mCyclide.size() > 3 ){
        else {
          Draw( cyclide.tframe[i].sphere[0], 1, .2, .2, .2);
        }
-       Draw (cyclide.tframe[i].frame.pos(),.2,0,0);
+       Draw (cyclide.tframe[i].pos(),.2,0,0);
      }
 
      if ( bDrawD){

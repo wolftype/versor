@@ -4,9 +4,6 @@
 /*
     KNOTS -- building up from Dorst and Valkenburg's paper on Square Roots of Rotors and Logarithms through Polar Decomposition
 
-
-    IN PROGRESS!!!! Still owkring out the best way to do this (and what "this" is)
-
 */
 //  Created by Pablo Colapinto on 11/7/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -19,8 +16,19 @@
 
 namespace vsr { namespace cga {
 
-//A sort of Coupled Boost
+/// TorusKnot (newer version)
+struct TKnot {
 
+  double mP, mQ;
+  HopfFiber mHopf;  
+  vector<double> mEnergy;
+  vector<Point> mPoint;
+  vector<Circle> mCircle;
+};
+
+/// A sort of Coupled Boost
+/// @todo clean this up -- pass number of iterations to apply() function . . .
+/// separate out functions from memory containers
 struct TorusKnot  {
 
     //typically integers
@@ -63,6 +71,21 @@ struct TorusKnot  {
         return HF.fiberA().dual() * a + HF.fiberB().dual() * b;
     }
 
+    Par par(float t) {
+        //double a = P == 0 ? 0 : PI/P; double b = Q == 0 ? 0 : PI/Q;
+        return (HF.fiberA().dual() * P + HF.fiberB().dual() * Q)*t;
+    }
+
+    Par dpar(int num){
+      if (num==0) return Par();
+      float t = PI / num;
+      return ( (HF.fiberA().dual().runit() * P) + (HF.fiberB().dual().runit() * Q) ) * t;
+    }
+    
+    Bst dbst(int num){
+      return Gen::bst( dpar(num) );
+    }
+
     Bst bst() {
         return Gen::bst( par() * amt  );
     }
@@ -71,8 +94,11 @@ struct TorusKnot  {
 
     TorusKnot(double p = 3, double q = 2, double a = .01) : P(p), Q(q), amt(a) {}
 
-  //Calculate full orbit from point p
-  void calc( const Pnt& p){
+    void set(double p, double q) { P = p; Q =q; }
+
+  /// Calculate full orbit from point p, renormalizing every step
+  /// save positions in pnt vector and tube slices in cir vector
+  vector<Pnt>& calc( const Pnt& p){
     pnt.clear(); cir.clear();
 
     Pnt np = p;
@@ -91,7 +117,60 @@ struct TorusKnot  {
       Cir c = tpar.dual();
       add ( c );
     }
+    return pnt;
   }
+
+  vector<Pnt>& apply( const Point& p, int num, bool bRenormalize=true){
+    pnt.clear(); cir.clear();
+    auto tbst = dbst(num);
+    auto tp = p;
+    //std::vector<Point> result;
+    add ( Round::loc(tp));
+    if (bRenormalize){ //renormalize during each step
+     for (int i =0;i <(int)num;++i){
+       tp = Round::loc( tp.spin( tbst ) );
+       //result.push_back( tp );
+       add(tp);
+     }
+    } else {
+     for (int i =0;i <(int)num;++i){
+       tp = tp.spin( tbst );
+       add (Round::loc(tp));
+       //result.push_back( Round::loc(tp) );  // or after each step
+     }
+    }
+
+    //Tube Neighborhood
+    for (int i = 0; i <= (int)num; ++i ){
+      int idx = i < num ? i + 1 : 0;
+      Par tpar = pnt[i] ^ pnt[idx];
+      Cir c = tpar.dual();
+      add ( c );
+    }
+
+    return pnt;    
+  }
+
+  //currently only works on pairs and circles
+  template<typename T>
+  vector<T> apply(const T& input, int num, bool bRenormalize=true){
+    vector<T> result;
+    auto tbst = dbst(num);
+    auto tmp = input;
+    if (bRenormalize){ //renormalize during each step
+     for (int i =0;i <(int)num;++i){
+       tmp = Round::renormalize( tmp.spin( tbst ) );
+       result.push_back( tmp );
+     }
+    } else {
+     for (int i =0;i <(int)num;++i){
+       tmp = tmp.spin( tbst );
+       result.push_back( Round::renormalize(tmp) );  // or after each step
+     }
+    }
+    return result;
+  }
+
 
   //calculate full orbit from point p without renormalizing at each step (no tube)
   double calc0( const Pnt& p){
@@ -117,17 +196,6 @@ struct TorusKnot  {
     return energy(0,tnum);
   }
 
-  template<typename T>
-  vector<T> apply0(const T& input){
-    vector<T> output;
-    auto tbst = bst();
-    auto tmp = input;
-    for (int i=0; i<iter();++i){
-      tmp = tmp.spin(tbst);
-      output.push_back( Round::loc(tmp) );
-    }
-    return output;
-  }
 
   double energy(int idx, int num){
 

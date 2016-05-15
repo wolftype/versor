@@ -3,8 +3,6 @@
  *
  *       Filename:  xSpaceGroup3D.cpp
  *
- *    Description:  from allo
- *
  *        Version:  1.0
  *        Created:  04/30/2015 15:30:13
  *       Revision:  none
@@ -30,14 +28,17 @@ struct State{
 
   float amt=0;
 
-  float p=2;
+  float p=2;        
   float q=2;
   bool pbar=false;
   bool qbar=false; 
   bool pqbar=false;
   
+  // a, b, or c glides
   bool bGlideA, bGlideB, bGlideC;
+  // amt of a, b or c glides
   float glideA, glideB, glideC;
+  
   float screwAB, screwBC, screwAC;
   float screwAB_trs,screwBC_trs;
 
@@ -69,7 +70,8 @@ void drawState(State * state){
 
 
      Vec ratioVec(s.xratio,s.yratio,s.zratio); 
-        
+     
+     // bravais type and lattice type   
      SpaceGroup3D<Vec>::Lattice lattice = {(int)s.bravaisType,(int)s.latticeType};
      SpaceGroup3D<Vec>::Glide glide = { {(int)s.glideA, s.bGlideA},{(int)s.glideB,s.bGlideB},{(int)s.glideC,s.bGlideC} };
      SpaceGroup3D<Vec>::Screw screw = { (int)s.screwAB, (int)s.screwBC, (int)s.screwAC, (int)s.screwAB_trs, (int)s.screwBC_trs };

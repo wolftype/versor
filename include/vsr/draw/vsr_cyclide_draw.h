@@ -1,14 +1,34 @@
 /*
+ * License
+ * ---------------------------------------------------------------------------
+ *
+ * Versor Geometric Algebra Library
+ * Copyright (C) 2010  Pablo Colapinto
+ * All rights reserved.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*
  * =====================================================================================
  *
  *       Filename:  vsr_cyclide_draw.h
  *
- *    Description: temporary drawing routines for cyclides 
+ *    Description: temporary drawing routines for cyclides
  *
  *        Version:  1.0
  *        Created:  11/20/2015 18:09:09
- *       Revision:  none
- *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail->wolftype
  *   Organization:  wolftype
@@ -32,7 +52,6 @@ namespace gfx{
 /*-----------------------------------------------------------------------------
  *  DATA
  *-----------------------------------------------------------------------------*/
-
 using vsr::cga::CyclideQuad;
 using vsr::cga::Round;
 using vsr::cga::Vec;
@@ -44,28 +63,27 @@ struct CyclideMeshData{
 };
 
 
+/// Immediate Draw Routine of Cyclidic Patch, draws 4 Frames
 template<> void Renderable<CyclideQuad>::DrawImmediate(const CyclideQuad& s){
   for (int i=0;i<4;++i){
-     auto tx = -Round::dir(s.tframe[i].bitan[0].undual()).copy<Vec>().unit();
-     auto ty = -Round::dir(s.tframe[i].bitan[1].undual()).copy<Vec>().unit();
-     auto tz = -Round::dir(s.tframe[i].bitan[2].undual()).copy<Vec>().unit();
+     auto tx = -Round::dir(s.tframe[i].tan[0]).copy<Vec>().unit();
+     auto ty = -Round::dir(s.tframe[i].tan[1]).copy<Vec>().unit();
+     auto tz = -Round::dir(s.tframe[i].tan[2]).copy<Vec>().unit();
 
-     DrawAt( tx, s.tframe[i].frame.pos(), 1,0,0);
-     DrawAt( ty, s.tframe[i].frame.pos(), 0,1,0);
-     DrawAt( tz, s.tframe[i].frame.pos(), 0,0,1);
+     DrawAt( tx, s.tframe[i].pos(), 1,0,0);
+     DrawAt( ty, s.tframe[i].pos(), 0,1,0);
+     DrawAt( tz, s.tframe[i].pos(), 0,0,1);
   }
 }
 
-/*-----------------------------------------------------------------------------
- *  Surface DRAW METHOD (immediate mode)
- *-----------------------------------------------------------------------------*/
-   template<> 
+/// Immeidate Draw of HalfEdge Graph of MeshData
+template<>
    void Renderable<vsr::HEGraph<CyclideMeshData>,0>::DrawImmediate( const vsr::HEGraph<CyclideMeshData>& graph){
      glBegin(GL_TRIANGLES);
      for (auto& i : graph.face()){
           auto& a = i->a();
           auto& b = i->b();
-          auto& c = i->c(); 
+          auto& c = i->c();
           //glColor4f(.2,1,.2,.7);
           GL::normal( a.normal.begin() );
           GL::vertex( a.pos.begin() );
@@ -91,14 +109,14 @@ struct MeshRender{
           int b = a+h;
           int c = b+1;
           int d = a+1;
-          
+
           if (alpha < 1 ) glColor4f(bColor*.8,bColor,bColor,alpha);
           else glColor3f(bColor*.8,bColor,bColor);
           GL::normal(mesh[a].normal.begin());
           GL::vertex(mesh[a].pos.begin());
           GL::vertex(mesh[b].pos.begin());
           GL::vertex(mesh[c].pos.begin());
-          GL::vertex(mesh[d].pos.begin());    
+          GL::vertex(mesh[d].pos.begin());
           bColor = !bColor;
       }
       bColor = !bColor;
@@ -115,13 +133,13 @@ struct MeshRender{
        if ( i==0 || i==w ){
 
        glBegin(GL_LINE_STRIP);
-        for (int j =0;j<=h; ++j){  
+        for (int j =0;j<=h; ++j){
            int a = i*(h+1)+j;
          //  GL::normal(mesh[a].normal.begin());
            GL::vertex(mesh[a].pos.begin());
         }
        glEnd();
-     
+
       }
     }
     for (int j =0;j<=h;++j){
@@ -129,7 +147,7 @@ struct MeshRender{
 
        glBegin(GL_LINE_STRIP);
        for (int i =0;i<=w; ++i){
-          
+
            int a = i*(h+1)+j;
        //  GL::normal(mesh[a].normal.begin());
            GL::vertex(mesh[a].pos.begin());
@@ -137,7 +155,7 @@ struct MeshRender{
        glEnd();
       }
     }
-    
+
 
   }
 
@@ -151,13 +169,13 @@ struct MeshRender{
           int b = a+h;
           int c = b+1;
           int d = a+1;
-          
+
           glColor4f(bColor*.8,bColor,bColor,.5);
           GL::normal(mesh[a].normal.begin());
           GL::vertex(mesh[a].pos.begin());
           GL::vertex(mesh[b].pos.begin());
           GL::vertex(mesh[c].pos.begin());
-          GL::vertex(mesh[d].pos.begin());    
+          GL::vertex(mesh[d].pos.begin());
           bColor = !bColor;
       }
       bColor = !bColor;
@@ -177,9 +195,12 @@ struct MeshRender{
   }
 };
 
-
+/// Settings for Drawing Cyclidic Patches (i.e. whether to draw surface)
+/// @todo generalize how to do this for objects
 struct CyclideDraw{
+  /// Half Edge Data Pointing to Vertices
   HEGraph<CyclideMeshData> graph;
+  /// The Vertices themselves (positions and normals)
   vector<CyclideMeshData> mesh;
 
   int width = 0;
@@ -194,12 +215,14 @@ struct CyclideDraw{
   void init(int w, int h){
     width =w ; height =h;
     mesh = vector<CyclideMeshData>( (width+1)*(height+1));
-    graph.UV( width+1,height+1,mesh); 
+    graph.UV( width+1,height+1,mesh);
   }
 
+  /// Draw a cylclidic patch using this data containers settings
+  /// @param surf which patch ratio to draw(leave at 0)
    void draw(const CyclideQuad& cyclide, int surf=0){
 
-     if (width==0) init(20,20);
+     if (width==0) init(10,10);
 
       if (bDrawCyclide) Draw(cyclide);
       if (bDrawCircle) Draw( cyclide.circle(),0,1,0 );
@@ -209,13 +232,13 @@ struct CyclideDraw{
         Draw( cyclide.tframe[1].sphere[2].dual() ^ cyclide.tframe[0].tan[2], 1, 0, 1 );
         Draw( cyclide.tframe[1].sphere[2].dual() ^ cyclide.tframe[3].tan[2], 1, 0, 1 );
       }
-     
+
       if (bDrawSurface){
-      for (int i =0;i<=width;i++){ 
+      for (int i =0;i<=width;i++){
        auto tu = (float)i/width;
-       for (int j =0;j<=height;j++){ 
+       for (int j =0;j<=height;j++){
          auto tv = (float)j/height;
-        
+
          Point np;
          vsr::cga::Pair tan;
          switch(surf){
@@ -240,13 +263,9 @@ struct CyclideDraw{
       }
      }
 
-    // Draw(graph,.2,1,.2,.7);   
-        
      MeshRender::Draw(mesh,width+1,height+1,bDrawNormals);
    }
 };
-
-
 
 
 }

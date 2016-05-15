@@ -30,43 +30,45 @@
 
 #include "gfx/gfx_postscript.h"
 
-struct App : public gfx::GFXAppGui {  
+
+///@todo namespace this
+struct App : public gfx::GFXAppGui {
 
   vsr::cga::Point mMouse2D;
   vsr::cga::Point mMouse3D;
   vsr::cga::Line mMouseRay;
 
   gfx::PostScript ps;
-  
+
   bool bSetMouse;
 
   vsr::cga::Point calcMouse3D(float z=.99){
 
     auto& vd = gfx::GFXAppGui::mContext.interface.io.viewdata;
     auto tv = vd.ray;
-    
+
     auto p = scene.unproject( io().pos(z) ); //vd.projectMid;
 
     cga::Vec tz (tv[0], tv[1], tv[2] );
 
     mMouse2D =  vsr::cga::Construct::point(p[0],p[1],0);
     mMouse3D =  vsr::cga::Construct::point(p[0],p[1],p[2]);
-    mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity(1); 
+    mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity(1);
 
     //intersection of ray with plane
     mMouse3D = vsr::cga::Construct::meet( mMouseRay, vsr::cga::DualPlane(tz) );
 
     return mMouse3D;
- 
-  } 
-  
+
+  }
+
   /// Called when a keyboard key is pressed
   virtual void onKeyDown(const gfx::Keyboard& k){
-    
+
    // Frame f;
     switch(k.code){
       case 'v':
-        printf("v\n"); 
+        printf("v\n");
         GL::enablePreset();
         scene.push(true);
          ps.print(*this);
@@ -81,8 +83,8 @@ struct App : public gfx::GFXAppGui {
 
     }
 
-  } 
-  
+  }
+
 
 };
 
@@ -92,7 +94,7 @@ struct App : public gfx::GFXAppGui {
 
 
  //     case  '0':
- //   
+ //
  //      f.pos( PT(0,0,5) );
  //      f.orient( Vec(0,0,0), false );
 
@@ -104,7 +106,7 @@ struct App : public gfx::GFXAppGui {
  //      f.orient( Vec(0,0,0), false );
 
  //      scene.camera.set( f.pos(), f.quat() );
- //      
+ //
  //      break;
  //     case  '2':
  //      f.pos( PT(5,0,0) );

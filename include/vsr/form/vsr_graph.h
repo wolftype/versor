@@ -787,9 +787,6 @@ namespace vsr{
     vector<Face*>        mFace;
     vector<Node*>        mNode;
 
-   //some data container (unnecessary?)
-   //vector<T> * data;
-
  };   
 
 
@@ -970,9 +967,9 @@ namespace vsr{
       }
 
 
-
       return graph;
     }
+
 
 } //vsr::
 

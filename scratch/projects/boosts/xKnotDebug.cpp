@@ -53,7 +53,7 @@ struct MyApp : App {
     gui(radius,"radius",-10,1);
     
     objectController.attach(&f);
-    bShadedOutput = false;
+    //bShadedOutput = false;
 
     amt = -PI;
     amt1 = 1;

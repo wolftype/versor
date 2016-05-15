@@ -17,18 +17,18 @@
  */
 
 
-#include "vsr_app.h"  
-#include <vsr/form/vsr_twist.h> 
-#include "form/vsr_rigid.h"
-#include <vsr/form/vsr_group.h>
+#include "vsr_app.h"
+#include "form/vsr_cyclide.h"
+#include "draw/vsr_cyclide_draw.h"
 
 using namespace vsr;
 using namespace vsr::cga;
 
+
 struct MyApp : App {
- 
+
   //Some Variables
-  bool bReset,bFlip = false;
+  bool bA,bB, bC,bD,bE,bF = false;//bReset2,bFlip,bFlip2= false;
 
   Point point;
   bool bSetMouse=true;
@@ -38,6 +38,8 @@ struct MyApp : App {
 
   float amt,amt1,amt2,radius,iter;
 
+  Frame fa = Frame(-2,0,0);
+  Frame fb = Frame(2,0,0);
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
@@ -46,27 +48,29 @@ struct MyApp : App {
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
-    gui(bReset)(bFlip);
+    gui(bA)(bB)(bC)(bD)(bE)(bF);
     gui(amt,"amt",-10,10);
     gui(amt1,"amt1",-1000,1000);
     gui(amt2,"amt2",-1000,1000);
     gui(iter,"iter",-1000,1000);
     gui(radius,"radius",-10,1);
-    
-    objectController.attach(&f);
+
+    objectController.attach(&fa);
+    objectController.attach(&fb);
     ps.bShadedOutput = false;
 
-    amt = -PI;
-    amt1 = 3;
-    amt2 = 2;
+    amt = 0;
+    amt1 = 0;
+    amt2 = 0;
     iter=100;
 
-    
+
+
   }
 
 
   void onKeyDown(const gfx::Keyboard& k){
-    
+
     switch (k.code){
       case 's':
         bSetMouse = !bSetMouse;
@@ -76,72 +80,45 @@ struct MyApp : App {
    }
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
     point = calcMouse3D();
 
+    Circle circle = fa.cxz();
+    auto ori = Construct::point( circle, amt );
 
+ //   /// Theta in radians. @todo, does not consider quadrant!
+ //   VSR_PRECISION theta( const Circle& circle, const Point& point){
+     /// Tangent Element on circle at point
+     auto t = Tangent::at(circle, point);
+     /// Direction of point relative to circle center
+     auto dir = Vec( Round::location( t ) - Round::location(circle) ).unit();
+     /// Spin e1 by rotor which takes e3 to normal
+     auto rot = Gen::ratio( Vec::z, Round::carrier(circle).dual().unit());
+     auto tx = Vec::x.spin( rot );
+     /// Theta that takes tx to to dir
+     auto phi = atan2( (dir^tx).rnorm() * Op::sign(dir^tx, Biv::xy.spin(rot) ? 1 : -1, (dir<=tx)[0] );
+ //   }
+    
 
-//      //0. a and c are at 90 degrees, must find b...
-//      auto a = Vec::x;
-//      auto c = Vec::z;
-//      
-//      //1. employ reduced version of good old spherical trig cosine rule ...
-//      double tp = PI/(int)amt1;
-//      double tq = PI/(int)amt2;
-//
-//      double ca = cos(tq);
-//      double sa = sin(tq);
-//      double cc = cos(tp);
-//      double sc = sin(tp);
-//
-//      //reduced (because tb is contrained to PIOVERTWO)
-//      double tA = acos( ca/sc );
-//      double tC = acos( cc/sa );
-//
-//      //2. ... to rotate the yx plane ...
-//      auto bivA = (a ^ c).rot( a.unduale() * -tA / 2.0 );//changed
-//      auto bivC = (a ^ c).rot( c.unduale() * tC / 2.0 );
-//
-//
-//      auto b = (bivA.duale() ^ bivC.duale()).duale().unit(); //note neg!
+  //  auto phi = Round::theta( cir, point );
+    cout << phi << endl;
+    
+    Draw(ori,1,0,0);
 
-//
-//       auto pair = Construct::point(0,-2,0) ^ Construct::point(0,2,0);
-//
-//      // Draw(pair.undual(),0,1,0);
-//
-//       auto circle = CXZ(1);
-//
-//       auto pair2 = circle.dual();
-//
-//       Draw( Construct::pointA(pair2),0,1,0);
-//       Draw( Construct::pointB(pair2),1,0,0);
-//
-//       Draw(circle,1,0,0);
-
-         Biv b(.2,3,.4);
-
-         auto v = b.duale() * 2;
-
-         auto vb = v*b;
-         auto bv = b*v;
-
-         cout << vb << endl;
-         cout << bv << endl;
-
-       
-//
+    Draw(point);
+    Draw(circle);
+    Draw(t);
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 
