@@ -125,7 +125,7 @@ struct TorusKnot  {
     auto tbst = dbst(num);
     auto tp = p;
     //std::vector<Point> result;
-    add ( Round::loc(tp));
+  //  add ( Round::loc(tp));
     if (bRenormalize){ //renormalize during each step
      for (int i =0;i <(int)num;++i){
        tp = Round::loc( tp.spin( tbst ) );
@@ -141,14 +141,18 @@ struct TorusKnot  {
     }
 
     //Tube Neighborhood
-    for (int i = 0; i <= (int)num; ++i ){
-      int idx = i < num ? i + 1 : 0;
+    for (int i = 0; i < (int)num; ++i ){
+      int idx = i < num - 1? i + 1 : 0;
       Par tpar = pnt[i] ^ pnt[idx];
       Cir c = tpar.dual();
       add ( c );
     }
 
-    return pnt;    
+    //energies
+   // auto d = energy(0,num);
+
+    return pnt; 
+   
   }
 
   //currently only works on pairs and circles

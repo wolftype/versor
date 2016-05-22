@@ -1335,10 +1335,10 @@ struct SpaceGroup3D : PointGroup3D<V> {
       vector<T> res( motif.size() * x * y * z );
       int ii=0;
       for (auto& i : motif){
-        auto tmp = hang(i,x,y,z);
+        auto tmp = hang(i,x,y,z); // hang each point of incoming pointgroup
         int jj=0;
         for (auto& j : tmp) {
-          int idx = jj*motif.size()+ii;
+          int idx = jj*motif.size()+ii;   //find idx into results
           res[idx]=j;
           jj++;
         }

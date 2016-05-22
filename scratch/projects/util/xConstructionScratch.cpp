@@ -92,25 +92,21 @@ struct MyApp : App {
  //   /// Theta in radians. @todo, does not consider quadrant!
  //   VSR_PRECISION theta( const Circle& circle, const Point& point){
      /// Tangent Element on circle at point
-     auto t = Tangent::at(circle, point);
-     /// Direction of point relative to circle center
-     auto dir = Vec( Round::location( t ) - Round::location(circle) ).unit();
-     /// Spin e1 by rotor which takes e3 to normal
-     auto rot = Gen::ratio( Vec::z, Round::carrier(circle).dual().unit());
-     auto tx = Vec::x.spin( rot );
-     /// Theta that takes tx to to dir
-     auto phi = atan2( (dir^tx).rnorm() * Op::sign(dir^tx, Biv::xy.spin(rot) ? 1 : -1, (dir<=tx)[0] );
+//     auto t = Tangent::at(circle, point);
+//     /// Direction of point relative to circle center
+//     auto dir = Vec( Round::location( t ) - Round::location(circle) ).unit();
+//     /// Spin e1 by rotor which takes e3 to normal
+//     auto rot = Gen::ratio( Vec::z, Round::carrier(circle).dual().unit());
+//     auto tx = Vec::x.spin( rot );
+//     /// Theta that takes tx to to dir
+//     auto phi = atan2( (dir^tx).rnorm() * Op::sign(dir^tx, Biv::xy.spin(rot) ? 1 : -1, (dir<=tx)[0] );
  //   }
     
 
-  //  auto phi = Round::theta( cir, point );
-    cout << phi << endl;
-    
-    Draw(ori,1,0,0);
 
-    Draw(point);
-    Draw(circle);
-    Draw(t);
+    Draw(fa.bound());
+    cout << (point <= fa.bound()) << endl;
+    
 
   }
 

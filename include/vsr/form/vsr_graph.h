@@ -918,6 +918,7 @@ namespace vsr{
     template<class T,class E> template<class S>
     inline HEGraph<T,E>& HEGraph<T,E>::UV(int w, int h, S& p, bool bCloseU, bool bCloseV){
       HEGraph& graph = *this;
+      graph.clear();
       //left column
       for (int j = 0; j < h; ++j){
           int idx = j;
