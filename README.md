@@ -202,7 +202,7 @@ It's a fantastic book and if you're reading this you should also consider readin
 
 License
 ---
-This software is licensed under the New BSD (3-clause) open source license (see copyrights/COPYRIGHT).  This is a permissive and compatible open source license -- you are pretty much free to do what you want with the source code.  In addition, you are strongly encouraged to email me to let me know how it is being used, so that we can all learn more.
+This software is licensed under the  FreeBSD (2-clause) open source license (see copyrights/COPYRIGHT).  This is a permissive and compatible open source license -- you are pretty much free to do what you want with the source code.  In addition, you are strongly encouraged to email me to let me know how it is being used, so that we can all learn more.
 
 Built to aid in my modelling of organic forms, the initial development was partially funded by the Olivia Long Converse Fellowship for Botanic research, courtesy of the Graduate Division at the University of California in Santa Barbara.  It has also received support from the Robert W. Deutsch Foundation.
 
