@@ -17,14 +17,14 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"   
 #include "vsr_cga3D_frame.h"
 #include "vsr_field.h"
 
 #include "gfx_map.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
  
@@ -50,16 +50,17 @@ struct MyApp : App {
     fpoint.resize(2,2,2,2,2,2);
 
     mesh.resize(10,10,10,.2,.2,.2);
-  
+ 
+    // Attach four corners to objectController 
     for (int i=0;i<fpoint.num();++i){
-      fpoint[i] = Ro::dls( fpoint.grid(i), .3);//Ro::dls( point[i], .3);
+      fpoint[i] = Round::dls( fpoint.grid(i), .3);
       objectController.attach(&fpoint[i]);
     }
   }
 
   void onAnimate(){
     for (int i =0;i<fpoint.num();++i){
-      field[i] = Gen::log( Gen::ratio( Ro::dls(1,0,0,0), fpoint[i] ) );
+      field[i] = Gen::log( Gen::ratio( Round::dls(1,0,0,0), fpoint[i] ) );
     }
     
     auto vals = data::map<Pair>(10,10,10,[&](float x,float y,float z){
@@ -69,8 +70,8 @@ struct MyApp : App {
     for (int i =0;i<mesh.num();++i){
       auto bst = Gen::bst(vals[i]*-amt);
       auto con = Gen::con( Gen::split(vals[i]), amt );
-      auto pntA = Ro::loc( mesh.grid(i).spin( bst ) );
-      auto pntB = Ro::loc( mesh.grid(i).spin( con ) );
+      auto pntA = Round::loc( mesh.grid(i).spin( bst ) );
+      auto pntB = Round::loc( mesh.grid(i).spin( con ) );
       mesh[i] = bSimple ? pntA : pntB;
     }
 
@@ -82,10 +83,7 @@ struct MyApp : App {
   void onDraw(){
   
     Draw(fpoint,1,0,0);
-    //for (int i=0;i<point.num();++i){ Draw( point[i], 1,0,0); }
-
     Draw(mesh);
-
 
   }
   

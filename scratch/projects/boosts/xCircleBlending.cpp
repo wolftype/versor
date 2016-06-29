@@ -49,18 +49,12 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
     
-    auto tca = ca.twist( cga::line(1,0,0).dual() * amt );
-    auto tcb = cb.twist( cga::line(1,0,0).dual() * -amt );
+    auto tca = ca.twist( LN(1,0,0).dual() * amt );
+    auto tcb = cb.twist( LN(1,0,0).dual() * -amt );
 
     draw(tca); 
     draw(tcb); 
   
-    
-    //normalized
-   // tca = tca.unit();
-   // tcb = tcb.unit();
-
-
     float theta = ( (tca<=tcb)[0] );
     cout << theta << endl;
 

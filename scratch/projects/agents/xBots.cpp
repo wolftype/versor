@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
@@ -41,8 +41,8 @@ struct Member : Frame {
 };
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -57,11 +57,11 @@ struct MyApp : App {
   float nearestspacing;
   float toonearspacing;
   float sourceweight;
-  float followweight;
-  float aversionweight;
-  float aversionspeed;
+  float followweight = .1;
+  float aversionweight = .1;
+  float aversionspeed =.03;
   float acc = .02;
-  float rotAcc = .02; 
+  float rotAcc = .02;
 
   vector<Member> frame;
 
@@ -89,18 +89,18 @@ struct MyApp : App {
       gui(aversionspeed, "aversionspeed,",0,100);
       gui(acc, "acc",0,100);
       gui(rotAcc, "rotAcc",0,100);
-  
+
       bMove =true; bSpin=true;
       toonearspacing = .75;  // anything less than this is unacceptably close, agents fly away
-      initialspacing = 3;    // initial spacing 
+      initialspacing = 3;    // initial spacing
       nearestspacing = 2;    // anything greater than this is ignored
       sourceweight = .1;     // pull towards middle
-      
+
       mColor.set(0,0,0);
    }
 
 
-  
+
   /*-----------------------------------------------------------------------------
    *  Initialize Frame Posiitons
    *-----------------------------------------------------------------------------*/
@@ -123,7 +123,7 @@ struct MyApp : App {
     virtual void onDraw(){
 
       GL::lightsOff();
-       
+
       mouse = calcMouse3D();        ///<-- get mouse position
 
       for (auto& f : frame){        ///<-- draw all frames
@@ -131,14 +131,14 @@ struct MyApp : App {
 
         for (auto& n : f.nearest){
           glColor3f(1,1,0);
-          if (bDrawConnections) gfx::Glyph::Line( f.pos(), n.pos() );   
+          if (bDrawConnections) gfx::Glyph::Line( f.pos(), n.pos() );
         }
 
         for (auto& n : f.toonear){
           glColor3f(0,1,1);
-          if (bDrawAversions) gfx::Glyph::Line( f.pos(), n.pos() );   
+          if (bDrawAversions) gfx::Glyph::Line( f.pos(), n.pos() );
         }
-        
+
       }
 
     }
@@ -147,30 +147,26 @@ struct MyApp : App {
     /*-----------------------------------------------------------------------------
      *  Simulation
      *-----------------------------------------------------------------------------*/
-    virtual void onAnimate(){ 
+    virtual void onAnimate(){
 
       if (bReset) initFrames();
 
 
-        
+
       ///frame physics timestep
       for (auto & f : frame ){
         f.clear();
         f.move();
         f.spin();
       }
-     
-     // float period = 1;
-     // float pitch = 1; 
-     // DualLine dll = Twist::Along( (mouse ^ Vec::z ^ Inf(1)).dual(), period , pitch );
 
 
       int numNeighbors = 3;                             ///<-- how many neighbors to look for
-      
+
       //For Each Frame,
       //find nearest neighbors within view
       //sum up their influence
-     for (auto& fa : frame){                           
+     for (auto& fa : frame){
 
        Biv db; // Amount to rotate
        Vec dx; // Amount to translate
@@ -178,61 +174,60 @@ struct MyApp : App {
        float racc;
 
        float dist = Round::sqd(fa.pos(), PAO);          ///<-- distance from frame to point at origin
-       float famt = 1.0/(.01 + (dist*dist) );          ///<-- weighting distance
+       float famt = 1.0/(.01 + (dist*dist) );           ///<-- weighting distance
 
-       float thresh = nearestspacing;                  ///<-- distance threshold                      
-       float min = toonearspacing;                     ///<-- minimum distance to maintain
+       float thresh = nearestspacing;                   ///<-- distance threshold
+       float min = toonearspacing;                      ///<-- minimum distance to maintain
 
        for (auto& fb : frame){
-         float halfplane = (fb.pos() <= fa.dxy())[0];          ///<-- on which side of fa's half-plane is fb?
-         if ( halfplane > 0 ){                                 ///<-- if it is in front of fa, fa can "see it"
-           float dist = Round::sqd( fa.bound(), fb.bound() );     ///<-- distance between frames
+         float halfplane = (fb.pos() <= fa.dxy())[0];                             ///<-- on which side of fa's half-plane is fb?
+         if ( halfplane > 0 ){                                                    ///<-- if it is in front of fa, fa can "see it"
+           float dist = Round::sqd( fa.bound(), fb.bound() );                     ///<-- distance between frames
            if (dist < min) fa.toonear.push_back( Member::Neighbor(fb,dist) );           ///<-- if it is less than min threshhold
            else if (dist < thresh) fa.nearest.push_back( Member::Neighbor(fb,dist) );        ///<-- if it is within distance threshhold
            if (fa.nearest.size() > numNeighbors || fa.toonear.size() > numNeighbors ) break;       //<-- stop after # nearest neighbors
         }
        }
-       
-     
+
+
        //orient towards neighbors
        if (!fa.nearest.empty()){
         for (auto& n : fa.nearest){
           if (n.dist>FPERROR) {
-            db += fa.relOrientBiv( n.pos() ) * followweight;//fa.nearest.size(); 
+            db += fa.relOrientBiv( n.pos() ) * followweight;//fa.nearest.size();
             tacc += aversionspeed;
           }
-        } 
+        }
        }
-               
-        //orient away from neighbors that are too close 
+
+        //orient away from neighbors that are too close
         if (!fa.toonear.empty()){
         for (auto& n : fa.toonear){
           if (n.dist>FPERROR) db -= fa.relOrientBiv( n.pos() ) * aversionweight;//fa.toonear.size(); //fa.xz() * (b?1:-1);
-         } 
+         }
         }
 
         db += fa.relOrientBiv( Vec(0,0,0) ) * sourceweight;
         dx += fa.z();
-        
-        fa.db() = db * rotAcc; 
+
+        fa.db() = db * rotAcc;
         fa.dx() = dx * (acc+tacc);
 
 
       }
-    
+
   }
-  
-  
+
+
 };
 
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
-  
+
   return 0;
 
 }
-

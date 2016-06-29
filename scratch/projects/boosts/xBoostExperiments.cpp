@@ -86,7 +86,7 @@ struct MyApp : App {
          
          //make movement  
          Par tpar = tmp ^ tp; 
-         Pnt cpnt = Round::pnt_cir( tpar.dual(), 0 );
+         Pnt cpnt = Round::point( tpar.dual(), 0 );
          Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
          Pnt p = cpnt;//Round::loc( cpnt.spin( mot * bst ) ) ;
          Draw(p,1,1,0);

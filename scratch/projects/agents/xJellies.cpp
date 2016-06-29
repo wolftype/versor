@@ -17,7 +17,7 @@
  */
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 #include "form/vsr_knot.h"
 #include "form/vsr_twist.h"
 #include "util/vsr_stat.h"
@@ -38,7 +38,7 @@ struct Population{
   Population(int num=50) : mNum(num) {}
 
   ~Population();
-    
+
   /*-----------------------------------------------------------------------------
    *  A Distance Relationship between Organisms
    *-----------------------------------------------------------------------------*/
@@ -47,7 +47,7 @@ struct Population{
     float dist;
   };
 
-  
+
   /*-----------------------------------------------------------------------------
    *  A Neighborhood of Relationships
    *-----------------------------------------------------------------------------*/
@@ -56,7 +56,7 @@ struct Population{
     vector<Relationship> toonear;
     void clear(){ nearest.clear(); toonear.clear(); }
   };
-  
+
 
   /*-----------------------------------------------------------------------------
    *  A List of Members of the Population
@@ -65,7 +65,7 @@ struct Population{
 
   /// initialize
   void init();
-  
+
   /// reset
   void reset();
 
@@ -73,7 +73,7 @@ struct Population{
   void add(Organism * org){ member.push_back(org); }
 
   /// Build a Neighborhood of relationships
-  void buildNeighborhoods();  
+  void buildNeighborhoods();
 
   /// timestep
   void step(float dt);
@@ -110,21 +110,21 @@ struct Organism : public Frame {
   void population(Population * pop) { mPopulation = pop; }
 
   enum Behavior{
-    Follow = 1, 
-    Flee = 1 << 1, 
-    Fold = 1 << 2, 
-    Unfold = 1 << 3, 
-    Feed = 1 << 4, 
-    Force = 1 << 5, 
+    Follow = 1,
+    Flee = 1 << 1,
+    Fold = 1 << 2,
+    Unfold = 1 << 3,
+    Feed = 1 << 4,
+    Force = 1 << 5,
     Flock = 1 << 6
   };
 
-  Organism( Point p = point(0,0,0), Rotor r = Rot(1) ) : Frame(p,r),
+  Organism( Point p = Construct::point(0,0,0), Rotor r = Rot(1) ) : Frame(p,r),
   target(NULL), mBehavior( Flock | Force | Feed )
   {}
 
   virtual void step(float dt){
-       
+
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
        // if (mBehavior & Feed)   feed();
@@ -132,13 +132,13 @@ struct Organism : public Frame {
         if (mBehavior & Flee)   flee();
         if (mBehavior & Fold)   fold();
         if (mBehavior & Unfold) unfold();
-        
-        //move forward by 
+
+        //move forward by
         this->dVec += this->z() * vVelocity;
-        
-        this->dBiv *= aBiv; 
+
+        this->dBiv *= aBiv;
         this->dVec *= aVec;
-        
+
         this->spin();
         this->move();
   };
@@ -149,7 +149,7 @@ struct Organism : public Frame {
   }
 
   virtual void flock(){
-        
+
        vVelocity = .01;
        //orient towards neighbors
        if (!mNeighborhood.nearest.empty()){
@@ -158,20 +158,20 @@ struct Organism : public Frame {
             dBiv += this->relOrientBiv( n.partner->pos() ) * (vFlockRotVel+mPopulation->globalFlockRotVel);
             vVelocity += vFlockAcc;
           }
-        } 
+        }
        }
-               
-        //orient away from neighbors that are too close 
+
+        //orient away from neighbors that are too close
         if (!mNeighborhood.toonear.empty()){
         for (auto& n : mNeighborhood.toonear){
           if (n.dist>FPERROR) dBiv -= this->relOrientBiv( n.partner->pos() ) * (vAvertRotVel+mPopulation->globalAvertRotVel);
-         } 
+         }
         }
 
 
   }
 
-  
+
   void follow(){
     if(target) this -> relTwist( *target, vFollowVel );
   }
@@ -184,34 +184,34 @@ struct Organism : public Frame {
     //get velocity from world's vector field
     //auto v = world.vecAt( this->pos() );
   }
-  
+
   virtual void fold(){}
   virtual void unfold(){}
 
   virtual void draw(GFXSceneNode * re){
-      render::pipe( *(Frame*)(this), re );     
+      render::pipe( *(Frame*)(this), re );
   };
   virtual void draw(){
-      render::draw( *(Frame*)(this) );     
+      render::draw( *(Frame*)(this) );
   };
 
   Population::Neighborhood mNeighborhood;
   Population::Neighborhood& neighborhood() { return mNeighborhood; }
 
-  Point foodsource = point(0,0,0);  ///<-- food source position from world
+  Point foodsource = Construct::point(0,0,0);  ///<-- food source position from world
   Organism * target;                ///<-- temporary target to chase?
 
   int mBehavior;                    ///<-- Behavior Mode
- 
+
   float vVelocity = .01;            ///<-- General Velocity
   float vFollowVel = .01;           ///<-- Velocity to chase
-  
-  float vSourceRotVel = .01;        ///<-- Rotational Velocity to food source 
-  
+
+  float vSourceRotVel = .01;        ///<-- Rotational Velocity to food source
+
   float vFlockRotVel =.01;          ///<-- Rotational Velocity during Flocking
   float vAvertRotVel = .01;         ///<-- Rotational Velocity to Avert during Flocking
 
-  float vFlockAcc =.1;  
+  float vFlockAcc =.1;
 };
 
 
@@ -227,8 +227,8 @@ void Population::init(){
     for (auto& i : member ){
       if (!i) i = new Organism();
       i->population(this);
-      i->pos() = point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range) ); 
-      i->rot() = Gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );   
+      i->pos() = Construct::point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range) );
+      i->rot() = Gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );
     }
 }
 
@@ -240,18 +240,18 @@ void Population::reset(){
 }
 
 void Population::buildNeighborhoods() {
-    
+
     for (auto& ma : member){
        auto& fa = *ma;
-       
+
        fa.neighborhood().clear();
 
        for (auto& mb : member){
          auto& fb = *mb;
-         
+
          float halfplane = (fb.pos() <= fa.dxy())[0];               ///<-- on which side of fa's half-plane is fb?
          if ( halfplane > 0 ){                                      ///<-- if fb is in front of fa, fa can "see it"
-           
+
            float dist = Round::sqd( fa.bound(), fb.bound() );       ///<-- distance between fa and fb
            if (dist < minDistance) fa.neighborhood().toonear.push_back( {mb,dist} );   ///<-- if distance is less than min threshold fb is too near
            else if (dist < maxDistance) fa.neighborhood().nearest.push_back( {mb,dist} );               ///<-- if distance is below max threshhold then add to nearest
@@ -266,7 +266,7 @@ void Population::step(float dt){
   buildNeighborhoods();
   for (auto& i : member) i->step(dt);
 }
-  
+
 void Population::draw(GFXSceneNode * re){
   for(auto& i : member) i->draw(re);
 
@@ -293,7 +293,7 @@ void Population::draw(){
         }
 
       }
-    glEnd();   
+    glEnd();
 //  }
 }
 
@@ -306,7 +306,7 @@ void Population::draw(){
  *-----------------------------------------------------------------------------*/
 struct Jelly : Organism {
 
-  Circle midsectionR, midsectionL; 
+  Circle midsectionR, midsectionL;
   TorusKnot tk;
 
   void init(){
@@ -327,9 +327,9 @@ struct Jelly : Organism {
     midsectionR = midsectionR.boost( par );
     midsectionL = midsectionL.boost( par );
   }
-  
 
-};  
+
+};
 
 
 
@@ -339,7 +339,7 @@ struct Jelly : Organism {
  *  APPLICATION
  *-----------------------------------------------------------------------------*/
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -364,8 +364,8 @@ struct MyApp : App {
 
     population.init();
    // jelly.init();
-   // mSceneRenderer.immediate(false);    
-    
+   // mSceneRenderer.immediate(false);
+
   }
 
 
@@ -375,7 +375,7 @@ struct MyApp : App {
     if (bReset) population.reset();
   }
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
@@ -383,12 +383,12 @@ struct MyApp : App {
    // else population.draw(this);
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

@@ -50,6 +50,7 @@ struct Construct {
    }
 };
 
+
 }} //vsr::cga2d::
 
 #endif   /* ----- #ifndef vsr_cga2D_op_INC  ----- */
