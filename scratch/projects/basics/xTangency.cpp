@@ -11,16 +11,16 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
 
@@ -42,7 +42,7 @@ struct MyApp : App {
     auto p = point(0,0,0);//calcMouse3D();
 
     cout << (p<=dls)[0] << endl;
-    
+
     //tangent of direct round at point p gives a direction
     auto tangentToCircle = Tangent::at(dls.dual(),p);
 
@@ -50,7 +50,7 @@ struct MyApp : App {
     //closest to point p
     auto line = p ^ dls ^ Inf(1);
     auto pointOnCircle = Ro::split( (line.dual() ^ dls).dual(), false);
-    
+
     draw(pointOnCircle,1,1,0);
 
     draw(tangentToCircle,0,0,1);
@@ -60,12 +60,12 @@ struct MyApp : App {
     draw(dls,1,0,0,.2); ///<-- draw red sphere
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

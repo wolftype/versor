@@ -18,7 +18,7 @@
  */
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 #include "form/vsr_group.h"
 #include "form/vsr_twist.h"
 
@@ -26,7 +26,7 @@ using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   float amt1 = 0; float amt2 = 0;
   bool bToggle, bSet;
 
@@ -37,7 +37,7 @@ struct MyApp : App {
   Field<Dll> dfield = Field<Dll>(2,2,2,5,5,5);
 
  // Circle c = CXY(1);
-  
+
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -50,12 +50,12 @@ struct MyApp : App {
 
     for (int i =0;i<frame.size();++i){
       frame[i].pos() = dfield.grid(i);
-      objectController.attach(&frame[i]);    
-    }   
+      objectController.attach(&frame[i]);
+    }
    }
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
@@ -70,7 +70,7 @@ struct MyApp : App {
     for (int i =0;i<=8;++i){
     for (int j =0;j<=8;++j){
     for (int k =0;k<=8;++k){
- 
+
        auto ti = (float)i/8;
        auto tj = (float)j/8;
        auto tk = (float)k/8;
@@ -79,7 +79,7 @@ struct MyApp : App {
        Frame f(tdll);
        f.scale() = amt1;
 
- 
+
       if (i==0 || i == 10 )  {
          DrawBAt(f.yz()*f.scale(), f.pos(),0,.6,.6);
          DrawAt (f.x()*f.scale() * (i==0 ? -1 : 1), f.pos(),.3,.1,.3);
@@ -94,23 +94,18 @@ struct MyApp : App {
         DrawAt (f.z()*f.scale() * (k==0 ? 1 : -1), f.pos(),.3,.1,.3);
 
       }
-      
-
-    }}} 
 
 
-
-
+    }}}
 
   }
 
 
-  
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

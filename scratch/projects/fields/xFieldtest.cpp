@@ -11,59 +11,58 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_cga3D_app.h"
-
+#include "vsr_app.h"
 #include "vsr_field.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
-  Lin ray;
+  float amt;
 
   float time =0;
-  
-  virtual void onDraw(){ 
-        
+
+  Field<Vec> vf(20,10,1);
+
+  virtual void setup(){
+    bindGLV();
+    gui(amt,"amt",-100,100);
+    amt = .3;
+  }
+
+  virtual void onDraw(){
+
       mouse = calcMouse3D();
       time +=.01;
-      auto pnt = Ro::point( sin(time)*5, cos(time) * 5, 0);
-    
-      static Field<Vec> vf(20,10,1);
-      //static Field<Vec> ortho(20,10,1);
+      auto pnt = Round::point( sin(time)*5, cos(time) * 5, 0);
 
       Par par;
       for (int i = 0; i < vf.num(); ++i){
-        float dist = Ro::sqd( vf.grid(i), pnt ) + .1;
+        float dist = Round::sqd( vf.grid(i), pnt ) + .1;
         par = Par(Tnv(0,1,0)).trs(pnt) * 1./dist;
-        Vec nv = Ro::loc( vf.grid(i).bst(par*amt) ) - vf.grid(i);
+        Vec nv = Round::location( vf.grid(i).bst(par*amt) ) - vf.grid(i);
         vf[i] = nv;
       }
 
       Draw(pnt);
-
       Draw(vf);
-      //Draw(ortho);
 
   }
-   
 
-  
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

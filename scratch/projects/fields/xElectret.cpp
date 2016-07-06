@@ -17,50 +17,39 @@
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr_app.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
+struct MyApp : App {
 
-
-struct MyApp : App {    
-   
   Pnt mouse;
-  Lin ray;
 
-  float time;
+  float time=0;
   float amt;
 
-  MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
-    time = 0;
-  }
+  //ELECTRET FIELD
+  Field<Flp> f(5,5,5,1);
 
-  void initGui(){
+  virtual void setup(){
+      bindGLV();
       gui(amt,"amt",-100,100);
-  }
-  
-    void getMouse(){
-      auto tv = interface.vd().ray; 
-      Vec z (tv[0], tv[1], tv[2] );
-      auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+      scene.camera.pos( 0,0,10 );
+
   }
 
-    virtual void onDraw(){ 
-        
-      getMouse();
-    
-    //ELECTRET FIELD
-    static Field<Flp> f(5,5,5,1);
+
+  virtual void onDraw(){
+
+    mouse = calcMouse3D();
+
+
 
     bool bPolarity = false;
     for (int i = 0; i < f.num(); ++i){
       bPolarity = !bPolarity;
-      Touch(interface, f.grid(i) );
+
       f[i] = f.grid(i) ^ Inf(1);
       if (bPolarity) {
         f[i] *= -1;
@@ -69,46 +58,35 @@ struct MyApp : App {
     }
 
     //FIELD THAT IT ACTS ON
-    Field<Vec> v(20,20,20,.2);
+    Field<Vec> v(10,10,10,.1);
 
     for (int i = 0; i < v.num(); ++i){
 
       Flp flp;
       //Sum Distances
       for (int j = 0; j < f.num(); ++j){
-        VT wt = 1.0 / (.1 + Ro::sqd(v.grid(i), f.grid(j)) );
+        float wt = 1.0 / (.1 + Round::sqd(v.grid(i), f.grid(j)) );
         flp += f[j] * wt;
       }
-      auto tp = v.grid(i).spin( Gen::bst(flp * amt) );
-      v[i] = tp / tp[3] - v.grid(i); 
+      auto tp = Round::location( v.grid(i).spin( Gen::bst(flp * amt) ) );
+      v[i] = tp - v.grid(i);
     }
 
-    DrawB(v);
+    Draw(v);
 
     //EQUIPOTENTIALS
-    
-  }
-   
 
-  
+  }
+
+
+
 };
 
 
-MyApp * app;
-
-
 int main(){
-                             
-  GLV glv(0,0);  
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
-  app -> initGui();
-  
-  
-  glv << *app;
-
-  Application::run();
+  MyApp app;
+  app.start();
 
   return 0;
 

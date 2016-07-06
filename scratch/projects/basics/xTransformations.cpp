@@ -17,7 +17,7 @@
  */
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 #include "form/vsr_twist.h"
 #include "form/vsr_conic.h"
 
@@ -25,12 +25,12 @@ using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bToggle = false;
   bool bSet = false;
   bool bMouseSet = false;
-  
+
   float amt1 = 0;
   float amt2 = 0;
 
@@ -51,22 +51,23 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt1,"amt1",-100,100)(amt2,"amt2",-100,100)(bToggle,"bToggle")(bSet,"bSet");
-    
+
     gui(switcher,"switcher",0,10);
-    
-    //objectController.attach(&c);
 
     objectController.attach(&point);
 
     mColor.set(.8,.8,.8);
+
+    amt1 = 2;
+    switcher=0;
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-  
+
     //mouse = calcMouse3D();
     Circle c = CXY(1);
     gl2psPointSize(5);
@@ -76,15 +77,15 @@ struct MyApp : App {
      float t= (float)i/num;
 
      Circle tcir;
-     
+
      auto rot = Gen::rot( Biv::xz * PI * -t * amt1);
      auto trs = Gen::trs( Vec::y * t * amt1 );
-     
-     
+
+
      auto dil = Gen::dil( point, -t * amt1);
 
      auto dll = Twist::Along(DLN(0,1,0), amt1, amt2);
-     auto mot = Gen::mot( dll * t ); 
+     auto mot = Gen::mot( dll * t );
 
      auto cir = Round::produce( Construct::sphere(2,0,0,amt2), Biv::xz);
      auto bst = Gen::bst( cir.dual() * -t * amt1);
@@ -109,7 +110,7 @@ struct MyApp : App {
             Draw( cir.dual(), 0, 1,0);
           }
          // else if (Round::size(cir) == 0) Draw( cir.dual(),0,1,0 );
-          
+
           tcir = c.spin(bst); break;
         case 5:
           glColor3f(.4+.4*t,0,.4-.4*t);
@@ -148,12 +149,12 @@ struct MyApp : App {
 
 
 
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

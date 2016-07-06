@@ -17,13 +17,13 @@
  */
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -39,18 +39,18 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-    
+
     ca = CXY(.5).trs(-1,0,0);
     cb = CXY(2).trs(2,0,0);
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    
+
     Draw(ca);
     Draw(cb);
 
@@ -62,16 +62,16 @@ struct MyApp : App {
     Draw(ref2, 0,1,0);
 
     plunge.print();
-    
+
     Draw(plunge,1,0,0,.5);
-  
+
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 
