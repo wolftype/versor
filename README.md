@@ -110,7 +110,7 @@ COMPILATION
 For this version you need C++11 support, which is now common (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.  
 See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
 
-	git clone git://github.com/wolftype/versor.git
+	git clone https://github.com/wolftype/versor.git
 
 You'll need to initialize the submodules to build any graphics examples:
 
