@@ -4,3 +4,5 @@ compiler:
   - gcc
 script:
   - ./build.sh
+sudo: required
+dist: trusty
