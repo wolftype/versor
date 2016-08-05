@@ -1,7 +1,6 @@
 #!/bin/bash
 
-mkdir -p build
-cd build
+
 #cmake -DCMAKE_TOOLCHAIN_FILE=<your_toolchain_file>
 
 #DEFAULTS
@@ -30,6 +29,9 @@ if [ $BUILD_GRAPHICS = 1 ]; then
   make -C ext/glv
 fi
 
+cmake --version
+mkdir -p build
+cd build
 cmake -DBUILD_GRAPHICS=$BUILD_GRAPHICS -DBUILD_EXAMPLES=$BUILD_EXAMPLES -DBUILD_SCRATCH=$BUILD_SCRATCH ..
 
 make VERBOSE=$MAKE_VERBOSE -j3
