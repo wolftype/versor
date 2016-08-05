@@ -12,4 +12,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - libglew-dev
-    - freeglut3-dev      
+    - freeglut3-dev
+    - libxi-dev
+    - libxmu-dev
