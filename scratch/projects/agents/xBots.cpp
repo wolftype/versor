@@ -16,9 +16,7 @@
  * =====================================================================================
  */
 
-#include "util/vsr_cga3D_app.h"
-#include "form/vsr_cga3D_frame.h"
-
+#include "vsr_app.h"
 #include "util/vsr_stat.h"
 #include "form/vsr_twist.h"
 

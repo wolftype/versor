@@ -72,7 +72,6 @@ namespace vsr{  namespace cga {
         init();    
      }
      
-
      void set( VSR_PRECISION theta, VSR_PRECISION lengthA, VSR_PRECISION lengthB, VSR_PRECISION offset=0.0){
        mTheta = theta; mLengthA = lengthA; mLengthB = lengthB; mOffsetA = offset; mOffsetB = offset;
        init();
@@ -104,7 +103,6 @@ namespace vsr{  namespace cga {
      VSR_PRECISION& lengthA() { return mLengthA; } 
      VSR_PRECISION& lengthB() { return mLengthB; } 
 
-
      VSR_PRECISION offsetA() const { return mOffsetA; } 
      VSR_PRECISION offsetB() const { return mOffsetB; } 
      VSR_PRECISION& offsetA() { return mOffsetA; } 
@@ -117,7 +115,7 @@ namespace vsr{  namespace cga {
       Meet of 1st and 3rd spheres of possibilities
     */
      Circle circleMeet(){
-       return ( nextSphere(1) ^ prevSphere(3) ).dual();//Round::dls(mFrame[1].pos(), mLengthB) ^ Round::dls(mFrame[3].pos(), mLengthA) ).dual();
+       return ( nextSphere(1) ^ prevSphere(3) ).undual();
      }
 
      Pair pairMeet(){
@@ -125,7 +123,7 @@ namespace vsr{  namespace cga {
      }
 
      Circle orbit(){
-       return ( nextPlane(3) ^ prevSphere(0) ).dual();//( mFrame[3].dxy() ^ Round::dls( mJoint[0].pos(), mLengthB ) ).dual();
+       return ( nextPlane(3) ^ prevSphere(0) ).undual();
      }
 
      
@@ -139,7 +137,7 @@ namespace vsr{  namespace cga {
 
         resetJoints();
 
-        mJoint[0].rot() = Gen::rot( Biv::xy * amt/2.0 );
+        mJoint[0].rot() = Gen::rot( Biv::xy * -amt/2.0 );
         fk(1);
         
         mFrame[3].mot( mBaseFrame.mot() * !mLink[3].mot() );
@@ -151,7 +149,7 @@ namespace vsr{  namespace cga {
         Pair p = ( mFrame[1].dxy() ^ dualMeet).dual();
         
         //pick one
-        mFrame[2].pos() = Round::location( Round::split(p, !bSwitch) );           
+        mFrame[2].pos() = Round::location( Round::split(p, !bSwitch) );
         
         Rot ry = mFrame[1].rot(); 
         for (int i = 1; i < 4; ++i){
@@ -164,7 +162,7 @@ namespace vsr{  namespace cga {
           Vec dv = (target-mFrame[i].vec()).unit().spin( linkRot );
 
           //mJoint[i].rot() = Gen::ratio(y,dv);
-          mJoint[i].rot() = Gen::rot(  Biv::xy * acos( ( dv <= y )[0] )/2.0 * (bSwitch ?  -1 : 1 ) );
+          mJoint[i].rot() = Gen::rot(  Biv::xy * acos( ( dv <= y )[0] )/2.0 * (bSwitch ?  1 : -1 ) );
           
          // ry = mJoint[i].rot() * ry;
           ry = ry * mJoint[i].rot() * mLink[i].rot();

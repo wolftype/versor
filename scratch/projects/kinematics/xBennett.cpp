@@ -76,10 +76,10 @@ struct MyApp : App {
       gui(lightX,"lightX",-10,10);
       gui(lightY,"lightY",-10,10);
       gui(lightZ,"lightZ",-10,10);
-      gui(bShadedOutput, "bShadedOutput");      
-      gui(bOffsetOutput, "bOffsetOutput");      
-      gui(bOccludeOutput, "bOccludeOutput");      
-      gui(bSortOutput, "bSortOutput");      
+      gui(ps.bShadedOutput, "bShadedOutput");
+      gui(ps.bOffsetOutput, "bOffsetOutput");
+      gui(ps.bOccludeOutput, "bOccludeOutput");
+      gui(ps.bSortOutput, "bSortOutput");
     
 
       link = 2;
