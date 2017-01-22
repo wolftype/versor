@@ -324,14 +324,6 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
       - vsr::cga::DirectionVector
       - vsr::cga::DirectionBivector
       - vsr::cga::DirectionTrivector
-            
-      these can be cast to vsr::cga::Pair, vsr::cga::Circle, vsr::cga::Sphere and then translated:
-
-            auto tau = Pair( TangentVector(0,1,0) ).translate(5,0,0);
-
-      or @ref shorthand
-            
-            auto tau = Par( Tnv(0,1,0) ).trs(5,0,0);
 
       ###Translating
       The 2-blade entitity vsr::cga::DirectionVector 

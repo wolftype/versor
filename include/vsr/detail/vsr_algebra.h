@@ -97,7 +97,7 @@ namespace vsr {
 
         using metric = metric_type;                             ///<-- Metric, with signature, whether Euclidean, Projective, Conformal, etc
           
-        using value_t = value_type;                             ///<-- %Field over which Algebra is Defined (e.g. float, double, complex)
+        using value_t = value_type;                             ///<-- Field over which Algebra is Defined (e.g. float, double, complex)
         
         static const int dim = metric::type::Num;               ///<-- Dimension of Algebra (2,3,4,5,etc)
  
@@ -456,7 +456,7 @@ namespace vsr {
 
 
             using scalar = Multivector<alg,sca>; 
-            using psuedoscalar = Multivector<alg,pss>;  
+            using pseudoscalar = Multivector<alg,pss>;  
             using euclidean_pseudoscalar = Multivector<alg,euc>;
             using vector = Multivector<alg,vec>; 
             using point = Multivector<alg,pnt>;
@@ -491,7 +491,7 @@ namespace vsr {
 
 
             using Scalar = Multivector<alg,sca>; 
-            using Psuedoscalar = Multivector<alg,pss>;  
+            using Pseudoscalar = Multivector<alg,pss>;  
             using EuclideanPseudoscalar = Multivector<alg,euc>;
             using Vector = Multivector<alg,vec>; 
             using Point = Multivector<alg,pnt>;

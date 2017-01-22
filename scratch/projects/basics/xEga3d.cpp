@@ -21,6 +21,8 @@
 using namespace vsr;
 
 typedef NEVec<3> Vec; /// A 3D Euclidean Vector
+typedef NERot<3> Rot; /// A 3D Euclidean Vector
+
 
 int main(){
 
@@ -40,5 +42,8 @@ int main(){
   ip.print(); op.print(); gp.print();
 
   EGProd< Vec::basis, Vec::basis >::Arrow().print();
+
+  cout << "ROTOR MULTIPLICATION" << endl;
+  EGProd< Rot::basis, Rot::basis >::Arrow().print();
 
 }

@@ -134,7 +134,9 @@ To compile and run programs in scratch/projects:
 
 	./run.sh scratch/projects/<folder>/<filename>
 
-Adding "configure" to the end of the above command first re-runs cmake in order to add "filename" to its list of targets. For instance, to build and run programs you have written (e.g. in some folder called scratch/projects/user/), you can first write:
+Note that not all projects will compile as I am in the process of updating them in this development branch.
+
+Adding "configure" to the end of the above `./run.sh` command first re-runs cmake in order to add `<filename>` to its list of targets. For instance, to build and run programs you have written (e.g. in some folder called scratch/projects/user/), you can first write:
 
 	./run.sh scratch/projects/user/<filename> --configure
 

@@ -54,11 +54,11 @@ struct MyApp : App {
 
   void fixedUpdate(){
     //test for intersection
-    auto pp = (player.bound() ^ ground).dual();
+    auto pp = (player.bound() ^ ground);
     if (Round::size(pp,true) > 0) bHit = true;
 
     if (bHit){
-      player.move(0,-Round::rad(pp),0 );
+      player.move(0,Round::rad(pp),0 );
     }
 
     player.move();
@@ -91,32 +91,30 @@ struct MyApp : App {
       
   }
 
-  virtual bool onKeyDown(GLV& glv){ 
+  virtual void onKeyDown(const gfx::Keyboard& k){
     
     //App::onKeyDown(glv);
 
     Vec v(0,0,0);
-    if (interface.keyboard.code == 'i'){
+    if (k.code == 'i'){
       cout <<"up" <<endl;
       v += Vec(0,0,-.1);
     }
-    if (interface.keyboard.code == 'k'){
-      //cout <<"up" <<endl;
+    if (k.code ==  'k'){
+      cout <<"down" <<endl;
       v += Vec(0,0,.1);
     }
-    if (interface.keyboard.code == 'l'){
-      //cout <<"up" <<endl;
+    if (k.code ==  'l'){
+      cout <<"right" <<endl;
       v += Vec(.1,0,0);
     }
-    if (interface.keyboard.code == 'j'){
-      //cout <<"up" <<endl;
+    if (k.code ==  'j'){
+       cout <<"left" <<endl;
       v += Vec(-.1,0,0);
     }
 
     player.dx() += v * amt;
-    
-   // cout << "false" << endl;
-    return true;
+
   }
    
 
