@@ -987,8 +987,8 @@ struct Euc{
           @returns \direction
       */
       template<class A,class B>
-      static constexpr auto direction( const Multivector<A,B>& f) RETURNS(
-          GAInf<A>(-1) <= f
+	  static constexpr auto direction(const Multivector<A, B>& f) RETURNS(
+		  GAInf<A>(-1) <= f
       )
     /*! Direction of Direct Flat
           @param Direct Flat [ Plane (Pln) or Line (Lin) ]

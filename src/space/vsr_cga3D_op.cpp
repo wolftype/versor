@@ -761,7 +761,7 @@ namespace cga {
       }
 
 
-      #pragma mark HYPERBOLIC_FUNCTIONS
+     // #pragma mark HYPERBOLIC_FUNCTIONS
       /*-----------------------------------------------------------------------------
        *  hyperbolic functions (see alan cortzen's document on this)
        *-----------------------------------------------------------------------------*/

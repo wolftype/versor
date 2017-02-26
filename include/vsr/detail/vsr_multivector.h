@@ -294,7 +294,7 @@ namespace vsr{
       *  Sums
       *-----------------------------------------------------------------------------*/
       template<class B>
-      auto operator + (const MultivectorB<B>& b) -> decltype( algebra::sum(*this, b) ) {
+      auto operator + (const MultivectorB<B>& b) ->MultivectorB< typename Merge<basis, B >::Type >{//decltype( algebra::sum(*this, b) ) {
         return algebra::sum(*this,b);
       }   
   
@@ -392,11 +392,11 @@ A Multivector<Algebra,B>::copy() const{
  *-----------------------------------------------------------------------------*/
 template<typename Algebra, typename B> template<bits::type IDX> 
 typename Algebra::value_t & Multivector<Algebra,B>::get(){
- return val[ find(IDX, B()) ];
+ return val[ find<B>(IDX,0) ];
 }
 template<typename Algebra, typename B>   template<bits::type IDX> 
 typename Algebra::value_t Multivector<Algebra,B>::get() const{
- return val[ find(IDX, B()) ];
+ return val[ find<B>(IDX, 0) ];
 }
 template<typename Algebra, typename B> template<bits::type IDX> 
 Multivector<Algebra,B>& Multivector<Algebra,B>::set( typename Algebra::value_t v){
@@ -498,7 +498,7 @@ template<bits::type dim, typename T=VSR_PRECISION> using euclidean_rotor = GARot
 
 template<typename T=VSR_PRECISION>
 struct NE{
-    template <bits::type ... NN> using e = typename GAE< euclidean<bits::dimOf( bits::blade((1<<(NN-1))...) ), T >>::template e<NN...>; 
+    template <bits::type ... NN> using e = typename GAE< euclidean<bits::dimOf( bits::BladeMaker<NN...>::type ), T >>::template e<NN...>; 
 };
 //
 

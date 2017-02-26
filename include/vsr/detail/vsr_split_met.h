@@ -150,7 +150,7 @@ struct Pop< XList<>, dim >{
 
 //compare two basis blades
 template< class A, class B>
-constexpr bool compare(const A& = A(), const B& = B()){
+constexpr bool compare(){// a = A(), const B& b = B()){
 	return A::BIT == B::BIT;
 }  
 
@@ -173,7 +173,7 @@ struct CompressIt<P,2>{
   	typedef typename P::HEAD A; 
 	typedef typename P::TAIL::HEAD B;
 	
-	typedef typename Maybe< compare( A(), B() ), 
+	typedef typename Maybe< compare<A,B>(), 
 	    XList< typename Sum< A, B >::Type >,
 		P
 		>::Type Type; 
@@ -190,7 +190,7 @@ struct CompressIt<P,4>{
 	
 	//SCA S = compare( B(), C() );  
 	
-	typedef typename Maybe< compare( B(), C() ), 
+	typedef typename Maybe< compare<B,C>(),
 	    XList< 
 			typename Sum< A, D >::Type,
 			typename Sum< B, C >::Type 

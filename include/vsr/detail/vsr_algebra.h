@@ -312,8 +312,9 @@ namespace vsr {
      
       using alg = typename A::algebra;
       //use as e<1,2,3> will return e123 blade
-      template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;  
-      template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
+  //    template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;  
+	  template<bits::type ... N> using e_basis = Basis< bits::BladeMaker<N...>::Type >;
+	  template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
 
       using sca = Basis<0>;  
       using pss = Basis<bits::pss(alg::dim)>;
@@ -330,11 +331,13 @@ namespace vsr {
     *-----------------------------------------------------------------------------*/
    template<typename alg> 
    struct named_types<algebra_impl<alg,true,false>>{
+		    static int mb(int i) { return 1 << (i - 1); }
+
 
             using algebra = alg;//AlgebraImpl<alg,true,false>;
             
             //use as e<1,2,3> will return e123 blade
-            template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;  
+            template<bits::type ... N> using e_basis = Basis< bits::BladeMaker<N...>::Type >;  
             template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
             
             using sca = Basis<0>;  
@@ -380,8 +383,8 @@ namespace vsr {
             
             using algebra = alg;//AlgebraImpl<alg,false,true>;
             //use as e<1,2,3> will return e123 blade
-            template<bits::type ... N> using e = Basis< bits::blade((1<<(N-1))...)>;  
-            
+            //template<bits::type ... N> using e = Basis< bits::blade( (1<<(N-1))...)>;  
+			template<bits::type ... N> using e_basis = Basis< bits::BladeMaker<N...>::Type >;
             //BASIS
             using sca = Basis<0>;  
             using pss = Basis<bits::pss(algebra::dim)>;

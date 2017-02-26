@@ -22,6 +22,12 @@
 #include <string>
 #include <sstream> 
 
+#ifdef _MSC_VER
+	#pragma warning(disable : 4503)
+	#pragma warning(disable : 4244)
+	#pragma warning(disable : 4200)
+	#pragma warning(disable : 4068)
+#endif
 
 /*!-----------------------------------------------------------------------------
  * the **versor** namespace 
@@ -83,6 +89,17 @@ template<class X, class...XS>
 constexpr type blade( X x, XS ... xs){
   return x | blade(xs...);  
 }
+
+/// Make bit representation of a blade
+template<class X>
+constexpr type makeBlade(X x) {
+	return 1 << (x - 1);
+}
+
+template<type ... X>
+struct BladeMaker {
+	static const type Type = blade((1 << (X - 1))...);
+};
 
 /// Grade of blade (count number of "on" bits)
 constexpr type grade(type a, type c = 0){

@@ -16,11 +16,11 @@ set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200  ")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 ") 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200 ")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 ") 
 
 
 #All .cpp files in src/space get built into libvsr
@@ -56,10 +56,16 @@ FILE(GLOB_RECURSE HeaderFiles "${PROJECT_SOURCE_DIR}/include/*")
 add_custom_target(headers SOURCES ${HeaderFiles})
 #Add scripts as custom target for same reason
 FILE(GLOB ScriptFiles "${PROJECT_SOURCE_DIR}/*.sh")
-add_custom_target(scr SOURCES ${ScriptFiles})
+add_custom_target(scripts SOURCES ${ScriptFiles})
 
-#FILE(GLOB_RECURSE ExampleFiles "${PROJECT_SOURCE_DIR}/examples/*")
-#add_custom_target(ex SOURCES ${ExampleFiles})
+FILE(GLOB ExampleFiles "${PROJECT_SOURCE_DIR}/examples/core/*")
+#add_custom_target(core_examples SOURCES ${ExampleFiles})
+foreach(filename ${ExampleFiles})
+  get_filename_component(target ${filename} NAME_WE)
+  add_executable(${target} ${filename} )
+  target_link_libraries(${target} vsr )
+endforeach()
+
 #FILE(GLOB_RECURSE ScratchFiles "${PROJECT_SOURCE_DIR}/scratch/*")
 #add_custom_target(scratch SOURCES ${ScratchFiles})
 

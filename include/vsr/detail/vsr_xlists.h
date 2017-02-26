@@ -61,6 +61,8 @@ template<bits::type ... XS>
 struct Basis{
   constexpr Basis(){}
   static const int Num = 0;
+  static const int HEAD = 0;
+  using TAIL = Basis<>;
   static void print(){ printf("\n");} 
 };   
 
@@ -270,7 +272,7 @@ struct ICat< Basis<>, B>{
 //Return Sub B not in A
 template<class A, class B>
 struct NotType{  
-  static const int IS = find( B::HEAD, A() );
+	static const int IS = find<A>(B::HEAD, 0);
   typedef typename Cat< 
     typename Maybe< IS == -1,
       Basis< B::HEAD > , 
@@ -286,6 +288,12 @@ struct NotType< A, Basis<> >{
 template<class A>
 struct NotType< Basis<>, A >{
   typedef A Type;  
+};
+
+
+template<class A, class B>
+struct Merge {
+	using Type = typename ICat< typename NotType<A, B>::Type, A >::Type;
 };
 
 
@@ -412,7 +420,7 @@ struct XList{
   
   template<class R, class A, class B>
   static constexpr R Make(const A& a, const B& b){
-    return R();
+    return R(0); //hmmm, changed from R() 
   }
 };                                                     
 
@@ -588,13 +596,19 @@ struct Involute< Basis<>, IDX >{
 };
 
 
-constexpr int find(int n, const Basis<>, int idx){ //should not have default arg
-	return -1;
-}
+//constexpr int find(int n, const Basis<>, int idx){ //should not have default arg
+//	return -1;
+//}
+
 template<class A>
-constexpr int find(int n, const A& a, int idx = 0){
-	return A::HEAD == n ? idx : find(n, typename A::TAIL(), idx +1);
+constexpr int find(int n, int idx ){
+	return A::Num == 0 ? -1 : A::HEAD == n ? idx : find<A::TAIL>(n, idx + 1);
 }    
+
+//template<class A, int N, int IDX=0> 
+//struct Find {
+//	static const int Result = Maybe< A::Head == N 
+//};
 
 /*-----------------------------------------------------------------------------
  *  Cast Type A to Type B
@@ -603,7 +617,7 @@ template<class A, class B>
 struct Cast{
 	typedef typename 
   XCat< 
-      XList< InstCast< find( A::HEAD, B() ) > >, 
+      XList< InstCast< find<B>( A::HEAD, 0 ) > >, 
       typename Cast< typename A::TAIL, B >::Type 
       >::Type Type;  
 };  
@@ -617,7 +631,7 @@ struct Cast< Basis<>, B >{
  *-----------------------------------------------------------------------------*/
 namespace basis_t{
   typedef Basis<0> sca;
-  template<bits::type ... N> using e = Basis< bits::blade((1<<(N-1))...) >;  
+  template<bits::type ... N> using e = Basis< bits::BladeMaker<N...>::type  >;  
   template<bits::type DIM> using pss = Basis< bits::pss(DIM) >;
   template<bits::type DIM> using epss = Basis< bits::pss(DIM-2) >;
   template<bits::type DIM> using origin = Basis< bits::origin<DIM>() >;
