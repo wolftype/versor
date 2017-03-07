@@ -265,6 +265,19 @@ struct ICat< Basis<>, B>{
   typedef B Type;
 };
 
+//constexpr int find(int n, const Basis<>, int idx){ //should not have default arg
+//  return -1;
+//}
+
+template<class A>
+constexpr int find(int n, int idx ){
+  return A::Num == 0 ? -1 : A::HEAD == n ? idx : find<typename A::TAIL>(n, idx + 1);
+}    
+
+//template<class A, int N, int IDX=0> 
+//struct Find {
+//  static const int Result = Maybe< A::Head == N 
+//};
 
 /*-----------------------------------------------------------------------------
  *  NOT TYPE (GETS ELEMENTS OF B NOT IN A)
@@ -420,7 +433,7 @@ struct XList{
   
   template<class R, class A, class B>
   static constexpr R Make(const A& a, const B& b){
-    return R(0); //hmmm, changed from R() 
+    return R(); //hmmm, changed from R(0) 
   }
 };                                                     
 
@@ -596,19 +609,6 @@ struct Involute< Basis<>, IDX >{
 };
 
 
-//constexpr int find(int n, const Basis<>, int idx){ //should not have default arg
-//	return -1;
-//}
-
-template<class A>
-constexpr int find(int n, int idx ){
-	return A::Num == 0 ? -1 : A::HEAD == n ? idx : find<A::TAIL>(n, idx + 1);
-}    
-
-//template<class A, int N, int IDX=0> 
-//struct Find {
-//	static const int Result = Maybe< A::Head == N 
-//};
 
 /*-----------------------------------------------------------------------------
  *  Cast Type A to Type B
