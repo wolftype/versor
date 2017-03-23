@@ -11,22 +11,21 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_app.h"
 #include "vsr_map.h"
 #include "vsr_graph.h"
 #include "vsr_graph_draw.h"
 
-using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -52,9 +51,9 @@ struct MyApp : App {
     gui(dist,"dist",-100,100);
 
     amt=10; size=0;dist=0;
-    
-    sa = sphere(-3,0,0);
-    sb = sphere(3,0,0);
+
+    sa = Construct::sphere(-3,0,0);
+    sb = Construct::sphere(3,0,0);
 
     objectController.attach(&sa);
     objectController.attach(&sb);
@@ -66,7 +65,7 @@ struct MyApp : App {
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
@@ -80,14 +79,14 @@ struct MyApp : App {
       float t = (float)i/10;
       auto ts = sa.bst(par.runit() * t * (amt+dst)/2.0 );
      // Draw(ts,0,1,0,.2);
-      tcir.push_back( meet(ts, sphere(0,0,0) ) );//Dlp(1,0,0)) );
+      tcir.push_back( Construct::meet(ts, Construct::sphere(0,0,0) ) );//Dlp(1,0,0)) );
       Draw(tcir.back(),t,0,1-t,.5);
     }
     
     //skin 100 pnts per circle
     pnts = functor::eval<Point>(tcir, pointOnCircle, 20, TWOPI);
 
-    generic::Draw(tmp);
+    Draw(tmp);
     
     for (auto& i : pnts) Draw(i,1,0,0);
 

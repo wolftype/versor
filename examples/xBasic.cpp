@@ -19,7 +19,7 @@ struct MyApp : App {
     bindGLV();
 
     //set renderer to use programmable pipeline
-    mSceneRenderer.immediate(false);
+    //mSceneRenderer.immediate(false);
 
     //Enable Mouse Control with 't' 'r' and 's' keys
     objectController.attach(&circle);
