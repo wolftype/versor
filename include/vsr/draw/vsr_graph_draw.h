@@ -16,6 +16,10 @@
  * =====================================================================================
  */
 
+#ifndef VSR_GRAPH_DRAW_H_INCLUDED
+#define VSR_GRAPH_DRAW_H_INCLUDED  
+ 
+
 #include "gfx/gfx_render.h"
 
 #include "form/vsr_graph.h"
@@ -154,3 +158,6 @@ template<>
 
 namespace vsr{
 } //vsr::
+
+
+#endif

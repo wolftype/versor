@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 
+#ifndef VSR_PRINT_H_INCLUDED
+#define VSR_PRINT_H_INCLUDED
+
 #include <sstream>
 
 using namespace std;
@@ -64,3 +67,5 @@ namespace vsr {
 
 
 }//vsr::
+
+#endif
