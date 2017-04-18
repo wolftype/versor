@@ -16,6 +16,10 @@
  * =====================================================================================
  */
 
+#ifndef VSR_EGA2D_DRAW_H_INCLUDED
+#define VSR_EGA2D_DRAW_H_INCLUDED  
+ 
+
 #include "vsr_products.h"
 #include "vsr_generic_op.h"  
 #include "vsr_ega2D_types.h"
@@ -53,4 +57,6 @@ namespace vsr {
   }
 
 }
+
+#endif
 

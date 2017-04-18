@@ -30,7 +30,9 @@ groups/xSpaceGroup3D.cpp
 @sa vsr_root.h for generating reflection groups
 
 @todo fix up SpaceGroup2D so that it is as complete as SpaceGroup3D 
-
+@todo revisit application algorithm (e.g. reserve space ahead of time)
+@todo only supports primitive lattice (not body centered, etc) right now
+@todo bravais system type should be determinable to avoid crashing
 */
   
 #ifndef  vsr_group_INC
@@ -705,7 +707,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
       
    // Sym mSym;           ///< Symmetry Class (i.e. 4,3), from which lattice system can be deduced
-    Lattice mLattice;   ///< lattice type (Primitive, Body, etc) and system (Triclinic, Cubic etc)
+    Lattice mLattice;   ///< system (Triclinic, Cubic etc) and lattice type (Primitive, Body, etc)
     Glide mGlide;       ///< glide reflections
     Screw mScrew;       ///< screw displacement
 

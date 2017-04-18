@@ -62,7 +62,7 @@ struct MyApp : App {
     draw(tk.cir,0,1,0);                     
 
     //Toggle between immediate (fixed function) and programmable pipelines
-    mSceneRenderer.immediate(bDrawMode);
+    mRenderGraph.immediate(bDrawMode);
 
 	}
 };

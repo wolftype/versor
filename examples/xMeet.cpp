@@ -34,6 +34,9 @@ struct MyApp : App {
     ///(hit "tab" and then "t" and "s" keys to translate and scale)
     objectController.attach(&sphereA);
     objectController.attach(&sphereB);
+
+    //scene.camera.lens.ortho(true);
+    //mRenderGraph.immediate(false);
   }
 
   void onDraw(){
@@ -41,12 +44,12 @@ struct MyApp : App {
     /// intersection of two spheres is the dual of their outer product
     auto meet = (sphereA ^ sphereB).dual();
 
-    draw(meet,0,1,0);                   ///<-- draw meet (circle) in green
+    draw(meet,0,1,0);                      ///<-- draw meet (circle) in green
     
     draw(Round::surround(meet),0,0,1,.5);  ///<-- draw surround of meet (a sphere) in blue with half alpha
 
-    draw(sphereA,1,0,0,.5);             ///<-- draw spheres in red, with half alpha
-    draw(sphereB,1,0,0,.5);             ///<-- draw spheres in red, with half alpha
+    draw(sphereA,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
+    draw(sphereB,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
 
   }
   

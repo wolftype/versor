@@ -19,6 +19,7 @@ struct MyApp : App {
      	distA = 5.0;
       linewidth=3;
       //immediate(false);
+      scene.camera.pos(0,0,20);
 	}
 
 	void onDraw(){
@@ -105,8 +106,8 @@ struct MyApp : App {
 		 }
 
 
-		 draw(ffsphere,1,0,0,.4,true);
-		 draw(firstSphere,1,0,0,.4,true);
+		 draw(ffsphere,1,0,0,.4);
+		 draw(firstSphere,1,0,0,.4);
 	}
 };
 
