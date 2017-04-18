@@ -293,6 +293,8 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
+    
+    mColor.set(0,0,0);
 
     state = new State;    
     memset(state, 0, sizeof(State));

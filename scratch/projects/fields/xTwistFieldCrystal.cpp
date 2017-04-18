@@ -92,7 +92,7 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-      bShadedOutput = false;
+      ps.bShadedOutput = false;
 
       if (bSet) mouse = calcMouse3D();
 

@@ -36,8 +36,10 @@ namespace vsr { namespace cga {
      void set(const vector<Pnt>& pnt){
        mDistance = vector<Vec>( pnt.size() );
 
-       float minx, miny, minz = 200000;
-       float maxx, maxy, maxz = -200000;
+       float minx, miny, minz;
+       minx=miny=minz=200000;
+       float maxx, maxy, maxz;
+       maxx=maxy=maxz=-200000;
 
        for (auto& i : pnt){
          if (i[0]< minx) minx = i[0];
@@ -50,7 +52,7 @@ namespace vsr { namespace cga {
        }
 
        float rangex, rangey, rangez;
-       rangex = fabs(maxx - minx); rangey =fabs( maxy-miny); rangez = fabs(maxz-minz);
+       rangex = fabs(maxx - minx); rangey =fabs(maxy-miny); rangez = fabs(maxz-minz);
 
        for (int i=0;i<pnt.size();++i){
           mDistance[i][0] = fabs(pnt[i][0] - minx)/rangex; 
@@ -58,6 +60,7 @@ namespace vsr { namespace cga {
           mDistance[i][2] = fabs(pnt[i][2] - maxz)/rangez; 
        }
 
+       //cout << rangex << " " << rangey << " " << rangez << endl;
 
        mFrame[0].pos(minx, miny, maxz);
        mFrame[1].pos(minx, miny, minz);
