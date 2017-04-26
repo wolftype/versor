@@ -25,7 +25,8 @@ that reflect over circles and spheres.
 
 Examples that use this:
 
-groups/xSpaceGroup3D.cpp
+scratch/projects/groups/xSpaceGroup2D.cpp
+scratch/projects/groups/xSpaceGroup3D.cpp
             
 @sa vsr_root.h for generating reflection groups
 
@@ -171,6 +172,8 @@ struct PointGroup2D : Group<V> {
        calcOps(a.unit(), b.unit());
    }
 
+   /// For pin groups, generate a reflection root system of ops
+   //  Otherwise, generate rotors
    void calcOps(const V& ta, const V& tb){
        this->ops.clear();
        this->sops.clear();
@@ -265,13 +268,14 @@ struct SpaceGroup2D : PointGroup2D<V> {
       auto tmp = (*this)(motif);  
       vector<T> res;
 
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
+
       for (auto& i : tmp ){
-        for (int j=-x/2.0;j<x/2.0;++j){
-          for (int k=-y/2.0;k<y/2.0;++k){
-            for (int m =0;m<mDiv;++m){
+        for (int j=0; j<x; ++j){
+          for (int k=0; k<y; ++k){
+            for (int m =0; m<mDiv; ++m){
               float t = (float)m/mDiv;
-              //Vec v = vec(j
-              res.push_back( i.trs( vec(j,k) + vec(t,t) ) );
+              res.push_back( i.trs( bottom_left + vec(j,k) + vec(t,t) ) );
             }
           }
         }
@@ -294,11 +298,13 @@ struct SpaceGroup2D : PointGroup2D<V> {
     template<class T>
     vector<T> hang(const T& motif, int x, int y){      
       vector<T> res;
-        for (int j=-x/2.0;j<x/2.0;++j){
-          for (int k=-y/2.0;k<y/2.0;++k){
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
+
+        for (int j=0; j<x; ++j){
+          for (int k=0; k<y; ++k){
             for (int m =0;m<mDiv;++m){
               float t = (float)m/mDiv;
-              res.push_back( motif.trs( vec(j,k) + vec(t,t) ) );
+              res.push_back( motif.trs(bottom_left + vec(j,k) + vec(t,t) ) );
             }
           }
         }
@@ -308,18 +314,44 @@ struct SpaceGroup2D : PointGroup2D<V> {
     template<class T>
     vector<T> hang(const vector<T>& motif, int x, int y){      
       vector<T> res;
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
       for (auto& i : motif){
-        for (int j=-x/2.0;j<x/2.0;++j){
-          for (int k=-y/2.0;k<y/2.0;++k){
+        auto tres = hang(i,x,y);
+        res . insert (res.end (), tres.begin (), tres.end());
+      }
+      return res;
+    } 
+
+    /// Don't apply operations, just hang on lattice points and apply bilinear function F
+    template<class T, class F>
+    vector<T> hang(const T& motif, int x, int y, const F& bifunc){      
+      vector<T> res;
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
+
+        for (int j=0; j<x; ++j){
+          for (int k=0; k<y; ++k){
             for (int m =0;m<mDiv;++m){
               float t = (float)m/mDiv;
-              res.push_back( i.trs( vec(j,k) + vec(t,t) ) );
+              T tres = motif.trs(bottom_left + vec(j,k) + vec(t,t));
+              res.push_back( bifunc ((float)j/x, (float)k/y, tres));
             }
           }
         }
+      return res;
+    }
+
+    /// Don't apply operations, just hang on lattice points and apply bilinear function F
+    template<class T, class F>
+    vector<T> hang(const vector<T>& motif, int x, int y,  const F& bifunc){      
+      vector<T> res;
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
+      for (auto& i : motif){
+        auto tres = hang(i,x,y,bifunc);
+        res . insert (res.end (), tres.begin (), tres.end());
       }
       return res;
-    }    
+    } 
+
 };
 
 

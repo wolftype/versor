@@ -50,7 +50,7 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-      bShadedOutput = bShaded;
+      ps.bShadedOutput = bShaded;
 
       //0. a and c are at 90 degrees, must find b...
       auto a = Vec::x;
@@ -77,6 +77,7 @@ struct MyApp : App {
 
 
       //rotate yz and xz planes by polar angles
+      // @todo note that since we know tb, the equation could be simplified
       double tA = acos( (ca-(cb*cc))/(sb*sc) );
       double tC = acos( (cc-(ca*cb))/(sa*sb) );
 
@@ -89,11 +90,11 @@ struct MyApp : App {
       
 
       if (bReset){
-       DrawB(bivA,1,1,0,1);//.5);
+       DrawB(bivA,1,1,0,1);
        Draw(b,0,1,0);  
-       DrawB(bivC,0,1,1,1);//.5);
+       DrawB(bivC,0,1,1,1);
        Draw(c,0,0,1);  
-       DrawB(Biv::xy,1,0,1,1);//.5);
+       DrawB(Biv::xy,1,0,1,1);
        Draw(a,1,0,0);  
 
       } else{
