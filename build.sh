@@ -26,6 +26,7 @@ do
 done
 
 if [ $BUILD_GRAPHICS = 1 ]; then
+  echo "BUILDING GLV LIBRARY"
   make -C ext/glv
 fi
 
