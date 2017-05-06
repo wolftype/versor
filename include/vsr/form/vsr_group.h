@@ -194,7 +194,8 @@ struct PointGroup2D : Group<V> {
 ///  A PointGroup2D along with a lattice formed by translating along the generators a and b
 ///  we generate the point group calcOps() and then replace by glide reflections if called for
 ///  To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
-template<class V > 
+///  typename V is a cga::Vec pin group 
+template<class V> 
 struct SpaceGroup2D : PointGroup2D<V> {
   
   using Trs = typename V::space::translator;
@@ -322,9 +323,9 @@ struct SpaceGroup2D : PointGroup2D<V> {
       return res;
     } 
 
-    /// Don't apply operations, just hang on lattice points and apply bilinear function F
+    /// Don't apply operations, just hang on lattice points before/after possibly applying bilinear function F
     template<class T, class F>
-    vector<T> hang(const T& motif, int x, int y, const F& bifunc){      
+    vector<T> hang(const T& motif, int x, int y, int bPre, const F& bifunc){      
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
 
@@ -332,8 +333,15 @@ struct SpaceGroup2D : PointGroup2D<V> {
           for (int k=0; k<y; ++k){
             for (int m =0;m<mDiv;++m){
               float t = (float)m/mDiv;
-              T tres = motif.trs(bottom_left + vec(j,k) + vec(t,t));
-              res.push_back( bifunc ((float)j/x, (float)k/y, tres));
+              if (bPre ==0){        //don't apply biFunc
+                res.push_back(motif.trs(bottom_left + vec(j,k) + vec(t,t)));
+              } else if (bPre==1) { //apply biFunc before translating
+                T tres = bifunc((float)j/x, (float)k/y, motif);
+                res.push_back( tres.trs(bottom_left + vec(j,k) + vec(t,t)));
+              } else if (bPre==2) { //apply biFunc after translating
+                T tres = motif.trs(bottom_left + vec(j,k) + vec(t,t));
+                res.push_back(bifunc ((float)j/x, (float)k/y, tres));
+              }
             }
           }
         }
@@ -342,11 +350,11 @@ struct SpaceGroup2D : PointGroup2D<V> {
 
     /// Don't apply operations, just hang on lattice points and apply bilinear function F
     template<class T, class F>
-    vector<T> hang(const vector<T>& motif, int x, int y,  const F& bifunc){      
+    vector<T> hang(const vector<T>& motif, int x, int y, int bPre, const F& bifunc){      
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
       for (auto& i : motif){
-        auto tres = hang(i,x,y,bifunc);
+        auto tres = hang(i,x,y,bPre,bifunc);
         res . insert (res.end (), tres.begin (), tres.end());
       }
       return res;
