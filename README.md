@@ -118,7 +118,7 @@ You'll need to initialize the submodules to build any graphics examples:
 	git submodule init
 	git submodule update
 
-To build library and all programs in /examples:
+To build library and add all programs in /examples:
 
 	./build.sh
 
@@ -136,11 +136,11 @@ To compile and run programs in scratch/projects:
 
 Note that not all projects will compile as I am in the process of updating them in this development branch.
 
-Adding "configure" to the end of the above `./run.sh` command first re-runs cmake in order to add `<filename>` to its list of targets. For instance, to build and run programs you have written (e.g. in some folder called scratch/projects/user/), you can first write:
+You can add your own file to the list of targets by adding it to /examples or scratch/projects/<yourname>/<your_cpp_file> and re-running `./build.sh`.
 
-	./run.sh scratch/projects/user/<filename> --configure
-
-This need only happen once when you create a new file. Thereafter you can run your file without adding "configure" to the end
+INSTALLATION
+---
+Hmmm, haven't added install options yet!  Will do so soon.
 
 Use Cases
 ---

@@ -1,4 +1,4 @@
-#CMAKE FOR The Versor Geometric Algebra Mathematics Library 
+#CMAKE FOR The Versor Geometric Algebra Mathematics Library
 
 #VERSION
 cmake_minimum_required(VERSION 2.8)
@@ -17,10 +17,10 @@ set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast") 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
 
 
 #All .cpp files in src/space get built into libvsr
@@ -58,14 +58,8 @@ add_custom_target(headers SOURCES ${HeaderFiles})
 FILE(GLOB ScriptFiles "${PROJECT_SOURCE_DIR}/*.sh")
 add_custom_target(scr SOURCES ${ScriptFiles})
 
-#FILE(GLOB_RECURSE ExampleFiles "${PROJECT_SOURCE_DIR}/examples/*")
-#add_custom_target(ex SOURCES ${ExampleFiles})
-#FILE(GLOB_RECURSE ScratchFiles "${PROJECT_SOURCE_DIR}/scratch/*")
-#add_custom_target(scratch SOURCES ${ScratchFiles})
-
-
 if(${BUILD_GRAPHICS})
-  
+
   #OPTIONAL ADD GFX AS SUBDIRECTORY TO BUILD GRAPHICS DEMOS
   add_subdirectory(ext/gfx)
 
@@ -80,31 +74,31 @@ if(${BUILD_GRAPHICS})
   file(GLOB graphicsGL src/draw/GL/*.cpp)
   file(GLOB graphicsGLES src/draw/GLES/*.cpp)
 
-  #change this to ${GLES} Flag
+  #todo: change this flag name to ${GLES} Flag
   if(${RASPBERRY})
     add_library(vsrGfx ${graphicsGLES}) 
   else()
-    add_library(vsrGfx ${graphicsGL} ${graphicsGLES}) 
+    add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
   endif()
 
   target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
   target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/draw)
 
   set(vsr_libraries  ${vsr_libraries} vsrGfx)
-  set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  ) 
+  set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )
 
-  if(${BUILD_EXAMPLES})
-    file(GLOB examples examples/*.cpp)
-    foreach(filename ${examples})
-      get_filename_component(target ${filename} NAME_WE)
+  file(GLOB examples examples/*.cpp)
+  foreach(filename ${examples})
+    get_filename_component(target ${filename} NAME_WE)
+    if (${BUILD_EXAMPLES})
+      add_executable(${target} ${filename} )
+    else()
       add_executable(${target} EXCLUDE_FROM_ALL ${filename} )
-      target_link_libraries(${target} ${libraries})
-    endforeach()
-  endif()
+    endif()
+    target_link_libraries(${target} ${libraries})
+  endforeach()
 
-  if(${BUILD_SCRATCH})
-      add_subdirectory(scratch)
-  endif()
+  add_subdirectory(scratch)
 
 endif()
 
