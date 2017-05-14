@@ -82,7 +82,7 @@ At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Det
 
 
 
-	As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection.  
+	As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection.
 	-Joseph Louis Lagrange
 
 	No attention should be paid to the fact that algebra and geometry are different in appearance.
@@ -107,7 +107,7 @@ At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Det
 COMPILATION
 ---
 
-For this version you need C++11 support, which is now common (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.  
+For this version you need C++11 support, which is now common (gcc 4.7 or higher or clang 3.2 or higher) and for graphics support you'll want glew.
 See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on installing glew.
 
 	git clone https://github.com/wolftype/versor.git
@@ -118,13 +118,13 @@ You'll need to initialize the submodules to build any graphics examples:
 	git submodule init
 	git submodule update
 
-To build library and add all programs in /examples:
+To build library
 
 	./build.sh
 
-To build library only without examples:
+To build library and examples:
 
-	./build.sh --lib
+	./build.sh --examples
 
 To build library without graphics:
 
@@ -134,13 +134,13 @@ To compile and run programs in scratch/projects:
 
 	./run.sh scratch/projects/<folder>/<filename>
 
-Note that not all projects will compile as I am in the process of updating them in this development branch.
+Note that not all projects in the scratch folder will compile as I am in the process of updating them in this development branch.
 
 You can add your own file to the list of targets by adding it to /examples or scratch/projects/<yourname>/<your_cpp_file> and re-running `./build.sh`.
 
 INSTALLATION
 ---
-Hmmm, haven't added install options yet!  Will do so soon.
+Hmmm, haven't added install options yet!  Will do so soon I promise.
 
 Use Cases
 ---
