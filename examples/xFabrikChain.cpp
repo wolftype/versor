@@ -36,7 +36,8 @@ struct MyApp : App {
   //Chain of 10 links
   Chain chain = Chain(10);
 
-
+  //whether to relcaculate joint positions
+  bool bFK;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -53,10 +54,17 @@ struct MyApp : App {
    *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-    auto point = calcMouse3D();
+    //intersection of ray cast by mouse into space and the xy plane
+    calcMouse3D();
+    Point point = Construct::meet (mMouseRay, Dlp(0,0,1,0));
 
-    //adjust amt variable to adjust error threshold
+    //Draw point on xy plane as small red circle.  This is our "target"
+    auto marker = Construct::sphere (point,.2);
+    Draw(marker,1,0,0);
+
+    //pass in beginning, ending index, adjust error threshold
     chain.fabrik(point,chain.num()-1,0,amt);
+    //recalculate forward kinematics
     chain.fk();
 
    // Draw(chain);
@@ -67,7 +75,10 @@ struct MyApp : App {
       Draw( chain.nextSphere(i),0,1,1,.3);
     }
 
+  }
 
+  void onKeyDown(const gfx::Keyboard &k){
+    if (k.code=='q') bFK = !bFK;
   }
 
 };

@@ -2,20 +2,20 @@
 
 using namespace vsr::cga;
 
-struct MyApp : App {  
+struct MyApp : App {
 
   //DualSphere at 2,0,0 with radius .5
   DualSphere sphere = Construct::sphere(2,0,0,.5);;
 
   //Circle through 3 Points
-  Circle circle = Construct::point(1,0,0) ^ Construct::point(0,1,0) ^ Construct::point(-1,0,0) ; 
-    
+  Circle circle = Construct::point(1,0,0) ^ Construct::point(0,1,0) ^ Construct::point(-1,0,0) ;
+
   //Dual plane with Normal in Y direction
   DualPlane dualplane = DualPlane(0,1,0);
 
   void setup(){
-   
-    //bind glv gui 
+
+    //bind glv gui
     bindGLV();
 
     //set renderer to use programmable pipeline
@@ -41,16 +41,16 @@ struct MyApp : App {
     draw(circle_meet,0,1,0);     //<-- Draw circle (intersection)
 
 //    text("use t, r and s keys and drag with mouse to Translate, Rotate and Scale the Circle");
-  } 
+  }
 
 };
-                        
+
 
 int main(){
-  
+
   MyApp app;
   app.start();
-  
+
   return 0;
-  
+
 }

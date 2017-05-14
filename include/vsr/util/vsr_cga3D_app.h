@@ -86,15 +86,15 @@ struct App : public gfx::GFXAppGui {
         this->scene.push(true);
          ps.print(*this);
         this->scene.pop(true);
-    
+
         this->scene.camera.left(false);
         this->scene.push(true);
          ps.print(*this);
         this->scene.pop(true);
-        
+
         GL::disablePreset();
         break;
-    
+
       case 'x':
         printf("x: save mouse position\n");
         bSetMouse = !bSetMouse;

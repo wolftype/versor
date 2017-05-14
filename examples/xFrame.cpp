@@ -17,16 +17,15 @@
  */
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bAbsolute = false;
-  bool bMoveToTarget = false;
   float amt = 0;
 
   Frame frameA = Frame(-3,0,0);
@@ -37,30 +36,30 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    
+
     ///Bind Gui
     bindGLV();
 
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bAbsolute,"bAbsolute_xf");
-    gui(bMoveToTarget,"move to target frame by amt");
-    
+
     bAbsolute = true;
-    bMoveToTarget=true;
     amt = .3;
 
+    //attach frame to object controller
     objectController.attach(&frameA);
     objectController.attach(&frameB);
   }
 
-
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
     mouse = calcMouse3D();
     Draw(mouse,1,0,0);
+
+    GL::lightsOff();
 
     if (bAbsolute) {
       frameA.orient( mouse );                            //<-- absolute orientation of z axis towards mouse
@@ -70,22 +69,24 @@ struct MyApp : App {
       frameB.relOrient(mouse, amt,false);                //<-- relative orientation of negative z axis towards mouse
     }
 
+    Motor m = frameA.relMotor(frameB);                   //<-- motor transformation taking frameA to frameB
+    DualLine dll = Gen::log(m);                          //<-- dual line generator of the transformation
+
     for (int i=0;i<10;++i){
-      Motor m = frameA.relMotor(frameB);                 //<-- motor transformation taking frameA to frameB
-      DualLine dll = Gen::log(m) * (float)i/10;          //<-- bivector generator of that
-      Draw( Frame( Gen::mot(dll) * frameA.mot() ) );     //<-- new frame from frameA and transformation
+      DualLine tdll = dll * (float)i/10;                  //<-- weighted generator
+      Draw( Frame( Gen::mot(tdll) * frameA.mot() ) );     //<-- new interpolated frame from frameA and transformation
     }
-    
+
     Draw(frameA);
     Draw(frameB);
-  
+
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

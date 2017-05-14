@@ -17,7 +17,7 @@
  */
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_rigid.h>
 #include <vsr/form/vsr_chain.h>
 #include <vsr/draw/vsr_chain_draw.h>
@@ -27,7 +27,7 @@ using namespace vsr::cga;
 
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt,amt2,amt3,linewidth = 0;
@@ -47,7 +47,7 @@ struct MyApp : App {
     gui(bReset,"bReset")(linewidth,"linewidth",1,10);
 
     //reset chain
-    reset();    
+    reset();
 
     amt = .001;
 
@@ -64,7 +64,7 @@ struct MyApp : App {
 
   void reset(){
     chain.reset();
-    
+
     //set up relative links (90 degree rotation)
     for (int i =0;i<chain.num();++i){
       chain.link(i).rot() = Gen::rot( Biv::xz * PIOVERFOUR);
@@ -73,7 +73,7 @@ struct MyApp : App {
   }
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
@@ -83,18 +83,18 @@ struct MyApp : App {
       if (bReset) reset();
 
       point = calcMouse3D();
-     
+
       //adjust amt variable to adjust error threshold (default is .001)
       chain.constrainedFabrik(point,chain.num()-1,0,amt);
       chain.fk();
-     } 
-          
+     }
+
      //Draw the chain
      Draw(chain);
 
      //Draw circle of rotation of each joint
      for (auto& i : chain.frame()){
-        Draw( i.cxy(),1,0,0); 
+        Draw( i.cxy(),1,0,0);
      }
 
      //Draw the in-socket rotation of each joint
@@ -110,12 +110,12 @@ struct MyApp : App {
 
      }
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 
