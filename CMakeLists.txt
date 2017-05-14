@@ -97,7 +97,6 @@ if(${BUILD_GRAPHICS})
     endif()
     target_link_libraries(${target} ${libraries})
   endforeach()
-
   add_subdirectory(scratch)
 
 endif()
