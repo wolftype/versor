@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "draw/vsr_cga3D_render.h"
+#include <vsr/draw/vsr_cga3D_render.h>
 
 
 namespace gfx{
@@ -74,7 +74,7 @@ namespace gfx{
   template<> MeshBuffer<Field<Pnt>>::MeshBuffer(){}
 
   template<> void MeshBuffer<Field<Vec>>::Add( const Field<Vec>& f ){
-    stringstream fs; fs << &f; 
+    stringstream fs; fs << &f;
     mMBOmap[fs.str()] =  MBO( Mesh::Points2(f.gridPtr(), f.dataPtr(), f.num()).mode(GL::L), GL::DYNAMIC);
   }
 
@@ -90,18 +90,18 @@ namespace gfx{
     }
   };
 
-   template<> void Renderable<Frame>::Draw(const Frame& frame, GFXSceneNode * re )  { 
+   template<> void Renderable<Frame>::Draw(const Frame& frame, GFXSceneNode * re )  {
     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(frame.rot(), frame.vec(), frame.scale()), re);
-  }  
+  }
   /*!
    *  Render a Circle
    */
-  template<> void Renderable<Cir>::Draw(const Cir& cir, GFXSceneNode * re) { 
+  template<> void Renderable<Cir>::Draw(const Cir& cir, GFXSceneNode * re) {
      MBO& mbo =  Get()[0];
-     bool real = Round::size(cir) > 0 ? 1 : 0;  
+     bool real = Round::size(cir) > 0 ? 1 : 0;
      real ? mbo.mesh.mode(GL::LL) : mbo.mesh.mode(GL::L);
      Renderable<MBO>::Draw(mbo,vsr::xf::mat(cir), re);
-  } 
+  }
 
   /*!
    *  Render a bunch of Circles
@@ -120,13 +120,13 @@ namespace gfx{
 
 
   template<> void Renderable<Vec>::Draw(const Vec& vec, GFXSceneNode * re){
-    
+
     auto& vmbo = Get();//MeshBuffer( vec );
     MBO& cone = vmbo[0];
-    MBO& line = vmbo[1]; 
+    MBO& line = vmbo[1];
     line.mesh[1].Pos = vec;
     line.update();
-    Renderable<MBO>::Draw(line, re); 
+    Renderable<MBO>::Draw(line, re);
     auto mat = vsr::xf::mat(vec);
     Renderable<MBO>::Draw(cone, mat, re);
   }
@@ -148,7 +148,7 @@ namespace gfx{
 
     if ( fabs(ta) >  FPERROR ) {
 
-        bool real = ta > 0 ? 1 : 0;  
+        bool real = ta > 0 ? 1 : 0;
         real ? sphere.mesh.mode(GL::TS) : sphere.mesh.mode(GL::L);
         auto mat = vsr::xf::mat(pnt, sqrt(fabs(ta)) );
         Renderable<MBO>::Draw(sphere, mat, re);
@@ -160,97 +160,97 @@ namespace gfx{
         Renderable<MBO>::Draw(point, re);
     }
 
-  } 
+  }
 
   template<> void Renderable<Sph>::Draw(const Sph& sph, GFXSceneNode * re) {
     Renderable<Pnt>::Draw( sph.dual(), re );
   }
-  
+
   template<> void Renderable<Par>::Draw(const Par& par, GFXSceneNode * re )  {
- 
+
         auto& sphere = Get()[0];//MeshBuffer(par)[0];
         auto& points = Get()[1];//MeshBuffer(par)[1];
 
         double size = Round::size( par, false );
         auto pp = Round::split( par );
- 
-        double ta = Round::size( pp[0], true );   
+
+        double ta = Round::size( pp[0], true );
 
         Pnt p1 = Round::cen( pp[0] );
         Pnt p2 = Round::cen( pp[1] );
 
-        if ( fabs(ta) >  FPERROR ) {        
-                            
+        if ( fabs(ta) >  FPERROR ) {
+
           double t = sqrt ( fabs ( ta ) );
-          bool real = size > 0 ? 1 : 0;  
+          bool real = size > 0 ? 1 : 0;
           real ? sphere.mesh.mode(GL::TS) : sphere.mesh.mode(GL::L);
-      
+
           auto mat1 = vsr::xf::mat(p1);
           auto mat2 = vsr::xf::mat(p2);
           Renderable<MBO>::Draw(sphere, mat1, re);
           Renderable<MBO>::Draw(sphere, mat2, re);
 
-      } else { 
+      } else {
 
           points.mesh[0].Pos = p1;
-          points.mesh[1].Pos = p2; 
-          points.update();            
+          points.mesh[1].Pos = p2;
+          points.update();
 
           Renderable<MBO>::Draw(points, re);
       }
-    
-  } 
-  
+
+  }
+
   template<> void Renderable<DualLine>::Draw(const DualLine& dll, GFXSceneNode * re)  {
-    Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dll), re);    
-  }  
- 
+    Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dll), re);
+  }
+
   template<> void Renderable<Line>::Draw(const Line& line, GFXSceneNode * re)  {
      auto dll = line.dual();
-     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dll), re);    
-  }   
-  
-  template<> void Renderable<DualPlane>::Draw(const DualPlane& dlp, GFXSceneNode * re)  
-  {
-     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dlp), re);    
-  }   
-
-  template<> void Renderable<Plane>::Draw(const Plane& pln, GFXSceneNode * re)  
-  {
-     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(pln.dual()), re);    
-  }   
-  
-  template<> void Renderable<Biv>::Draw( const Biv& biv, GFXSceneNode * re)  {
-      Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(biv), re);         
+     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dll), re);
   }
-  
 
-  
+  template<> void Renderable<DualPlane>::Draw(const DualPlane& dlp, GFXSceneNode * re)
+  {
+     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(dlp), re);
+  }
+
+  template<> void Renderable<Plane>::Draw(const Plane& pln, GFXSceneNode * re)
+  {
+     Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(pln.dual()), re);
+  }
+
+  template<> void Renderable<Biv>::Draw( const Biv& biv, GFXSceneNode * re)  {
+      Renderable<MBO>::Draw( Get()[0], vsr::xf::mat(biv), re);
+  }
+
+
+
   template<> void Renderable<Field<Vec>>::Draw( const Field<Vec>& f,  GFXSceneNode * re )  {
-  
+
     MBO& points = Get(f);
 
-    for (int i=0; i < f.num(); ++i){  
+    for (int i=0; i < f.num(); ++i){
       Vec3f v( f.grid(i) );
       int idx = i*2+1;
-      points.mesh[idx].Pos = v + Vec3f( f[i] ); 
+      points.mesh[idx].Pos = v + Vec3f( f[i] );
     }
 
     points.update();
-    Renderable<MBO>::Draw(points, re);  
-  }   
+    Renderable<MBO>::Draw(points, re);
+  }
 
   template<> void Renderable<Field<Pnt>>::Draw( const Field<Pnt>& f, GFXSceneNode * re )  {
 
     MBO& points = Get(f);
 
-    for (int i = 0; i < f.num(); ++i){  
-      points.mesh[i].Pos = Vec3f( f[i] ); 
+    for (int i = 0; i < f.num(); ++i){
+      points.mesh[i].Pos = Vec3f( f[i] );
     }
 
     points.update();
-    Renderable<MBO>::Draw(points, re);  
-  }   
+    Renderable<MBO>::Draw(points, re);
+  }
 
 
  template void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);

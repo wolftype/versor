@@ -20,15 +20,15 @@
 #ifndef  vsr_cga3D_app_INC
 #define  vsr_cga3D_app_INC
 
-#include "space/vsr_cga3D_op.h"               //<-- conformal 3D types and basic operations
+#include <vsr/space/vsr_cga3D_op.h>               //<-- conformal 3D types and basic operations
 
-#include "draw/vsr_cga3D_draw.h"              //<-- fixed pipeline draw routines
-#include "draw/vsr_cga3D_render.h"            //<-- programmable pipeline draw routines
+#include <vsr/draw/vsr_cga3D_draw.h>              //<-- fixed pipeline draw routines
+#include <vsr/draw/vsr_cga3D_render.h>            //<-- programmable pipeline draw routines
 
-#include "util/vsr_cga3D_control.h"           //<-- interface controls (mouse and keyboard)
-#include "gfx/util/gfx_glv_app.h"             //<-- an app class with built-in gui
+#include <vsr/util/vsr_cga3D_control.h>           //<-- interface controls (mouse and keyboard)
+#include <gfx/util/gfx_glv_app.h>             //<-- an app class with built-in gui
 
-#include "gfx/gfx_postscript.h"
+#include <gfx/gfx_postscript.h>
 
 
 ///@todo namespace this

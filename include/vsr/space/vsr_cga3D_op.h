@@ -13,12 +13,12 @@
 #include <math.h>
 #include <vector>
 
-#include "vsr_cga3D_types.h"
-#include "vsr_cga3D_round.h"
+#include <vsr/space/vsr_cga3D_types.h>
+#include <vsr/space/vsr_cga3D_round.h>
 
-#include "detail/vsr_generic_op.h"
-#include "util/vsr_constants.h"
-#include "util/vsr_math.h"
+#include <vsr/detail/vsr_generic_op.h>
+#include <vsr/util/vsr_constants.h>
+#include <vsr/util/vsr_math.h>
 
 namespace vsr{ namespace cga{
 

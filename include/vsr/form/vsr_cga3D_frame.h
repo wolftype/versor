@@ -24,7 +24,7 @@
 #ifndef  vsr_cga3D_frame_INC
 #define  vsr_cga3D_frame_INC
 
-#include "space/vsr_cga3D_op.h"
+#include <vsr/space/vsr_cga3D_op.h>
 
 namespace vsr { namespace cga {
 

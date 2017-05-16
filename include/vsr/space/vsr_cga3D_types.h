@@ -1,42 +1,42 @@
 
-/*! 
+/*!
  * @file Conformal Geometric Algebra Types (3D)
- * 
+ *
  */
 
 
 #ifndef VSR_CGA3D_TYPES_INCLUDED
 #define VSR_CGA3D_TYPES_INCLUDED
 
-#include "detail/vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
 
-namespace vsr{ 
-  
+namespace vsr{
+
 
 /*!
- * 
+ *
    @defgroup cgageneric Conformal Geometric Algebra
-   
-   Generic CGA Types and Functions 
-   
+
+   Generic CGA Types and Functions
+
  */
 
- 
+
 /*!
- * 
+ *
    @defgroup cga 3D Conformal Geometric Algebra
-   
-   3D CGA Types and Functions 
-   
+
+   3D CGA Types and Functions
+
  */
 
-  
+
 /*!
  * 3D Conformal Geometric Algebra Namespace
  * @ingroup cga
  *
  */
-namespace cga{ 
+namespace cga{
 
 /**@defgroup shorthand Shorthand Syntax
 
@@ -49,8 +49,8 @@ namespace cga{
    some, so documentation is typically written out in longform.
 
    While it is sometimes useful for clarity to write out @ref TangentVector,
-   I find the terseness of @ref Tnv to be sufficiently necessary.  
-   Note that this encoding mirrors the shorthand for methods, which also 
+   I find the terseness of @ref Tnv to be sufficiently necessary.
+   Note that this encoding mirrors the shorthand for methods, which also
    can be written out in longform, as in `Gen::transversor` or shorthand, as in `Gen::trv`
 
    @sa @ref cgatypes
@@ -58,15 +58,15 @@ namespace cga{
    @{
 */
 
-using Sca = NSca<5>; ///< @ref Scalar 
-using Vec = NVec<5>; ///< @ref Vector 
-using Biv = NBiv<5>; ///< @ref Bivector 
+using Sca = NSca<5>; ///< @ref Scalar
+using Vec = NVec<5>; ///< @ref Vector
+using Biv = NBiv<5>; ///< @ref Bivector
 using Rot = NRot<5>; ///< @ref Rotor
-using Tri = NTri<5>; ///< @ref Trivector 
+using Tri = NTri<5>; ///< @ref Trivector
 
 using Ori = NOri<5>; ///< @ref Origin
 using Inf = NInf<5>; ///< @ref Infinity
-using Mnk = NMnk<5>; ///< @ref Minkowski 
+using Mnk = NMnk<5>; ///< @ref Minkowski
 using Pss = NPss<5>; ///< @ref Pseudoscalar
 
 using Pnt = NPnt<5>; ///< @ref Point
@@ -104,12 +104,12 @@ using Tsd = NTsd<5>; ///< @ref TranslatedDilator
 
 3D CGA Instantiations of the Multivector Template class
 
-These are the most Common 3D Conformal Geometric Algebra Types, 
+These are the most Common 3D Conformal Geometric Algebra Types,
 
 ###Naming
 
-Types can be written in long form (as in @ref Scalar or @ref Pseudoscalar) 
-or three-letter short form (as in @ref Sca or @ref Pss).  
+Types can be written in long form (as in @ref Scalar or @ref Pseudoscalar)
+or three-letter short form (as in @ref Sca or @ref Pss).
 
 
 @sa @ref shorthand
@@ -137,7 +137,7 @@ typedef  Tnv TangentVector;       ///< Tangent Vector  \\(\\boldsymbol{x}n_o\\)
 typedef  Tnb TangentBivector;     ///< Tangent Bivector  \\(\\boldsymbol{B}n_o\\)
 typedef  Tnt TangentTrivector;    ///< Tangent Trivector  \\(\\boldsymbol{I}n_o\\)
 typedef  Dll DualLine;            ///< Dual Line bivector \\(\\lambda=\\boldsymbol{B}+\\boldsymbol{x}n_\\infty\\)
-typedef  Lin Line;                ///< Direct Line Trivector \\(p_a \\wedge p_b \\wedge n_\\infty\\) 
+typedef  Lin Line;                ///< Direct Line Trivector \\(p_a \\wedge p_b \\wedge n_\\infty\\)
 typedef  Flp FlatPoint;           ///< Flat Point \\(p \\wedge n_\\infty\\)
 typedef  Pln Plane;               ///< Direct Plane \\(p_a \\wedge p_b \\wedge p_c \\wedge n_\\infty\\)
 typedef  Dlp DualPlane;           ///< Dual Plane   \\(\\boldsymbol{n}+n_\\infty\\)
@@ -156,29 +156,29 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
  *-----------------------------------------------------------------------------*/
 
 
-/**@typedef Scalar 
+/**@typedef Scalar
 
    extract VSR_PRECISION value with operator []
-   
+
    @code
       Scalar s(0);
       float f = s[0];
    @endcode
-   
+
 */
 
 
 
-/**@page typesystem The Type System 
+/**@page typesystem The Type System
 
     @todo finish this explanation
 
    Methods for creating, combining, and navigating between geometric number types
 
    ###Multivectors
-   
+
    @sa @ref Multivector
-   
+
    All geometric entities are instantiations of the generic Multivector type.
    A Multivector is templated on an @ref algebra and a @ref basis.
 
@@ -189,12 +189,12 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
       There is no inheritance implemented, and no introspection, it is useful to categorize the various types
     by their characteristics in the documentation -- e.g. a @ref flat or @ref round -- and to use
     static functions to evaluate them. For instance:
-      
+
       - vsr::Flat::direction(<a @ref flat>) returns the @ref direction component of a @ref flat argument
 
       - vsr::Round::direction(<a @ref round>) returns the @ref direction component of a @ref round argument
 
-   Note, that the library user is responsible for ensuring that the arguments are of the correct category. 
+   Note, that the library user is responsible for ensuring that the arguments are of the correct category.
 
    ###Type-level operations (advanced use)
 
@@ -211,9 +211,9 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   Geometric Entities in Conformal Metrics
 
   ###Organization
-  
-  Group names like @ref round and @ref flat are \e not actual types but categories of types which can be 
-  operated on by the similarly named static methods.  For instance, vsr::cga::Round methods can be applied 
+
+  Group names like @ref round and @ref flat are \e not actual types but categories of types which can be
+  operated on by the similarly named static methods.  For instance, vsr::cga::Round methods can be applied
   to @ref cgatypes of the @ref round category.  To determine the direction of a Circle:
 
         Circle c = CXY(1);
@@ -229,7 +229,7 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   However, most operations can also be applied to higher (or lower) dimensions by using identically named
   methods in the vsr::nga namespace.  If you're new to this document, stick to the vsr::cga namespace.
 
-    
+
 */
 
 
@@ -239,11 +239,11 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
 
   @detail
   A @ref euclidean Element is a Multivector whose blades are basis elements of a positive \\(\\mathbb{R}^p\\) metric
-  
+
   Any @ref euclidean is therefore also a subspace of the higher-dimensional conformal \\(\\mathbb{R}^{p+1,1}\\) metric
 
   ###Euclidean Elements in 3D CGA
-  
+
   - vsr::cga::Scalar
   - vsr::cga::Vector
   - vsr::cga::Bivector
@@ -270,25 +270,25 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   - vsr::cga::Plane
   - vsr::cga::DualPlane
 
-   @sa vsr::cga::Flat for operations on these @ref cgatypes 
-   @sa vsr::nga::Flat for operations on @ref generic ND types 
+   @sa vsr::cga::Flat for operations on these @ref cgatypes
+   @sa vsr::nga::Flat for operations on @ref generic ND types
 
-*/  
+*/
 
 /**
-* @defgroup round Round 
+* @defgroup round Round
   @ingroup cgaelements
 
   @detail
 
   A @ref round Element is an n-sphere an can be operated.
-  
-  A @ref round Element can be operated on by vsr::cga::Round static methods.  
-  
+
+  A @ref round Element can be operated on by vsr::cga::Round static methods.
+
   The conformal model of geometric algebra
-  is based on the representation of \\(p-1\\)-spheres of \\(\\mathbb{R}^p\\) 
+  is based on the representation of \\(p-1\\)-spheres of \\(\\mathbb{R}^p\\)
   as vectors in \\(\\mathbb{R}^{p+1,1}\\)
-  
+
   ###Round Elements in 3D CGA
 
   - vsr::cga::Point
@@ -297,38 +297,38 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
   - vsr::cga::Sphere
 
   ###Construction
-  
+
   Points are the 1-blade vector of CGA, and a useful building block for constructing
   other @ref round elements.
-  
-  
+
+
   \\(n+1\\)-spheres can be built by wedging \\(n\\)-spheres with a 0-sphere point
 
-  @sa vsr::cga::Round for operations on these @ref cgatypes 
+  @sa vsr::cga::Round for operations on these @ref cgatypes
   @sa vsr::nga::Round for operations on @ref generic ND @ref Multivector Types
-  
+
 */
- 
+
  /**
   * @defgroup direction Direction
     @ingroup cgaelements
-  
+
     @detail
-  
+
       A @ref direction Element is a @ref euclidean Element wedged with Infinity.
-      
+
       It is invariant under translation, but can be used to generate translations.
 
       ###Direction Types in 3D CGA
-      
+
       - vsr::cga::DirectionVector
       - vsr::cga::DirectionBivector
       - vsr::cga::DirectionTrivector
 
       ###Translating
-      The 2-blade entitity vsr::cga::DirectionVector 
+      The 2-blade entitity vsr::cga::DirectionVector
       can be used as generators of translations in longform:
-          
+
           using namespace vsr::cga;
           auto trs = Gen::translator( DirectionVector(.5,0,0) );
 
@@ -336,25 +336,25 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
 
           auto trs = Gen::trs( Drv(.5,0,0) );
 
-      or 
-         
+      or
+
           auto trs = Gen::trs(.5,0,0);
 
-          
+
 
       ###Twisting
 
-      vsr::cga::DualLine has a vsr::cga::DirectionVector component and can be fed as an 
-      argument into vsr::cga::Gen::motor to generate a twist 
-      
+      vsr::cga::DualLine has a vsr::cga::DirectionVector component and can be fed as an
+      argument into vsr::cga::Gen::motor to generate a twist
+
       @sa @refTwist for a helper class to build generators
 
-      \todo document twisting 
+      \todo document twisting
   */
-  
-  
+
+
   /**
-  * @defgroup tangent Tangent 
+  * @defgroup tangent Tangent
     @ingroup cgaelements
 
       @brief
@@ -362,54 +362,54 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
       A @ref tangent is a @ref euclidean wedged with the Origin.
 
       @detail
-      
+
       A @ref tangent can be operated on by vsr::cga::Tangent static methods.
-      Optionally translated to create null-sized rounds.  
+      Optionally translated to create null-sized rounds.
 
       ###Examples of Tangent Types
-      
+
       - vsr::cga::TangentVector
       - vsr::cga::TangentBivector
       - vsr::cga::TangentTrivector
 
       which are a vsr::cga::Vector, vsr::cga::Bivector, and vsr::cga::Trivector wedged with vsr::cga::Origin
-      
+
       these can be cast to vsr::cga::Pair, vsr::cga::Circle, vsr::cga::Sphere and then translated:
 
             auto tau = Pair( TangentVector(0,1,0) ).translate(5,0,0);
 
       or in @ref shorthand
-            
+
             auto tau = Par( Tnv(0,1,0) ).trs(5,0,0);
 
       ###Bending
-      The 2-blade entitites, vsr::cga::TangentVector and vsr::cga::Pair, 
+      The 2-blade entitites, vsr::cga::TangentVector and vsr::cga::Pair,
       can be used as generators of conformal transformations
 
       A vsr::cga::TangentVector can be fed as an argument into vsr::cga::Gen::transversor.
-      
+
       A vsr::cga::Pair can be fed as an argument into vsr::cga::Gen::boost
 
-      @sa vsr::cga::Tangent for operations on these @ref cgatypes 
+      @sa vsr::cga::Tangent for operations on these @ref cgatypes
 
       \todo document link to a paper on this
- 
+
 
   */
 
-  /** @defgroup rotor Rotor 
+  /** @defgroup rotor Rotor
       @ingroup cgaelements
-  
+
     @detail
-    
+
     A @ref rotor is used to transform geometric elements of the algebra.
-    
+
     A @ref rotor can be operated on by vsr::cga::Gen static methods.
-    
+
     They are typically created by passing in some 2-blade to a method
     in vsr::gen, and the result applied to any element x by calling the
     x.spin(<a @ref rotor>) method
-    
+
     For instance, to create a quaternionic rotation we use a Euclidean plane of rotation
 
           auto v = Vec(1,0,0);
@@ -425,12 +425,12 @@ typedef  Tsd TranslatedDilator;   ///< Dilation relative to some point p  \\(e^{
     - vsr::cga::Transversor
     - vsr::cga::Boost
     - vsr::cga::ConformalRotor
-    
-    @sa vsr::cga::Gen for operations making these @cgatypes
-    @sa vsr::nga::Gen for @ref generic operations 
-    @sa @ref Twist 
 
-    
+    @sa vsr::cga::Gen for operations making these @cgatypes
+    @sa vsr::nga::Gen for @ref generic operations
+    @sa @ref Twist
+
+
   */
 
 
