@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  wolftype 
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
@@ -22,18 +22,16 @@
 
 #include "gfx/gfx_render.h"
 
-#include "space/vsr_cga3D_op.h"
-#include "space/vsr_cga3D_xf.h"
+#include <vsr/space/vsr_cga3D_op.h>
+#include <vsr/space/vsr_cga3D_xf.h>
 
-#include "form/vsr_cga3D_frame.h"  
-#include "form/vsr_field.h"
+#include <vsr/form/vsr_cga3D_frame.h>
+#include <vsr/form/vsr_field.h>
 
-//#include "draw/vsr_cga3D_draw.h"
-
-namespace gfx{   
+namespace gfx{
 
   using namespace vsr;
-  
+
   /*-----------------------------------------------------------------------------
    *  Template Specializations for Making Meshes for Specfic Types
    *-----------------------------------------------------------------------------*/
@@ -51,7 +49,7 @@ namespace gfx{
 
   /*-----------------------------------------------------------------------------
    *  FIELDS (arrays) CAN VARY IN SIZE, SO USER IS RESPONSIBLE TO Add BUFFER ONLY ONCE
-   *  (the GetMeshBuffer uses address of argument to check for existence the mMBOmap) 
+   *  (the GetMeshBuffer uses address of argument to check for existence the mMBOmap)
    *-----------------------------------------------------------------------------*/
 
   template<> MeshBuffer<Field<cga::Vec>>::MeshBuffer();
@@ -77,10 +75,10 @@ namespace gfx{
 
   extern template void MeshBuffer<Field<cga::Vec>>::Add( const Field<cga::Vec>& f );
   extern template void MeshBuffer<Field<cga::Pnt>>::Add( const Field<cga::Pnt>& f );
- 
-  template<> struct ModelMatrix<cga::Frame>; 
-  //extern template struct ModelMatrix<cga::Frame>; 
-  
+
+  template<> struct ModelMatrix<cga::Frame>;
+  //extern template struct ModelMatrix<cga::Frame>;
+
   template<> void Renderable<cga::Frame>::Draw(const cga::Frame&, GFXSceneNode * s);
   template<> void Renderable<cga::Cir>::Draw(const cga::Cir&, GFXSceneNode * s);
   template<> void Renderable<vector<cga::Cir>>::Draw(const vector<cga::Cir>&, GFXSceneNode * s);
@@ -94,8 +92,8 @@ namespace gfx{
   template<> void Renderable<cga::Biv>::Draw(const cga::Biv&, GFXSceneNode * s);
   template<> void Renderable<Field<cga::Vec>>::Draw(const Field<cga::Vec>&, GFXSceneNode * s);
   template<> void Renderable<Field<cga::Pnt>>::Draw(const Field<cga::Pnt>&, GFXSceneNode * s);
-    
-  
+
+
   extern template void Renderable<cga::Frame>::Draw(const cga::Frame&, GFXSceneNode * s);
   extern template void Renderable<cga::Cir>::Draw(const cga::Cir&, GFXSceneNode * s);
   extern template void Renderable<vector<cga::Cir>>::Draw(const vector<cga::Cir>&, GFXSceneNode * s);
@@ -109,132 +107,132 @@ namespace gfx{
   extern template void Renderable<cga::Biv>::Draw(const cga::Biv&, GFXSceneNode * s);
   extern template void Renderable<Field<cga::Vec>>::Draw(const Field<cga::Vec>&, GFXSceneNode * s);
   extern template void Renderable<Field<cga::Pnt>>::Draw(const Field<cga::Pnt>&, GFXSceneNode * s);
- 
+
 
 
   /* template<> void Drawable<Field<Frame>>::Immediate( const Field<Frame>& f){ */
-  /*   for (int i = 0; i < f.num(); ++i){ */  
-  /*     glPushMatrix(); */ 
-  /*     Immediate( f[i] ); */ 
-  /*     glPopMatrix(); */ 
+  /*   for (int i = 0; i < f.num(); ++i){ */
+  /*     glPushMatrix(); */
+  /*     Immediate( f[i] ); */
+  /*     glPopMatrix(); */
   /*   } */
-  /* } */  
+  /* } */
 
   /* template<> void Drawable<Frame>::ImmediateB( const Frame& f){ */
 
   /*    gfx::GL::translate( f.pos().begin() ); */
-  /*    gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); */ 
-  /*    gfx::GL::scale( f.scale() ); */  
+  /*    gfx::GL::rotate( Gen::aa( f.rot() ).begin() ); */
+  /*    gfx::GL::scale( f.scale() ); */
   /*    Draw( Vec::x,1,0,0); */
   /*    Draw( Vec::y,0,1,0); */
   /*    Draw( Vec::z,0,0,1); */
-  /* } */  
+  /* } */
 
   /* template<> */
   /* template<> void Drawable<ttttt>::ImmediateB( const Field<Vec>& f){ */
-  /*   for (int i = 0; i < f.num(); ++i){ */  
-  /*     DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); */ 
+  /*   for (int i = 0; i < f.num(); ++i){ */
+  /*     DrawAtB( f[i], f.grid(i) );// f[i][0], 1, 1 - f[i][0] ); */
   /*   } */
-  /* } */   
-  
-  
-  
+  /* } */
+
+
+
   /* template<> void Drawable<Vec>::Immediate (const Vec& s){ */
   /*     gfx::Glyph::Line(s); */
-  /*     glPushMatrix(); */  
+  /*     glPushMatrix(); */
   /*     gfx::GL::translate( s.begin() ); */
-  /*     gfx::GL::rotate( Op::AA(s).begin() ); */  
+  /*     gfx::GL::rotate( Op::AA(s).begin() ); */
   /*     Glyph::Cone(); */
   /*     glPopMatrix(); */
-  /* } */  
+  /* } */
 
-  
+
    /* template<> void Drawable<Vec>::ImmediateB (const Vec& s){ */
    /*    //cout << "ehl" << endl; */
    /*    gfx::Glyph::Line(s); */
-   /*    glPushMatrix(); */  
+   /*    glPushMatrix(); */
    /*    gfx::GL::translate( s.begin() ); */
    /*    gfx::Glyph::SolidSphere(.05,5,5); */
-   /*    glPopMatrix(); */                       
+   /*    glPopMatrix(); */
   /* } */
-  
+
   /* template<> void Drawable<Biv>::Immediate(const Biv& s){ */
-		/* double ta = s.norm(); */ 
+		/* double ta = s.norm(); */
 	  /* bool sn = Op::sn( s , Biv::xy * (-1)); */
-	
-		/* glPushMatrix(); */	
-			/* gfx::GL::rotate( Op::AA(s).begin() ); */  
+
+		/* glPushMatrix(); */
+			/* gfx::GL::rotate( Op::AA(s).begin() ); */
 			/* gfx::Glyph::DirCircle( ta, sn ); */
 		/* glPopMatrix(); */
   /* } */
-  
+
   /* template<> void Drawable<Tnv>::Immediate (const Tnv& s){ */
   /*   Immediate( s.copy<Vec>() ); */
-  /* } */   
-  
-  /*  template<> void Drawable<Drv>::Immediate (const Drv& s){ */ 
+  /* } */
+
+  /*  template<> void Drawable<Drv>::Immediate (const Drv& s){ */
   /*   Immediate( s.copy<Vec>() ); */
   /* } */
 
   /* template<> void Drawable<Dlp>::Immediate (const Dlp& s){ */
   /*     gfx::GL::translate( Op::Pos(s).begin() ); */
-  /*     gfx::GL::rotate( Op::AA(s).begin() ); */ 
+  /*     gfx::GL::rotate( Op::AA(s).begin() ); */
   /*     Glyph::SolidGrid(6,6,5); */
   /* } */
   /* template<> void Drawable<Pln>::Immediate (const Pln& s){ */
   /*   Immediate(s.dual()); */
   /* } */
 
-  /* template<> void Drawable<Cir>::Immediate( const Cir& s )  { */  
+  /* template<> void Drawable<Cir>::Immediate( const Cir& s )  { */
   /*   VT rad = Round::rad( s ); */
-  /*   bool im = Round::size(s, false) > 0 ? 1 : 0; */  
-  
-  /*   gfx::GL::translate( Op::Pos(s).begin() ); */
-  /*   gfx::GL::rotate( Op::AA(s).begin() ); */ 
+  /*   bool im = Round::size(s, false) > 0 ? 1 : 0; */
 
-  /*   im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad ); */            
-  /* } */  
-  
+  /*   gfx::GL::translate( Op::Pos(s).begin() ); */
+  /*   gfx::GL::rotate( Op::AA(s).begin() ); */
+
+  /*   im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad ); */
+  /* } */
+
   /* template<> void Drawable<Pnt>::Immediate (const Pnt& s){ */
- 
+
   /*     VT ta = Round::size( s, true ); */
 
   /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
   /*     if ( fabs(ta) >  FPERROR ) { */
-  /*         bool real = ta > 0 ? 1 : 0; */  
+  /*         bool real = ta > 0 ? 1 : 0; */
 
   /*         Pnt p = Round::cen( s ); */
   /*         VT t = sqrt ( fabs ( ta ) ); */
 
   /*         gfx::GL::translate ( p.begin() ); */
-  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */  
-  /*     } else { */  
+  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */
+  /*     } else { */
   /*         gfx::Glyph::Point(s); */
   /*     } */
-  /* } */ 
-  
+  /* } */
+
   /* template<> void Drawable<Sph>::Immediate (const Sph& s){ */
- 
+
   /*     VT ta = Round::size( s, false ); */
 
   /*     //Draw as dual Sphere (if |radius^2| > 0.000001); */
   /*     if ( fabs(ta) >  FPERROR ) { */
-  /*         bool real = ta > 0 ? 1 : 0; */  
+  /*         bool real = ta > 0 ? 1 : 0; */
 
   /*         Pnt p = Round::cen( s ); */
   /*         VT t = sqrt ( fabs ( ta ) ); */
 
   /*         gfx::GL::translate ( p.begin() ); */
-  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */  
-  /*     } else { */  
+  /*         (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t); */
+  /*     } else { */
   /*         gfx::Glyph::Point(s); */
   /*     } */
   /* } */
-  
+
   /* template<> void Drawable<Flp>::Immediate (const Flp& s){ */
   /*   Immediate( Round::null( s[0], s[1], s[2] ) ); */
   /* } */
-  
+
   /*  template<> void Drawable<Par>::Immediate (const Par& s){ */
   /*        //Is Imaginary? */
   /*     VT size = Round::size( s, false ); */
@@ -242,27 +240,27 @@ namespace gfx{
   /*     //is null? */
   /*     if ( fabs(size) < FPERROR ){ */
   /*         GL::translate( Round::loc(s).begin() ); */
-  /*         Immediate( -Round::dir(s).copy<Vec>() ); */ 
-        
+  /*         Immediate( -Round::dir(s).copy<Vec>() ); */
+
   /*     }else{ */
-      
+
   /*       std::vector<Pnt> pp = Round::split( s ); */
 
-  /*       VT ta = Round::size( pp[0], true ); */   
-                                     
-  /*       if ( fabs(ta) >  FPERROR ) { */    
+  /*       VT ta = Round::size( pp[0], true ); */
+
+  /*       if ( fabs(ta) >  FPERROR ) { */
   /*           Pnt p1 = Round::cen( pp[0] ); */
   /*           Pnt p2 = Round::cen( pp[1] ); */
   /*           double t = sqrt ( fabs ( ta ) ); */
-  /*           bool real = size > 0 ? 1 : 0; */  
+  /*           bool real = size > 0 ? 1 : 0; */
 
   /*           glPushMatrix(); */
   /*           gfx::GL::translate ( p1.begin() );//(p1[0], p1[1], p1[2]); */
-  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */  
+  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */
   /*           glPopMatrix(); */
 
   /*           gfx::GL::translate ( p2.begin() ); */
-  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */  
+  /*           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : gfx::Glyph::Sphere(t); */
 
   /*       } else { */
   /*      // pp[0].vprint(); pp[1].vprint(); */
@@ -271,22 +269,22 @@ namespace gfx{
   /*           gfx::Glyph::Line(pp[0],pp[1]); */
   /*       } */
   /*     } */
-  /* } */  
-  
+  /* } */
+
   /* template<> void Drawable<Dll>::Immediate (const Dll& s){ */
   /*     Drv d = Fl::dir( s.undual() ); */
   /*     Dls v = Fl::loc( s , PAO, true); */
   /*     gfx::GL::translate (v.begin()); */
-  /*     gfx::Glyph::DashedLine(d * 10, d * -10); */  
-  /* } */  
-  
+  /*     gfx::Glyph::DashedLine(d * 10, d * -10); */
+  /* } */
+
   /* template<> void Drawable<Lin>::Immediate (const Lin& s){ */
   /*     Drv d = Fl::dir( s ); */
   /*     Dls v = Fl::loc( s , PAO, false); */
   /*     gfx::GL::translate (v.begin()); */
-  /*     gfx::Glyph::Line(d * 10, d * -10); */  
+  /*     gfx::Glyph::Line(d * 10, d * -10); */
   /* } */
-  
+
 
 } //vsr::
 

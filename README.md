@@ -14,7 +14,7 @@ CSS: scripts/style.css
 Versor (libvsr)
 ===
 
-A (fast) Generic C++ library for Geometric Algebras, including Euclidean, Projective, Conformal, Spacetime (etc).  
+A (fast) Generic C++ library for Geometric Algebras, including Euclidean, Projective, Conformal, Spacetime (etc).
 ---
 ### Currently tested on Linux and Mac OS X ###
 
@@ -30,19 +30,19 @@ A (fast) Generic C++ library for Geometric Algebras, including Euclidean, Projec
 **Versor** is a C++ Library for **Geometric Algebra**, sometimes called **Clifford Algebra**, a system for encoding geometric concepts numerically.
 
 The headers generate optimized code at compile-time through template metaprogramming.  The core of the library
-is under 150kb, and supports arbitrary dimensions and metrics (limited by your compiler...).  
+is under 150kb, and supports arbitrary dimensions and metrics (limited by your compiler...).
 
-The library can be used as a math-only, or as an application with built-in graphics.  Both OpenGL and OpeGLES draw routines are supported.   
+The library can be used as a math-only, or as an application with built-in graphics.  Both OpenGL and OpeGLES draw routines are supported.
 
 
-Lead Developer: Pablo Colapinto  
-`gmail: wolftype`  
+Lead Developer: Pablo Colapinto
+`gmail: wolftype`
 
 
 ## CONTENTS: ##
 
-* [Recent Changes](#recentchanges)                               
-* [Compilation](#compilation)   
+* [Recent Changes](#recentchanges)
+* [Compilation](#compilation)
 * [Introduction](#introduction)
 * [Generators](#generators)
 * [What the Point is](#whatthepointis)
@@ -148,9 +148,9 @@ Use Cases
 1. A math library:
 ---
 
-	#include "vsr.h"
+	#include <vsr/vsr.h>
 
-	using Vec = vsr::euclidean_vec<3,float>;  		//<-- A 3 dimensional euclidean vector defined over floats
+	using Vec = vsr::euclidean_vector<3,float>;  		//<-- A 3 dimensional euclidean vector defined over floats
 	using Biv = vsr::euclidean_bivector<3,float>;   //<-- A 3 dimensional bivector or "directed area element"
 
 	int main(){
@@ -178,7 +178,7 @@ While fully enabling arbitrary metric spaces, *Versor* has a lot of built-in fun
 
 
 TROUBLESHOOTING
----                 
+---
 
 * You may need to install Glew on newer macs.  Best way to do this is with brew:
 
@@ -199,7 +199,7 @@ spherical and hyperbolic spaces, transformations, design robots, etc.
 I am using it for my PhD on bio-inspired engineering.
 
 I first developed _Versor_ while reading "Geometric Algebra for Computer Science" by Leo Dorst, Daniel Fontijne, and Stephen Mann.
-It's a fantastic book and if you're reading this you should also consider reading that.  
+It's a fantastic book and if you're reading this you should also consider reading that.
 
 
 License
@@ -229,7 +229,7 @@ very helpful algorithms in rigid body dynamics and gravitational physics see the
 Typical matrix operation libraries have templated inlined functions for Vector and Matrix multiplication.  Versor
 is similar, but on steroids, where _vectors_ and sparse _matrices_ of various sizes are all just called _multivectors_ and represent geometric
 elements beyond just xyz directions and transformation matrices. Circles, lines, spheres, planes, points are all algebraic elements, as are
-operators that spin, twist, dilate, and bend those variables.  Both these elements and operators are _multivectors_ which multiply together in many many many different ways.  
+operators that spin, twist, dilate, and bend those variables.  Both these elements and operators are _multivectors_ which multiply together in many many many different ways.
 
 
 ####What's new?
@@ -254,8 +254,8 @@ since it helps people out.
 ####How does it work?
 
 If you like functional template metaprogramming, take a look at the code
-and please let me know what you think.  If you don't, then I wouldn't . . .  
-But if you have ideas or questions please do not hesitate to contact me.   
+and please let me know what you think.  If you don't, then I wouldn't . . .
+But if you have ideas or questions please do not hesitate to contact me.
 
 WHAT THE POINT IS
 ---
@@ -266,9 +266,9 @@ GA combines many other maths (matrix, tensor, vector, and lie algebras). It is *
 A fuller treatment of this question (er, the question of why we do this) can be found in my [Master's thesis on the subject](http://wolftype.com/versor/colapinto_masters_final_02.pdf).  But basically,
 Geometic Algebra offers a particular richness of spatial expression.  Imagine needing glasses and not knowing you needed glasses.  Then, when you do get glasses, the world changes
 unexpectedly.  GA is like glasses for the inside of your brain.  _Conformal_ Geometric Algebra, especially the 5D variety enlisted here, are like x-ray glasses.  One
-point of clarification that occurs are **disambiguations** of previously collapsed concepts.  
+point of clarification that occurs are **disambiguations** of previously collapsed concepts.
 
-For instance, the main disambiguation, is that between a _Point_ in space and a _Vector_ in space.  
+For instance, the main disambiguation, is that between a _Point_ in space and a _Vector_ in space.
 A Point has no magnitude, but a Vector does.  A Point has no direction, but a Vector does. Points are _null_ Vectors.  We can make them
 by writing
 
@@ -313,11 +313,11 @@ Speaking of Spheres, we can also make spheres with a radius this way:
 
 	DualSphere dls = Round::dls( Vec( 1,0,0 ).null(), 1 );
 
-or  
+or
 
 	DualSphere dls = Round::dls( Vec( 1,0,0 ), 1 );
 
-or, specifying the radius first and then the coordinate:  
+or, specifying the radius first and then the coordinate:
 
 	DualSphere dls = Round::dls( 1 /* <--radius */ , 1,0,0 )
 
@@ -327,11 +327,11 @@ all of which give a dual sphere of radius 1 at coordinate 1,0,0;
 BASICS
 ---
 
-_Versor_ is named after the one of the basic category of elements of geometric algebra.  
+_Versor_ is named after the one of the basic category of elements of geometric algebra.
 A **versor** is a type of **multivector** which can be used to compose geometric transformations,
 namely reflections, translations, rotations, twists, dilations, and transversions (special conformal transformations).
 
-More on all of those transformations later.  
+More on all of those transformations later.
 
 In Versor, a `Vector` (or `Vec`) is a typical Euclidean 3D element.  It can be built in the normal way:
 
@@ -361,7 +361,7 @@ Some built-in Bivectors exist:
 	Biv::xz xy; //<-- XZ Counterclockwise Unit Area Biv(0,1,0)
 	Biv::yz xy; //<-- YZ Counterclockwise Unit Area Biv(0,0,1)
 
-While it is perfectly valid to write `Vector`, `Bivector` and `Rotor`, you'll notice I've truncated them to their three letter nicknames, `Vec` and `Rot`.  
+While it is perfectly valid to write `Vector`, `Bivector` and `Rotor`, you'll notice I've truncated them to their three letter nicknames, `Vec` and `Rot`.
 That's up to you: Both long-name and nick-name versions are valid in libvsr (they are typedef'ed to each other).
 
 	Biv b = Biv::xy;
@@ -393,7 +393,7 @@ Gui
 
 The examples/*.cpp files include bindings to the GLV framework for windowing and user interface controls. This provides the minumum necessary glue to get started quickly building your own GA based graphics applications.
 
-The interface has a built in gui, mouse info, and keyboard info stored.  
+The interface has a built in gui, mouse info, and keyboard info stored.
 
     //... a member of your App
 	Circle circle;
@@ -402,20 +402,20 @@ The interface has a built in gui, mouse info, and keyboard info stored.
 
 
 Putting the above code inside your application will enable you to click and modify geometric elements by hitting the "T", "R" and "S" keys (for translate, rotate, and scale)
-Hit any other key to deselect all elements.   
+Hit any other key to deselect all elements.
 
 
 [**BUILT-IN INTERFACE**]
 
 |                                 |                                             |
-Key                                 | Response  
-------------------------------      | ------------------------------------------  
-`~`                                 | Toggle full screen.  
-`SHIFT` + `Mouse` or `Arrow Keys`   | Translate the camera  in x and z directions.  
-`CTRL`+ `Mouse` or `Arrow Keys` 	| Rotate the camera  
-`ALT` +`Arrow Keys`              	| Rotate the model view around.  
-`T`                                 | Translate an Element  
-`R`                                 | Rotate an Element  
+Key                                 | Response
+------------------------------      | ------------------------------------------
+`~`                                 | Toggle full screen.
+`SHIFT` + `Mouse` or `Arrow Keys`   | Translate the camera  in x and z directions.
+`CTRL`+ `Mouse` or `Arrow Keys` 	| Rotate the camera
+`ALT` +`Arrow Keys`              	| Rotate the model view around.
+`T`                                 | Translate an Element
+`R`                                 | Rotate an Element
 `S`                                 | Scale an Element
 `Tab`                               | Switch from navigation mode (default) to object manipulation mode
 Any other key						| Release all Elements
@@ -430,13 +430,13 @@ act on the elements of the algebra.  All are known as _multivectors_ since they 
 
 Multivector elements are most often combined using three overloaded binary operators:
 
-The **Geometric** Product of elements `A` and `B`:  
+The **Geometric** Product of elements `A` and `B`:
 
 	A * B
 
 multiplies two multivector elements together.  This is most useful when multiplying one by the inverse of another (see `!` operator, below).
 
-The **Outer** Product of elements `A` and `B`:  
+The **Outer** Product of elements `A` and `B`:
 
 	A ^ B
 
@@ -455,13 +455,13 @@ There is also a **Commutator** product (differential)
 
 And a few overloaded operations, including,
 
-The Inverse:  
+The Inverse:
 
 	!A
 
 returns \\(A^{-1}\\)
 
-The Reverse:  
+The Reverse:
 
 	~A
 
@@ -474,22 +474,22 @@ And finally, since I ran out of overloadable operators, some basic methods
 
 which returns \\(\bar{A}\\)
 
-	A.inv()  
+	A.inv()
 
 which returns \\(\hat{A}\\)
 
-In summary:  
+In summary:
 
-| Versor     | Math                                              |                                          Description                                         |   |   |  
-| ---------- | ------------------------------------------------- | :------------------------------------------------------------------------------------------: | - |  
-| `A * B`    | \\(AB\\)                                          | Multiplies two elements together (and, in the case of A * !B finds ratios between elements). |  
-| `A ^ B`    | \\(A \wedge B\\)                                  |             Wedges two elements together (builds up higher dimensional elements).            |  
-| `A <= B`   | \\(A \rfloor B\\) or \\(\boldsymbol{a} \cdot B\\) |             Contracts A out of B (returns the part of B "least like A", sort of).            |  
-| `A % B`    | \\(A \times B\\)                                  |                         Commutator, equal to \\(\frac{1}{2}(AB-BA)\\)                        |  
-| `!A`       | \\(A^{-1}\\)                                      |                                       The Inverse of A.                                      |  
-| `~A`       | \\(\tilde{A}\\)                                   |                                       The Reverse of A.                                      |  
-| `A.conj()` | \\(\bar{A}\\)                                     |                                         Conjugation.                                         |  
-| `A.inv()`  | \\(\hat{A}\\)                                     |                                          Involution.                                         |  
+| Versor     | Math                                              |                                          Description                                         |   |   |
+| ---------- | ------------------------------------------------- | :------------------------------------------------------------------------------------------: | - |
+| `A * B`    | \\(AB\\)                                          | Multiplies two elements together (and, in the case of A * !B finds ratios between elements). |
+| `A ^ B`    | \\(A \wedge B\\)                                  |             Wedges two elements together (builds up higher dimensional elements).            |
+| `A <= B`   | \\(A \rfloor B\\) or \\(\boldsymbol{a} \cdot B\\) |             Contracts A out of B (returns the part of B "least like A", sort of).            |
+| `A % B`    | \\(A \times B\\)                                  |                         Commutator, equal to \\(\frac{1}{2}(AB-BA)\\)                        |
+| `!A`       | \\(A^{-1}\\)                                      |                                       The Inverse of A.                                      |
+| `~A`       | \\(\tilde{A}\\)                                   |                                       The Reverse of A.                                      |
+| `A.conj()` | \\(\bar{A}\\)                                     |                                         Conjugation.                                         |
+| `A.inv()`  | \\(\hat{A}\\)                                     |                                          Involution.                                         |
 
 
 ELEMENTS
@@ -498,48 +498,48 @@ ELEMENTS
 To make the process of writing code faster, all elements of the algebra are represented by types 3 letters long.
 Alternatively, you can also use the long-form name.
 
-[**BASIC ELEMENTS**]				  
-Type  |  Long Form   		     |     Descrription                                                        |  
------ | ---------------- | :---------------------------------------------------------: |  
-_Euclidean_             ||  
-`Sca` | `Scalar`         |                         A real number  
-`Vec` | `Vector`         |  A Directed Magnitude, or 3D Vector, typical cartesian stuff  
-`Biv` | `Bivector`       | A Directed Area. Use them to make Rotors: `Gen::Rot( Biv b )`  
-`Tri` | `Trivector`      |                   A Directed Volume Element  
+[**BASIC ELEMENTS**]
+Type  |  Long Form   		     |     Descrription                                                        |
+----- | ---------------- | :---------------------------------------------------------: |
+_Euclidean_             ||
+`Sca` | `Scalar`         |                         A real number
+`Vec` | `Vector`         |  A Directed Magnitude, or 3D Vector, typical cartesian stuff
+`Biv` | `Bivector`       | A Directed Area. Use them to make Rotors: `Gen::Rot( Biv b )`
+`Tri` | `Trivector`      |                   A Directed Volume Element
 
-_Round_                 ||  
-`Pnt` | `Point`          |           A Null Vector: `Pnt a = Vec(1,0,0).null()`  
-`Par` | `PointPair`      |    A 0-Sphere (Sphere on a Line): `Par par = Pnt a ^ Pnt b`  
-`Cir` | `Circle`         |         A 1-Sphere: `Cir cir = Pnt a ^ Pnt b ^ Pnt c`  
-`Sph` | `Sphere`         |     A 2-Sphere: `Sph sph = Pnt a ^ Pnt b ^ Pnt c ^ Pnt d`  
-`Dls` | `DualSphere`     |            Typedef'ed as a point: `typedef Pnt Dls`  
+_Round_                 ||
+`Pnt` | `Point`          |           A Null Vector: `Pnt a = Vec(1,0,0).null()`
+`Par` | `PointPair`      |    A 0-Sphere (Sphere on a Line): `Par par = Pnt a ^ Pnt b`
+`Cir` | `Circle`         |         A 1-Sphere: `Cir cir = Pnt a ^ Pnt b ^ Pnt c`
+`Sph` | `Sphere`         |     A 2-Sphere: `Sph sph = Pnt a ^ Pnt b ^ Pnt c ^ Pnt d`
+`Dls` | `DualSphere`     |            Typedef'ed as a point: `typedef Pnt Dls`
 
-_Flat_                  ||  
-`Lin` | `Line`           |        A Direct Line: e.g. `Lin lin = Par par ^ Inf(1)`  
-`Dll` | `DualLine`       |            A Dual Line: e.g. `Dll dll = lin.dual()`  
-`Pln` | `Plane`          |       A Direct Plane: e.g. `Pln pln = Cir cir ^ Inf(1)`  
-`Dlp` | `DualPlane`      |                A Dual Plane: e.g. `Dlp dlp = `  
-`Flp` | `FlatPoint`      |  
+_Flat_                  ||
+`Lin` | `Line`           |        A Direct Line: e.g. `Lin lin = Par par ^ Inf(1)`
+`Dll` | `DualLine`       |            A Dual Line: e.g. `Dll dll = lin.dual()`
+`Pln` | `Plane`          |       A Direct Plane: e.g. `Pln pln = Cir cir ^ Inf(1)`
+`Dlp` | `DualPlane`      |                A Dual Plane: e.g. `Dlp dlp = `
+`Flp` | `FlatPoint`      |
 
-_Versors_               ||  
-`Rot` | `Rotor`          |            Spins an Element (as a Quaternion would)  
+_Versors_               ||
+`Rot` | `Rotor`          |            Spins an Element (as a Quaternion would)
 `Trs` | `Translator`     |                     Translates an Element
-`Dil` | `Dilator`        |                       Dilates an Element  
-`Mot` | `Motor`          |                Twists an Element along an axis  
+`Dil` | `Dilator`        |                       Dilates an Element
+`Mot` | `Motor`          |                Twists an Element along an axis
 `Trv` | `Transversor`    |                        Bends an Element about the Origin
 `Bst` | `Booster`        |                        Bends an Element around an "Orbit"
 
-_Abstract_              ||  
-`Mnk` | `MinkowskiPlane` |  
-`Pss` | `Pseudoscalar`   |  
-`Inf` | `Infinity`       |  
+_Abstract_              ||
+`Mnk` | `MinkowskiPlane` |
+`Pss` | `Pseudoscalar`   |
+`Inf` | `Infinity`       |
 
 
 There are others as well (for instance, affine planes, lines, and points) but the above are more than sufficient to start with.
-There are also built in macros, for instance  
+There are also built in macros, for instance
 
-`EP`  			| Sphere At the Origin.   
-`EM`  			| Imaginary Sphere at the Origin.    
+`EP`  			| Sphere At the Origin.
+`EM`  			| Imaginary Sphere at the Origin.
 `PT(x,y,z)`  	| A null Point at x,y,z
 
 `EP` and `EM` can be invoked instead of `Inf` to work in non-Euclidean metrics ( Spherical and Hyperbolic, respectively)
@@ -548,11 +548,11 @@ Many Euclidean elements can be drawn by invoking Draw::Render(<element>).  Some 
 how to draw them (e.g the scalar) or because I just didn't figure out how to do it or because I forgot or was lazy.  If you
 want something to be drawable, let me know and I'll add it in.  Or try adding it in yourself and send a pull request via github.
 
-All elements can be dualized by invoking their `dual()` method  
+All elements can be dualized by invoking their `dual()` method
 
-All elements can be reflected over spinors with the `sp(<spinor>)` method  
+All elements can be reflected over spinors with the `sp(<spinor>)` method
 
-All elements can be reflected over versors with the `re(<versor>)` method  
+All elements can be reflected over versors with the `re(<versor>)` method
 
 The versors are constructed by the geometric entities, typically by using the `Gen::` routines.  Operators can also be acted on by operators -- you can rotate a translation, or twist a boost.
 
@@ -572,15 +572,15 @@ COMMON CONFORMAL FUNCTIONS
 GENERATORS
 ---
 
-|       |                                     |  
-Returns | Function                            | Description  
-------- | ----------------------------------- | -------------------------------------------------  
-Rot     | Gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector  
-Trs     | Gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector  
-Mot     | Gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line  
-Dil     | Gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount  
-Trv     | Gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector  
-Bst     | Gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair  
+|       |                                     |
+Returns | Function                            | Description
+------- | ----------------------------------- | -------------------------------------------------
+Rot     | Gen::rot( const Biv& b );           | //<-- Generate a Rotor from a Bivector
+Trs     | Gen::trs( const Drv& v);            | //<-- Generate a Translator from a Direction Vector
+Mot     | Gen::mot( const Dll& d);            | //<-- Generate a Motor from a Dual Line
+Dil     | Gen::dil( const Pnt& p, double amt );| //<-- Generate a Dilator from a Point and an amount
+Trv     | Gen::trv( cont Tnv& v);             | //<-- Generate a Transveror from a Tangent Vector
+Bst     | Gen::bst( const Par& p);            | //<-- Generate a Booster from a Point Pair
 
 
 REFLECTIONS
@@ -593,7 +593,7 @@ In addition to the above "even" spinors, we can also reflect.  Reflections (in a
 	r = r / r[3]; 			    //Renormalization of a point
 
 The re() method calculates `v.re(C)` as `C*v.inv()*~C` where inv() is an involution. With a versor `C` and an element `v` you might also try `C * v * !C`.  Inversion in a circle or a sphere may change the
-weight of the element (for a Point at x, it will change it by x^2)        
+weight of the element (for a Point at x, it will change it by x^2)
 
 
 LINKS

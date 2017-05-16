@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  wolftype 
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
@@ -19,18 +19,18 @@
 
 
 #ifndef VSR_DRAW_H_INCLUDED
-#define VSR_DRAW_H_INCLUDED  
+#define VSR_DRAW_H_INCLUDED
 
-#include "gfx/gfx_glyphs.h" 
-#include "gfx/gfx_render.h" 
-#include "draw/vsr_draw.h"
+#include "gfx/gfx_glyphs.h"
+#include "gfx/gfx_render.h"
+#include <vsr/draw/vsr_draw.h>
 
-#include "space/vsr_cga3D_op.h"
-#include "form/vsr_cga3D_frame.h" 
-#include "form/vsr_field.h"
+#include <vsr/space/vsr_cga3D_op.h>
+#include <vsr/form/vsr_cga3D_frame.h>
+#include <vsr/form/vsr_field.h>
 
 namespace gfx{
-                             
+
   using namespace vsr;
   //triangle and normal
   template<class T>
@@ -40,30 +40,30 @@ namespace gfx{
   }
 
 
- 
+
 // //Alternative Draw routine
 // template<class A>
 // void DrawB( const A& s, float r = 1, float g = 1, float b = 1, float a = 1){
-//   glPushMatrix(); 
+//   glPushMatrix();
 //   glNormal3f(0,0,1);
 //   glColor4f(r,g,b,a);
 //     ImmediateB(s);
 //   glPopMatrix();
 // }
 //
-  
+
 //
 /////Draw alternative glyph of A at location of B
 //  template<class A, class B>
 // void DrawAtB( const A& s, const B& p, float r = 1, float g = 1, float b = 1, float a = 1){
 //   glPushMatrix();
-//   glTranslatef( p[0], p[1], p[2] ); 
+//   glTranslatef( p[0], p[1], p[2] );
 //   glNormal3f(0,0,1);
 //   glColor4f(r,g,b,a);
 //     ImmediateB(s);
 //   glPopMatrix();
-// }   
-    
+// }
+
 
 
 //   template< class A, class B>
@@ -89,34 +89,34 @@ namespace gfx{
 //     // DrawAll(a, b);
 //    }
 
-     
-  template<> void Renderable<cga::Vec,0>::DrawImmediate  (const cga::Vec& s);  
- // template<> void Renderable<cga::V,0ec>::DrawImmediateB (const cga::Vec& s);                        
-  template<> void Renderable<cga::Biv,0>::DrawImmediate  (const cga::Biv& s);    
-  template<> void Renderable<cga::Biv,1>::DrawImmediate  (const cga::Biv& s);    
-  template<> void Renderable<cga::Drv,0>::DrawImmediate  (const cga::Drv& s); 
+
+  template<> void Renderable<cga::Vec,0>::DrawImmediate  (const cga::Vec& s);
+ // template<> void Renderable<cga::V,0ec>::DrawImmediateB (const cga::Vec& s);
+  template<> void Renderable<cga::Biv,0>::DrawImmediate  (const cga::Biv& s);
+  template<> void Renderable<cga::Biv,1>::DrawImmediate  (const cga::Biv& s);
+  template<> void Renderable<cga::Drv,0>::DrawImmediate  (const cga::Drv& s);
   template<> void Renderable<cga::Dlp,0>::DrawImmediate  (const cga::Dlp& s);
-  template<> void Renderable<cga::Pln,0>::DrawImmediate  (const cga::Pln& s); 
-  template<> void Renderable<cga::Cir,0>::DrawImmediate  (const cga::Cir& s ); 
+  template<> void Renderable<cga::Pln,0>::DrawImmediate  (const cga::Pln& s);
+  template<> void Renderable<cga::Cir,0>::DrawImmediate  (const cga::Cir& s );
   template<> void Renderable<cga::Pnt,0>::DrawImmediate  (const cga::Pnt& s);
   template<> void Renderable<cga::Sph,0>::DrawImmediate  (const cga::Sph& s);
   template<> void Renderable<cga::Flp,0>::DrawImmediate  (const cga::Flp& s);
-  template<> void Renderable<cga::Par,0>::DrawImmediate  (const cga::Par& s); 
-  template<> void Renderable<cga::Par,1>::DrawImmediate  (const cga::Par& s); 
-  template<> void Renderable<cga::Dll,0>::DrawImmediate  (const cga::Dll& s);  
+  template<> void Renderable<cga::Par,0>::DrawImmediate  (const cga::Par& s);
+  template<> void Renderable<cga::Par,1>::DrawImmediate  (const cga::Par& s);
+  template<> void Renderable<cga::Dll,0>::DrawImmediate  (const cga::Dll& s);
   template<> void Renderable<cga::Lin,0>::DrawImmediate  (const cga::Lin& s);
   template<> void Renderable<cga::Tnv,0>::DrawImmediate  (const cga::Tnv& t);
   template<> void Renderable<cga::Frame,0>::DrawImmediate  (const cga::Frame& f);
   template<> void Renderable<cga::Frame,1>::DrawImmediate  (const cga::Frame& f);
-//  template<> void Renderable<cga::Frame>::DrawImmediateB (const cga::Frame& s);   
-  
+//  template<> void Renderable<cga::Frame>::DrawImmediateB (const cga::Frame& s);
+
 
   template<> void Renderable<Field<cga::Vec>,0>::DrawImmediate( const Field<cga::Vec>& f);
   template<> void Renderable<Field<cga::Sca>,0>::DrawImmediate( const Field<cga::Sca>& f);
   template<> void Renderable<Field<cga::Tnv>,0>::DrawImmediate( const Field<cga::Tnv>& f);
   template<> void Renderable<Field<cga::Frame>,0>::DrawImmediate( const Field<cga::Frame>& f);
 
-  
+
 } //gfx::
 
 #endif

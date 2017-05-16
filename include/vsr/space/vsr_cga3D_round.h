@@ -21,8 +21,8 @@
 #define  vsr_cga3D_round_INC
 
 
-#include "detail/vsr_generic_op.h"
-#include "space/vsr_cga3D_types.h"
+#include <vsr/detail/vsr_generic_op.h>
+#include <vsr/space/vsr_cga3D_types.h>
 
 namespace vsr { namespace cga {
 

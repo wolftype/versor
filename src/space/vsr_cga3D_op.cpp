@@ -1,4 +1,11 @@
-  #include "space/vsr_cga3D_op.h"
+/*  versor - geometric algbera library
+ *  https://github.com/wolftype/versor
+ *  c++11 (gcc >= 4.7 or clang >= 3.2)
+ *
+ *	(c)  p a b l o   c o l a p i n t o
+ */
+
+#include <vsr/space/vsr_cga3D_op.h>
 
 namespace vsr{
 namespace cga {

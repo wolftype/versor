@@ -30,11 +30,11 @@ link_directories(${PROJECT_BINARY_DIR})
 #PROJECT INCLUDE AND LINK
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR})
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/detail)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/space)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/form)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/util)
+#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
+#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/detail)
+#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/space)
+#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/form)
+#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/util)
 
 
 
@@ -76,13 +76,13 @@ if(${BUILD_GRAPHICS})
 
   #todo: change this flag name to ${GLES} Flag
   if(${RASPBERRY})
-    add_library(vsrGfx ${graphicsGLES}) 
+    add_library(vsrGfx ${graphicsGLES})
   else()
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
   endif()
 
-  target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
-  target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/draw)
+  target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include)
+  #target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/draw)
 
   set(vsr_libraries  ${vsr_libraries} vsrGfx)
   set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )

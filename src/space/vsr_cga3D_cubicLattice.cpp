@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_cga3D_cubicLattice.cpp
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  12/03/2013 12:51:56
@@ -15,7 +15,7 @@
  *
  * =====================================================================================
  */
-#include "form/vsr_cubicLattice.h"
+#include <vsr/form/vsr_cubicLattice.h>
 
 namespace vsr{
 
@@ -27,8 +27,8 @@ namespace vsr{
          for (int i = 0; i < mWidth; ++i){
             for (int j = 0; j < mHeight; ++j){
                 for (int k = 0; k < mDepth; ++k){
-                    int tidx = idx(i,j,k); 
-                    mPoint[ tidx ]  = nga::Round::point(px(i),  py(j),  pz(k) ); 
+                    int tidx = idx(i,j,k);
+                    mPoint[ tidx ]  = nga::Round::point(px(i),  py(j),  pz(k) );
                    // mPoint[tidx].print();
                 }
             }

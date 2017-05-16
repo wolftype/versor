@@ -17,7 +17,7 @@
  */
 
 
-#include "space/vsr_cga3D_round.h"
+#include <vsr/space/vsr_cga3D_round.h>
 
 namespace vsr { namespace cga {
 
