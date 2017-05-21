@@ -68,7 +68,7 @@ struct App : public gfx::GFXAppGui {
    // Frame f;
     switch(k.code){
       case 'o':
-        printf("o: output ps mono\n");
+        printf("-o: output ps mono\n");
         ps.bTightBounds = true;
         GL::enablePreset();
         this->scene.camera.stereo(false);
@@ -78,7 +78,7 @@ struct App : public gfx::GFXAppGui {
         GL::disablePreset();
         break;
       case 'p':
-        printf("p: output ps stereo\n");
+        printf("output ps stereo\n");
         ps.bTightBounds = false;
         GL::enablePreset();
         this->scene.camera.stereo(true);
@@ -96,12 +96,12 @@ struct App : public gfx::GFXAppGui {
         break;
 
       case 'x':
-        printf("x: save mouse position\n");
+        printf("save mouse position\n");
         bSetMouse = !bSetMouse;
         break;
 
       case 'm':
-        printf("m: mono / stereo toggle\n");
+        printf("mono / stereo toggle\n");
         mRenderGraph.mStereoMode =
           mRenderGraph.mStereoMode == GFXRenderGraph::MONO ?
             GFXRenderGraph::ANAGLYPH : GFXRenderGraph::MONO;

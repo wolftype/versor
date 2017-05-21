@@ -46,8 +46,8 @@ add_library(vsr ${core})
 link_directories(${PROJECT_BINARY_DIR})
 
 #PROJECT INCLUDE AND LINK
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR})
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(vsr BEFORE PUBLIC ${PROJECT_SOURCE_DIR})
+target_include_directories(vsr BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
@@ -91,8 +91,7 @@ if(${BUILD_GRAPHICS})
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
   endif()
 
-  target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include)
-  #target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/draw)
+  target_include_directories(vsrGfx BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
   set(vsr_libraries ${vsr_libraries} vsrGfx)
   set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )
