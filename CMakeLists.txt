@@ -127,16 +127,14 @@ install(DIRECTORY include/vsr/space  DESTINATION include/vsr)
 install(DIRECTORY include/vsr/util   DESTINATION include/vsr)
 install(FILES include/vsr/vsr.h include/vsr/vsr_app.h DESTINATION include/vsr)
 
-
-
 ##PRINT DIRECTORIES
 #message("VERSOR LINK DIRECTORES")
 #foreach(d ${link_dirs})
 #  message(STATUS "link dir='${d}'")
 #endforeach()
-message("VERSOR INCLUDE DIRECTORES")
-foreach(d ${inc_dirs})
-  message(STATUS "include dir='${d}'")
-endforeach()
+#message("VERSOR INCLUDE DIRECTORES")
+#foreach(d ${inc_dirs})
+#  message(STATUS "include dir='${d}'")
+#endforeach()
 
 
