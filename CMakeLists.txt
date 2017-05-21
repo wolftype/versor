@@ -46,8 +46,8 @@ add_library(vsr ${core})
 link_directories(${PROJECT_BINARY_DIR})
 
 #PROJECT INCLUDE AND LINK
-target_include_directories(vsr BEFORE PUBLIC ${PROJECT_SOURCE_DIR})
-target_include_directories(vsr BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR})
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
@@ -90,8 +90,6 @@ if(${BUILD_GRAPHICS})
   else()
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
   endif()
-
-  target_include_directories(vsrGfx BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
   set(vsr_libraries ${vsr_libraries} vsrGfx)
   set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )
@@ -136,9 +134,9 @@ install(FILES include/vsr/vsr.h include/vsr/vsr_app.h DESTINATION include/vsr)
 #foreach(d ${link_dirs})
 #  message(STATUS "link dir='${d}'")
 #endforeach()
-#message("VERSOR INCLUDE DIRECTORES")
-#foreach(d ${inc_dirs})
-#  message(STATUS "include dir='${d}'")
-#endforeach()
+message("VERSOR INCLUDE DIRECTORES")
+foreach(d ${inc_dirs})
+  message(STATUS "include dir='${d}'")
+endforeach()
 
 

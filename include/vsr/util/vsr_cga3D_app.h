@@ -68,7 +68,7 @@ struct App : public gfx::GFXAppGui {
    // Frame f;
     switch(k.code){
       case 'o':
-        printf("-o: output ps mono\n");
+        printf("o: output ps mono\n");
         ps.bTightBounds = true;
         GL::enablePreset();
         this->scene.camera.stereo(false);
@@ -78,7 +78,7 @@ struct App : public gfx::GFXAppGui {
         GL::disablePreset();
         break;
       case 'p':
-        printf("output ps stereo\n");
+        printf("p: output ps stereo\n");
         ps.bTightBounds = false;
         GL::enablePreset();
         this->scene.camera.stereo(true);
