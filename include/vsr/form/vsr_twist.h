@@ -11,9 +11,9 @@
 #define VSR_TWIST_H_INCLUDED
 
 
-#include "space/vsr_cga3D_op.h"
-#include "vsr_interp.h"
-#include "vsr_field.h"
+#include <vsr/space/vsr_cga3D_op.h>
+#include <vsr/form/vsr_interp.h>
+#include <vsr/form/vsr_field.h>
 
 namespace vsr { namespace cga {
 

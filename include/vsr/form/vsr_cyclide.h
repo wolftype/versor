@@ -19,7 +19,7 @@
 #ifndef  vsr_cyclide_INC
 #define  vsr_cyclide_INC
 
-#include "vsr_tangent.h"
+#include <vsr/form/vsr_tangent.h>
 
 namespace vsr { namespace cga {
 

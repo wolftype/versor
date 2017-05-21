@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "vsr_products.h"
+#include <vsr/space/vsr_products.h>
 
 namespace vsr{
 

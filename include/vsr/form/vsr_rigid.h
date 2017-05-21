@@ -29,7 +29,7 @@
 #ifndef  vsr_rigid_INC
 #define  vsr_rigid_INC
 
-#include "vsr_graph.h"
+#include <vsr/form/vsr_graph.h>
 
 namespace vsr { namespace cga {
 

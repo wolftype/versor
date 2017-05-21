@@ -20,7 +20,7 @@
 #ifndef  vsr_map_INC
 #define  vsr_map_INC
 
-#include "detail/vsr_generic_op.h"
+#include <vsr/detail/vsr_generic_op.h>
 
 namespace vsr {
 

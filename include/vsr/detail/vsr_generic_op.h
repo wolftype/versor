@@ -19,8 +19,8 @@
 #ifndef VSR_GENERIC_OP_H_INCLUDED
 #define VSR_GENERIC_OP_H_INCLUDED
 
-#include "vsr_multivector.h"
-#include "../util/vsr_constants.h"
+#include <vsr/detail/vsr_multivector.h>
+#include <vsr/util/vsr_constants.h>
 #include <vector>
 
 namespace vsr {

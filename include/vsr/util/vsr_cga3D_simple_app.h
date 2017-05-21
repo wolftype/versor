@@ -21,17 +21,17 @@
 #ifndef  vsr_cga3D_app_INC
 #define  vsr_cga3D_app_INC
 
-#include "space/vsr_cga3D_op.h"               //<-- conformal 3D types and basic
-#include "space/vsr_cga3D_funcs.h"               //<-- conformal 3D types and helper functions
+#include <vsr/space/vsr_cga3D_op.h>               //<-- conformal 3D types and basic
+#include <vsr/space/vsr_cga3D_funcs.h>               //<-- conformal 3D types and helper functions
 
-#include "draw/vsr_cga3D_draw.h"              //<-- fixed pipeline draw routines
-#include "draw/vsr_cga3D_render.h"            //<-- programmable pipeline draw routines
+#include <vsr/draw/vsr_cga3D_draw.h>              //<-- fixed pipeline draw routines
+#include <vsr/draw/vsr_cga3D_render.h>            //<-- programmable pipeline draw routines
 
-#include "util/vsr_cga3D_control.h"      //<-- interface controls (mouse and keyboard)
-#include "gfx/util/gfx_glv_app.h"             //<-- an app class with built-in gui
+#include <vsr/util/vsr_cga3D_control.h>      //<-- interface controls (mouse and keyboard)
+#include <gfx/util/gfx_glv_app.h>             //<-- an app class with built-in gui
 
 //GL2PS
-//#include "gl2ps/gl2ps.h"
+//#include <gl2ps/gl2ps.h>
 
 
 struct App : public gfx::GFXAppGui {  

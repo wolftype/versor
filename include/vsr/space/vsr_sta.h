@@ -6,7 +6,7 @@
 	
  SEE Hestenes Space Time Algebra
 */
-#include "detail/vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
  
 namespace vsr{
 	

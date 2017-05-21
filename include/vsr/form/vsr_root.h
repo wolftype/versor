@@ -14,7 +14,7 @@
 #define ROOT_SYSTEM_INCLUDED
                       
 #include <vector>
-#include "detail/vsr_generic_op.h"
+#include <vsr/detail/vsr_generic_op.h>
 
 using namespace std;
 

@@ -39,13 +39,13 @@
 #ifndef  vsr_cyclide_draw_INC
 #define  vsr_cyclide_draw_INC
 
-#include "form/vsr_graph.h"
-#include "form/vsr_cyclide.h"
+#include <vsr/form/vsr_graph.h>
+#include <vsr/form/vsr_cyclide.h>
 
-#include "gfx/gfx_mesh.h"
-#include "gfx/gfx_print.h"
+#include <gfx/gfx_mesh.h>
+#include <gfx/gfx_print.h>
 
-#include "vsr_cga3D_draw.h"
+#include <vsr/draw/vsr_cga3D_draw.h>
 
 namespace gfx{
 

@@ -2,11 +2,11 @@
 #ifndef  vsr_chain_draw_INC
 #define  vsr_chain_draw_INC
 
-#include "gfx/gfx_mesh.h"
-#include "gfx/gfx_print.h"
+#include <gfx/gfx_mesh.h>
+#include <gfx/gfx_print.h>
 
-#include "vsr_cga3D_draw.h"
-#include "form/vsr_chain.h"
+#include <vsr/draw/vsr_cga3D_draw.h>
+#include <vsr/form/vsr_chain.h>
 
 #include <sstream>
 

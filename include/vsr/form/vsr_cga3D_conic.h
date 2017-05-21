@@ -21,7 +21,7 @@
 #ifndef  vsr_cga3D_conic_INC
 #define  vsr_cga3D_conic_INC
 
-#include "vsr_conic.h"
+#include <vsr/form/vsr_conic.h>
 
 namespace vsr{
 

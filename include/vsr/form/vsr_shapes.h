@@ -16,10 +16,10 @@
  * =====================================================================================
  */
 
-#include "space/vsr_cga3D_op.h"
-//#include "vsr_cga3D_funcs.h"
+#include <vsr/space/vsr_cga3D_op.h>
+//#include <vsr/form/vsr_cga3D_funcs.h>
 
-#include "gfx/gfx_mesh.h"
+#include <gfx/gfx_mesh.h>
 
 namespace vsr{ namespace cga {
 

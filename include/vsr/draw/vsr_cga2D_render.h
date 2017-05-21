@@ -22,8 +22,8 @@
 #define  vsr_cga2D_render_INC
 
 
-#include "gfx/gfx_render.h"
-#include "vsr_cga2D_types.h"
+#include <gfx/gfx_render.h>
+#include <vsr/draw/vsr_cga2D_types.h>
 
 using namespace gfx;
 

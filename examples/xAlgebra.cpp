@@ -17,7 +17,7 @@
  */
 
 #include <type_traits>
-#include "detail/vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
 
 /*-----------------------------------------------------------------------------
   

@@ -1,7 +1,7 @@
 #ifndef VSR_EGA3D_H_TYPES_INCLUDED
 #define VSR_EGA3D_H_TYPES_INCLUDED
 
-#include "detail/vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
 
 namespace vsr{
 

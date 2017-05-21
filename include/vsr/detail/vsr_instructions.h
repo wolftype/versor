@@ -14,7 +14,7 @@
 #ifndef INSTRUCTIONS_H_INCLUDED
 #define INSTRUCTIONS_H_INCLUDED
 
-#include "vsr_basis.h"
+#include <vsr/detail/vsr_basis.h>
 
 namespace vsr{
 

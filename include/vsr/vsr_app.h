@@ -20,8 +20,8 @@
 #ifndef  vsr_app_INC
 #define  vsr_app_INC
 
-#include "util/vsr_cga3D_app.h"
-#include "form/vsr_cga3D_frame.h"
-#include "form/vsr_field.h"
+#include <vsr/util/vsr_cga3D_app.h>
+#include <vsr/form/vsr_cga3D_frame.h>
+#include <vsr/form/vsr_field.h>
 
 #endif   /* ----- #ifndef vsr_app_INC  ----- */
