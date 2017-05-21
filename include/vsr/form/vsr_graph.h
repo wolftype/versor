@@ -3,8 +3,8 @@
 #ifndef VSR_GRAPH_H_INCLUDED
 #define VSR_GRAPH_H_INCLUDED
 
-#include "vsr_set.h"
-//#include "vsr_smart.h"
+#include <vsr/form/vsr_set.h>
+//#include <vsr/form/vsr_smart.h>
 
 namespace vsr{
 

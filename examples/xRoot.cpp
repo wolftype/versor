@@ -1,7 +1,7 @@
 
-#include "form/vsr_root.h"  
-#include "draw/vsr_ega3D_draw.h"
-#include "gfx/util/gfx_glv_app.h"
+#include <vsr/form/vsr_root.h>  
+#include <vsr/draw/vsr_ega3D_draw.h>
+#include <gfx/util/gfx_glv_app.h>
 
 using namespace vsr;  
 using namespace vsr::ega;  

@@ -2,8 +2,8 @@
 #define VSR_EGA3D_DRAW_H_INCLUDED  
  
 
-#include "gfx/gfx_glyphs.h" 
-#include "space/vsr_ega3D_types.h" 
+#include <gfx/gfx_glyphs.h> 
+#include <vsr/space/vsr_ega3D_types.h> 
 
 namespace vsr{  
 

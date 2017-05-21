@@ -19,8 +19,8 @@
 #ifndef  vsr_differential_INC
 #define  vsr_differential_INC
 
-#include "space/vsr_cga3D_op.h" //<-- assume cga3d for now
-#include "vsr_graph.h"
+#include <vsr/space/vsr_cga3D_op.h> //<-- assume cga3d for now
+#include <vsr/form/vsr_graph.h>
 
 namespace vsr { namespace cga {
 

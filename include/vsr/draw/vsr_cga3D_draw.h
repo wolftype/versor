@@ -21,8 +21,8 @@
 #ifndef VSR_DRAW_H_INCLUDED
 #define VSR_DRAW_H_INCLUDED
 
-#include "gfx/gfx_glyphs.h"
-#include "gfx/gfx_render.h"
+#include <gfx/gfx_glyphs.h>
+#include <gfx/gfx_render.h>
 #include <vsr/draw/vsr_draw.h>
 
 #include <vsr/space/vsr_cga3D_op.h>

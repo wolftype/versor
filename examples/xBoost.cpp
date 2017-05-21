@@ -7,7 +7,7 @@
  *-----------------------------------------------------------------------------*/
 
 
-#include "vsr_app.h"  
+#include <vsr/vsr_app.h>  
 
 using namespace vsr;
 using namespace vsr::cga;

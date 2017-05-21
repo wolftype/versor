@@ -10,9 +10,9 @@
 #ifndef VSR_H_FOLD_INCLUDED
 #define VSR_H_FOLD_INCLUDED
 
-#include "space/vsr_cga3D_op.h"
-#include "form/vsr_set.h"
-#include "form/vsr_rigid.h"
+#include <vsr/space/vsr_cga3D_op.h>
+#include <vsr/form/vsr_set.h>
+#include <vsr/form/vsr_rigid.h>
 
 namespace vsr{ namespace cga{
 

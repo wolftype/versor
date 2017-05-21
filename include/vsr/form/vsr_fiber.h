@@ -11,8 +11,8 @@
 #ifndef Versor_vsr_fiber_h
 #define Versor_vsr_fiber_h
 
-#include "space/vsr_cga3D_op.h"
-#include "util/vsr_coord.h"
+#include <vsr/space/vsr_cga3D_op.h>
+#include <vsr/util/vsr_coord.h>
 
 
 //Q: Given a Circle, can we find it's associated HopfBundle, and thereby a commuting Circle?

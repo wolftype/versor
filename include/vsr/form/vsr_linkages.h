@@ -26,7 +26,7 @@
 #ifndef  vsr_linkages_INC
 #define  vsr_linkages_INC
 
-#include "vsr_chain.h"
+#include <vsr/form/vsr_chain.h>
 
 namespace vsr{  namespace cga {
 

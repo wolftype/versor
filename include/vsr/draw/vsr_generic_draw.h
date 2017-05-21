@@ -8,9 +8,9 @@
 #ifndef VSR_GENERIC_DRAW_H_INCLUDED
 #define VSR_GENERIC_DRAW_H_INCLUDED  
 
-#include "gfx/gfx_glyphs.h" 
-#include "detail/vsr_generic_op.h"
-#include "form/vsr_field.h"
+#include <gfx/gfx_glyphs.h> 
+#include <vsr/detail/vsr_generic_op.h>
+#include <vsr/form/vsr_field.h>
 
 namespace vsr{ 
 

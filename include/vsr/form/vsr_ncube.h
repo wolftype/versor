@@ -1,8 +1,8 @@
 #ifndef VSR_NCUBE_H_INCLUDED
 #define VSR_NCUBE_H_INCLUDED
 
-#include "vsr_products.h"
-#include "vsr_generic_op.h"
+#include <vsr/form/vsr_products.h>
+#include <vsr/form/vsr_generic_op.h>
 #include <vector> 
 
 namespace vsr{    

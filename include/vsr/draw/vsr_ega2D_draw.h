@@ -20,10 +20,10 @@
 #define VSR_EGA2D_DRAW_H_INCLUDED  
  
 
-#include "vsr_products.h"
-#include "vsr_generic_op.h"  
-#include "vsr_ega2D_types.h"
-#include "gfx/gfx_glyphs.h"
+#include <vsr/draw/vsr_products.h>
+#include <vsr/draw/vsr_generic_op.h>  
+#include <vsr/draw/vsr_ega2D_types.h>
+#include <gfx/gfx_glyphs.h>
 
 namespace vsr {
 

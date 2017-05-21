@@ -16,27 +16,38 @@ set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
+# set (CMAKE_CXX_STANDARD 11)
+# set (CMAKE_CXX_STANDARD_REQUIRED ON)
+# set (CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
+set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+
+if (NOT CMAKE_BUILD_TYPE)
+  set (CMAKE_BUILD_TYPE RelWithDebInfo)
+endif ()
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(BUILD_TYPE_FLAGS "-g -O0")
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+  set(BUILD_TYPE_FLAGS "-g0 -O3")
+elseif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+  set(BUILD_TYPE_FLAGS "-g -O3")
+else()
+  message(FATAL_ERROR "invalid build type or failure to set a build type.  specify Release, Debug, or RelWithDebInfo")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 
 
 #All .cpp files in src/space get built into libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
 link_directories(${PROJECT_BINARY_DIR})
+
 #PROJECT INCLUDE AND LINK
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR})
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include)
-#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
-#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/detail)
-#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/space)
-#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/form)
-#target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/util)
-
-
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
@@ -47,7 +58,6 @@ foreach(filename ${tests})
   target_link_libraries(${target} vsr )
 endforeach()
 
-#define ${vsr_libraries}
 set(vsr_libraries vsr)
 
 
@@ -84,7 +94,7 @@ if(${BUILD_GRAPHICS})
   target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include)
   #target_include_directories(vsrGfx PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/draw)
 
-  set(vsr_libraries  ${vsr_libraries} vsrGfx)
+  set(vsr_libraries ${vsr_libraries} vsrGfx)
   set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )
 
   file(GLOB examples examples/*.cpp)
@@ -108,6 +118,18 @@ get_property(inc_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIR
 set_property(GLOBAL PROPERTY VSR_LIBRARIES ${vsr_libraries})
 set_property(GLOBAL PROPERTY VSR_INCLUDE_DIR "${inc_dirs}")
 set_property(GLOBAL PROPERTY VSR_LINK_DIR "${link_dirs}")
+
+install(TARGETS ${vsr_libraries}
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY include/vsr/detail DESTINATION include/vsr)
+install(DIRECTORY include/vsr/form   DESTINATION include/vsr)
+install(DIRECTORY include/vsr/space  DESTINATION include/vsr)
+install(DIRECTORY include/vsr/util   DESTINATION include/vsr)
+install(FILES include/vsr/vsr.h include/vsr/vsr_app.h DESTINATION include/vsr)
+
 
 
 ##PRINT DIRECTORIES

@@ -21,7 +21,7 @@
 #ifndef  vsr_tangent_INC
 #define  vsr_tangent_INC
 
-#include "vsr_cga3D_frame.h"
+#include <vsr/form/vsr_cga3D_frame.h>
 
 namespace vsr { namespace cga {
 

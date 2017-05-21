@@ -20,8 +20,8 @@
 #ifndef  vsr_simplex_draw_INC
 #define  vsr_simplex_draw_INC
 
-#include "vsr_simplex.h"
-#include "vsr_generic_draw.h"
+#include <vsr/draw/vsr_simplex.h>
+#include <vsr/draw/vsr_generic_draw.h>
 
 namespace vsr{
 

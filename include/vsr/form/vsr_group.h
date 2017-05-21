@@ -41,9 +41,9 @@ scratch/projects/groups/xSpaceGroup3D.cpp
 #define  vsr_group_INC
 
                      
-#include "vsr_set.h" 
-#include "vsr_root.h"
-#include "detail/vsr_generic_op.h"
+#include <vsr/form/vsr_set.h> 
+#include <vsr/form/vsr_root.h>
+#include <vsr/detail/vsr_generic_op.h>
 #include <vector>                 
  
 using std::vector;

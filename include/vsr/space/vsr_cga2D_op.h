@@ -20,7 +20,7 @@
 #ifndef  vsr_cga2D_op_INC
 #define  vsr_cga2D_op_INC
 
-#include "vsr_cga2D_types.h"
+#include <vsr/space/vsr_cga2D_types.h>
 
 namespace vsr { namespace cga2D {
 

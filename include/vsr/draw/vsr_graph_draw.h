@@ -20,10 +20,10 @@
 #define VSR_GRAPH_DRAW_H_INCLUDED  
  
 
-#include "gfx/gfx_render.h"
+#include <gfx/gfx_render.h>
 
-#include "form/vsr_graph.h"
-#include "vsr_generic_draw.h"
+#include <vsr/form/vsr_graph.h>
+#include <vsr/draw/vsr_generic_draw.h>
 
 namespace gfx{
 

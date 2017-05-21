@@ -24,7 +24,7 @@
 #define  vsr_conic_INC
 
 
-#include "detail/vsr_generic_op.h"
+#include <vsr/detail/vsr_generic_op.h>
 
 
 namespace vsr{ 

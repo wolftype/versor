@@ -26,7 +26,7 @@
 #define MV_H_INCLUDED
 
 
-#include "vsr_algebra.h"  //<-- algebra implementation details (EGA, MGA, CGA)
+#include <vsr/detail/vsr_algebra.h>  //<-- algebra implementation details (EGA, MGA, CGA)
 
 #include <math.h>
 #include <iostream>

@@ -20,7 +20,7 @@
 #ifndef  vsr_cga3D_render_INC
 #define  vsr_cga3D_render_INC
 
-#include "gfx/gfx_render.h"
+#include <gfx/gfx_render.h>
 
 #include <vsr/space/vsr_cga3D_op.h>
 #include <vsr/space/vsr_cga3D_xf.h>

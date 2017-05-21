@@ -40,8 +40,8 @@
 #include <bitset> 
 #include <iostream>
 
-#include "vsr_basis.h"
-#include "vsr_instructions.h"
+#include <vsr/detail/vsr_basis.h>
+#include <vsr/detail/vsr_instructions.h>
   
 using namespace std;
 

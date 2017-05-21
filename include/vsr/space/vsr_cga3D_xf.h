@@ -20,8 +20,8 @@
 #ifndef  vsr_cga3D_xf_INC
 #define  vsr_cga3D_xf_INC
 
-#include "vsr_cga3D_op.h" 
-#include "gfx/gfx_matrix.h"
+#include <vsr/space/vsr_cga3D_op.h> 
+#include <gfx/gfx_matrix.h>
 
 namespace vsr {
 

@@ -17,9 +17,9 @@
 #ifndef VSR_CHAIN_H_INCLUDED
 #define VSR_CHAIN_H_INCLUDED
 
-#include "vsr_cga3D_frame.h"
-#include "vsr_twist.h"
-#include "vsr_rigid.h"
+#include <vsr/form/vsr_cga3D_frame.h>
+#include <vsr/form/vsr_twist.h>
+#include <vsr/form/vsr_rigid.h>
 
 #include <map>
 #include <string>

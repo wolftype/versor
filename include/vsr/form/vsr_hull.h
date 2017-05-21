@@ -27,8 +27,8 @@
 #ifndef  vsr_hull_INC
 #define  vsr_hull_INC
 
-#include "vsr_graph.h"
-#include "detail/vsr_generic_op.h"
+#include <vsr/form/vsr_graph.h>
+#include <vsr/detail/vsr_generic_op.h>
 
 namespace vsr{
 

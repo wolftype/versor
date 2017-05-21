@@ -34,8 +34,8 @@
 #ifndef  vsr_products_INC
 #define  vsr_products_INC
 
-#include "vsr_xlists.h"
-#include "vsr_split_met.h"
+#include <vsr/detail/vsr_xlists.h>
+#include <vsr/detail/vsr_split_met.h>
 
 namespace vsr {
 

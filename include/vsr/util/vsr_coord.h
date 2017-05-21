@@ -9,7 +9,7 @@
 #ifndef Versor_vsr_coord_h
 #define Versor_vsr_coord_h
 
-#include "space/vsr_cga3D_op.h"
+#include <vsr/space/vsr_cga3D_op.h>
 
 //#include <iostream>
 

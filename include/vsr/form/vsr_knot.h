@@ -12,7 +12,7 @@
 #ifndef Versor_vsr_knot_h
 #define Versor_vsr_knot_h
 
-#include "vsr_fiber.h"
+#include <vsr/form/vsr_fiber.h>
 
 namespace vsr { namespace cga {
 
