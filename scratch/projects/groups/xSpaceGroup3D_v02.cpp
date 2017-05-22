@@ -1,6 +1,6 @@
-#include "vsr_app.h"
-#include "vsr/form/vsr_group.h"
-#include "vsr/form/vsr_twist.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_group.h>
+#include <vsr/form/vsr_twist.h>
 
 using namespace vsr;
 using namespace vsr::cga;

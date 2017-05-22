@@ -17,9 +17,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_root.h"
-#include "form/vsr_group.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_root.h>
+#include <vsr/form/vsr_group.h>
 
 
 using namespace vsr;

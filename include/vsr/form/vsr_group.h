@@ -20,35 +20,35 @@
 Point and Space Groups in 2D and 3D
 
 Groups are defined generically on reflection pin type T, so
-the techniques could theoretically be extended to build hyperbolic groups 
+the techniques could theoretically be extended to build hyperbolic groups
 that reflect over circles and spheres.
 
 Examples that use this:
 
 scratch/projects/groups/xSpaceGroup2D.cpp
 scratch/projects/groups/xSpaceGroup3D.cpp
-            
+
 @sa vsr_root.h for generating reflection groups
 
 @todo deprecate overloaded () operator (in favor of `apply`)
-@todo fix up SpaceGroup2D so that it is as complete as SpaceGroup3D 
+@todo fix up SpaceGroup2D so that it is as complete as SpaceGroup3D
 @todo revisit application algorithm (e.g. reserve space ahead of time)
 @todo only supports primitive lattice (not body centered, etc) right now
 @todo bravais system type should be determinable to avoid crashing
 */
-  
+
 #ifndef  vsr_group_INC
 #define  vsr_group_INC
 
-                     
-#include <vsr/form/vsr_set.h> 
+
+#include <vsr/form/vsr_set.h>
 #include <vsr/form/vsr_root.h>
 #include <vsr/detail/vsr_generic_op.h>
-#include <vector>                 
- 
+#include <vector>
+
 using std::vector;
 
-namespace vsr{ 
+namespace vsr{
 
 /// Simple Reflection group templated on Pin Type (no translating or gliding spinors)
 /// @todo make class with private member mOps
@@ -58,7 +58,7 @@ struct SimpleGroup{
 
    SimpleGroup() {}
    SimpleGroup( vector<V> v ) : ops(v) {} ///< Instantiate with pin group
- 
+
     /// Applies all std::vector<V> operators onto p motif and returns results
     /// as std::vector<T>
   template<class T>
@@ -78,7 +78,7 @@ struct SimpleGroup{
 /// A Group of Operations called with group( sometype t ) or group( vector<sometype> t)
 /// V are  versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
 /// NOTE this is overloaded by the PointGroup3D, which handles its own operator ()
-/// @todo 
+/// @todo
 template< class V >
 struct Group {
 
@@ -102,7 +102,7 @@ struct Group {
 
   vector<decltype(V()*V())> sops;             ///< Spin Operators (Rot, etc)
   vector<decltype(V()*V()*V())> tops;         ///< Triple Reflection (abbar 3d group)
-  vector<decltype(V()*Trs())> gops;           ///< Glide Operators 
+  vector<decltype(V()*Trs())> gops;           ///< Glide Operators
   vector<decltype(V()*V()*Trs())> scrops;     ///< Screw Operators (Motor)
 
   Group() {}
@@ -120,7 +120,7 @@ struct Group {
 //          vector<T> res;
 //
 //          for (auto& i : ops ){
-//              T tp = p.reflect( i.unit() ); 
+//              T tp = p.reflect( i.unit() );
 //              res.push_back( tp );
 //              //reflect EACH back over first mirror plane to get original ...
 //              res.push_back( tp.reflect( ops[0].unit() ) );
@@ -144,14 +144,14 @@ struct Group {
 //              if (ops.empty()) {
 //                res.push_back(tg);
 //                res.push_back( tg.reflect( gops[0] ) );
-//              }              
+//              }
 //              for (auto& j : ops){
 //                T tp = tg.reflect( j.unit() );
 //                res.push_back(tp);
 //                res.push_back( tp.reflect( ops[0].unit() ) );
 //              }
 //           }
-//          
+//
 //          return res;
 //    }
 //
@@ -164,17 +164,17 @@ struct Group {
 //        for (auto& j : tRes){
 //          res.push_back(j);
 //        }
-//      }    
+//      }
 //      return res;
 //    }
 
-}; 
+};
 
 /// A 2D Point Group at the origin
 /// Templated on V, the reflection type of the point group (e.g. Vec or DualPlane)
-template< class V > 
+template< class V >
 struct PointGroup2D : Group<V> {
-  
+
     typedef decltype( V() ^ V() ) Biv;
 
     V a, b;                 ///< Generators
@@ -186,8 +186,8 @@ struct PointGroup2D : Group<V> {
        a = V::x;
        b = V::x.rot( Biv::xy * -PIOVERTWO/p );
        calcOps(a.unit(), b.unit());
-       
-       //setOps ();        
+
+       //setOps ();
        //seed ();
    }
 
@@ -195,7 +195,7 @@ struct PointGroup2D : Group<V> {
    /// Otherwise, generate mP rotors
    /// @sa vsr_root.h
    void calcOps(const V& ta, const V& tb){
-       
+
        this->ops.clear();
        this->sops.clear();
        this->gops.clear();
@@ -209,15 +209,15 @@ struct PointGroup2D : Group<V> {
           this->sops.push_back(trot);
           trot = trot * rot;
         }
-      }  
-      
-      
+      }
+
+
     }
 
   void setOps (){
      this->ops = {a,b};
      this->sops = {a*b};
-    // this->gops = vector<GlideType>(2);  
+    // this->gops = vector<GlideType>(2);
   }
 
 // 2D seed
@@ -232,7 +232,7 @@ struct PointGroup2D : Group<V> {
 //
 //    opInst = { {0,0,0}, {0,1,0} };
 //
-//    
+//
 //    vector<Vec> tv;
 //    tv.push_back(vec);
 //
@@ -249,12 +249,12 @@ struct PointGroup2D : Group<V> {
 //      iter++;
 //      keepgoing=false;
 //      int tn = tv.size();
-//      
+//
 //      //Any New Reflection Results
 //      for(int i =0; i<numBasicOps; ++i){
 //        for (int j=0;j<tn;++j){
 //          tmp =  tv[j].reflect( this->ops[ opInst[i].opIdx ] );
-//   
+//
 //          bool exists = false;
 //          for (auto& k : tv){
 //            exists = Root::Compare(tmp,k);
@@ -262,8 +262,8 @@ struct PointGroup2D : Group<V> {
 //              break;
 //            }
 //           }
-//  
-//          //if new, add result to tv and idx 
+//
+//          //if new, add result to tv and idx
 //          if (!exists){
 //            tv.push_back(tmp);
 //            opInst.push_back( {0, opInst[i].opIdx, j} );
@@ -273,11 +273,11 @@ struct PointGroup2D : Group<V> {
 //      }
 //    }
 // }
- 
+
 //    // apply transformation group to a multivector T using seed method (in progress...)
 //    template<class T>
 //    vector<T> apply2(const T& p) const{
-//            
+//
 //      vector<T> res;
 //      res.push_back(p);
 //
@@ -307,8 +307,8 @@ struct PointGroup2D : Group<V> {
       int g = this->gops . size ();
 
       int gg = (o == 0) ? g * 2 : o * g * 2;
-      
-      return o*2 + s + gg; 
+
+      return o*2 + s + gg;
     }
 
     /*-----------------------------------------------------------------------------
@@ -316,36 +316,36 @@ struct PointGroup2D : Group<V> {
      *-----------------------------------------------------------------------------*/
     template<class T>
     vector<T> apply (const T& motif) const {
-      
+
       vector<T> res;
       res . reserve (numOps());
-      
+
       for (auto& i : this->ops ){
         //reflect motif over each generator
-        T tm = motif.reflect( i.unit() ); 
+        T tm = motif.reflect( i.unit() );
         res.push_back( tm );
         //reflect EACH back over first mirror plane to get original ...
         res.push_back( tm.reflect( this->ops[0].unit() ) );
       }
 
       for (auto& i : this->sops ){
-        T tm = motif.spin(i.unit()); 
+        T tm = motif.spin(i.unit());
         res.push_back( tm );
       }
-      
+
       for (auto& i : this->gops){
         T tg = motif.reflect(i);
         if (this->ops.empty()) {
          res.push_back(tg);
          res.push_back(tg.reflect( this->gops[0] ) );
-        }              
+        }
         for (auto& j : this->ops){
           T tp = tg.reflect( j.unit() );
           res.push_back(tp);
           res.push_back( tp.reflect( this->ops[0].unit() ) );
         }
       }
-  
+
       return res;
     }
 
@@ -397,10 +397,10 @@ struct PointGroup2D : Group<V> {
 ///  A PointGroup2D along with a lattice formed by translating along the generators a and b
 ///  we generate the point group calcOps() and then replace by glide reflections if called for
 ///  To use Translators multiplicatively, here we assume the conformal model is in play (2D or above)
-///  typename V is a cga::Vec pin group 
-template<class V> 
+///  typename V is a cga::Vec pin group
+template<class V>
 struct SpaceGroup2D : PointGroup2D<V> {
-  
+
   using Trs = typename V::space::translator;
   using Vec = typename V::space::vector;
 
@@ -408,55 +408,56 @@ struct SpaceGroup2D : PointGroup2D<V> {
 
   int mDiv;  //(p)rimitive lattice = 1.0 (default); (c)entered lattice = 2; (h)exagonal lattice = 3
   float mRatioY=1;
-  float mRatioX=1; 
+  float mRatioX=1;
 
   /// Constructor
   // @param mP: symmetry group (1,2,3,4,6)
-  // @param mRatio: for translations on the lattice 
+  // @param mRatio: for translations on the lattice
   // @param bPin: pin or spin generators
   // @param mDiv: number of divisions into lattice cell
   // @param ga: whether a glide reflection replaces first mirror generator
-  // @param gb: whether a glide reflection replaces second mirror generator 
-  SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) 
+  // @param gb: whether a glide reflection replaces second mirror generator
+  SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false)
   : PointGroup2D<V>(p,pin), mRatioY(ratio), mDiv(div)  {
-  
-    if (p==1){
-      //Glide Reflections
-      if (ga) { //replace first mirror
-        this->ops.clear();
-        this->gops.push_back( this->a * nga::Gen::trs( Vec::y * .5) ); 
-      }        
-    } else if (p<4){ 
-      //Glide Reflections
-      if (ga) { //replace first mirror
-        this->ops.clear();
-        this->ops.push_back( this->b );
-        this->gops.push_back( this->a * nga::Gen::trs(this->b * .5) ); 
-      }    
-      if (gb) { //replace second mirror
-        if (!this->ops.empty())
-          this->ops.pop_back();
-        this->gops.push_back( this->b * nga::Gen::trs(this->a * .5) ); 
-      }
-    } else {
-      if (p==4){
-        this->b = this->a + (this->a).rot( Biv::xy * -PIOVERTWO/2);
-        if(ga){
-          this->ops.clear();
-          this->ops.push_back(this->b.unit());
-          this->ops.push_back(this->b.reflect(this->a).unit());
-          this->gops.push_back( this->a * nga::Gen::trs((this->b - this->a) * .5) ); 
-        }
-      }
-      if (p==6){
-        this->b = this->a + this->a.rot( Biv::xy * -PIOVERTWO/3);
-      }
-    }
-  }
 
+   if (p==4)
+    this->b = this->a + (this->a).rot( Biv::xy * -PIOVERTWO/2);
+   if (p==6)
+    this->b = this->a + this->a.rot( Biv::xy * -PIOVERTWO/3);
+
+    //Glide Reflections
+   if (pin) {
+     if (p==1){
+       if (ga) { //replace first mirror
+         this->ops.clear();
+         this->gops.push_back( this->a * nga::Gen::trs( Vec::y * .5) );
+       }
+     } else if (p<4){
+       if (ga) { //replace first mirror
+         this->ops.clear();
+         this->ops.push_back( this->b );
+         this->gops.push_back( this->a * nga::Gen::trs(this->b * .5) );
+       }
+       if (gb) { //replace second mirror
+         if (!this->ops.empty())
+           this->ops.pop_back();
+         this->gops.push_back( this->b * nga::Gen::trs(this->a * .5) );
+       }
+     } else {
+       if (p==4){
+         if(ga){
+           this->ops.clear();
+           this->ops.push_back(this->b.unit());
+           this->ops.push_back(this->b.reflect(this->a).unit());
+           this->gops.push_back( this->a * nga::Gen::trs((this->b - this->a) * .5) );
+         }
+       }
+     }
+   }
+  }
     /// Get translation vector at x,y
     Vec vec(float x, float y){
-      if (this->mP!=1) return this->a*x*mRatioX + this->b*y*mRatioY; 
+      if (this->mP!=1) return this->a*x*mRatioX + this->b*y*mRatioY;
       else return this->a*x + Vec::y*y;
     }
 
@@ -466,7 +467,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
      *-----------------------------------------------------------------------------*/
     /// Hang motif on lattice points
     template<class T>
-    vector<T> hang(const T& motif, int x, int y){      
+    vector<T> hang(const T& motif, int x, int y){
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
 
@@ -479,11 +480,11 @@ struct SpaceGroup2D : PointGroup2D<V> {
           }
         }
       return res;
-    }    
-    
+    }
+
     /// Hang std::vector on lattice points and striate
     template<class T>
-    vector<T> hang(const vector<T>& motif, int x, int y){      
+    vector<T> hang(const vector<T>& motif, int x, int y){
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
       for (auto& i : motif){
@@ -491,11 +492,11 @@ struct SpaceGroup2D : PointGroup2D<V> {
         res . insert (res.end (), tres.begin (), tres.end());
       }
       return res;
-    } 
+    }
 
     /// Don't apply operations, just hang on lattice points before/after possibly applying bilinear function F
     template<class T, class F>
-    vector<T> hang(const T& motif, int x, int y, int bPre, const F& bifunc){      
+    vector<T> hang(const T& motif, int x, int y, int bPre, const F& bifunc){
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
 
@@ -520,7 +521,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
 
     /// Don't apply operations, just hang on lattice points and apply bilinear function F
     template<class T, class F>
-    vector<T> hang(const vector<T>& motif, int x, int y, int bPre, const F& bifunc){      
+    vector<T> hang(const vector<T>& motif, int x, int y, int bPre, const F& bifunc){
       vector<T> res;
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
       for (auto& i : motif){
@@ -528,7 +529,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
         res . insert (res.end (), tres.begin (), tres.end());
       }
       return res;
-    } 
+    }
 
 };
 
@@ -592,32 +593,32 @@ struct PointGroup3D : Group<V> {
     struct Bar{
       bool a, b, ab;
     } mBar;
-    
+
     /// Returns true if we are dealing with the special case of p=3 and q=3
     bool is33(){
       return (mSym.p==mSym.q) && (mSym.p==3);
     }
 
     PointGroup3D(){};
-    
+
     /// must satisfy dicycle ab^p = bc^q = ac^2
-    PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false) 
+    PointGroup3D(int p, int q, bool abar=false, bool bbar=false, bool abbar=false)
     : mSym{p,q}
     {
       set(p,q,abar,bbar,abbar);
     }
 
     void set(int p, int q, bool abar=false, bool bbar=false, bool abbar=false){
-     
-      mSym = {p,q}; 
+
+      mSym = {p,q};
       mBar = {abar, bbar, abbar};
       /// Clear all data
       opIdx.clear();
-      
+
       //0. a and c are at 90 degrees, must find b...
       a = V::x;
       c = V::y;
-      
+
       //1. employ the good old spherical trig cosine rule ...
       // @todo *there is a simpler way, below, but needs to  be worked out for is33()
 
@@ -669,11 +670,11 @@ struct PointGroup3D : Group<V> {
       if (!abar && !bbar && !abbar ){                    // Case of only reflections. easy!
          opIdx= {  {0,0,0}, {0,1,0}, {0,2,0} };
        } else if (abbar){                                // Case of roto-reflection
-         opIdx = { {2,0,0} };                            
-       } else if ( abar && bbar ) { 
+         opIdx = { {2,0,0} };
+       } else if ( abar && bbar ) {
          opIdx = { {1,0,0}, {1,1,0} };
        } else if (abar){                                 // Case of only one or other are cyclic
-         opIdx = { {0,2,0},{1,0,0} };          
+         opIdx = { {0,2,0},{1,0,0} };
        } else if (bbar){
          opIdx = { {0,0,0},{1,1,0} };
        } //note need an ac bar option for space groups
@@ -727,11 +728,11 @@ struct PointGroup3D : Group<V> {
           iter++;
           keepgoing=false;
           int tn = tv.size();
-          
+
           //Any New Reflection Results
           for(int i =0; i<numBasicOps; ++i){
             for (int j=0;j<tn;++j){
-              
+
               switch (opIdx[i].type){
                   case 0:
                     tmp =  tv[j].reflect( this->ops[ opIdx[i].opIdx ] );
@@ -743,7 +744,7 @@ struct PointGroup3D : Group<V> {
                     tmp = tv[i].reflect( this->tops[opIdx[i].opIdx] );
                     break;
               }
-       
+
               bool exists = false;
               for (auto& k : tv){
                 exists = Root::Compare(tmp,k);
@@ -751,8 +752,8 @@ struct PointGroup3D : Group<V> {
                   break;
                 }
                }
-      
-              //if new, add result to tv and idx 
+
+              //if new, add result to tv and idx
               if (!exists){
                 tv.push_back(tmp);
                 opIdx.push_back( {opIdx[i].type, opIdx[i].opIdx, j} );
@@ -762,7 +763,7 @@ struct PointGroup3D : Group<V> {
           }
         }
     }
- 
+
     /// apply to a std::vector and striate results
     template<class T>
     vector<T> apply(const vector<T>& p) const{
@@ -780,11 +781,11 @@ struct PointGroup3D : Group<V> {
       }
       return res;
     }
-    
+
     // apply transformation group to a multivector T
     template<class T>
     vector<T> apply(const T& p) const{
-            
+
       vector<T> res;
       res.push_back(p);
 
@@ -807,7 +808,7 @@ struct PointGroup3D : Group<V> {
           case 4: //screw
               tmp = input.spin( this->scrops[ i.opIdx] );
               break;
-              
+
         }
         res.push_back(tmp);
       }
@@ -825,20 +826,20 @@ struct PointGroup3D : Group<V> {
 
 
 /// 3D space group, templated on mirror type (e.g. cga::Vec )
-// avoid 6.3 5.3 
+// avoid 6.3 5.3
 template<class V>
 struct SpaceGroup3D : PointGroup3D<V> {
 
-    using Trs = typename V::space::translator; 
+    using Trs = typename V::space::translator;
     using Vec = typename V::space::Vec;
     using Biv = typename V::space::Biv;
 
-    /// Lattice cell system 
+    /// Lattice cell system
     enum BravaisType{
       Triclinic=1, Monoclinic, Orthorhombic, Tetragonal, Trigonal, Hexagonal, Cubic
     };
 
-    /// Lattice cell type 
+    /// Lattice cell type
     enum LatticeType{
       Primitive=1, Body, SingleFace, Face, Rhombo
     };
@@ -848,7 +849,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
       int system; //bravais system (Triclinic, Tetragonal, etc)
       int type;   //latticetype (primitive, Body, single face, etc)
     };
-    
+
     /// A axial (a), B axial (b), C axial (c), Diagonal (n), Diamond (d)
     enum GlideType{
       None=0, AxialA, AxialB, AxialC, Diagonal, Diamond
@@ -868,7 +869,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
       int ab_trs, bc_trs, ca_trs;
     };
 
-      
+
    // Sym mSym;           ///< Symmetry Class (i.e. 4,3), from which lattice system can be deduced
     Lattice mLattice;   ///< system (Triclinic, Cubic etc) and lattice type (Primitive, Body, etc)
     Glide mGlide;       ///< glide reflections
@@ -892,11 +893,11 @@ struct SpaceGroup3D : PointGroup3D<V> {
     }
 
     SpaceGroup3D(){}
-    
+
     /**
     * @brief 3D SpaceGroup Generator
     *
-    * @param p 
+    * @param p
     * @param q
     * @param abar default false
     * @param bbar default false
@@ -907,19 +908,19 @@ struct SpaceGroup3D : PointGroup3D<V> {
       @param screw defulat 0
     */
     SpaceGroup3D(
-      int p, int q, 
+      int p, int q,
       bool abar=false, bool bbar=false, bool abbar=false,
       Lattice lattice = {Triclinic, Primitive},
       Vec ratio= Vec(1,1,1),
       Glide glide = Glide(),
       Screw screw = {0,0,0,0,0,0}
-      ) 
+      )
       {
         set(p,q,abar,bbar,abbar,lattice,ratio,glide,screw);
       }
 
     void set( int p, int q, bool abar, bool bbar, bool abbar, Lattice lattice, Vec ratio, Glide glide, Screw screw){
-      
+
       PointGroup3D<V>::set(p,q,abar,bbar,abbar);
       mLattice = lattice;
       mRatio = ratio;
@@ -975,7 +976,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
  //       case 4:
  //         if (mSym.q==3) mLattice.system = Cubic;
  //         break;
- //         
+ //
  //     }
  //   }
 
@@ -983,7 +984,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
     * @brief Calculate glide a Vector
     *
     * @return cga3D::Vec
-    */    
+    */
     Vec glideA(){
       //vector<Vec> res;
       switch(mGlide.a.type){
@@ -1012,9 +1013,9 @@ struct SpaceGroup3D : PointGroup3D<V> {
         case AxialC:
           return mC_dir;
         case Diagonal:
-          return mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir;      
+          return mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir;
         case Diamond:
-          return (mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir) * .5;   
+          return (mLattice.system==Cubic ? mC_dir + mA_dir - mB_dir : mC_dir + mA_dir) * .5;
       }
 
       return Vec();
@@ -1034,45 +1035,45 @@ struct SpaceGroup3D : PointGroup3D<V> {
         case AxialB:
           return mB_dir;
         case Diagonal:
-          return mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir;      
+          return mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir;
         case Diamond:
-          return (mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir)  * .5;   
+          return (mLattice.system==Cubic ? ( this->is33() ? mC_dir + mA_dir + mB_dir : mC_dir + mA_dir - mB_dir ) : mB_dir + mA_dir)  * .5;
       }
 
       return Vec();
 
     }
 
-  
+
     /**
     * Calculate Glide Reflections
     */
     void setGlides(){
         //GLIDE replacements for non-symmorphic groups
         vector<int> replaceReflection; //keep track of indices into this->ops to replace
-  
+
         if (mGlide.a.type != None)  {
             replaceReflection.push_back(0);
             auto trs = nga::Gen::trs( glideA()* .5 );
             this->gops[0] = this->a * trs;
         }
-    
-        if(mGlide.b.type != None){      
+
+        if(mGlide.b.type != None){
             replaceReflection.push_back(1);
             auto trs = nga::Gen::trs( glideB()* .5 );
             this->gops[1] = this->b * trs;
-         }          
-      
+         }
+
         if(mGlide.c.type != None){
             replaceReflection.push_back(2);
             auto trs = nga::Gen::trs( glideC()* .5 );
             this->gops[2] = this->c * trs;
-         }             
+         }
 
         // replace reflections with glide reflections
         for (auto& i : replaceReflection){
           for (auto& j : this->opIdx){
-            if (j.opIdx==i && j.type==0 ) j.type = 3; 
+            if (j.opIdx==i && j.type==0 ) j.type = 3;
          }
         }
     }
@@ -1094,7 +1095,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
         // replace rotations with screw displacements
         for (auto& i : replaceRotation){
           for (auto& j : this->opIdx){
-            if (j.opIdx==i && j.type == 1) j.type = 4; 
+            if (j.opIdx==i && j.type == 1) j.type = 4;
          }
         }
 
@@ -1117,14 +1118,14 @@ struct SpaceGroup3D : PointGroup3D<V> {
         vector<int> replaceRotation;
 
         if (mScrew.ab){
-          
+
           replaceRotation.push_back(0);
-          
+
           //switcher
           float ratio = (float)mScrew.ab/this->mSym.p;
           auto vec = mC_dir * ratio;
           auto scr = this->sops[0] * nga::Gen::trs( vec );
-          
+
           //possible trans of scr
           if (mScrew.ab_trs){
             if (mScrew.ab_trs==1) scr = scr.translate( -mB_dir * (1-ratio) );
@@ -1138,14 +1139,14 @@ struct SpaceGroup3D : PointGroup3D<V> {
         if (mScrew.bc){
 
           replaceRotation.push_back(1);
-          
+
           //switcher
           float ratio = (float)mScrew.bc/this->mSym.q;
           auto vec = mA_dir * ratio;
           if (mLattice.system == Tetragonal){
             vec = (mA_dir - mB_dir) * ratio;
           }
-         
+
           auto scr = this->sops[1] * nga::Gen::trs( vec );
 
           //possible trans of scr
@@ -1154,14 +1155,14 @@ struct SpaceGroup3D : PointGroup3D<V> {
             else scr = (typename Group<V>::ScrewType(this->sops[1])).translate( mB_dir * .25 );  //see e.g. 198 and 199 in hestenes/holt paper
           }
 
-          
+
           this->scrops[1] = scr;
         }
 
         if (mScrew.ac){
 
            replaceRotation.push_back(2);
-          
+
            //switcher
            // auto vec = this->a * mRatio[0] * mScrew.b;
            auto vec = mB_dir * .25;
@@ -1175,11 +1176,11 @@ struct SpaceGroup3D : PointGroup3D<V> {
         // replace rotations with screw displacements
         for (auto& i : replaceRotation){
           for (auto& j : this->opIdx){
-            if (j.opIdx==i && j.type == 1) j.type = 4; 
+            if (j.opIdx==i && j.type == 1) j.type = 4;
          }
         }
 
-        
+
     }
 
 
@@ -1200,7 +1201,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
        }
 
        this->setOps();
-      
+
         dirA();
         dirB();
         dirC();
@@ -1239,7 +1240,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
         break;
        case Cubic:
         if (this->is33() ) tmp=(this->c + this->a)*mRatio[0]/2.0;
-        else tmp = (-this->a.reflect(this->b))*mRatio[0];        
+        else tmp = (-this->a.reflect(this->b))*mRatio[0];
         break;
       }
 
@@ -1255,14 +1256,14 @@ struct SpaceGroup3D : PointGroup3D<V> {
         break;
        case Cubic:
         if (this->is33()) tmp=((this->b * 2) - this->a - this->c)*mRatio[0]/2.0;
-        else tmp = ((this->a ^ this->b).duale().unit())*mRatio[0]; 
+        else tmp = ((this->a ^ this->b).duale().unit())*mRatio[0];
         break;
 
        default:
         tmp = this->c * mRatio[2];
         break;
-      }     
-      
+      }
+
       mC_dir = tmp;
       return mC_dir;
     }
@@ -1270,7 +1271,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
     Vec lengthA(){
       return this->a * mRatio[0];
     }
- 
+
      /// corrected length of b
     /// is stored as mB_length on init();
     Vec lengthB(){
@@ -1288,10 +1289,10 @@ struct SpaceGroup3D : PointGroup3D<V> {
         break;
        case Cubic:
          if ( this->is33() ) tmp = this->b*mRatio[0];
-         else 
-           tmp = mA_dir + mB_dir; 
+         else
+           tmp = mA_dir + mB_dir;
           break;
-       
+
       }
       mB_length = tmp;
       return tmp;
@@ -1304,7 +1305,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
      switch(mLattice.system){
        case Cubic:
         if ( this->is33() ) tmp = this->c*mRatio[0];
-        else tmp = mB_dir + mC_dir; 
+        else tmp = mB_dir + mC_dir;
         break;
        default:
         tmp = mC_dir;
@@ -1314,12 +1315,12 @@ struct SpaceGroup3D : PointGroup3D<V> {
       return tmp;
     }
 
-  
+
     /*!-----------------------------------------------------------------------------
-     * Calculate a vector transformation basice on generators and ratio 
+     * Calculate a vector transformation basice on generators and ratio
      *-----------------------------------------------------------------------------*/
     Vec vec(float x, float y, float z){
-        return mA_dir*x + mB_dir*y + mC_dir*z; 
+        return mA_dir*x + mB_dir*y + mC_dir*z;
     }
 
 
@@ -1327,12 +1328,12 @@ struct SpaceGroup3D : PointGroup3D<V> {
      *  Hang a motif on a Lattice of dimensions x,y,z
      *-----------------------------------------------------------------------------*/
     template<class T>
-    vector<T> hang(const T& motif, int x, int y, int z){      
-      
+    vector<T> hang(const T& motif, int x, int y, int z){
+
         vector<T> res;
 
         switch( mLattice.type ){
-            case Primitive: 
+            case Primitive:
             {
               for (int j=-x/2.0;j<x/2.0;++j){
                 for (int k=-y/2.0;k<y/2.0;++k){
@@ -1341,8 +1342,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
  //               for (int k=0;k<y;++k){
  //                 for (int l=0;l<z;++l){
  //                   //auto vec = vec(j,k,l);
-                    res.push_back( motif.trs( vec(j,k,l) ) ); 
-                    //if (l==z-1) res.push_back( motif.trs( cellBack() ) );               
+                    res.push_back( motif.trs( vec(j,k,l) ) );
+                    //if (l==z-1) res.push_back( motif.trs( cellBack() ) );
                   }
                 }
               }
@@ -1357,8 +1358,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
                  for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                  res.push_back( motif.trs( vec(j,k,l) ) );   
-                  res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,.5) ) );    
+                  res.push_back( motif.trs( vec(j,k,l) ) );
+                  res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,.5) ) );
                  }
                }
              }
@@ -1376,8 +1377,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
                 for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                       res.push_back( motif.trs( vec(j,k,l)  ) );  
-                       res.push_back( motif.trs( vec(j,k,l) + vec(0,.5,.5) ) );    
+                       res.push_back( motif.trs( vec(j,k,l)  ) );
+                       res.push_back( motif.trs( vec(j,k,l) + vec(0,.5,.5) ) );
                      }
                    }
                  }
@@ -1392,13 +1393,13 @@ struct SpaceGroup3D : PointGroup3D<V> {
                 for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                      res.push_back( motif.trs( vec(j,k,l)  ) );  
-                      res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,0) ) );    
+                      res.push_back( motif.trs( vec(j,k,l)  ) );
+                      res.push_back( motif.trs( vec(j,k,l) + vec(.5,.5,0) ) );
                     }
                   }
                 }
                break;
-             }          
+             }
               case Trigonal:
               case Hexagonal:
               {
@@ -1409,17 +1410,17 @@ struct SpaceGroup3D : PointGroup3D<V> {
                 for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                       res.push_back( motif.trs( vec(j,k,l)  ) );  
-                       res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,0) ) );    
-                       res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,0) ) );   
+                       res.push_back( motif.trs( vec(j,k,l)  ) );
+                       res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,0) ) );
+                       res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,0) ) );
                      }
                    }
                  }
                 break;
-              }  
+              }
             }
             break;
-          }         
+          }
           case Face:
           {
             switch(mLattice.system){
@@ -1433,12 +1434,12 @@ struct SpaceGroup3D : PointGroup3D<V> {
                  for (int k=0;k<y;++k){
                    for (int l=0;l<z;++l){
 
-                        res.push_back( motif.trs( vec(j,k,l)  ) );  
+                        res.push_back( motif.trs( vec(j,k,l)  ) );
                         for (int m =1;m<2;++m){
                          float t = (float)m/2;
-                         res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );    
-                         res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );  
-                         res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );  
+                         res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );
+                         res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );
+                         res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );
                         }
                       }
                     }
@@ -1455,12 +1456,12 @@ struct SpaceGroup3D : PointGroup3D<V> {
                 for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                         res.push_back( motif.trs( vec(j,k,l)  ) );  
+                         res.push_back( motif.trs( vec(j,k,l)  ) );
                          for (int m =1;m<3;++m){
                           float t = (float)m/3;
-                          res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );    
-                          res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );  
-                          res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );  
+                          res.push_back( motif.trs( vec(j,k,l) + vec(t,t,0) ) );
+                          res.push_back( motif.trs( vec(j,k,l) + vec(0,t,t) ) );
+                          res.push_back( motif.trs( vec(j,k,l) + vec(-t,0,t) ) );
                          }
                        }
                      }
@@ -1479,9 +1480,9 @@ struct SpaceGroup3D : PointGroup3D<V> {
                 for (int k=0;k<y;++k){
                   for (int l=0;l<z;++l){
 
-                   res.push_back( motif.trs( vec(j,k,l)  ) );  
-                   res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,.3333333) ) );    
-                   res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,.6666666) ) );   
+                   res.push_back( motif.trs( vec(j,k,l)  ) );
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.3333333,.3333333,.3333333) ) );
+                   res.push_back( motif.trs( vec(j,k,l) + vec(.6666666,.6666666,.6666666) ) );
                  }
                }
              }
@@ -1489,8 +1490,8 @@ struct SpaceGroup3D : PointGroup3D<V> {
           }
         }
       return res;
-    }   
-    
+    }
+
     template<class T>
     vector<T> hang(const vector<T>& motif, int x, int y, int z ){
       vector<T> res( motif.size() * x * y * z );
@@ -1510,7 +1511,7 @@ struct SpaceGroup3D : PointGroup3D<V> {
 
 //    /// a std::vector of Points representing cell positions of a single lattice
 //    vector<cga::Point> cellPositions(){
-//      
+//
 //      vector<cga::Point> res;
 //    //  switch( ){
 //    //    case Primitive:
