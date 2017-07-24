@@ -681,7 +681,7 @@ struct Euc{
     }
     /*! Radius of Round
     */
-  template<class T>
+    template<class T>
     static constexpr VSR_PRECISION
     radius( const T& s ){
         return sqrt ( fabs ( size(s, false) ) );
@@ -701,7 +701,6 @@ struct Euc{
     /*! Curvature of Round
         @param t a Round Element
     */
-
     template<class T>
     static constexpr VSR_PRECISION
     cur( const T& t) { return curvature(t); }
@@ -716,9 +715,9 @@ struct Euc{
         return (dls * dls)[0];
     }
 
-   /*! Squared distance between two points
-   */
-  template<class A>
+    /*! Squared distance between two points
+    */
+    template<class A>
     static constexpr VSR_PRECISION
     squaredDistance(const GAPnt<A>& a, const GAPnt<A> b){
         return ( (a <= b)[0] ) * -2.0;
@@ -727,7 +726,7 @@ struct Euc{
 
 
     /*! Distance between points a and b */
-  template<class A>
+    template<class A>
     static constexpr VSR_PRECISION
     distance(const GAPnt<A>& a, const GAPnt<A> b){
         return sqrt( fabs(sqd(a,b) ) );
@@ -742,7 +741,7 @@ struct Euc{
     static std::vector< GAPnt<A> >
     split(const GAPar<A>& pp){
 
-      std::vector< GAPnt<A> > pair;
+      std::vector< GAPnt<A> > pair (2);
 
       VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
 
@@ -760,8 +759,8 @@ struct Euc{
       GAPnt<A> pB;
       pB = ( bstB ) / d;
 
-      pair.push_back(pA);
-      pair.push_back(pB);
+      pair[0] = pA;
+      pair[1] = pB;
 
       return pair;
     }

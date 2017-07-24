@@ -1,6 +1,6 @@
-#include "vsr_cga2D_types.h"
-#include "vsr_cga2D_draw.h"
-#include "vsr_app.h"
+#include <vsr/boosts/vsr_cga2D_types.h>
+#include <vsr/boosts/vsr_cga2D_draw.h>
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga2D;

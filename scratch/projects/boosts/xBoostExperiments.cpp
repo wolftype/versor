@@ -17,9 +17,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_knot.h"
-#include "util/vsr_stat.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_knot.h>
+#include <vsr/util/vsr_stat.h>
 
 using namespace vsr;
 using namespace vsr::cga;

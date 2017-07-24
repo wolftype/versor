@@ -36,17 +36,25 @@ struct Construct {
      return nga::Round::null(x,y);
    }
 
+   //Dual Circle at x, y with radius r
    static Point circle(VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION rad){
      return nga::Round::dls( Vec(x,y), rad );
    }
 
+   //Dual Circle at v with radius r
    template<class V>
-   static Point circle(const V& v, VSR_PRECISION rad){
-     return nga::Round::dls( Vec(v[0],v[1]), rad );
+   static Point circle(const V& v, VSR_PRECISION r){
+     return nga::Round::dls( Vec(v[0],v[1]), r );
+   }
+
+   //Dual Circle at v through p
+   template<class V>
+   static Point circle(const V& v, const Point& p){
+     return nga::Round::at( point(v[0],v[1]), p);
    }
 
    static Pair meet( const Line& lin, const Circle& cir){
-     return ( lin.dual() ^ cir.dual() ).dual();
+     return ( lin.dual() ^ cir.dual() ).undual();
    }
 };
 

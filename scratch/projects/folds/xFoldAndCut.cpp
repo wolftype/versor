@@ -1,14 +1,14 @@
 //Get mouse position as an "unprojected" point in 3D space
 
-#include "vsr_cga3D.h"
+#include <vsr/folds/vsr_cga3D.h>
 
-#include "vsr_cga3D_funcs.h"   
+#include <vsr/folds/vsr_cga3D_funcs.h>   
 
-#include "vsr_GLVimpl.h"
+#include <vsr/folds/vsr_GLVimpl.h>
 
-#include "vsr_field.h"
+#include <vsr/folds/vsr_field.h>
 
-#include "vsr_set.h"
+#include <vsr/folds/vsr_set.h>
 
 using namespace vsr;
 

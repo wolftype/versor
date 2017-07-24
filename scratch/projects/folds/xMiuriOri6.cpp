@@ -17,9 +17,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_field.h"
-#include "form/vsr_fold.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_field.h>
+#include <vsr/form/vsr_fold.h>
 
 using namespace vsr;
 using namespace vsr::cga;

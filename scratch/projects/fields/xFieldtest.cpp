@@ -17,8 +17,8 @@
  */
 
 
-#include "vsr_app.h"
-#include "vsr_field.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_field.h>
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -31,7 +31,7 @@ struct MyApp : App {
 
   float time =0;
 
-  Field<Vec> vf(20,10,1);
+  Field<Vec> vf = Field<Vec>(20,10,1);
 
   virtual void setup(){
     bindGLV();

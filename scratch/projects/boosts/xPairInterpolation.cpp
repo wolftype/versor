@@ -17,11 +17,11 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_cga3D_frame.h"
-#include "vsr_field.h"
+#include <vsr/boosts/vsr_cga3D_app.h>   
+#include <vsr/boosts/vsr_cga3D_frame.h>
+#include <vsr/boosts/vsr_field.h>
 
-//#include "vsr_cga3D_log.h" //will be replaced
+//#include <vsr/boosts/vsr_cga3D_log.h> //will be replaced
 
 using namespace vsr;
 using namespace vsr::cga3D;

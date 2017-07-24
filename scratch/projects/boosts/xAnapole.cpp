@@ -17,20 +17,17 @@
  */
 
 
-#include "vsr_app.h"   
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
-  //Some Variables
+
   bool bReset = false;
   float amt = 0;
   float amtB = 0;
-
   float timer = 0;
-
   Frame frame;
 
   /*-----------------------------------------------------------------------------
@@ -44,33 +41,29 @@ struct MyApp : App {
     gui(amtB,"amtB",-100,100);
 
     objectController.attach(&frame);
-    
+
   }
 
-
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-  
-    auto cir = frame.cxz();
 
+    auto cir = frame.cxz();
     auto tcir = CXZ(2).rot( Biv(amtB,0,0) ).trs(amt,0,0);
 
-
-    Draw(cir,1,0,0);
-    
     timer += .01;
 
+    Draw(cir,1,0,0);
     Draw( tcir.spin( Gen::bst( cir.dual() * timer ) ), 0, 1, 0 );
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

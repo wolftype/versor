@@ -40,7 +40,6 @@ scratch/projects/groups/xSpaceGroup3D.cpp
 #ifndef  vsr_group_INC
 #define  vsr_group_INC
 
-
 #include <vsr/form/vsr_set.h>
 #include <vsr/form/vsr_root.h>
 #include <vsr/detail/vsr_generic_op.h>
@@ -52,6 +51,7 @@ namespace vsr{
 
 /// Simple Reflection group templated on Pin Type (no translating or gliding spinors)
 /// @todo make class with private member mOps
+/// @todo is this used at all?
 template<class V>
 struct SimpleGroup{
    vector<V> ops;                       ///< Pin Operators (Vec, etc)
@@ -78,7 +78,7 @@ struct SimpleGroup{
 /// A Group of Operations called with group( sometype t ) or group( vector<sometype> t)
 /// V are  versors any dimension, etc DualLines in cga2D or DualPlanes in cga3D or Circles . . .
 /// NOTE this is overloaded by the PointGroup3D, which handles its own operator ()
-/// @todo
+/// @todo use OpInst instead
 template< class V >
 struct Group {
 
@@ -217,7 +217,6 @@ struct PointGroup2D : Group<V> {
   void setOps (){
      this->ops = {a,b};
      this->sops = {a*b};
-    // this->gops = vector<GlideType>(2);
   }
 
 // 2D seed
@@ -321,7 +320,7 @@ struct PointGroup2D : Group<V> {
       res . reserve (numOps());
 
       for (auto& i : this->ops ){
-        //reflect motif over each generator
+        //reflect motif over each pin group member
         T tm = motif.reflect( i.unit() );
         res.push_back( tm );
         //reflect EACH back over first mirror plane to get original ...
@@ -425,7 +424,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
    if (p==6)
     this->b = this->a + this->a.rot( Biv::xy * -PIOVERTWO/3);
 
-    //Glide Reflections
+   //Glide Reflections
    if (pin) {
      if (p==1){
        if (ga) { //replace first mirror
@@ -469,6 +468,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
     template<class T>
     vector<T> hang(const T& motif, int x, int y){
       vector<T> res;
+      res.reserve (x*y*mDiv);
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
 
         for (int j=0; j<x; ++j){
@@ -482,14 +482,34 @@ struct SpaceGroup2D : PointGroup2D<V> {
       return res;
     }
 
-    /// Hang std::vector on lattice points and striate
+    /// Hang std::vector on lattice points
     template<class T>
-    vector<T> hang(const vector<T>& motif, int x, int y){
+    vector<T> hang_old(const vector<T>& motif, int x, int y){
       vector<T> res;
+      res.reserve (motif.size()*x*y*mDiv);
       Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
       for (auto& i : motif){
         auto tres = hang(i,x,y);
         res . insert (res.end (), tres.begin (), tres.end());
+      }
+      return res;
+    }
+
+    /// Hang std::vector on lattice points
+    template<class T>
+    vector<T> hang(const vector<T>& motif, int x, int y){
+      vector<T> res(motif.size()*x*y*mDiv);
+      Vec bottom_left = vec(-(x-1)/2.0, -(y-1)/2.0);
+      int ii = 0;
+      for (auto& i : motif){
+        auto tmp = hang(i,x,y);
+        int jj = 0;
+        for (auto &j : tmp){
+          int idx = jj * motif.size() +ii;
+          res[idx] = j;
+          jj++;
+        }
+        ii++;
       }
       return res;
     }

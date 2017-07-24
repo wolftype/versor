@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
 
 using namespace vsr;
 

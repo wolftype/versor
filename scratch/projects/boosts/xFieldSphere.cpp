@@ -17,9 +17,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "vsr_cga3D_frame.h"
-#include "vsr_field.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/boosts/vsr_cga3D_frame.h>
+#include <vsr/boosts/vsr_field.h>
 
 #include "gfx_map.h"
 

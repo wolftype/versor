@@ -16,13 +16,13 @@
  * =====================================================================================
  */
 
-#include "vsr_cga3D.h"   
-#include "vsr_twist.h"
-#include "vsr_cga3D_frame.h"
-#include "vsr_differential.h"
-#include "vsr_graph.h"
-#include "vsr_group.h"
-#include "vsr_cga3D_app.h"
+#include <vsr/fields/vsr_cga3D.h>   
+#include <vsr/fields/vsr_twist.h>
+#include <vsr/fields/vsr_cga3D_frame.h>
+#include <vsr/fields/vsr_differential.h>
+#include <vsr/fields/vsr_graph.h>
+#include <vsr/fields/vsr_group.h>
+#include <vsr/fields/vsr_cga3D_app.h>
 
 using namespace vsr;
 using namespace vsr::cga3D;

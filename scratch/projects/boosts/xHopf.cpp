@@ -18,12 +18,12 @@
 
 
 
-#include "vsr_app.h"   
+#include <vsr/vsr_app.h>   
 
-#include "form/vsr_field.h"
-#include "form/vsr_knot.h"
-#include "form/vsr_knot.h"
-#include "form/vsr_shapes.h"
+#include <vsr/form/vsr_field.h>
+#include <vsr/form/vsr_knot.h>
+#include <vsr/form/vsr_knot.h>
+#include <vsr/form/vsr_shapes.h>
 
 
 using namespace vsr;

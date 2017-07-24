@@ -17,8 +17,8 @@
  */
 
 
-#include "vsr_app.h"
-#include "form/vsr_differential.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_differential.h>
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -71,7 +71,10 @@ struct MyApp : App {
         for (int j = 0;j<vector_field.h(); ++j){
             int ni =  (i < vector_field.w()-1) ? i+1 : 0;
             int nj = (j < vector_field.h()-1) ? j+1 : 0;
-            vector_field.at(i,j) = orthoGradient(scalar_field.at(i,j), scalar_field.at(ni,j), scalar_field.at(i,nj) );
+            if (ni != 0 && nj != 0)
+              vector_field.at(i,j) = orthoGradient(scalar_field.at(i,j), scalar_field.at(ni,j), scalar_field.at(i,nj) );
+            else
+              vector_field.at(i,j) = Vec(0,0,0);
         }
      }
 

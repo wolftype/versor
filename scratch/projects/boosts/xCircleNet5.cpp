@@ -17,14 +17,14 @@
  */
 
 
-#include "vsr_app.h"
-#include "form/vsr_shapes.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_shapes.h>
 
-#include "form/vsr_cyclide.h"
-#include "draw/vsr_cyclide_draw.h"
+#include <vsr/form/vsr_cyclide.h>
+#include <vsr/draw/vsr_cyclide_draw.h>
 
-#include "form/vsr_graph.h"
-#include "draw/vsr_graph_draw.h"
+#include <vsr/form/vsr_graph.h>
+#include <vsr/draw/vsr_graph_draw.h>
 
 using namespace vsr;
 using namespace vsr::cga;

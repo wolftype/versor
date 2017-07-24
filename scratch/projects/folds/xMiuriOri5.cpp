@@ -19,10 +19,10 @@
 
 //Get mouse position as an "unprojected" point in 3D space
 
-#include "vsr_app.h"   
-#include "form/vsr_field.h"
-#include "form/vsr_fold.h"
-//#include "form/vsr_fold_molecules.h":e
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_field.h>
+#include <vsr/form/vsr_fold.h>
+//#include <vsr/form/vsr_fold_molecules.h>:e
 
 using namespace vsr;
 using namespace vsr::cga;

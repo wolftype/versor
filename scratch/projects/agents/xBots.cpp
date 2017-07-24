@@ -16,9 +16,9 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"
-#include "util/vsr_stat.h"
-#include "form/vsr_twist.h"
+#include <vsr/vsr_app.h>
+#include <vsr/util/vsr_stat.h>
+#include <vsr/form/vsr_twist.h>
 
 using namespace vsr;
 using namespace vsr::cga;

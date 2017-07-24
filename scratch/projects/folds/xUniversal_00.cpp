@@ -16,9 +16,9 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_fold.h"
-#include "form/vsr_fold_molecules.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_fold.h>
+#include <vsr/form/vsr_fold_molecules.h>
 
 using namespace vsr;
 using namespace vsr::cga;

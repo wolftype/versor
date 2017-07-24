@@ -1,8 +1,8 @@
-#include "vsr_cga3D.h"
-#include "vsr_cga3D_funcs.h"   
-#include "vsr_GLVimpl.h"
+#include <vsr/folds/vsr_cga3D.h>
+#include <vsr/folds/vsr_cga3D_funcs.h>   
+#include <vsr/folds/vsr_GLVimpl.h>
 
-#include "vsr_field.h"
+#include <vsr/folds/vsr_field.h>
 
 using namespace vsr;
 using namespace vsr::cga3D; 

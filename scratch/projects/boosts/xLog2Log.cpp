@@ -17,8 +17,8 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_cga3D_log.h"
+#include <vsr/boosts/vsr_cga3D_app.h>   
+#include <vsr/boosts/vsr_cga3D_log.h>
 
 using namespace vsr;
 using namespace vsr::cga3D;

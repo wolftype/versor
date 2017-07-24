@@ -17,10 +17,10 @@
  */
 
 
-#include "vsr_app.h"
-#include "form/vsr_knot.h"
-#include "form/vsr_twist.h"
-#include "util/vsr_stat.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_knot.h>
+#include <vsr/form/vsr_twist.h>
+#include <vsr/util/vsr_stat.h>
 
 
 using namespace vsr;
@@ -328,11 +328,7 @@ struct Jelly : Organism {
     midsectionL = midsectionL.boost( par );
   }
 
-
 };
-
-
-
 
 
 /*-----------------------------------------------------------------------------
@@ -363,11 +359,8 @@ struct MyApp : App {
     gui(population.globalAvertRotVel, "globalAvertRotVel",0,100);
 
     population.init();
-   // jelly.init();
-   // mSceneRenderer.immediate(false);
 
   }
-
 
   void onAnimate(){
     population.step(.01);
@@ -378,20 +371,14 @@ struct MyApp : App {
    *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
-
-    if (mSceneRenderer.immediate() ) population.draw();
-   // else population.draw(this);
-
+    population.draw();
   }
 
 };
 
 
 int main(){
-
   MyApp app;
   app.start();
-
   return 0;
-
 }

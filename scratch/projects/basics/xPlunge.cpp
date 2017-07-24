@@ -17,31 +17,26 @@
  */
 
 
-#include "vsr_app.h"
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
 
-  //Some Variables
-  bool bReset = false;
-  float amt = 0;
-
-
-  Circle ca, cb;
+  DualSphere sa, sb;
 
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
-    ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bReset,"bReset");
 
-    ca = CXY(.5).trs(-1,0,0);
-    cb = CXY(2).trs(2,0,0);
+    DualSphere sph = Construct::sphere (0,0,0);
+    sa = sph.trs(-1,0,0);
+    sb = sph.trs(2,0,0);
+
+    objectController.attach(&sa);
+    objectController.attach(&sb);
   }
 
 
@@ -50,20 +45,13 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-
-    Draw(ca);
-    Draw(cb);
-
-    auto plunge = ca.dual() ^ Round::surround(cb);
-
-    auto ref1 = ca.reflect(cb);
-    auto ref2 = cb.reflect(ca);
-    Draw(ref1, 0,1,0);
-    Draw(ref2, 0,1,0);
+    auto plunge = sa ^ sb;
 
     plunge.print();
 
-    Draw(plunge,1,0,0,.5);
+    Draw(plunge,0,1,1,.5);
+    Draw(sa, 1,0,0,.5);
+    Draw(sb, 1,0,0,.5);
 
   }
 

@@ -22,10 +22,10 @@
 
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
-#include "vsr_fold.h"
-#include "vsr_set.h"
+#include <vsr/folds/vsr_cga3D.h>   
+#include <vsr/folds/vsr_GLVimpl.h>
+#include <vsr/folds/vsr_fold.h>
+#include <vsr/folds/vsr_set.h>
 
 using namespace vsr;
 using namespace vsr::cga3D;

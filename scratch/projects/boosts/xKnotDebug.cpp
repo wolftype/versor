@@ -18,7 +18,7 @@
 
 
 
-#include "vsr_app.h"  
+#include <vsr/vsr_app.h>  
 #include <vsr/form/vsr_twist.h> 
 
 using namespace vsr;

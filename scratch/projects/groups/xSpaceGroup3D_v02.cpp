@@ -7,19 +7,18 @@ using namespace vsr::cga;
 
 struct MyApp : App {
 
-
   float radius = 0;
   float amt2 = 0;
 
   float p=2;
   float q=2;
   bool pbar=false;
-  bool qbar=false; 
+  bool qbar=false;
   bool pqbar=false;
 
   float bravaisType;
   float latticeType;
-  
+
   bool bGlideA, bGlideB, bGlideC;
   float glideA = 0;
   float glideB = 0;
@@ -38,25 +37,23 @@ struct MyApp : App {
 
   Point mouse;
   Circle cmotif;
-   
+
   bool bDrawCircle, bDrawTwist, bDrawPoints, bTwistIt;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-  	mColor.set(0,0,0);
+  	mColor.set(.1,.1,.1);
     ///Bind Gui
     bindGLV();
     ///Add Variables to GUI
     gui(radius,"radius",-100,100)(amt2,"amt2",-100,100);
 
-    //(bToggle,"bToggle")(bSet,"bSet");
-
     gui(pqbar,"pqbar");                  // abc
-    gui(p,"p",0,10);                     
+    gui(p,"p",0,10);
     gui(pbar,"pbar");                    // rotational?
     gui(q,"q",0,10);
-    gui(qbar,"qbar"); 
+    gui(qbar,"qbar");
     gui(bravaisType,"bravais",1,7);
     gui(latticeType,"lattice",1,5);
     gui(glideA, "glide a",0,5);
@@ -69,20 +66,20 @@ struct MyApp : App {
     gui(screwBC, "screw bc",0,5);
     gui(screwAC, "screw ac",0,5);
     gui(screwAB_trs, "screw ab trs",0,5);
-    gui(screwBC_trs, "screw bc trs",0,5);    
+    gui(screwBC_trs, "screw bc trs",0,5);
     gui(num_width, "num_width",1,50);
     gui(num_height, "num_height",1,50);
-    gui(num_depth, "num_depth",1,50); 
-    gui(eyeSep,"eyesep",-10,10);   
+    gui(num_depth, "num_depth",1,50);
+    gui(eyeSep,"eyesep",-10,10);
     gui(focal,"focal",-100,100);
-    gui(bDrawCircle, "drawCircle");  
-    gui(bDrawTwist, "drawTwist"); 
-    gui(bDrawPoints, "bDrawPoints"); 
-    gui(bTwistIt, "twistIt"); 
+    gui(bDrawCircle, "drawCircle");
+    gui(bDrawTwist, "drawTwist");
+    gui(bDrawPoints, "bDrawPoints");
+    gui(bTwistIt, "twistIt");
 
     for (auto& i : twf.frame()){
-      objectController.attach(&i);    
-    }   
+      objectController.attach(&i);
+    }
 
     objectController.attach(&cmotif);
 
@@ -109,7 +106,7 @@ struct MyApp : App {
     // Mouse position makes a sphere
     if (bSetMouse) mouse = calcMouse3D();
     auto dls = Round::sphere(mouse, radius);
-	  
+
     // Make a Box here
     vector<Pnt> motif;
 	  float phi = PIOVERTWO * amt2;
@@ -129,7 +126,7 @@ struct MyApp : App {
 	  SpaceGroup3D<Vec>::Glide glide = { {(int)glideA, bGlideA},{(int)glideB,bGlideB},{(int)glideC,bGlideC} };
     // not sure ...
 	  SpaceGroup3D<Vec>::Screw screw = { (int)screwAB, (int)screwBC, (int)screwAC, (int)screwAB_trs, (int)screwBC_trs };
-	  
+
     // Make the SpaceGroup
     SpaceGroup3D<Vec> sg(p,q,pbar,qbar,pqbar,lattice,Vec(1,1,1),glide,screw);
 
@@ -145,7 +142,7 @@ struct MyApp : App {
    //     auto &a = bsgroup[i];
    //     auto &b = bsgroup[i+1];
    //     auto &c = bsgroup[((i+2) % 8 != 0) ? i + 2 : i-6];
-       
+
    //     float ct = (float)i/bsgroup.size();
    //     glColor4f(1.0,1.0,1.0,1.0);//.2,1-ct,1.0);
    //     GL::vertex(a);

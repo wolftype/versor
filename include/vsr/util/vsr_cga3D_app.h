@@ -26,7 +26,7 @@
 #include <vsr/draw/vsr_cga3D_render.h>            //<-- programmable pipeline draw routines
 
 #include <vsr/util/vsr_cga3D_control.h>           //<-- interface controls (mouse and keyboard)
-#include <gfx/util/gfx_glv_app.h>             //<-- an app class with built-in gui
+#include <gfx/util/gfx_glv_app.h>                 //<-- an app class with built-in gui
 
 #include <gfx/gfx_postscript.h>
 
@@ -51,12 +51,12 @@ struct App : public gfx::GFXAppGui {
 
     cga::Vec tz (tv[0], tv[1], tv[2] );
 
-    mMouse2D =  vsr::cga::Construct::point(p[0],p[1],0);
     mMouse3D =  vsr::cga::Construct::point(p[0],p[1],p[2]);
     mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity(1);
 
     //intersection of ray with plane
     mMouse3D = vsr::cga::Construct::meet( mMouseRay, vsr::cga::DualPlane(tz) );
+    mMouse2D = vsr::cga::Construct::meet( mMouseRay, vsr::cga::DualPlane(0,0,1) );
 
     return mMouse3D;
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+#run this script from folder to replace "" includes with <> includes
 
 INPLACE=0
 RENAME=0

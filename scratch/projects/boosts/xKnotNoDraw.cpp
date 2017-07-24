@@ -1,11 +1,11 @@
-#include "vsr_cga3D_op.h"
+#include <vsr/boosts/vsr_cga3D_op.h>
 
-#include "vsr_GLVimpl.h" 
-#include "vsr_cga3D_draw.h"  
-#include "vsr_cga3D_interface.h"   
+#include <vsr/boosts/vsr_GLVimpl.h> 
+#include <vsr/boosts/vsr_cga3D_draw.h>  
+#include <vsr/boosts/vsr_cga3D_interface.h>   
 //                         
 //                    
-#include "vsr_knot.h"
+#include <vsr/boosts/vsr_knot.h>
 
 using namespace vsr;
 

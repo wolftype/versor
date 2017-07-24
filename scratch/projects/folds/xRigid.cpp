@@ -19,11 +19,11 @@
 
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
-#include "vsr_group.h"
-#include "vsr_rigid.h"
-#include "vsr_graph.h"
+#include <vsr/folds/vsr_cga3D.h>   
+#include <vsr/folds/vsr_GLVimpl.h>
+#include <vsr/folds/vsr_group.h>
+#include <vsr/folds/vsr_rigid.h>
+#include <vsr/folds/vsr_graph.h>
 
 using namespace vsr;
 using namespace vsr::cga3D;

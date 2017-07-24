@@ -17,8 +17,8 @@
  */
 
 
-#include "vsr_cga3D_app.h"   
-#include "vsr_knot.h"
+#include <vsr/boosts/vsr_cga3D_app.h>   
+#include <vsr/boosts/vsr_knot.h>
 
 using namespace vsr;
 using namespace vsr::cga3D;

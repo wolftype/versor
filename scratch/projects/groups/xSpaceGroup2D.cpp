@@ -11,13 +11,13 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_fold.h>
 #include <vsr/form/vsr_group.h>
 //#include <vsr/form/vsr_simplex.h>
@@ -46,13 +46,13 @@ using namespace vsr::cga;
 //
 //}
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Point mouse;
   Line ray;
 
   float time;
-  float amt ,pNum, ratio, div, numDraw, iter_width, iter_height;
+  float amt ,pNum, ratio, div, numDraw, iter_width, iter_height, motif_idx;
   bool bPin, bGlideA, bGlideB,bReset,bSnap,bDrawMotif;
 
   Point pa = PT(0,0,0);
@@ -60,8 +60,8 @@ struct MyApp : App {
   Point pc = PT(0,1,0);
   Point pd = PT(0,-1,0);
 
-
   void setup(){
+      ps.bShadedOutput = true;
       bindGLV();
       gui(amt,"amt",-100,100);
       gui(bReset,"reset");
@@ -75,6 +75,7 @@ struct MyApp : App {
       gui(bGlideB, "gb");
       gui(iter_width,"iter_width",0,200);
       gui(iter_height,"iter_height",0,200);
+      gui(motif_idx,"motif_idx",0,100);
       amt = .5;
       ratio = 1.0;
       bPin = true;
@@ -88,51 +89,88 @@ struct MyApp : App {
 
       mColor.set(1,1,1);
   }
-  
 
-    virtual void onDraw(){ 
-        
+
+    virtual void onDraw(){
+
       mouse = calcMouse3D();
       time++;
 
-      //symmetry number | w/h ratio | reflect or spin | face divisor | 
+      //symmetry number | w/h ratio | reflect or spin | face divisor |
       SpaceGroup2D<Vec> sg(pNum,ratio,bPin,(int)div,bGlideA,bGlideB);
-
 
       // Pair them up
       vector<Pair> motif;
       motif.push_back(pa^pb);
-      motif.push_back(pa^pc); 
-      motif.push_back(pa^pd);
+      motif.push_back(pa^pc);
+//    motif.push_back(pa^pd);
 
       // let's make a bunch of them
-      auto pgroup = sg.apply(motif,1,1);
-      auto res = sg.hang(pgroup,iter_width,iter_height,
-          [](float tx, float ty, const Pair &pair)
-          {
-            return pair.rotate( Biv::xy * TWOPI * tx);
-          });
+      auto pgroup = sg.apply(motif);
+      auto res = sg.hang(pgroup,iter_width,iter_height);
 
-      for (auto& i : res){
-        Draw(i,0,0,0);
+      //auto pgroupA = sg.apply(pa^pb);
+      //auto pgroupB = sg.apply(pa^pc);
+
+      //cout << "PGROUPA" << endl;
+      //for (auto& i : pgroupA)
+      //  i.print();
+      //cout << "PGROUPB" << endl;
+      //for (auto& i : pgroupB)
+      //  i.print ();
+      //cout << "PGROUP" << endl;
+      //for (auto& i : pgroup)
+      //  i.print();
+
+     // auto ppa = pa^pb;
+     // auto ppb = pa^pc;
+     // glColor3f(1.0,0.0,0.0);
+     // glBegin (GL_TRIANGLES);
+     //   auto tpa = Round::splitLocation (ppa);
+     //   auto tpb = Round::splitLocation (ppb);
+     //   GL::Tri (tpa[0], tpa[1], tpb[0]);
+     // glEnd();
+
+     // glBegin (GL_TRIANGLES);
+     // for (int i = 0 ; i < pgroupA.size(); i++) {
+     //   auto tpa = Round::split (pgroupA[i]);
+     //   auto tpb = Round::split (pgroupB[i]);
+     //   GL::Tri (tpa[0], tpa[1], tpb[1]);
+     // }
+     // glEnd ();
+
+      cout << "NUM OPS: " << sg.numOps() << endl;
+      glBegin (GL_TRIANGLES);
+      for (int i = 0 ; i < res.size(); i += motif.size()){
+        if ((i < res.size()-1) && (((i/motif.size()+(int)motif_idx) % sg.numOps()) == 0) ){
+          auto tpa = Round::split (res[i]);
+          auto tpb = Round::split (res[i+1]);
+          GL::Tri (tpa[0], tpa[1], tpb[0]);
+        }
+      }
+      glEnd ();
+
+      for (int i = 0 ; i < res.size(); ++i ){
+        Draw( res[i], 0, 0, 0);
       }
 
       if (bDrawMotif){
         Draw( Round::dls(pa,.1),0,0,0,.5  );
         Draw( Round::dls(pb,.1),0,0,0,.5  );
         Draw( Round::dls(pc,.1),0,0,0,.5 );
-        Draw( Round::dls(pd,.1),0,0,0,.5 );
+        //Draw( Round::dls(pd,.1),0,0,0,.5 );
       }
-      
+
       // Ok, for next time we generate bunch of copies of motif to find near points ..
       // ... which snap together if snapping is enabled
-      auto single = sg.apply(motif,3,3); 
-      if (bSnap){                
-        for (auto& i : single){
+      auto single = sg.apply(motif);
+      auto multiple = sg.hang(single,3,3);
+      if (bSnap){
+        for (auto& i : multiple){
           auto sa =  Round::split(i,true);
           auto sb =  Round::split(i,false);
 
-          if ( Round::sqd(sa, pa) < .03 ) 
+          if ( Round::sqd(sa, pa) < .03 )
             pa = Round::null( pa + (sa-pa) *.05);
           else if ( Round::sqd(sb, pa) < .03 )
             pa = Round::null( pa + (sb-pa)*.05);
@@ -152,24 +190,24 @@ struct MyApp : App {
         }
       }
 
-      // ... Or even maybe Reset the points 
+      // ... Or even maybe Reset the points
       if(bReset){
         pa = PT(0,0,0);
         pb = PT(1,0,0);
         pc = PT(0,1,0);
         pd = PT(0,-1,0);
       }
-      
 
-//      cout << "num mirror ops: " << sg.ops.size() << endl; 
-//      cout << "num spin ops: " << sg.sops.size() << endl; 
-//      cout << "num glide ops: " << sg.gops.size() << endl; 
+
+//      cout << "num mirror ops: " << sg.ops.size() << endl;
+//      cout << "num spin ops: " << sg.sops.size() << endl;
+//      cout << "num glide ops: " << sg.gops.size() << endl;
 //      cout << "num res: " << single.size() << endl;
-      
-  }
-   
 
-  
+  }
+
+
+
 };
 
 
@@ -177,5 +215,5 @@ struct MyApp : App {
 int main(){
   MyApp app;
   app.start();
-  return 0;                             
+  return 0;
 }

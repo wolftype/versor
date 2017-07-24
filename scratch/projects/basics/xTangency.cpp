@@ -17,14 +17,14 @@
  */
 
 
-#include "vsr_app.h"
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
 
-  DualSphere dls = sphere(0,0,0,1);
+  DualSphere dls = Construct::sphere(0,0,0,1);
 
   //Some Variables
   float amt = 0;
@@ -39,7 +39,7 @@ struct MyApp : App {
   }
 
   void onDraw(){
-    auto p = point(0,0,0);//calcMouse3D();
+    auto p = Construct::point(0,0,0);//calcMouse3D();
 
     cout << (p<=dls)[0] << endl;
 
@@ -49,15 +49,15 @@ struct MyApp : App {
     //line through point and sphere, intersected with sphere, gives point on sphere
     //closest to point p
     auto line = p ^ dls ^ Inf(1);
-    auto pointOnCircle = Ro::split( (line.dual() ^ dls).dual(), false);
+    auto pointOnCircle = Round::split( (line.dual() ^ dls).dual(), false);
 
-    draw(pointOnCircle,1,1,0);
+    Draw(pointOnCircle,1,1,0);
 
-    draw(tangentToCircle,0,0,1);
+    Draw(tangentToCircle,0,0,1);
 
-    draw(Ro::loc(tangentToCircle),0,1,0);
+    Draw(Round::loc(tangentToCircle),0,1,0);
 
-    draw(dls,1,0,0,.2); ///<-- draw red sphere
+    Draw(dls,1,0,0,.2); ///<-- draw red sphere
 
   }
 

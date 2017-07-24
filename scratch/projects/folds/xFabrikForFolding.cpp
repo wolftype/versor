@@ -17,10 +17,10 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_rigid.h"
-#include "form/vsr_group.h"
-#include "draw/vsr_graph_draw.h"
+#include <vsr/vsr_app.h>   
+#include <vsr/form/vsr_rigid.h>
+#include <vsr/form/vsr_group.h>
+#include <vsr/draw/vsr_graph_draw.h>
 
 using namespace vsr;
 using namespace vsr::cga;

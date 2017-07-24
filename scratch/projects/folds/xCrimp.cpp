@@ -17,29 +17,27 @@
  */
 
 
-#include "vsr_app.h"   
-#include "form/vsr_rigid.h"
+#include <vsr/vsr_app.h>
+#include <vsr/form/vsr_rigid.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
 
-
-
 struct Crumpling : Frame{
-  
+
   vector<Point> pnt;
   vector<Rigid2> rigid;
 
   MBO mbo;
 
   void init(){
-    
+
     mNum = 10;
-    
+
     for (int i=0; i<mNum; ++i){
       auto p = point( this->cxy(), TWOPI*(float)i/10 );
-      pnt.push_back(p); 
+      pnt.push_back(p);
     }
     pnt.push_back( this->pos() );
     mesh();
@@ -51,10 +49,10 @@ struct Crumpling : Frame{
     for (int i=0;i<mNum; ++i){
       int prv = i>0? i-1 : rigid.size()-2;
       int nxt = (i<rigid.size()-2)? i+1 : 0;
-      rigid[i].add( &rigid.back(), &rigid[prv], true); 
-      rigid[i].add( &rigid[nxt], &rigid.back(), true); 
+      rigid[i].add( &rigid.back(), &rigid[prv], true);
+      rigid[i].add( &rigid[nxt], &rigid.back(), true);
     }
-    
+
   }
 
   void satisfy(){
@@ -62,7 +60,7 @@ struct Crumpling : Frame{
       i.result = Constrain::Tangency(i.result, i.parents[0].da(), i.parents[0].db());
     }
   }
-  
+
   void mesh(){
     Mesh mesh;
     for (int i = 0; i< pnt.size()-1; ++i){
@@ -93,7 +91,7 @@ struct Crumpling : Frame{
 
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -111,22 +109,22 @@ struct MyApp : App {
     mSceneRenderer.immediate(false);
 
     crimp.init();
-    
+
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
     crimp.draw(this);
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

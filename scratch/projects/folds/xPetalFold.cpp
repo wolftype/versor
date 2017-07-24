@@ -12,8 +12,8 @@
  * */
 
 
-#include "vsr_app.h"
-#include "vsr_fold.h"
+#include <vsr/vsr_app.h>
+#include <vsr/folds/vsr_fold.h>
 
 using namespace vsr;
 using namespace vsr::cga;

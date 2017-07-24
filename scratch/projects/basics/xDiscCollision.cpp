@@ -16,7 +16,7 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -56,17 +56,15 @@ struct MyApp : App {
     auto n = Round::carrier(cir);
 
     // if mouse point lies within surround of circle
+    // (the sphere of which it is the diameter)
     if ( (p<=s)[0] > 0){
-      // print out weight of point
-      cout << (p^n).wt() << endl;
-      // if absolute weight is greater than error
-      if ( fabs( (p^n).wt()) <.00001 ) {
-        // draw point
+      // get the "weight" of the point
+      float f = (p^n).wt();
+      cout << "point is within surround: "  << f << endl;
+      // if absolute weight is less than error
+      if ( fabs(f) < .0001 )
         draw(p,1,0,0);
-      }
     }
-
-
   }
 
 };
