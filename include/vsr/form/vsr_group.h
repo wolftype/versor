@@ -182,14 +182,21 @@ struct PointGroup2D : Group<V> {
     int mP;                 ///< Symmetry Group
     bool bPin;              ///< Pin or Spin
 
-    PointGroup2D(int p, bool pin = true) : mP(p), bPin(pin) {
-       a = V::x;
-       b = V::x.rot( Biv::xy * -PIOVERTWO/p );
-       calcOps(a.unit(), b.unit());
+    PointGroup2D () {}
 
+    PointGroup2D(int p, bool pin)
+    { set (p, pin); }
+
+    virtual void set (int p, bool pin)
+    {
+      mP= p;
+      bPin=pin;
+      a = V::x;
+      b = V::x.rot( Biv::xy * -PIOVERTWO/p );
+      calcOps(a.unit(), b.unit());
        //setOps ();
        //seed ();
-   }
+    }
 
    /// For pin groups, generate a reflection root system of ops
    /// Otherwise, generate mP rotors
@@ -409,6 +416,7 @@ struct SpaceGroup2D : PointGroup2D<V> {
   float mRatioY=1;
   float mRatioX=1;
 
+  SpaceGroup2D (){}
   /// Constructor
   // @param mP: symmetry group (1,2,3,4,6)
   // @param mRatio: for translations on the lattice
@@ -416,8 +424,13 @@ struct SpaceGroup2D : PointGroup2D<V> {
   // @param mDiv: number of divisions into lattice cell
   // @param ga: whether a glide reflection replaces first mirror generator
   // @param gb: whether a glide reflection replaces second mirror generator
-  SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false)
-  : PointGroup2D<V>(p,pin), mRatioY(ratio), mDiv(div)  {
+  SpaceGroup2D(int p, float ratio = 1.0, bool pin=true, int div = 1, bool ga=false, bool gb=false) : PointGroup2D<V>(p, pin)
+  { set (p,ratio,pin,div,ga,gb); }
+
+  virtual void set (int p, float ratio, bool pin, int div, bool ga, bool gb){
+
+   PointGroup2D<V>::set(p,pin);
+   mRatioY = ratio; mDiv = div;
 
    if (p==4)
     this->b = this->a + (this->a).rot( Biv::xy * -PIOVERTWO/2);

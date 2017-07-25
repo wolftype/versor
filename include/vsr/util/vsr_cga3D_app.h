@@ -62,39 +62,47 @@ struct App : public gfx::GFXAppGui {
 
   }
 
+  ///@todo move to gfx
+  void monoPrint (){
+    printf("o: output ps mono\n");
+    ps.bTightBounds = false;
+    GL::enablePreset();
+    this->scene.camera.stereo(false);
+    this->scene.push(true);
+     ps.print(*this);
+    this->scene.pop(true);
+    GL::disablePreset();
+  }
+
+  ///@todo move to gfx
+  void stereoPrint (){
+    printf("p: output ps stereo\n");
+    ps.bTightBounds = false;
+    GL::enablePreset();
+    this->scene.camera.stereo(true);
+    this->scene.camera.left(true);
+    this->scene.push(true);
+     ps.print(*this);
+    this->scene.pop(true);
+
+    this->scene.camera.left(false);
+    this->scene.push(true);
+     ps.print(*this);
+    this->scene.pop(true);
+
+    GL::disablePreset();
+  }
   /// Called when a keyboard key is pressed
   virtual void onKeyDown(const gfx::Keyboard& k){
 
    // Frame f;
     switch(k.code){
       case 'o':
-        printf("o: output ps mono\n");
-        ps.bTightBounds = false;
-        GL::enablePreset();
-        this->scene.camera.stereo(false);
-        this->scene.push(true);
-         ps.print(*this);
-        this->scene.pop(true);
-        GL::disablePreset();
+        monoPrint();
         break;
       case 'p':
-        printf("p: output ps stereo\n");
-        ps.bTightBounds = false;
-        GL::enablePreset();
-        this->scene.camera.stereo(true);
-        this->scene.camera.left(true);
-        this->scene.push(true);
-         ps.print(*this);
-        this->scene.pop(true);
-
-        this->scene.camera.left(false);
-        this->scene.push(true);
-         ps.print(*this);
-        this->scene.pop(true);
-
-        GL::disablePreset();
+        stereoPrint();
         break;
-
       case 'x':
         printf("save mouse position\n");
         bSetMouse = !bSetMouse;

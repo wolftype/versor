@@ -60,6 +60,8 @@ struct MyApp : App {
   Point pc = PT(0,1,0);
   Point pd = PT(0,-1,0);
 
+  SpaceGroup2D<Vec> sg;
+
   void setup(){
       ps.bShadedOutput = true;
       bindGLV();
@@ -97,49 +99,17 @@ struct MyApp : App {
       time++;
 
       //symmetry number | w/h ratio | reflect or spin | face divisor |
-      SpaceGroup2D<Vec> sg(pNum,ratio,bPin,(int)div,bGlideA,bGlideB);
+      sg.set(pNum,ratio,bPin,(int)div,bGlideA,bGlideB);
 
       // Pair them up
       vector<Pair> motif;
       motif.push_back(pa^pb);
       motif.push_back(pa^pc);
-//    motif.push_back(pa^pd);
 
       // let's make a bunch of them
       auto pgroup = sg.apply(motif);
       auto res = sg.hang(pgroup,iter_width,iter_height);
 
-      //auto pgroupA = sg.apply(pa^pb);
-      //auto pgroupB = sg.apply(pa^pc);
-
-      //cout << "PGROUPA" << endl;
-      //for (auto& i : pgroupA)
-      //  i.print();
-      //cout << "PGROUPB" << endl;
-      //for (auto& i : pgroupB)
-      //  i.print ();
-      //cout << "PGROUP" << endl;
-      //for (auto& i : pgroup)
-      //  i.print();
-
-     // auto ppa = pa^pb;
-     // auto ppb = pa^pc;
-     // glColor3f(1.0,0.0,0.0);
-     // glBegin (GL_TRIANGLES);
-     //   auto tpa = Round::splitLocation (ppa);
-     //   auto tpb = Round::splitLocation (ppb);
-     //   GL::Tri (tpa[0], tpa[1], tpb[0]);
-     // glEnd();
-
-     // glBegin (GL_TRIANGLES);
-     // for (int i = 0 ; i < pgroupA.size(); i++) {
-     //   auto tpa = Round::split (pgroupA[i]);
-     //   auto tpb = Round::split (pgroupB[i]);
-     //   GL::Tri (tpa[0], tpa[1], tpb[1]);
-     // }
-     // glEnd ();
-
-      cout << "NUM OPS: " << sg.numOps() << endl;
       glBegin (GL_TRIANGLES);
       for (int i = 0 ; i < res.size(); i += motif.size()){
         if ((i < res.size()-1) && (((i/motif.size()+(int)motif_idx) % sg.numOps()) == 0) ){
@@ -158,7 +128,6 @@ struct MyApp : App {
         Draw( Round::dls(pa,.1),0,0,0,.5  );
         Draw( Round::dls(pb,.1),0,0,0,.5  );
         Draw( Round::dls(pc,.1),0,0,0,.5 );
-        //Draw( Round::dls(pd,.1),0,0,0,.5 );
       }
 
       // Ok, for next time we generate bunch of copies of motif to find near points ..
@@ -206,6 +175,19 @@ struct MyApp : App {
 
   }
 
+
+    virtual void onKeyDown ( const gfx::Keyboard& key){
+
+        switch (key.code){
+            case 'o':
+              for (int i = 0; i<sg.numOps(); ++i)
+              {
+                motif_idx = i;
+                 monoPrint ();
+              }
+              break;
+        }
+    }
 
 
 };
