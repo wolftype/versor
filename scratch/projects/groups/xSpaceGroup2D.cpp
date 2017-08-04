@@ -53,7 +53,7 @@ struct MyApp : App {
 
   float time;
   float amt ,pNum, ratio, div, numDraw, iter_width, iter_height, motif_idx;
-  bool bPin, bGlideA, bGlideB,bReset,bSnap,bDrawMotif;
+  bool bPin, bGlideA, bGlideB,bReset,bSnap,bDrawMotif, bDrawAll;
 
   Point pa = PT(0,0,0);
   Point pb = PT(1,0,0);
@@ -63,7 +63,6 @@ struct MyApp : App {
   SpaceGroup2D<Vec> sg;
 
   void setup(){
-      ps.bShadedOutput = true;
       bindGLV();
       gui(amt,"amt",-100,100);
       gui(bReset,"reset");
@@ -75,6 +74,7 @@ struct MyApp : App {
       gui(bPin,"pin");          ///< pin or spin
       gui(bGlideA,"ga");        ///< glide
       gui(bGlideB, "gb");
+      gui(bDrawAll, "bDrawAll");
       gui(iter_width,"iter_width",0,200);
       gui(iter_height,"iter_height",0,200);
       gui(motif_idx,"motif_idx",0,100);
@@ -90,6 +90,7 @@ struct MyApp : App {
       objectController.attach(&pd);
 
       mColor.set(1,1,1);
+      ps.bPDF = false;
   }
 
 
@@ -112,7 +113,7 @@ struct MyApp : App {
 
       glBegin (GL_TRIANGLES);
       for (int i = 0 ; i < res.size(); i += motif.size()){
-        if ((i < res.size()-1) && (((i/motif.size()+(int)motif_idx) % sg.numOps()) == 0) ){
+        if ((i < res.size()-1) && (((i/motif.size()+(int)motif_idx) % sg.numOps()) == 0 || bDrawAll) ){
           auto tpa = Round::split (res[i]);
           auto tpb = Round::split (res[i+1]);
           GL::Tri (tpa[0], tpa[1], tpb[0]);
@@ -120,9 +121,13 @@ struct MyApp : App {
       }
       glEnd ();
 
+      glBegin (GL_LINES);
       for (int i = 0 ; i < res.size(); ++i ){
-        Draw( res[i], 0, 0, 0);
+        Point pa = Construct::pointA(res[i]);
+        Point pb = Construct::pointB(res[i]);
+        GL::Line (pa, pb);
       }
+      glEnd();
 
       if (bDrawMotif){
         Draw( Round::dls(pa,.1),0,0,0,.5  );
