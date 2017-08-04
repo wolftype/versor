@@ -18,7 +18,7 @@
 
 
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 #include "form/vsr_cga3D_conic.h"
 #include "util/vsr_map.h"
 
@@ -28,8 +28,8 @@ using namespace vsr;
 using namespace vsr::cga;
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   DualPlane mousePlane;
   DualPlane imousePlane; /// inverse transform of plane
@@ -49,11 +49,11 @@ struct MyApp : App {
       gui(beta,"beta",-1,1);
       gui(gamma,"gamma",-1,1);
   }
- 
+
   virtual void onAnimate(){
-    
+
     Vec dir = Vec(1,0,0);
-     
+
     vp.clear();
 
     //a bunch of points on the surface of a sphere
@@ -71,25 +71,25 @@ struct MyApp : App {
     //extract points on the circle from the meet
     np = pointsOnCircle(circleMeet, 100);
     np = functor::fmap<Point>( conic::transform::point,  np, dir,  amt );
-    
+
 
   }
 
-  virtual void onDraw(){ 
-        
+  virtual void onDraw(){
+
      mouse = calcMouse3D();
 
-    // Draw( Vec::x.sp(  Gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 ); 
+    // Draw( Vec::x.sp(  Gen::rot( PI * beta, PIOVERFOUR * gamma )), 0,1,0 );
 
     auto p = Flat::loc( mousePlane, Ori(1), true );
     p.print();
-    // Draw( ,1,0,0); 
-    
+    // Draw( ,1,0,0);
+
      Mesh mesh = Mesh::UV( cp.data(), 20, 20 );
      mesh.drawElements();
 
      Draw(mousePlane,0,0,1);
-     
+
     // Draw(imousePlane);
      Draw(circleMeet,0,1,0);
 
@@ -108,22 +108,17 @@ struct MyApp : App {
         /* auto p2 = Ro::split( pp ); */
         /* Pnt pa = Conic::Transform (p2[0], mv, amt); */
         /* Pnt pb = Conic::Transform(p2[1], mv, amt); */
-         
-        /* Draw( pa ); Draw(pb); */ 
-    
-  }
-   
 
-  
+        /* Draw( pa ); Draw(pb); */
+
+  }
+
+
+
 };
 
-
-
-
 int main(){
-                             
-    MyApp app;
-    app.start();
-  return 0;
-
+ MyApp app;
+ app.start();
+ return 0;
 }

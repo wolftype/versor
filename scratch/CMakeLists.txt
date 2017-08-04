@@ -10,6 +10,7 @@ endif(COMMAND cmake_policy)
 
 #PROJECT
 project(VERSOR_SCRATCH)
+message ("SCRATCH PROJECTS ADDED TO LIST OF TARGETS")
 
 file(GLOB projects projects/*/*.cpp)
 foreach(filename ${projects})

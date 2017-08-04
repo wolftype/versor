@@ -16,13 +16,13 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"   
+#include "vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -35,49 +35,41 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-    
+
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
     scene.camera.lens.bOrtho = bReset;
-    Vec target(2,2,2);
-    //Draw( Construct::point(2,2,2),1,0,0 );
+
+    Vec target = calcMouse3D();//mouse;//(2,2,2);
 
     Frame fa;
     Frame fb;
     Frame fc;
-    
+
     fb.rot() = Gen::ratio( Vec::z, target.unit() );
     fc.orient(target);
 
-
     fa.pos(-2,0,0);
     fc.pos(2,0,0);
-//    Draw(fa);
-//    if (bReset) {
-      DrawB(fa);
-     // DrawAt(target.unit(),fa.pos(),0,0,1,.5);
-      Draw(fb.xy(),.3,.3,.2);
-      DrawB(fb);
-      DrawAt( Vec(Op::project( Vec::y, fb.xy() )).unit(), fb.pos(), 0,1,0,.5 );
-//    }
-//    else {
-      
-      DrawB(fc);
-//    }
+    DrawB(fa);
+    Draw(fb.xy(),.3,.3,.2);
+    DrawB(fb);
+    DrawAt( Vec(Op::project( Vec::y, fb.xy() )).unit(), fb.pos(), 0,1,0,.5 );
+    DrawB(fc);
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 
