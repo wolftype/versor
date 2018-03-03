@@ -185,6 +185,7 @@ TROUBLESHOOTING
     brew install glew
 
 * You'll need C++11 support on your compiler (See makefile notes below). For C++11 you'll want clang 3.2 (mac) or above or gcc 4.7 or above (linux).
+* On Linux: you may need to sudo apt-get install libxmu-dev libxi-dev
 * Alternatively an earlier version of Versor is available at [github.com/wolftype/versor_1.0.git](https://github.com/wolftype/versor_1.0.git)
 This older version runs just as fast, but is strictly 3D CGA (i.e. R4,1 metric) since I generated headers ahead of time.
 

@@ -12,7 +12,7 @@ endif(COMMAND cmake_policy)
 #PROJECT
 project(VERSOR)
 
-#optional flags and defaults for building graphics and examples
+#optional flags and their defaults for building graphics and examples
 set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
@@ -21,8 +21,10 @@ set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
+#some additional flags
 set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
 
+#default release type if none specified
 if (NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE RelWithDebInfo)
 endif ()
@@ -40,17 +42,21 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 
-
 #All .cpp files in src/space get built into libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
 link_directories(${PROJECT_BINARY_DIR})
 set(vsr_libraries vsr)
 
-#project include directory
+#project include directories
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/detail)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/form)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/draw)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/space)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/util)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
@@ -123,6 +129,7 @@ install(TARGETS ${vsr_libraries}
   ARCHIVE DESTINATION lib)
 
 install(DIRECTORY include/vsr/detail DESTINATION include/vsr)
+install(DIRECTORY include/vsr/draw DESTINATION include/vsr)
 install(DIRECTORY include/vsr/form   DESTINATION include/vsr)
 install(DIRECTORY include/vsr/space  DESTINATION include/vsr)
 install(DIRECTORY include/vsr/util   DESTINATION include/vsr)
