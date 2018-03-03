@@ -1,0 +1,17 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+script:
+  - ./build.sh
+sudo: required
+dist: trusty
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - libglew-dev
+    - freeglut3-dev
+    - libxi-dev
+    - libxmu-dev

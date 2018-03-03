@@ -1,0 +1,15 @@
+@mastersthesis{colapinto2011versor,
+  added-at = {2015-07-08T22:48:57.000+0200},
+  author = {Colapinto, Pablo},
+  biburl = {http://www.bibsonomy.org/bibtex/2db6e14c92434ad9688751135864fdf76/wolftype},
+  interhash = {d4f085cbc42bbf381b37aece5a714379},
+  intrahash = {db6e14c92434ad9688751135864fdf76},
+  key = {colapinto2011thesis},
+  keywords = {geometricalgebra},
+  note = {Available at \url{http://versor.mat.ucsb.edu}},
+  school = {University of California at Santa Barbara},
+  timestamp = {2015-07-08T22:55:21.000+0200},
+  title = {Versor: Spatial Computing with Conformal Geometric Algebra},
+  url = {http://versor.mat.ucsb.edu},
+  year = 2011
+}
