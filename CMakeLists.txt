@@ -51,12 +51,6 @@ set(vsr_libraries vsr)
 #project include directories
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/detail)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/form)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/draw)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/space)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/vsr/util)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
@@ -127,6 +121,10 @@ install(TARGETS ${vsr_libraries}
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+foreach(lib ${vsr_libraries})
+  message(STATUS "libraries='${lib}'")
+endforeach()
 
 install(DIRECTORY include/vsr/detail DESTINATION include/vsr)
 install(DIRECTORY include/vsr/draw DESTINATION include/vsr)

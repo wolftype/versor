@@ -15,7 +15,7 @@
 #ifndef VSR_CONSTANTS_H_INCLUDED
 #define VSR_CONSTANTS_H_INCLUDED
 
-namespace vsr{
+namespace vsr {
 
 #ifndef PI
 #define PI 3.141592653589793
@@ -53,11 +53,11 @@ namespace vsr{
 #define GOLDENANGLE 137.507764
 #endif
 
-#ifndef GOLDENRADIAN 
+#ifndef GOLDENRADIAN
 #define GOLDENRADIAN 2.399963
 #endif
 
-#ifndef SMALLRAD 
+#ifndef SMALLRAD
 #define SMALLRAD (PI * 36 / 180)
 #endif
 
@@ -82,31 +82,30 @@ namespace vsr{
 #endif
 
 #ifndef ERROR
-#define ERROR(x,y) (x<=y && x>=-y)
-#endif   
+#define ERROR(x, y) (x <= y && x >= -y)
+#endif
 
 #ifndef MAXRADIUS
 #define MAXRADIUS 100000
 #endif
 
 #ifndef FERROR
-#define FERROR(x) (fabs(x)<=FPERROR)
+#define FERROR(x) (fabs (x) <= FPERROR)
 #endif
 
 #ifndef CLAMP
-#define CLAMP(val,min,max) val<min?min:val>max?max:val
+#define CLAMP(val, min, max) val<min ? min : val> max ? max : val
 #endif
 
 #ifndef D2R
-#define D2R(val) PI*val/180.0
+#define D2R(val) PI *val / 180.0
 #endif
 
 #ifndef ZERO
-#define ZERO(x) (fabs(x)<FPERROR?0:x)
+#define ZERO(x) (fabs (x) < FPERROR ? 0 : x)
 #endif
 
 
-} //vsr::
+}  //vsr::
 
 #endif
-
