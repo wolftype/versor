@@ -45,7 +45,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLA
 #All .cpp files in src/space get built into libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
-link_directories(${PROJECT_BINARY_DIR})
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 set(vsr_libraries vsr)
 
 #project include directories
@@ -53,7 +53,11 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
-set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
+#set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
+#set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
+set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/lib")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/bin")
+
 file(GLOB tests tests/*.cpp)
 foreach(filename ${tests})
   get_filename_component(target ${filename} NAME_WE)
@@ -78,6 +82,10 @@ if(${BUILD_GRAPHICS})
 
   include_directories(${GFX_INCLUDE_DIR})
   link_directories(${GFX_LINK_DIR})
+
+  foreach (lib ${GFX_LIBRARIES})
+  message ("GFXLIB:" ${lib})
+  endforeach()
 
   #get all source files
   file(GLOB graphicsGL src/draw/GL/*.cpp)
@@ -134,10 +142,10 @@ install(DIRECTORY include/vsr/util   DESTINATION include/vsr)
 install(FILES include/vsr/vsr.h include/vsr/vsr_app.h DESTINATION include/vsr)
 
 ##PRINT DIRECTORIES
-#message("VERSOR LINK DIRECTORES")
-#foreach(d ${link_dirs})
-#  message(STATUS "link dir='${d}'")
-#endforeach()
+message("VERSOR LINK DIRECTORES")
+foreach(d ${link_dirs})
+  message(STATUS "link dir='${d}'")
+endforeach()
 message("VERSOR INCLUDE DIRECTORES")
 foreach(d ${inc_dirs})
   message(STATUS "include dir='${d}'")

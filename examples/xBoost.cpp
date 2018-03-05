@@ -7,85 +7,99 @@
  *-----------------------------------------------------------------------------*/
 
 
-#include <vsr/vsr_app.h>  
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
-struct MyApp : App {
-      
-  float amt,dist;
-  bool bPos,bFlop;
+struct MyApp : App
+{
+
+  float amt, dist;
+  bool bPos, bFlop;
 
   Circle ca, cb;
-   
-  virtual void setup(){
-    
-    bindGLV();
-    gui(amt,"amt",-100,100);
-    gui(dist,"dist",-100,100);
-    gui(bPos, "bPos");
-    gui(bFlop, "bFlop");
+
+  virtual void setup ()
+  {
+
+    gui (amt, "amt", -100, 100);
+    gui (dist, "dist", -100, 100);
+    gui (bPos, "bPos");
+    gui (bFlop, "bFlop");
 
     amt = .01;
     dist = 1;
-    
-    ca = Construct::circle(-3,0,0);                           //<-- A circle at coordinate -3,0,0
-    cb = Construct::circle(3,0,0);                            //<-- A circle at coordinate 3,0,0
+
+    ca = Construct::circle (-3, 0, 0);  //<-- A circle at coordinate -3,0,0
+    cb = Construct::circle (3, 0, 0);   //<-- A circle at coordinate 3,0,0
   }
-  
 
-  virtual void onDraw(){       
 
-    auto tca = Construct::circle(-dist/2.0,0,0).twist(Construct::line(1,0,0).dual() * -amt );   //<-- twist circle b around x axis dualline
-    auto tcb = Construct::circle(dist/2.0,0,0).twist(Construct::line(1,0,0).dual() * amt );     //<-- twist circle b around x axis dualline
-  
+  virtual void onDraw ()
+  {
+
+    auto tca = Construct::circle (-dist / 2.0, 0, 0)
+                 .twist (Construct::line (1, 0, 0).dual ()
+                         * -amt);  //<-- twist circle b around x axis dualline
+    auto tcb = Construct::circle (dist / 2.0, 0, 0)
+                 .twist (Construct::line (1, 0, 0).dual ()
+                         * amt);  //<-- twist circle b around x axis dualline
+
     //log of transformation from ca to cb
-    auto ratio = Gen::ratio(tca,tcb);
-    auto log = Gen::log( ratio );
+    auto ratio = Gen::ratio (tca, tcb);
+    auto log = Gen::log (ratio);
 
-    auto trot = (tcb/tca).runit();
-    auto angle = ( Round::dir(tcb).copy<Biv>().runit() / Round::dir(tca).copy<Biv>().runit() )[0];
-    
-   // cout << trot[0] << " " << angle << endl;
-    float theta = acos( trot[0] );
+    auto trot = (tcb / tca).runit ();
+    auto angle = (Round::dir (tcb).copy<Biv> ().runit ()
+                  / Round::dir (tca).copy<Biv> ().runit ())[0];
 
-    float planarity = (Round::carrier(tca).dual().unit() ^ Round::carrier(tcb).dual().unit()).wt();
-    if (FERROR(planarity)) cout << "PLANAR" << endl;
-         
+    // cout << trot[0] << " " << angle << endl;
+    float theta = acos (trot[0]);
+
+    float planarity = (Round::carrier (tca).dual ().unit ()
+                       ^ Round::carrier (tcb).dual ().unit ())
+                        .wt ();
+    if (FERROR (planarity))
+      cout << "PLANAR" << endl;
+
     int num = 100;
-    for (int i = 0; i < num; ++i ){
-      float t = 1.0 * i/num;
-      
-      auto nc = tca.spin( Gen::con(log, t * ( bPos ? 1 : -1) ) );            //<- general rotation ("spin") by general conformal transformation
-      
+    for (int i = 0; i < num; ++i)
+      {
+        float t = 1.0 * i / num;
 
-    //  auto nnc = (tca * sin((1-t)*theta) + (tcb * sin(t*theta)) ) / sin(theta);
-      Draw ( nc );
-    //  Draw( nnc, 1,0,0);
-    }
+        auto nc = tca.spin (Gen::con (
+          log,
+          t * (bPos
+                 ? 1
+                 : -1)));  //<- general rotation ("spin") by general conformal transformation
 
-    Draw(tca,1,0,1);
-    Draw(tcb,1,1,0);
-  
+
+        //  auto nnc = (tca * sin((1-t)*theta) + (tcb * sin(t*theta)) ) / sin(theta);
+        draw (nc);
+        //  Draw( nnc, 1,0,0);
+      }
+
+    draw (tca, 1, 0, 1);
+    draw (tcb, 1, 1, 0);
   }
-  
 };
 
 
-int main(){
-                             
+int main ()
+{
+
   MyApp app;
-  app.start();
+  app.start ();
 
   return 0;
-
-}  
+}
 
 
 //namespace vsr{ namespace gen {
 //   Con ratio_( const Circle& a, const Circle& b, bool flop){
-//    
+//
 //    Con trot = (b/a).runit();
 //    //planar?
 //    float planarity = (Round::carrier(a).dual().unit() ^ Round::carrier(b).dual().unit()).wt();
@@ -94,7 +108,7 @@ int main(){
 //    if ( flop && trot[0] < 0 ) {//fabs(planarity)<=.000009 )  {
 //      trot = -trot;//(-b/a).runit();//-trot; //restrict to positive <R> only if coplanar
 //    }
-//      
+//
 //    auto rotone = trot + 1;  //<-- we are going to "normalize" this by polar decomposition
 //
 //    VSR_PRECISION sca = 1 + trot[0];
@@ -125,8 +139,8 @@ int main(){
 //
 // //   sca = fabs(sca);  //<--* added this fabs in
 //    auto v1 = ( -sph + sca ) / (2*sca3);
-//    auto v2 = (sph+(sca+sqsca3))/sqrt( sca+sqsca3 ); 
-//     
-//    return rotone * v1 * v2;      
+//    auto v2 = (sph+(sca+sqsca3))/sqrt( sca+sqsca3 );
+//
+//    return rotone * v1 * v2;
 //   }
 //}}

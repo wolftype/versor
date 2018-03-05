@@ -17,8 +17,6 @@ struct MyApp : App {
    *  Setup Gui
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(amt1,"amt1",-100,100)(amt2,"amt2",-100,100)(bToggle,"bToggle")(bSet,"bSet");
   }
@@ -33,7 +31,7 @@ struct MyApp : App {
     //use mouse position in world space to construct a circle
     Circle cxy = Construct::circle(mMouse3D, 1);
     //draw the circle
-    Draw (cxy);
+    draw (cxy);
 
    }
 

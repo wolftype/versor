@@ -37,9 +37,6 @@ struct MyApp : App {
    *-----------------------------------------------------------------------------*/
   void setup(){
 
-    ///Bind Gui
-    bindGLV();
-
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bAbsolute,"bAbsolute_xf");
 
@@ -57,9 +54,9 @@ struct MyApp : App {
   void onDraw(){
 
     mouse = calcMouse3D();
-    Draw(mouse,1,0,0);
+    draw(mouse,1,0,0);
 
-    GL::lightsOff();
+    gfx::GL::lightsOff();
 
     if (bAbsolute) {
       frameA.orient( mouse );                            //<-- absolute orientation of z axis towards mouse
@@ -74,11 +71,11 @@ struct MyApp : App {
 
     for (int i=0;i<10;++i){
       DualLine tdll = dll * (float)i/10;                  //<-- weighted generator
-      Draw( Frame( Gen::mot(tdll) * frameA.mot() ) );     //<-- new interpolated frame from frameA and transformation
+      draw( Frame( Gen::mot(tdll) * frameA.mot() ) );     //<-- new interpolated frame from frameA and transformation
     }
 
-    Draw(frameA);
-    Draw(frameB);
+    draw(frameA);
+    draw(frameB);
 
   }
 

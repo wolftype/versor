@@ -31,8 +31,6 @@ struct MyApp : App {
   float amt = 0;
 
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(button,"bImmediate");
 

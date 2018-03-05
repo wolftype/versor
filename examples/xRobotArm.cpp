@@ -13,13 +13,12 @@ struct MyApp : App {
 	float distA;
 
 	void setup(){
-      bindGLV();
       gui(distA, "LinkLength", 1,10);
       gui(linewidth,"linewidth",0,10);
      	distA = 5.0;
       linewidth=3;
       //immediate(false);
-      scene.camera.pos(0,0,20);
+      scene.camera.pos(0,0,30);
 	}
 
 	void onDraw(){

@@ -26,14 +26,6 @@ do
   esac
 done
 
-if [ $BUILD_GRAPHICS = 1 ]; then
-  echo "BUILDING SUBMODULE GLV LIBRARY...."
-  echo "please make sure you have run:"
-  echo "  git submodule init"
-  echo "  git submodule update"
-  make -C ext/glv
-fi
-
 cmake --version
 mkdir -p build
 cd build

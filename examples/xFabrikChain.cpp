@@ -42,8 +42,6 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
 
@@ -60,19 +58,19 @@ struct MyApp : App {
 
     //Draw point on xy plane as small red circle.  This is our "target"
     auto marker = Construct::sphere (point,.2);
-    Draw(marker,1,0,0);
+    draw(marker,1,0,0);
 
     //pass in beginning, ending index, adjust error threshold
     chain.fabrik(point,chain.num()-1,0,amt);
     //recalculate forward kinematics
     chain.fk();
 
-   // Draw(chain);
+   // draw(chain);
 
     for (int i = 0;i<chain.num(); ++i){
-      Draw( chain[i]);
-      Draw( chain.nextLine(i),1,0,0);
-      Draw( chain.nextSphere(i),0,1,1,.3);
+      draw( chain[i]);
+      draw( chain.nextLine(i),1,0,0);
+      draw( chain.nextSphere(i),0,1,1,.3);
     }
 
   }

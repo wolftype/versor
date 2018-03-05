@@ -2,6 +2,7 @@
 #include <vsr/form/vsr_root.h>  
 #include <vsr/draw/vsr_ega3D_draw.h>
 #include <gfx/util/gfx_glv_app.h>
+#include <gfx/util/glut_window.hpp>
 
 using namespace vsr;  
 using namespace vsr::ega;  
@@ -16,12 +17,11 @@ auto D4 = Root::System( V4(1,0,0,0), V4(0,1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1)
 auto F4 = Root::System( V4(0,1,-1,0), V4(1,-1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );  
 auto H4 = Root::System( V4(0,-1,0,0), V4(0,1.618,1,-.618) * .5, V4(0,0,-1,0), ( V4(-.618,0,1, 1.618) * .5 ) ); 
 
-struct MyApp : gfx::GFXAppGui { 
+struct MyApp : gfx::GFXAppGui<GlutContext> { 
 	
 	bool d4, f4, h4, bSpin, bOrtho;
 	 
 	void setup(){
-	  bindGLV();
   	gui(d4,"d4")(f4,"f4")(h4,"h4");
 		gui(bSpin, "spin")(bOrtho, "ortho");  
 		d4 = true;
