@@ -70,7 +70,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   ///@todo move to gfx
   void monoPrint ()
   {
-    printf ("o: output ps mono\n");
+    printf ("output ps mono\n");
     ps.bTightBounds = false;
     gfx::GL::enablePreset ();
     this->scene.camera.stereo (false);
@@ -83,7 +83,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   ///@todo move to gfx
   void stereoPrint ()
   {
-    printf ("p: output ps stereo\n");
+    printf ("output ps stereo\n");
     ps.bTightBounds = false;
     gfx::GL::enablePreset ();
     this->scene.camera.stereo (true);
@@ -104,12 +104,13 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   {
 
     // Frame f;
+    cout << k.code << endl;
     switch (k.code)
       {
-        case 'o':
+        case 'i':
           monoPrint ();
           break;
-        case 'p':
+        case 'o':
           stereoPrint ();
           break;
         case 'x':
@@ -123,6 +124,8 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
             mRenderGraph.mStereoMode == gfx::GFXRenderGraph::MONO
               ? gfx::GFXRenderGraph::ANAGLYPH
               : gfx::GFXRenderGraph::MONO;
+          break;
+        default:
           break;
       }
   }
