@@ -12,6 +12,15 @@ endif(COMMAND cmake_policy)
 #PROJECT
 project(VERSOR)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  SET( LINUX 1)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  SET( APPLE 1 )
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  SET( WINDOWS 1)
+endif()
+
+
 #optional flags and their defaults for building graphics and examples
 set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
@@ -22,7 +31,12 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 #some additional flags
+
+if (WINDOWS)
+set (VERSOR_FLAGS "-ftemplate-depth-1200")
+else()
 set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+endif()
 
 #default release type if none specified
 if (NOT CMAKE_BUILD_TYPE)
@@ -115,6 +129,23 @@ if(${BUILD_GRAPHICS})
   endforeach()
 
   add_subdirectory(scratch)
+
+else ()
+
+  set(libraries ${vsr_libraries})
+
+  #potentially build examples
+  set (examples examples/xAlgebra.cpp)
+  foreach(filename ${examples})
+    message (${filename})
+    get_filename_component(target ${filename} NAME_WE)
+    if (${BUILD_EXAMPLES})
+      add_executable(${target} ${filename} )
+    else()
+      add_executable(${target} EXCLUDE_FROM_ALL ${filename} )
+    endif()
+    target_link_libraries(${target} ${libraries})
+  endforeach()
 
 endif()
 
