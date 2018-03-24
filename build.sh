@@ -7,7 +7,7 @@ BUILD_GRAPHICS=1
 BUILD_EXAMPLES=0
 MAKE_VERBOSE=1
 DO_INSTALL=0
-#RUN_CMAKE=0
+DO_UPDATE=0
 
 for i
 do
@@ -23,8 +23,16 @@ do
   ;;
   -i | --install)
     DO_INSTALL=1
+  ;;
+  -u | --update)
+    DO_UPDATE=1
   esac
 done
+
+
+if [ $DO_UPDATE = 1 ]; then
+  git submodule update --init --recursive
+fi
 
 cmake --version
 mkdir -p build
