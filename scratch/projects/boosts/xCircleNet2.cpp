@@ -26,6 +26,7 @@
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
 
 /*-----------------------------------------------------------------------------
@@ -93,8 +94,6 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(fnum,"num",3,10);
     gui(amt,"amt",-100,1000)(surf,"surf",-100,1000)(bReset,"bReset");

@@ -11,144 +11,146 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
  *
  * =====================================================================================
  */
 
 
 
-#include "vsr_cga3D_app.h"
-#include "vsr_simplex.h"
+#include "vsr/vsr_app.h"
+#include "vsr/form/vsr_simplex.h"
 
 using namespace vsr;
-using namespace vsr::cga3D;
+using namespace vsr::cga;
 
+struct MyApp : App
+{
 
-struct MyApp : App {    
-   
   Point mouse;
-  Dls mysphere = sphere(0,0,0);
+  Dls mysphere = Round::dualSphere (1, 0, 0, 0);
 
-  float time=0;
+  float time = 0;
   float amtA, amtB, amtC;
 
   bool bReset;
 
-  void setup(){
-      
-      bindGLV();
-      gui(amtA,"amtA",-100,100);
-      gui(amtB,"amtB",-100,100);
-      gui(amtC,"amtC",-100,100);
-      gui(bReset,"reset");
+  void setup ()
+  {
+    gui (amtA, "amtA", -100, 100);
+    gui (amtB, "amtB", -100, 100);
+    gui (amtC, "amtC", -100, 100);
+    gui (bReset, "reset");
 
-      objectController.attach(&mysphere);
-  }
-  
-  void getMouse(){
-     mouse = calcMouse3D();
+    objectController.attach (&mysphere);
   }
 
-    virtual void onDraw(){ 
-        
-      getMouse();
+  void getMouse () { mouse = calcMouse3D (); }
 
-      //a triangle
-      Simplex<2> n;
+  virtual void onDraw ()
+  {
 
-      //make simplex vertices null points
-      auto pa = cga3D::point( n.verts[0][0], n.verts[0][1], 0);//.translate(5,0,0);
-      auto pb = cga3D::point( n.verts[1][0], n.verts[1][1], 0);//.translate(5,0,0);
-      auto pc = cga3D::point( n.verts[2][0], n.verts[2][1], 0);//.translate(5,-5,0);
+    getMouse ();
 
-      //points along hlines
-      for (int i = 0;i<=10;++i){
-        float t = (float)i/10;
+    //a triangle
+    Simplex<2> n;
 
-        auto iab = hspin(pa, pb, t);
-        auto iac = hspin(pa, pc, t);
-        
-        auto iba = hspin(pb, pa, t);
-        auto ibc = hspin(pb, pc, t);
+    //make simplex vertices null points
+    auto pa =
+      Round::point (n.verts[0][0], n.verts[0][1], 0);  //.translate(5,0,0);
+    auto pb =
+      Round::point (n.verts[1][0], n.verts[1][1], 0);  //.translate(5,0,0);
+    auto pc =
+      Round::point (n.verts[2][0], n.verts[2][1], 0);  //.translate(5,-5,0);
 
-        auto ica = hspin(pc, pa, t);
-        auto icb = hspin(pc, pb, t);
+    //points along hlines
+    for (int i = 0; i <= 10; ++i)
+      {
+        float t = (float) i / 10;
 
-        Draw(iab,0,1,0); Draw(iac,0,1,0); Draw(ibc,0,1,0);
-        
-      }      
- 
-      /*-----------------------------------------------------------------------------
+        auto iab = hspin (pa, pb, t);
+        auto iac = hspin (pa, pc, t);
+
+        auto iba = hspin (pb, pa, t);
+        auto ibc = hspin (pb, pc, t);
+
+        auto ica = hspin (pc, pa, t);
+        auto icb = hspin (pc, pb, t);
+
+        Draw (iab, 0, 1, 0);
+        Draw (iac, 0, 1, 0);
+        Draw (ibc, 0, 1, 0);
+      }
+
+    /*-----------------------------------------------------------------------------
        *  OKAY, above works, now, experiment
-       *-----------------------------------------------------------------------------*/    
-      //hyperbolic tangent space
-      auto pss = pa ^ pb ^ pc ^ EP;
-      auto norm = pss.rnorm();
-      auto sqnorm = norm * norm;
-      pss /= -sqnorm; 
+       *-----------------------------------------------------------------------------*/
+    //hyperbolic tangent space
+    auto pss = pa ^ pb ^ pc ^ EP;
+    auto norm = pss.rnorm ();
+    auto sqnorm = norm * norm;
+    pss /= -sqnorm;
 
-      //circle edges
-      auto cirA = pb ^ pa ^ mysphere;
-      auto cirB = pc ^ pa ^ mysphere;
+    //circle edges
+    auto cirA = pb ^ pa ^ mysphere;
+    auto cirB = pc ^ pa ^ mysphere;
 
-      //surrounds
-      auto sa = Ro::surround(cirA);
-      auto sb = Ro::surround(cirB);
+    //surrounds
+    auto sa = Round::surround (cirA);
+    auto sb = Round::surround (cirB);
 
-      //distance
-      double dist = (sa<=sb)[0];
-      //now add in 2x what?
-      double hdist = dist - 2*sa[4] - 2*sb[4];
-     // cout << hdist << endl;
+    //distance
+    double dist = (sa <= sb)[0];
+    //now add in 2x what?
+    double hdist = dist - 2 * sa[4] - 2 * sb[4];
+    // cout << hdist << endl;
 
-      //centers
-      auto ca = Ro::loc(cirA);
-      auto cb = Ro::loc(cirB);
+    //centers
+    auto ca = Round::loc (cirA);
+    auto cb = Round::loc (cirB);
 
-      auto trace = sa ^ sb ^ mysphere;
-      auto vers = (mysphere<=trace).runit();
+    auto trace = sa ^ sb ^ mysphere;
+    auto vers = (mysphere <= trace).runit ();
 
-      /* for (int j=0;j<=20;++j){ */
-      /*   Draw( hspin(ca,cb,(float)j/20), 1,0,0); */
-      /* } */
-     
-      //plunge
-      auto plunge = sa ^ sb ^ mysphere;
-      Draw(plunge);
-      auto versor = (mysphere<=plunge).runit();
-      auto sdist = 1.0/Ro::size(plunge,true);
+    /* for (int j=0;j<=20;++j){ */
+    /*   Draw( hspin(ca,cb,(float)j/20), 1,0,0); */
+    /* } */
 
-      /* auto pairA = meet(plunge,sa); */
-      /* auto pairB = meet(plunge,sb); */
+    //plunge
+    auto plunge = sa ^ sb ^ mysphere;
+    Draw (plunge);
+    auto versor = (mysphere <= plunge).runit ();
+    auto sdist = 1.0 / Round::size (plunge, true);
 
-      /* auto a = Ro::loc( Ro::split(pairA,true) ); */
-      /* auto b = Ro::loc( Ro::split(pairB,false) ); */   
+    /* auto pairA = meet(plunge,sa); */
+    /* auto pairB = meet(plunge,sb); */
 
-     // Draw(a,0,0,1);  
-     // Draw(b,0,0,1);  
-      
-      //auto gen = hgen(a,b,amtA);
-     // double dist = hdist(ca,cb);
+    /* auto a = Round::loc( Round::split(pairA,true) ); */
+    /* auto b = Round::loc( Round::split(pairB,false) ); */
 
-     // Draw( cirA.boost(gen) );
-     // Draw( cirA.boost( versor * amtB * (1-dist)*.5 ),0,0,1 );
-      Draw( cirA.boost( versor * sdist * amtC * .5), 0,1,0 ) ;
+    // Draw(a,0,0,1);
+    // Draw(b,0,0,1);
 
-      //Draw(mysphere,0,1,.2,.3);
-      //Draw(plunge,1,0,1,.3);
+    //auto gen = hgen(a,b,amtA);
+    // double dist = hdist(ca,cb);
 
-     /* //centers */
-     /*  auto ca = Ro::loc(sa); */
-     /*  auto cb = Ro::loc(sb); */
+    // Draw( cirA.boost(gen) );
+    // Draw( cirA.boost( versor * amtB * (1-dist)*.5 ),0,0,1 );
+    Draw (cirA.boost (versor * sdist * amtC * .5), 0, 1, 0);
 
-     /*  //transformation */
-     /*  auto gen = hgen(ca,cb, amtA); */
-     /*  Draw(gen,1,1,0); */
-     /*  auto xf = cirA.boost(gen); */
-     /*  Draw(xf,1,0,0,.5); */
+    //Draw(mysphere,0,1,.2,.3);
+    //Draw(plunge,1,0,1,.3);
 
-     // auto cirC = eab ^ EP;
+    /* //centers */
+    /*  auto ca = Round::loc(sa); */
+    /*  auto cb = Round::loc(sb); */
+
+    /*  //transformation */
+    /*  auto gen = hgen(ca,cb, amtA); */
+    /*  Draw(gen,1,1,0); */
+    /*  auto xf = cirA.boost(gen); */
+    /*  Draw(xf,1,0,0,.5); */
+
+    // auto cirC = eab ^ EP;
 
     //  reciprocal frames (dual spheres)
     //  auto rcpA = cirA <= pss;
@@ -158,29 +160,26 @@ struct MyApp : App {
     //  rcpB /= rcpB[3];
     //  auto rcpC = cirC <= pss;
 
-      //candidate transformation lines
-     // auto rta = rcpA ^ pa ^ EP;
-     // auto rtb = rcpB ^ pb ^ EP;
+    //candidate transformation lines
+    // auto rta = rcpA ^ pa ^ EP;
+    // auto rtb = rcpB ^ pb ^ EP;
     //  auto rtc = rcpC ^ pa ^ EP;
     //
-  
-  //  double dist = acosh(1-(hnorm(rcpA)<=hnorm(rcpB))[0]);
-  //  auto hline = rcpA ^ rcpB ^ EP;
-  //  auto hversor = EP<=hline; 
-  //  hversor /=hversor.rnorm();
-  //  Draw(hversor,1,1,0);
 
-   }
-
-  
+    //  double dist = acosh(1-(hnorm(rcpA)<=hnorm(rcpB))[0]);
+    //  auto hline = rcpA ^ rcpB ^ EP;
+    //  auto hversor = EP<=hline;
+    //  hversor /=hversor.rnorm();
+    //  Draw(hversor,1,1,0);
+  }
 };
 
 
-int main(){
-                             
+int main ()
+{
+
   MyApp app;
-  app.start();
+  app.start ();
 
   return 0;
-
 }

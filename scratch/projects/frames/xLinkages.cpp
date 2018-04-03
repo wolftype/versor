@@ -17,14 +17,15 @@
  */
 
 
-#include <vsr_app.h>
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_chain.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
 
-struct MyApp : App {
+struct MyApp : App
+{
 
   Pnt mouse;
   Lin ray;
@@ -32,85 +33,88 @@ struct MyApp : App {
   float amt, pinRatio, decayRate;
 
   int num = 20;
-  Chain chainA = Chain(num);
-  Chain chainB = Chain(num);
+  Chain chainA = Chain (num);
+  Chain chainB = Chain (num);
 
-  Point pnt = PT(.5,-2,0);
+  Point pnt = PT (.5, -2, 0);
 
 
-  void setup(){
-      bindGLV();
-      gui(amt,"amt",-100,100);
-      gui(pinRatio, "pinRatio",0,100)(decayRate,"decayRate",-100,100);
+  void setup ()
+  {
+    bindGLV ();
+    gui (amt, "amt", -100, 100);
+    gui (pinRatio, "pinRatio", 0, 100) (decayRate, "decayRate", -100, 100);
 
-      objectController.attach(&pnt);
+    objectController.attach (&pnt);
 
-      pinRatio = 1;
-      decayRate = 0;
+    pinRatio = 1;
+    decayRate = 0;
   }
 
-    virtual void onDraw(){
+  virtual void onDraw ()
+  {
 
-      mouse = calcMouse3D();
+    mouse = calcMouse3D ();
 
 
-      chainA[0].pos() = pnt;
+    chainA[0].pos () = pnt;
 
-      for (int i = 0; i < num; ++i){
-        Draw( chainA[i] ); Draw(chainB[i]);
-
+    for (int i = 0; i < num; ++i)
+      {
+        draw (chainA[i]);
+        draw (chainB[i]);
       }
 
-      double tpinRatio = pinRatio;
-      bool flip = false;
+    double tpinRatio = pinRatio;
+    bool flip = false;
 
-      for (int i = 0; i < num; i+=2){
+    for (int i = 0; i < num; i += 2)
+      {
 
         //Next chain element connects A and B (pivot)
-        Dls dlsA = chainA.nextSphere(i);
-        Dls dlsB = chainB.nextSphere(i);
+        Dls dlsA = chainA.nextSphere (i);
+        Dls dlsB = chainB.nextSphere (i);
 
         //Alternate dilation of A and B
-        Dls tdlsa = flip ? dlsA : dlsA.dil( dlsA.null(), log(tpinRatio) );
-        Dls tdlsb = !flip ? dlsB : dlsB.dil( dlsB.null(), log(tpinRatio) );
+        Dls tdlsa = flip ? dlsA : dlsA.dil (dlsA.null (), log (tpinRatio));
+        Dls tdlsb = !flip ? dlsB : dlsB.dil (dlsB.null (), log (tpinRatio));
 
         //Intersection
-        Par p = ( tdlsa ^ tdlsb ^ Dlp(0,0,1,0) ).dual();
-        Pnt pnt = Round::split(p,flip);
+        Par p = (tdlsa ^ tdlsb ^ Dlp (0, 0, 1, 0)).dual ();
+        Pnt pnt = Round::split (p, flip);
 
         //Set Chain Position of Next Element
-        chainA[i+1].pos() = pnt;
-        chainB[i+1].pos() = pnt;
+        chainA[i + 1].pos () = pnt;
+        chainB[i + 1].pos () = pnt;
 
         //Alternate next position ratio
-        double a = ( 1 /tpinRatio);
+        double a = (1 / tpinRatio);
         double b = tpinRatio;
 
         //chain + direction * ratio
-        chainA[i+2].pos() =  Round::null( chainA[i].vec() + ( ( chainA[i+1].vec() - chainA[i].vec() ) * (1 + ( (flip) ? b : a ) ) ) );
-        chainB[i+2].pos() =  Round::null( chainB[i].vec() + ( ( chainB[i+1].vec() - chainB[i].vec() ) * (1 + ( (flip) ? a : b ) ) ) );
+        chainA[i + 2].pos () = Round::null (
+          chainA[i].vec () + ((chainA[i + 1].vec () - chainA[i].vec ())
+                              * (1 + ((flip) ? b : a))));
+        chainB[i + 2].pos () = Round::null (
+          chainB[i].vec () + ((chainB[i + 1].vec () - chainB[i].vec ())
+                              * (1 + ((flip) ? a : b))));
 
         flip = !flip;
 
-        tpinRatio *= (1-decayRate);
+        tpinRatio *= (1 - decayRate);
 
-        Draw ( pnt );
+        draw (pnt);
+      }
 
-    }
-
-    chainA.joints();
-    chainB.joints();
-
+    chainA.calcJoints ();
+    chainB.calcJoints ();
   }
-
-
-
 };
 
 
-int main(){
+int main ()
+{
   MyApp app;
-  app.start();
+  app.start ();
   return 0;
 }
-
