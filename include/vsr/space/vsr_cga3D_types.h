@@ -90,6 +90,7 @@ using Tnt = NTnt<5>; ///< @ref TangentTrivector
 
 using Trs = NTrs<5>; ///< @ref Translator
 using Mot = NMot<5>; ///< @ref Motor
+using Grt = NGrt<5>; ///< @ref Motor
 using Trv = NTrv<5>; ///< @ref Transversor
 using Bst = NBst<5>; ///< @ref Boost
 using Con = NCon<5>; ///< @ref ConformalRotor

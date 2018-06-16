@@ -29,7 +29,6 @@ do
   esac
 done
 
-
 if [ $DO_UPDATE = 1 ]; then
   git submodule update --init --recursive
 fi

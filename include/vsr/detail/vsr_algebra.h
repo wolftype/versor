@@ -415,6 +415,7 @@ namespace vsr {
             using trv = typename algebra::template sum_basis_t<tnv, sca>;// 1 );
             using dil = typename algebra::template sum_basis_t<mnk, sca>;// 1 );
             using tsd = typename algebra::template sum_basis_t<flp, sca>;// 1 );
+            using grt = typename algebra::template sum_basis_t<dll, sca>;
             using mot = typename algebra::template gp_basis_t<rot, trs>;
             using bst = typename algebra::template sum_basis_t<par,sca>;
             using con = typename algebra::template gp_basis_t<par, par>;
@@ -450,6 +451,7 @@ namespace vsr {
             using Trv = Multivector<alg,trv>;
             using Dil = Multivector<alg,dil>;
             using Tsd = Multivector<alg,tsd>;
+            using Grt = Multivector<alg,grt>;
             using Mot = Multivector<alg,mot>;
             using Bst = Multivector<alg,bst>;
             using Con = Multivector<alg,con>;
@@ -485,6 +487,7 @@ namespace vsr {
             using transversor = Multivector<alg,trv>;
             using dilator = Multivector<alg,dil>;
             using translated_dilator = Multivector<alg,tsd>;
+            using general_rotation= Multivector<alg,grt>;
             using motor = Multivector<alg,mot>;
             using boost = Multivector<alg,bst>;
             using conformal_rotor = Multivector<alg,con>;
@@ -520,6 +523,7 @@ namespace vsr {
             using Transversor = Multivector<alg,trv>;
             using Dilator = Multivector<alg,dil>;
             using TranslatedDilator = Multivector<alg,tsd>;
+            using GeneralRotation = Multivector<alg,grt>;
             using Motor = Multivector<alg,mot>;
             using Boost = Multivector<alg,bst>;
             using ConformalRotor = Multivector<alg,con>;

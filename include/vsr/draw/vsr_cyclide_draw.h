@@ -25,7 +25,7 @@
  *
  *       Filename:  vsr_cyclide_draw.h
  *
- *    Description: temporary drawing routines for cyclides
+ *    Description:  temporary drawing routines for cyclides
  *
  *        Version:  1.0
  *        Created:  11/20/2015 18:09:09
@@ -61,7 +61,6 @@ struct CyclideMeshData{
   Vec pos;
   Vec normal;
 };
-
 
 /// Immediate Draw Routine of Cyclidic Patch, draws 4 Frames
 template<> void Renderable<CyclideQuad>::DrawImmediate(const CyclideQuad& s){

@@ -11,13 +11,13 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_twist.h>
 #include <vsr/form/vsr_differential.h>
 #include <vsr/form/vsr_graph.h>
@@ -27,9 +27,9 @@ using namespace vsr;
 using namespace vsr::cga;
 
 
-//Per Vertex Geometric Data 
+//Per Vertex Geometric Data
 struct MyData {
-  
+
   Point pnt;
   MyData(const Point& p=point(0,0,0) ) : pnt(p) { }
 
@@ -45,7 +45,7 @@ struct MyData {
   float kg = 0;
   float mean =0;   //gaussian and mean;
   float deficit;
-  
+
   vector<Simplicial2> simplex;  //simplicial domain
 
 };
@@ -75,13 +75,13 @@ struct MyApp : App {
 
   void setup(){
     bindGLV();
-    
+
     gui(amt,"amt",-100,100);               //<-- amt of transform
     gui(wt,"wt",-100,100);                 //<-- wt of diff
     gui(bUseCotan,"bUseCotan");            //<-- use TWOPI deficit formula
     gui(bExterior,"bExterior");            //<-- use vector derivatives then exterior
     gui(bDivideByArea,"bDivideByArea");    //<-- use vector derivatives then exterior
-    gui(bDrawMean,"bDrawMean");            //<-- draw mean color (vs gaussian) 
+    gui(bDrawMean,"bDrawMean");            //<-- draw mean color (vs gaussian)
     gui(bDrawNormals,"bDrawNormals");      //<-- draw normals
     gui(bDrawReciprocals,"bDrawReciprocals");     //<-- draw normals
 
@@ -106,7 +106,7 @@ struct MyApp : App {
       i->data().simplex = vector<Simplicial2>(num);
     }
   }
-  
+
   void onKeyDown(const gfx::Keyboard& k){
     if (k.code=='s') bTrackMouse = !bTrackMouse;
   }
@@ -120,7 +120,7 @@ struct MyApp : App {
     auto dll = Twist::Along( frame.dly(), amt,0);
     //transform data
     for(int i=0;i<mesh.num();++i){
-      auto& v = mesh[i].pnt; 
+      auto& v = mesh[i].pnt;
       auto& s = mesh.store(i).pnt;
       double dist = 1.0/(.1+fabs( Round::sqd(frame.pos(), s ) ) );
       auto motor = Gen::mot(dll*dist);
@@ -131,28 +131,28 @@ struct MyApp : App {
     //1. per node, calculate reciprocal simplices in neighborhood
     //2. (use edge node as root?)
     for(auto& i : graph.node() ){
-     
+
       auto& v = i->data();
       v.reset();
       auto& a = v.pnt;
       auto e = i->valence();        //per edge
       float area=0;
       float deficit = TWOPI;
-      
+
       for (int j=0;j<e.size();++j){
-       
+
         auto& b = e[j]->a().pnt;
         auto& c = e[j]->next->a().pnt;
         //auto simplex = Simplicial2(Vec(b),Vec(c),Vec(a));
         auto simplex = Simplicial2(Vec(b),Vec(c),Vec(a));
-        
+
         v.normal += simplex.derivative0(Vec(b),Vec(c),Vec(a));
 
         area += simplex.area;       //sum area
-        
+
         v.simplex[j] = simplex;
-       
-        //for comparison: the classic way of defining curvature as deficit from TWOPI 
+
+        //for comparison: the classic way of defining curvature as deficit from TWOPI
         deficit -= acos( ( ( Vec(c-a).unit() )<=( (Vec(b-a).unit()) ) )[0] );
 
       }
@@ -177,26 +177,26 @@ struct MyApp : App {
          auto& nb = e[j]->a().normal;
          auto& nc = e[j]->next->a().normal;
          v.curl += simplex[j].derivative(na,nb,nc);
-        
+
          //nope, unless summing around area
          v.dn += simplex[j].derivative0(nb,nc,na);
 
          area += simplex[j].area;
 
-         //for comparison, use of cotan formula 
-        
+         //for comparison, use of cotan formula
+
       }
-      
-      v.dn *= wt; 
+
+      v.dn *= wt;
       v.curl *= wt;
       if (bDivideByArea){ v.dn /= area; v.curl /= area; v.deficit /=area; }
       auto tmp0 = -(v.dn.duale() <= !(v.normal.duale())) [0];
       auto tmp = -(v.curl <= !(v.normal.duale()))[0];
       v.kg= bUseCotan ? v.deficit : tmp0;
 
-     // v.kg= bUseCotan ? v.deficit : tmp; 
+     // v.kg= bUseCotan ? v.deficit : tmp;
     }
-    
+
   }
 
   void onDraw(){

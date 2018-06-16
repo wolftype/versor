@@ -104,7 +104,6 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   {
 
     // Frame f;
-    cout << k.code << endl;
     switch (k.code)
       {
         case 'i':

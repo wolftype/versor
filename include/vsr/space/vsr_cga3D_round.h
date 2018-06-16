@@ -67,7 +67,6 @@ namespace vsr { namespace cga {
         @param r Radius (enter a negative radius for an imaginary sphere)
         @param 3 of coordinates
 
-
         @sa vsr::nga::dualSphere
     */
    static DualSphere dualSphere( VSR_PRECISION r, VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z);
@@ -204,6 +203,7 @@ namespace vsr { namespace cga {
 
     /*! Curvature of Round
         @param Round Element
+        @todo max radius in case of point
     */
     template<class A>
     static VSR_PRECISION

@@ -11,13 +11,13 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include "vsr_app.h"   
+#include "vsr/vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -29,10 +29,10 @@ struct Recip {
 };
 
 
-struct MyApp : App {    
+struct MyApp : App {
 
   Point mouse;
-     
+
   float time;
   float amt, amtA,amtB,amtC;
 
@@ -40,7 +40,6 @@ struct MyApp : App {
   Frame fa, fb, fc, fd;
 
   void setup(){
-      bindGLV();
       gui(amt,"amt",-100,100);
       gui(amtA,"amtA",-1,1);
       gui(amtB,"amtB",-1,1);
@@ -57,11 +56,11 @@ struct MyApp : App {
       fd.pos() = PT(1,-1,0);
 
   }
- 
-    virtual void onDraw(){ 
-        
+
+    virtual void onDraw(){
+
       mouse = calcMouse3D();
-            
+
       //Draw
       Draw(fa); Draw(fb); Draw(fc); Draw(fd);
 
@@ -88,9 +87,9 @@ struct MyApp : App {
       Draw(sphere,0,1,0,.3 );
 
   }
-   
 
-  
+
+
 };
 
 
@@ -99,7 +98,7 @@ int main(){
 
   MyApp app;
   app.start();
-  
+
   return 0;
 
 }

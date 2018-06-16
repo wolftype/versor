@@ -242,6 +242,8 @@ struct Euc{
 
     /*! ND Rotor from Bivector b
         @param b vsr::cga::Bivector or vsr::ega::Bivector
+
+        @todo if c == 0, return 1 (i.e. see Gen::bst case)
     */
     template<class A>
     static auto rot ( const A& b ) -> decltype( b + 1 ) {
@@ -289,6 +291,30 @@ struct Euc{
         return b * ( s / n);
     }
 
+
+    /*! Get DualLine Generator from a General Rotation
+          @param r vsr::cga::general_rotation
+
+          @todo test generic dimensionality of this log
+      */
+     template<class algebra>
+     static auto log(const GAGrt<algebra>& r) -> GADll<algebra> {
+
+        using TDll= GADll<algebra>;
+
+        VSR_PRECISION n;
+
+        TDll p;
+        p = r; //extract 2-blade part
+        VSR_PRECISION td = p.wt(); //get scalar
+
+        if (td > 0 ) { VSR_PRECISION s2 = sqrt(td);  n = asinh( s2 ) / s2; }
+        else if ( td == 0 ) { n = 1; }
+        else if (td < 0 ) { VSR_PRECISION s2 = sqrt(-td); n = atan2(s2, r[0] ) / s2; }
+
+        return p * n;
+
+      }
 
     /*! Get Pair Generator from a Conformal Boost
           @param r vsr::cga::Boost

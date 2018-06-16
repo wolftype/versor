@@ -18,20 +18,30 @@
 
 
 
-#ifndef  vsr_cga3D_conic_INC
-#define  vsr_cga3D_conic_INC
+#ifndef vsr_cga3D_conic_INC
+#define vsr_cga3D_conic_INC
 
 #include <vsr/form/vsr_conic.h>
+#include <vsr/space/vsr_cga3D_types.h>
 
-namespace vsr{
+namespace vsr {
 
-  namespace cga { namespace conic { namespace transform {
-  
-    auto point = [](const Point& p, Vec& v, VSR_PRECISION amt){
-      return Conic::Transform(p, v, amt);
-    };
+namespace cga {
+namespace conic {
+namespace transform {
 
-  }}} //cga3D::conic::transform
+//lambda function to transform point p (relative to origin)
+auto point = [](const cga::Point &p, Vec &v, VSR_PRECISION amt) {
+  return Conic::Transform (p, v, amt);
+};
 
+//lambda function to transform point p (relative to given center)
+auto point_cen = [](const cga::Point &p, const cga::Point &c, Vec &v,
+                         VSR_PRECISION amt) {
+  return Conic::Transform (p, c, v, amt);
+};
 }
-#endif   /* ----- #ifndef vsr_cga3D_conic_INC  ----- */
+}
+}  //cga3D::conic::transform
+}
+#endif /* ----- #ifndef vsr_cga3D_conic_INC  ----- */
