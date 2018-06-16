@@ -359,8 +359,8 @@ Bivectors are also just three elements long, and are built the same way Vectors 
 Some built-in Bivectors exist:
 
 	Biv::xy xy; //<-- XY Counterclockwise Unit Area Biv(1,0,0)
-	Biv::xz xy; //<-- XZ Counterclockwise Unit Area Biv(0,1,0)
-	Biv::yz xy; //<-- YZ Counterclockwise Unit Area Biv(0,0,1)
+	Biv::xz xz; //<-- XZ Counterclockwise Unit Area Biv(0,1,0)
+	Biv::yz yz; //<-- YZ Counterclockwise Unit Area Biv(0,0,1)
 
 While it is perfectly valid to write `Vector`, `Bivector` and `Rotor`, you'll notice I've truncated them to their three letter nicknames, `Vec` and `Rot`.
 That's up to you: Both long-name and nick-name versions are valid in libvsr (they are typedef'ed to each other).
