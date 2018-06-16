@@ -11,13 +11,13 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D_app.h"   
+#include "vsr_cga3D_app.h"
 #include "vsr_cga3D_frame.h"
 
 using namespace vsr;
@@ -34,19 +34,19 @@ namespace topo {
 
 }
 
-    void Immediate( const Cir& s, float th, float phi )  {  
+    void Immediate( const Cir& s, float th, float phi )  {
     VT rad = Ro::rad( s );
-      bool im = Ro::size(s, false) > 0 ? 1 : 0;  
-     
+      bool im = Ro::size(s, false) > 0 ? 1 : 0;
+
     //Op::AA(s).vprint();
     gfx::GL::translate( Op::Pos(s).begin() );
-    gfx::GL::rotate( Op::AA(s).begin() ); 
+    gfx::GL::rotate( Op::AA(s).begin() );
 
-      im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );            
-  }  
+      im ? gfx::Glyph::Circle( rad ) :  gfx::Glyph::DashedCircle( rad );
+  }
 
 struct MyApp : App {
- 
+
   //Some Variables
   bool bReset = false;
   float amt = 0;
@@ -62,13 +62,13 @@ struct MyApp : App {
     bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-    
+
     objectController.attach(&cir);
   }
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
@@ -97,7 +97,7 @@ struct MyApp : App {
       float t=(float)i/100 * (theta1 - theta2)/2.0;
       draw( sphere( s1.spin( Gen::mot( axis(cir).runit()*(TWOPI-t) ) ), .1), 0,0,1);
     }
-  
+
     auto wt = pair.wt() * PI;
 
     cout << "theta: " << theta1 - theta2 << " " << theta2-theta1 << endl;
@@ -112,14 +112,14 @@ struct MyApp : App {
 
     /* } */
 
-  
+
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

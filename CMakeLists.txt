@@ -59,7 +59,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLA
 #All .cpp files in src/space get built into libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 set(vsr_libraries vsr)
 
 #project include directories

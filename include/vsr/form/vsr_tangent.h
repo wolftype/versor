@@ -28,20 +28,24 @@ namespace cga {
 
 
 /// 3D Frame of Tangent Vectors (Point Pairs)
-//  @todo make a six-sphere system vsr_coord
-/// @todo currently inherits from Frame -- might want to be able to set parent class Frame::pos and Frame::rot from tangent info stored here.
-/// possibly make more method, and less memory, oriented
+///
+///  @todo make a six-sphere system vsr_coord
+///  @todo currently inherits from Frame --
+///  might want to be able to set parent class Frame::pos and Frame::rot
+///  from tangent info stored here.
+///  @todo possibly make more method-based, and less state-based
+///  @todo how many spheres about a circle?  any number?
 struct TangentFrame : public Frame
 {
-
   /// Coordinate Surface Spheres (Sigma)
   ///  Sphere through next point with tangents as below (needed or put in next level?)
   Sphere sphere[3];
-  /// \kappa
+  /// kappa Tangent Vectors (null point pairs)
   Pair tan[3];
-  /// Kappa
+  /// Kappa  Tangent Bivectors (null circles)
   Circle bitan[3];
-  /// Derivatives in every possible direction
+
+  /// @todo Derivatives in every possible direction
   //float curvature[6];
 
   /// Default Construct -- Store Frame as Tangents
@@ -50,7 +54,7 @@ struct TangentFrame : public Frame
   /// Copy Construct from Frame -- Store Frame as Tangents
   TangentFrame (const Frame &f) : Frame (f) { store (); }
 
-  /// Construct at position p w.r.t relative to TangentFrame
+  /// Construct at position p w.r.t TangentFrame
   TangentFrame (const Point &p, const TangentFrame tf) { set (p, tf); }
 
   /// Assignment to Frame
@@ -95,21 +99,20 @@ struct TangentFrame : public Frame
   }
 
   /// Set current tangents at position from relative TangentFrame
-  void set (const Point &p, const TangentFrame tf)
+  void set (const Point &p, const TangentFrame &tf)
   {
     this->pos () = p;
+    // hmm, could potentially work in any dimension
     for (int j = 0; j < 3; ++j)
       {
-        sphere[j] =
-          tf.bitan[j]
-          ^ p;  //note this outer product order really matters for reflections
+        //this outer product order really matters for symmetry
+        sphere[j] = tf.bitan[j] ^ p;
         bitan[j] = Tangent::at (sphere[j], p);
         tan[j] = bitan[j].dual ();
       }
   }
 
-
-  /// Flip direction of ith Tangent
+  /// Flip direction of ith Tangent (useful when chaining systems)
   TangentFrame &flip (int idx)
   {
     tan[idx] *= -1;
@@ -124,9 +127,8 @@ struct TangentFrame : public Frame
     for (int idx = 0; idx < 3; ++idx)
       {
         // normalize euclidean representation and reformulate
-        tf.sphere[idx] =
-          sphere[idx] / (Round::direction (
-                          sphere[idx])[0]);  //normalize coordinate surface?
+        // need to normalize coordinate surface?
+        tf.sphere[idx] = sphere[idx] / (Round::direction (sphere[idx])[0]);
         tf.bitan[idx] =
           Circle (
             Round::direction (bitan[idx]).copy<Biv> ().runit ().copy<Tnb> ())
@@ -153,35 +155,35 @@ struct TangentFrame : public Frame
     return c;
   }
 
+  /// Get x DirectionVector
+  Drv xdir () { return -Round::direction (tan[0]); }
+  /// Get y DirectionVector
+  Drv ydir () { return -Round::direction (tan[1]); }
+  /// Get z DirectionVector
+  Drv zdir () { return -Round::direction (tan[2]); }
 
-  Drv xdir () { return -Round::direction (tan[0]); }  ///< get x DirectionVector
-  Drv ydir () { return -Round::direction (tan[1]); }  ///< get y DirectionVector
-  Drv zdir () { return -Round::direction (tan[2]); }  ///< get z DirectionVector
-
-  /// Generate Boost Relative to x TangentVector (null Pair)
+  /// Generate Boost Relative to x Tangent Vector
   Bst xcurve (float amt) { return Gen::bst (tan[0] * amt * -.5); }
-  /// Generate Boost Relative to y TangentVector (null Pair)
+  /// Generate Boost Relative to y Tangent Vector
   Bst ycurve (float amt) { return Gen::bst (tan[1] * amt * -.5); }
-  /// Generate Boost Relative to z TangentVector (null Pair)
+  /// Generate Boost Relative to z Tangent Vector
   Bst zcurve (float amt) { return Gen::bst (tan[2] * amt * -.5); }
 
-  /// Generate Boost Relative to const x and const y TangentVector (null Pair)
+  /// Generate Boost Relative to const x and const y Tangent Vector
   Bst xycurve (float amtX, float amtY)
   {
-    return Gen::bst ((tan[0] * amtX + tan[1] * amtY)
-                     * -.5);  // + tan[2] *amtZ);
+    return Gen::bst ((tan[0] * amtX + tan[1] * amtY) * -.5);
   }
+
   /// Generate Boost Relative to x and z TangentVector (null Pair) (dx/dy + dz/dy)
   Bst xzcurve (float amtX, float amtZ)
   {
-    return Gen::bst ((tan[0] * amtX + tan[2] * amtZ)
-                     * -.5);  // + tan[2] *amtZ);
+    return Gen::bst ((tan[0] * amtX + tan[2] * amtZ) * -.5);
   }
   /// Generate Boost Relative to y and z TangentVector (null Pair)
   Bst yzcurve (float amtY, float amtZ)
   {
-    return Gen::bst ((tan[1] * amtY + tan[2] * amtZ)
-                     * -.5);  // + tan[2] *amtZ);
+    return Gen::bst ((tan[1] * amtY + tan[2] * amtZ) * -.5);
   }
 
   /// x = Constant Coordinate Surface from Boost generator

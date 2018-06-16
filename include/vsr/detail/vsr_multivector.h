@@ -466,6 +466,7 @@ template<typename algebra> using GADrt = Multivector< algebra, typename algebra:
 template<typename algebra> using GARot = Multivector< algebra, typename algebra::types::rot >;
 template<typename algebra> using GATrs = Multivector< algebra, typename algebra::types::trs >;
 template<typename algebra> using GADil = Multivector< algebra, typename algebra::types::dil >;
+template<typename algebra> using GAGrt = Multivector< algebra, typename algebra::types::grt >;
 template<typename algebra> using GAMot = Multivector< algebra, typename algebra::types::mot >;
 template<typename algebra> using GABst = Multivector< algebra, typename algebra::types::bst >;
 template<typename algebra> using GATrv = Multivector< algebra, typename algebra::types::trv >;
@@ -536,6 +537,7 @@ template<bits::type N, typename T=VSR_PRECISION> using NDrb = GADrb<conformal<N,
 template<bits::type N, typename T=VSR_PRECISION> using NTnb = GATnb<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using NTnt = GATnt<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using NDrt = GADrt<conformal<N,T>>;
+template<bits::type N, typename T=VSR_PRECISION> using NGrt = GAGrt<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using NMot = GAMot<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using NCon = GACon<conformal<N,T>>;
 
@@ -570,6 +572,7 @@ template<bits::type N, typename T=VSR_PRECISION> using conformal_Drb = GADrb<con
 template<bits::type N, typename T=VSR_PRECISION> using conformal_Tnb = GATnb<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using conformal_Tnt = GATnt<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using conformal_Drt = GADrt<conformal<N,T>>;
+template<bits::type N, typename T=VSR_PRECISION> using conformal_Grt = GAGrt<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using conformal_Mot = GAMot<conformal<N,T>>;
 template<bits::type N, typename T=VSR_PRECISION> using conformal_Con = GACon<conformal<N,T>>;
 

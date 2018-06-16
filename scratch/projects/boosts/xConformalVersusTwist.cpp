@@ -3,7 +3,7 @@
  *
  *       Filename:  xConformalVersusTwist.cpp
  *
- *    Description:  attempt to show benefits of conformal vs twist based tranforms
+ *    Description:  attempt to show benefits of conformal vs twist transforms
  *
  *        Version:  1.0
  *        Created:  06/26/2015 14:37:01
@@ -18,18 +18,18 @@
 
 
 
-
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_twist.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 
-struct MyApp : App {
- 
+struct MyApp : App
+{
+
   //Some Variables
   bool bReset = false;
-  float amt,theta = 0;
+  float amt, theta = 0;
 
   bool bDrawMotor, bDrawBoost;
 
@@ -39,67 +39,65 @@ struct MyApp : App {
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
-  void setup(){
-    ///Bind Gui
-    bindGLV();
+  void setup ()
+  {
     ///Add Variables to GUI
-    gui(theta,"theta",-TWOPI, TWOPI)(amt,"amt",-100,100)(bReset,"bReset");
-    gui(bDrawMotor,"bDrawMotor")(bDrawBoost,"bDrawBoost");
-   
-   
-    objectController.attach(&f); 
+    gui (theta, "theta", -TWOPI, TWOPI) (amt, "amt", -100, 100) (bReset,
+                                                                 "bReset");
+    gui (bDrawMotor, "bDrawMotor") (bDrawBoost, "bDrawBoost");
 
-    p.resize(10,1,10,1);
-    for (int i =0;i<p.num();++i){
-        p[i] = Pair(Tnv(0,1,0)).translate(p.grid(i));
-    }
+
+    objectController.attach (&f);
+
+    p.resize (10, 1, 10, 1);
+    for (int i = 0; i < p.num (); ++i)
+      {
+        p[i] = Pair (Tnv (0, 1, 0)).translate (p.grid (i));
+      }
 
     bDrawMotor = bDrawBoost = 0;
 
-    f.pos(0,1,0);
+    f.pos (0, 1, 0);
   }
 
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
-  void onDraw(){
+  void onDraw ()
+  {
 
+    for (int i = 0; i < p.num (); ++i)
+      {
 
-     
+        auto dist = 1.0 / (.01 + Round::dist (p.grid (i), f.pos ()));
 
-    for (int i = 0;i < p.num();++i ){
-      
-      auto dist = 1.0 / (.01 + Round::dist(p.grid(i),f.pos()));
+        auto motor = Gen::mot (Twist::Along (f.dlz (), theta, amt) * dist);
+        auto boost = Gen::boost (f.tz () * amt * dist);
 
-     auto motor = Gen::mot( Twist::Along( f.dlz(), theta, amt) * dist );
-     auto boost = Gen::boost( f.tz() * amt * dist );
+        auto pa = Round::loc (p.grid (i).spin (motor));
+        auto pb = Round::loc (p.grid (i).spin (boost));
 
-      auto pa = Round::loc( p.grid(i).spin( motor ));
-      auto pb = Round::loc ( p.grid(i).spin( boost ));
+        auto ta = p[i].spin (motor);
+        auto tb = p[i].spin (boost);
 
-      auto ta = p[i].spin(motor);
-      auto tb = p[i].spin(boost);
+        if (bDrawMotor)
+          gfx::DrawAt (-Round::dir (ta), pa);
+        if (bDrawBoost)
+          gfx::DrawAt (-Round::dir (tb), pb);
+      }
 
-      if (bDrawMotor) DrawAt( -Round::dir(ta), pa );
-      if (bDrawBoost) DrawAt( -Round::dir(tb), pb );
-    }
-
-    Draw(f); 
-    Draw(p,0,1,0);
-
-  
+    draw (f);
+    draw (p, 0, 1, 0);
   }
-  
 };
 
 
-int main(){
-                             
+int main ()
+{
   MyApp app;
-  app.start();
+  app.start ();
 
   return 0;
-
 }

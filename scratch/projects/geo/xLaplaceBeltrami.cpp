@@ -15,10 +15,11 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"
+#include "vsr/vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
 struct MyApp : App
 {
@@ -38,39 +39,44 @@ struct MyApp : App
     gui (amt, "amt", -100, 100);
     gui (amtB, "amtB", -100, 100);
     gui (bReset, "reset") (bUseRecip, "bUseRecip");
+
+    objectController.attach (&frame);
   }
 
   virtual void onDraw ()
   {
 
-    mouse = CalcMouse3D ();
+    mouse = calcMouse3D ();
 
-    vector<Pnt> pnt (7);
-
-    static Frame frame (0, 3, 0);
-    Touch (interface, frame);
+    //Control frame
     Draw (frame.ty (), 0, 1, 0);
 
-    for (int i = 0; i < 7; ++i)
+    //Create Vertices based on a Boost relative to a tangent
+    //(Cause it's easy)
+    int numverts = 7;
+    vector<Pnt> pnt (numverts);
+    for (int i = 0; i < numverts; ++i)
       {
-        Pnt pa = i == 6
+        //spin Vec::x about xz plane and put a frame there
+        int tnum = numverts - 1;
+        Pnt pa = i == tnum
                    ? PAO
-                   : Vec (1, 0, 0).rot (Biv::xz * PI * amtB * i / 6.0).null ();
+                   : Vec (1, 0, 0).rot (Biv::xz * PI * amtB * i / tnum).null ();
         Frame tf (pa);
 
-        auto dist = 1.0 / Ro::dist (tf.pos (), frame.pos ());
+        //effect parameterized by inverse distance
+        auto dist = 1.0 / Round::dist (tf.pos (), frame.pos ());
         auto bst = Gen::bst (frame.ty () * amt * dist);
-
         Par par = tf.ty ().spin (bst);
-        Pnt np = Ro::loc (par);
+        Pnt np = Round::loc (par);
         pnt[i] = np;
+
         Draw (pnt[i]);
         Draw (par);
-        // DrawAt(Ro::dir(par).copy<Vec>(), pa, 0,1,0);
       }
 
-    Pnt c = pnt[6];
-
+    //center
+    Pnt c = pnt[numverts - 1];
 
     Vec sum, gsum, dsum, vsum;
     Biv asum, bsum;
@@ -87,17 +93,14 @@ struct MyApp : App
     float wt = 0;
     float vwt = 0;
     float gwt = 0;
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < numverts - 1; ++i)
       {
-        int n = (i < 5) ? i + 1 : 0;
-        int p = (i > 0) ? i - 1 : 5;
+        int n = (i < numverts - 2) ? i + 1 : 0;
+        int p = (i > 0) ? i - 1 : numverts - 2;
 
-        cen[i] = Ro::loc (c ^ pnt[i] ^ pnt[n]);
-        cen[p] = Ro::loc (c ^ pnt[p] ^ pnt[i]);
-
-
-        //plane bisector difference
-        //Dlp dlp = pnt[i] - c;
+        //centers of adjacent triangles
+        cen[i] = Round::loc (c ^ pnt[i] ^ pnt[n]);
+        cen[p] = Round::loc (c ^ pnt[p] ^ pnt[i]);
 
         //valences
         Vec cur = Vec (pnt[i] - c);
@@ -169,15 +172,11 @@ struct MyApp : App
         //        Vec vb = Op::pj( grad2[i], next );//area[i].duale() );
         //        Vec va = Op::pj( grad[i], e2 );//tmp.duale() );
         //        Vec vb = Op::pj( grad2[i], e );//area[i].duale() );
-        Vec tv =
-          ea
-          / cur
-              .norm ();  //Op::pj(ei,cur)/cur.norm();//da + db;//cur*gcnorm;//(va+vb);//(grad[i]^grad2[i]).duale();
+        Vec tv = ea / cur.norm ();
+        //Op::pj(ei,cur)/cur.norm();//da + db;//cur*gcnorm;//(va+vb);//(grad[i]^grad2[i]).duale();
         DrawAt (tv, pnt[i], 0, 0, 1);
-        gsum +=
-          bUseRecip
-            ? tv
-            : (cur * gcnorm);  //( grad[i] + grad2[i] )/((area[i]/2).rnorm());
+        gsum += bUseRecip ? tv : (cur * gcnorm);
+        //( grad[i] + grad2[i] )/((area[i]/2).rnorm());
 
 
         auto dotA = Vec (pnt[i] - pnt[n]).unit () <= Vec (c - pnt[n]).unit ();
@@ -234,22 +233,12 @@ struct MyApp : App
 };
 
 
-MyApp *app;
-
 
 int main ()
 {
 
-  GLV glv (0, 0);
-
-  Window *win = new Window (500, 500, "Versor", &glv);
-  app = new MyApp (win);
-  app->initGui ();
-
-
-  glv << *app;
-
-  Application::run ();
+  MyApp app;
+  app.start ();
 
   return 0;
 }

@@ -13,7 +13,7 @@ namespace vsr{
   struct nada {
 
   };
- 
+
  /*! Templated half edge structure (pointers to any type, with any type at any edge)
   *  Navigates references to surface topology of data only (DOES NOT STORE DATA)
   *
@@ -22,30 +22,30 @@ namespace vsr{
 
       @todo generalize half-edge data structure to any dimension
       @todo add templates to faces as well
-  */ 
+  */
  template<class T, class E=nada>
  struct HEGraph {
 
-   struct HalfEdge;                     
+   struct HalfEdge;
    struct Face;
    struct Node;
-   
+
 
    /*!
     *  A Node stores address of value of type T and pointer to an emanating edge.
     *  It includes functions for finding all emanating edges, faces, connected neighbors,
-    *  and a boolean visitation flag that can be set to avoid endless looping algorithms  
+    *  and a boolean visitation flag that can be set to avoid endless looping algorithms
     */
    struct Node {
 
      Node() : ptr(NULL), edge(NULL), bVisited(false){}
 
      T * ptr;                           ///< Pointer to type T
-     HalfEdge * edge;                   ///< An emanating half-edge      
+     HalfEdge * edge;                   ///< An emanating half-edge
      bool bVisited;                     ///< Flag for keeping track of visitation
 
      /// Get reference to data;
-     T& data() { return *ptr; }    
+     T& data() { return *ptr; }
      /// Get const reference to data
      T data() const { return *ptr; }
 
@@ -54,7 +54,7 @@ namespace vsr{
 
      /// Find all emanating edges
      vector<HalfEdge*> valence() const;
-     
+
      /// Find edge loop (next of all emanating edges)
      vector<HalfEdge*> edgeLoop() const;
 
@@ -63,7 +63,7 @@ namespace vsr{
 
     // bool bClosed; //maybe save state for cheaper comp
 
-     /// Find any null edge of a node 
+     /// Find any null edge of a node
      HalfEdge& null();
 
      /// Find both null edges around a node
@@ -81,38 +81,38 @@ namespace vsr{
      bool visited(){ return bVisited; }
      /// set visitation flag value to zero
      void reset() { bVisited=false; }
-        
+
    };
 
 
 
-      
+
    /*!
-    * HALF EDGE Data structure 
+    * HALF EDGE Data structure
     */
-   struct HalfEdge{ 
+   struct HalfEdge{
 
      //int id;
-     
+
      HalfEdge() : node(NULL), face(NULL), opp(NULL), next(NULL), bVisited(false)
      {}
-         
+
      E * ptr;                      ///< Pointer to data assigned to each edge (e.g. constraint)
      /// Get reference to data;
-     E& data() { return *ptr; }    
+     E& data() { return *ptr; }
      /// Get const reference to data
      E data() const { return *ptr; }
-         
-     bool bVisited;                ///< Whether visited? 
 
-          
+     bool bVisited;                ///< Whether visited?
+
+
      Node    * node;                ///< Incident vertex
      Face    * face;                ///< Face membership
-    
+
      HalfEdge  * opp;               ///< Opposite half-edge
      HalfEdge  * next;              ///< Next half-edge counterclockwise
 
-     HalfEdge& prev() { return *(next -> next); }  ///< Reference to Previous Edge (clockwise) 
+     HalfEdge& prev() { return *(next -> next); }  ///< Reference to Previous Edge (clockwise)
 
      T& a() { return node -> data(); }             ///< Reference to T data at incident node
      T& b() { return prev().node -> data(); }      ///< Reference to T data at other end
@@ -126,17 +126,17 @@ namespace vsr{
         next = &(*e.next);
      }
 
-    /// Find next null edge 
+    /// Find next null edge
     /// (assumes this edge is null)
-    /// Could be on same face . . . 
+    /// Could be on same face . . .
      HalfEdge& nextNull(bool clockwise){
-        
+
         if (clockwise){
           HalfEdge * e = next -> opp;
           HalfEdge * t = next;
           while (e !=NULL){
               t = e -> next;
-              e = e -> next -> opp;   
+              e = e -> next -> opp;
           }
           return *t;
         } else {
@@ -144,7 +144,7 @@ namespace vsr{
           HalfEdge * t = next -> next;
           while (e !=NULL){
               t = e -> next -> next;
-              e = e -> next -> next -> opp;   
+              e = e -> next -> next -> opp;
           }
           return *t;
 
@@ -179,7 +179,7 @@ namespace vsr{
         if ( &nextNull(true) == &(eb.nextNull(false)) ) return true;
         else return false;
      }
-    
+
      /// Edge Looop around graph until we return to this (or until null edge)
     /* vector<HalfEdge*> loop(){ */
     /*   vector<HalfEdge*> redge; */
@@ -198,7 +198,7 @@ namespace vsr{
 
    };
 
-   
+
    struct Face {
 
      Face() : edge(NULL) {}
@@ -251,28 +251,28 @@ namespace vsr{
    //once three nodes exist, seed them into a facet (starts with b)
     void seedNodes(){
 
-        Node *na, *nb, *nc; 
+        Node *na, *nb, *nc;
         HalfEdge *ea, *eb, *ec;
         Face *f;
-        
+
         na = &(*(mNode[0]));  nb = &(*( mNode[1] ));  nc = &(*(mNode[2]));
 
-         
-        ea = new HalfEdge; 
-        eb = new HalfEdge; 
-        ec = new HalfEdge;
-        
-        f = new Face(); 
 
-        //Assign a edge incident to b, b edge incident to c, etc      
-        ea -> node = na;//nb;  
-        eb -> node = nb;//nc; 
-        ec -> node = nc;//na; 
-        
+        ea = new HalfEdge;
+        eb = new HalfEdge;
+        ec = new HalfEdge;
+
+        f = new Face();
+
+        //Assign a edge incident to b, b edge incident to c, etc
+        ea -> node = na;//nb;
+        eb -> node = nb;//nc;
+        ec -> node = nc;//na;
+
         f -> edge = ea; //Pick any old edge
 
         na -> edge = eb; //emanating
-        nb -> edge = ec; 
+        nb -> edge = ec;
         nc -> edge = ea;
 
         ea -> next = eb; ea -> face = f;  // assign next edge and face
@@ -290,7 +290,7 @@ namespace vsr{
 
 
     void facet( HalfEdge * ea, HalfEdge * eb, HalfEdge * ec, Face * f){
-      
+
       ea -> next = eb;  eb -> next = ec; ec -> next = ea;
       ea -> face = f; eb -> face = f; ec -> face = f;
 
@@ -308,29 +308,29 @@ namespace vsr{
 
     //add faces and edges to nodes that already exist
     HEGraph& fillFace( int a, int b, int c ){
-      
-      Node *na, *nb, *nc; 
+
+      Node *na, *nb, *nc;
       HalfEdge *ea, *eb, *ec;
       Face *f;
 
       na = mNode[a];
       nb = mNode[b];
       nc = mNode[c];
-      
-      ea = new HalfEdge; 
-      eb = new HalfEdge; 
+
+      ea = new HalfEdge;
+      eb = new HalfEdge;
       ec = new HalfEdge;
-      
-      f = new Face(); 
+
+      f = new Face();
 
       na -> edge = eb; //emanating
-      nb -> edge = ec; 
+      nb -> edge = ec;
       nc -> edge = ea;
-     
-       //Assign a edge incident to b, b edge incident to c, etc      
-      ea -> node = na;//nb;  
-      eb -> node = nb;//nc; 
-      ec -> node = nc;//na; 
+
+       //Assign a edge incident to b, b edge incident to c, etc
+      ea -> node = na;//nb;
+      eb -> node = nb;//nc;
+      ec -> node = nc;//na;
 
       mHalfEdge.push_back(ea);
       mHalfEdge.push_back(eb);
@@ -342,12 +342,12 @@ namespace vsr{
       facet(ea,eb,ec,f);
 
       return *this;
-       
+
     }
 
 
-    HEGraph& add( T& v ) {  
-      int num = mNode.size();      
+    HEGraph& add( T& v ) {
+      int num = mNode.size();
       if (num < 3 )  addNode( v );
       if (num == 2 ) seedNodes(); //if num was 2 coming in, it is now 3 so seed
       if (num >= 3 ) addAt ( v, lastEdge() );
@@ -361,8 +361,8 @@ namespace vsr{
 
       Node * n = new Node;
 
-      HalfEdge * ea = new HalfEdge; 
-      HalfEdge * eb = new HalfEdge; 
+      HalfEdge * ea = new HalfEdge;
+      HalfEdge * eb = new HalfEdge;
       HalfEdge * ec = new HalfEdge;
 
       Face * f = new Face;
@@ -375,24 +375,24 @@ namespace vsr{
       ea -> face = f; eb -> face = f; ec -> face = f;
 
       //incidence: ea is outgoing edge from new node, ec is incident edge to it, eb shares with argument
-      n -> ptr = &v; 
+      n -> ptr = &v;
       n -> edge = ea;
       ec -> node = n;
 
       e.opp = eb; eb -> opp = &e;
 
-      ea -> node = e.node; 
-      eb -> node = e.next -> next -> node; 
+      ea -> node = e.node;
+      eb -> node = e.next -> next -> node;
 
-      //Store     
+      //Store
       mNode.push_back(n);
-      
+
       mHalfEdge.push_back(ea);
       mHalfEdge.push_back(eb);
       mHalfEdge.push_back(ec);
 
       mFace.push_back(f);
-      
+
       return *this;
     }
 
@@ -413,27 +413,27 @@ namespace vsr{
       Node * n = new Node;
       Face * f = new Face;
 
-      ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;  
+      ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
 
       //Assign, new face
       ea -> set( e ); //equal . . .
       ea -> face = f; f -> edge = ea; // . . . except for face
-  
-      ec->opp = eb; eb->opp  = ec; 
-      ec->next = ea; 
+
+      ec->opp = eb; eb->opp  = ec;
+      ec->next = ea;
       ec->node = n;
       ec->face = f;
-    
+
       eb->node = &(*(e.next -> node));
       eb->next = &(*(e.next -> next));
       eb->face = &(*(e.face));
-      
+
       n -> ptr = &pa; n -> edge = ea;
-      
+
       e.next -> face = f;
       e.next -> next = ec;
 
-      e.node = n; e.next = eb;       
+      e.node = n; e.next = eb;
       e.face -> edge = &e;
 
       //Store
@@ -452,13 +452,13 @@ namespace vsr{
 
       //add an edge and a face
       Face * f = new Face;
-      
+
       HalfEdge *ea, *eb, *ec;
       ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
-      
+
       //make facet
       facet( ea,eb,ec,f);
-      
+
       ea -> node = hb.prev().node;
       ec -> node = hb.node;
       eb -> node = ha.prev().node;
@@ -478,11 +478,11 @@ namespace vsr{
 
       //a new face
       Face * f = new Face;
-      
+
       //3 new halfEdges
       HalfEdge *ea, *eb, *ec;
       ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
-      
+
       //make facet
       facet( ea,eb,ec,f);
 
@@ -505,10 +505,10 @@ namespace vsr{
    void close( HalfEdge& e ){
       //add edges and a face
       Face * f = new Face;
-      
+
       HalfEdge *ea, *eb, *ec;
       ea = new HalfEdge; eb = new HalfEdge; ec = new HalfEdge;
-      
+
       //make facet
       facet( ea,eb,ec,f);
 
@@ -548,9 +548,9 @@ namespace vsr{
 
     /// given an edge loop around a node, find next outer edge loop
     vector<HalfEdge*> edgeLoop0( vector<HalfEdge*> loop ){//const Node& n){
-      
+
       vector<HalfEdge*> result;
-      
+
       if (!loop.empty()){
         //pick one node and get emanating edges
         auto v = loop[0]->node->valence();
@@ -571,11 +571,11 @@ namespace vsr{
         }
 
        //assuming we found a new emanating edge, add all first
-        //cw edges that don't point back 
+        //cw edges that don't point back
         //until we get back to first or hit border
         HalfEdge * tmp = first;
         while (tmp!=NULL && (tmp->node != first->node)  ){
-          
+
           bool bExists=false;
           tmp = tmp->next;
           for (auto& j : loop){
@@ -586,8 +586,8 @@ namespace vsr{
            }
            if (bExists) tmp = tmp->opp; //repeat
            else {
-            result.push_back(tmp); 
-           }        
+            result.push_back(tmp);
+           }
         }
       }
 
@@ -596,11 +596,11 @@ namespace vsr{
 
   /// emanating edges from an input loop of emanating edges
   vector<HalfEdge*> emanatingEdges( vector<HalfEdge*> loop ){
-      
+
       HalfEdge * first = NULL;
 
       vector<HalfEdge*> result;
-     
+
       for(auto& i : loop){
         if (i->opp!=NULL){
           result.push_back(i->opp->next);
@@ -612,18 +612,18 @@ namespace vsr{
     vector<HalfEdge*> edgeLoop( vector<HalfEdge*> loop ){
 
             int maxNum = 100;
-    
+
             vector<HalfEdge*> result;
             HalfEdge * tmp = NULL;
-    
+
             if (!loop.empty()){
-    
+
               //does loop close?
               bool bClosed = loop.back()->node == loop[0]->prev().node;
-    
+
               //Get Emanating Edges
               auto edges = emanatingEdges(loop);
-    
+
               //if not closed, connect edge to first emanating edge
               //(if first emanating edge isn't already on border)
               if (!bClosed){
@@ -638,7 +638,7 @@ namespace vsr{
                     result.push_back(tmp);
                     tmp = tmp->next;
                     result.push_back(tmp);
-    
+
                     iter =0;
                     while(tmp->node != edges[0]->node && iter<maxNum){
                       tmp = tmp->next->opp->next;
@@ -646,12 +646,12 @@ namespace vsr{
                       iter++;
                     }
                   } else if (edges.size()>2) {
-                    result.push_back(tmp);          
+                    result.push_back(tmp);
                   }
-    
+
                 }
               }
-    
+
               //Connect emanating edges (avoiding original loop's nodes)
               for (int i=0; i<edges.size();++i){
                 tmp = edges[i];
@@ -660,7 +660,7 @@ namespace vsr{
                 while ( tmp!=NULL && tmp->node != edges[nxt]->node && iter < maxNum){
                   iter++;
                   tmp = tmp->next;
-    
+
                   bool bExists=false;
                   for (auto& j : loop){
                     if ( (j->node==tmp->node) || (j->next->next->node==tmp->node) ){
@@ -668,23 +668,23 @@ namespace vsr{
                       break;
                     }
                   }
-    
+
                   if (bExists) {
                     if (tmp->opp==NULL){
                        result.push_back(tmp);
                     }
                     tmp = tmp->opp;
                    } else {
-                    result.push_back(tmp); 
-                   }        
+                    result.push_back(tmp);
+                   }
                }
               }
-    
+
             }
-    
+
             return result;
     }
-    
+
 
     //all nodes connected to a node
     /* vector<Node*> nodeLoop( Node& a){ */
@@ -721,21 +721,21 @@ namespace vsr{
 
       vector<HalfEdge*> tmp;
       int it = -1;
-      
+
       for (int it = 0; it < mHalfEdge.size(); ++it){
-          
+
           if ( mHalfEdge[it] -> opp != NULL ) continue;
-          
+
           else {
-             
+
              HalfEdge * he = mHalfEdge[it];
-             
-             do{          
+
+             do{
                 tmp.push_back( he );
-                he = &(he -> nextNull() ); 
-             } while ( he != mHalfEdge[it] ); 
-             
-             return tmp;  
+                he = &(he -> nextNull() );
+             } while ( he != mHalfEdge[it] );
+
+             return tmp;
          }
       }
     }
@@ -787,12 +787,12 @@ namespace vsr{
     vector<Face*>        mFace;
     vector<Node*>        mNode;
 
- };   
+ };
 
 
      //NODE METHODS
     template<class T,class E>
-    inline typename HEGraph<T,E>::HalfEdge& HEGraph<T,E>::Node::null(){     
+    inline typename HEGraph<T,E>::HalfEdge& HEGraph<T,E>::Node::null(){
       HEGraph::HalfEdge * e = edge -> opp;
       while ( e != NULL && e != edge -> next -> next ){
         e = e -> next -> opp;
@@ -805,7 +805,7 @@ namespace vsr{
       HEGraph::HalfEdge * e = edge -> opp;
       if (e == NULL) return false;
       while ( e != edge -> next -> next ){
-          e = e -> next -> opp; 
+          e = e -> next -> opp;
           if (e == NULL) return false;
       }
       return true;
@@ -829,31 +829,31 @@ namespace vsr{
       return tmp;
     }
 
-    
+
     //edge loop around a node collects (emanating) edges
     template<class T,class E>
     inline vector<typename HEGraph<T,E>::HalfEdge*> HEGraph<T,E>::Node::valence() const {
         vector<HEGraph::HalfEdge*> tmp;
         HEGraph::HalfEdge * e = edge;
-       
+
         if (closed()){
-       
+
           do {
             tmp.push_back(e);
             e = e -> next -> next -> opp;
           } while( e != edge );
-       
-          return tmp; 
-       
+
+          return tmp;
+
         } else {
-          //if it doesn't loop around to the beginning, 
+          //if it doesn't loop around to the beginning,
           //iterate to end in clockwise direction, and then add in counter clockwise
           auto te = edge->opp;
           while (te != NULL ){
             e = te->next;
             te = te->next->opp;
           }
-          //now e is cw most edge, add in all . . . there will always be one node left.. 
+          //now e is cw most edge, add in all . . . there will always be one node left..
           while(e != NULL){
             tmp.push_back(e);
             e = e -> next -> next -> opp;
@@ -890,7 +890,7 @@ namespace vsr{
       for(auto& i : res){
         tmp.push_back( i->node );
       }
-      if( !closed() ) tmp.push_back( res.back()->next->node ); 
+      if( !closed() ) tmp.push_back( res.back()->next->node );
       return tmp;
     }
 
@@ -902,7 +902,7 @@ namespace vsr{
     /*   for(auto& i : res){ */
     /*     tmp.push_back( i->node ); */
     /*   } */
-    /*   if( !closed() ) tmp.push_back( res.back()->next->node ); */ 
+    /*   if( !closed() ) tmp.push_back( res.back()->next->node ); */
     /*   return tmp; */
     /* } */
 
@@ -928,7 +928,7 @@ namespace vsr{
           else graph.addAt( p[idx], graph.edge(-3) );
           //add next row over
           if (j==0) graph.add( p[idxB] );//adds b
-          //else if (j<2) graph.addAt( p[idxB], graph.edge(-3) ); 
+          //else if (j<2) graph.addAt( p[idxB], graph.edge(-3) );
           else  graph.addAt( p[idxB], graph.edge(-1) );       //add to last edge
       }
 
@@ -939,9 +939,9 @@ namespace vsr{
         graph.addAt( p[pidx], graph.edge( idx ) );
         graph.addAt( p[pidxB], graph.edge(-3) );
         for (int j = 2; j < h; ++j){
-           int pidxC = i * h + j; 
+           int pidxC = i * h + j;
             graph.close( graph.edge(-3), graph.edge( idx + (j-1) * 6 ) );
-            graph.add( p[pidxC] );  
+            graph.add( p[pidxC] );
         }
       }
 
@@ -989,23 +989,23 @@ namespace vsr{
     /*    Node *na, *nb, *nc; */
     /*    HalfEdge *ea, *eb, *ec; */
     /*    Face *f; */
-        
-    /*     na = new Node; nb = new Node; nc = new Node; */
-         
-    /*     ea = new HalfEdge; */ 
-    /*     eb = new HalfEdge; */ 
-    /*     ec = new HalfEdge; */
-        
-    /*     f = new Face(); */ 
 
-    /*     //Assign a edge incident to b, b edge incident to c, etc */      
-    /*     ea -> node = nb; */  
-    /*     eb -> node = nc; */ 
-    /*     ec -> node = na; */ 
-        
-    /*     na -> ptr  = &pa; */ 
-    /*     nb -> ptr  = &pb; */ 
-    /*     nc -> ptr  = &pc; */ 
+    /*     na = new Node; nb = new Node; nc = new Node; */
+
+    /*     ea = new HalfEdge; */
+    /*     eb = new HalfEdge; */
+    /*     ec = new HalfEdge; */
+
+    /*     f = new Face(); */
+
+    /*     //Assign a edge incident to b, b edge incident to c, etc */
+    /*     ea -> node = nb; */
+    /*     eb -> node = nc; */
+    /*     ec -> node = na; */
+
+    /*     na -> ptr  = &pa; */
+    /*     nb -> ptr  = &pb; */
+    /*     nc -> ptr  = &pc; */
 
     /*     f -> edge = ea; //Pick any old edge */
 
@@ -1031,7 +1031,7 @@ namespace vsr{
     /* void close( T& p ){ */
     /*   //should make a new face */
     /*   Face * f = new Face; */
-      
+
     /*   HalfEdge *ea = new HalfEdge; */
     /*   HalfEdge *eb = new HalfEdge; */
     /*   HalfEdge *ec = new HalfEdge; */
@@ -1042,7 +1042,7 @@ namespace vsr{
 
     /*   HalfEdge& edge = lastEdge(); */
     /*   edge.opp = eb; */
-      
+
     /*   mFace.push_back(f); */
     /*   mHalfEdge.push_back(ea); */
     /*   mHalfEdge.push_back(eb); */
@@ -1055,7 +1055,7 @@ namespace vsr{
 
     /*   //should make a new face */
     /*   Face * f = new Face; */
-      
+
     /*   HalfEdge *ea = new HalfEdge; */
     /*   HalfEdge *eb = new HalfEdge; */
     /*   HalfEdge *ec = new HalfEdge; */

@@ -6,6 +6,7 @@
  *    Description:  calculate normals at vertices of a mesh using reciprocal frames
  *
  *    assumptions: sum of reciprocal frames along loop around vertex returns normal at vertex
+ *    (area-gradient)
  *
  *        Version:  1.0
  *        Created:  04/07/2014 14:46:56
@@ -19,7 +20,7 @@
  */
 
 
-#include "vsr_cga3D.h"   
+#include "vsr_cga3D.h"
 #include "vsr_GLVimpl.h"
 #include "gfx/gfx_mesh.h"
 #include "vsr_graph.h"
@@ -39,12 +40,12 @@ struct VertexData {
 //DRAWING THE MESH GRAPH
 template<class T>
 void Drw( HEGraph<T>& graph){
-  
+
   for (int i = 0; i < graph.edge().size(); ++i){
-  
+
       if ( graph.edge(i).opp == NULL ) glColor3f(1,0,0);
       else glColor3f(0,1,0);
-    
+
       T& a = graph.edge(i).a();
       T& b = graph.edge(i).b();
      glBegin(GL_LINES);
@@ -90,7 +91,7 @@ vector<Dlp> rframe(const Pnt& pa, const Pnt& pb, const Pnt& pc){
     rpa /= (-sqnorm);
     rpb /= (-sqnorm);
     rpc /= (-sqnorm);
-    
+
     vector<Dlp> recip;
 
     recip.push_back(rpa);
@@ -111,8 +112,8 @@ Pnt tnull(const T& t){
 /*-----------------------------------------------------------------------------
  *  app
  *-----------------------------------------------------------------------------*/
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -128,14 +129,14 @@ struct MyApp : App {
   bool bNorm;
 
   MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
+    scene.camera.pos( 0,0,10 );
     time = 0;
 
-    int w = 5; 
+    int w = 5;
     int h = w;
     mesh = Mesh::Grid2D(w,h,1);
     for (auto& i: mesh.vertex()){
-      vdata.push_back( { tnull(i.Pos), Dlp() } ); 
+      vdata.push_back( { tnull(i.Pos), Dlp() } );
     }
     heg.UV(w,h,vdata);
   }
@@ -150,30 +151,30 @@ struct MyApp : App {
       gui(bNorm, "bNormalize");
 
   }
-  
+
     void getMouse(){
-      auto tv = interface.vd().ray; 
+      auto tv = interface.vd().ray;
       Vec z (tv[0], tv[1], tv[2] );
       auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ INF; 
-      mouse = Round::point( ray,  Ori(1) );  
+      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ INF;
+      mouse = Round::point( ray,  Ori(1) );
   }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       getMouse();
-      
+
       static Frame f; Touch(interface,f);
       DrawAt(f.z(), f.pos(), 1,0,0);
       Bst bst = Gen::bst( f.tz() * amt );
-      
+
       int it =0;
       for(auto& i: mesh.original() ){
         auto np = Ro::null( i.Pos[0], i.Pos[1], i.Pos[2] ).sp( bst );
         vdata[it].pnt = np;// = Vec3f(np[0], np[1], np[2]);
         it++;
       }
-      //mesh.drawElements();  
+      //mesh.drawElements();
       Drw(heg);
 
       //Given some half edge structure, find normals
@@ -188,10 +189,10 @@ struct MyApp : App {
         i->data().dlp = sum ;
       }
 
-      for(auto& i : heg.node() ){ 
+      for(auto& i : heg.node() ){
         DrawAt( Vec(i->data().dlp), i->data().pnt,0,1,0);
       }
-      
+
       /* for(auto& i : heg.node() ){ */
       /*   if ( i->closed() ){ */
       /*     Dlp sum; */
@@ -210,11 +211,11 @@ struct MyApp : App {
       /*     //Draw(sum); */
       /*  } */
       /* } */
-      
+
       for (auto& i: heg.node() ){
         if ( i->closed() ) {
           auto valence = i->valence();
-          auto a = i->data().dlp.dual(); //I psuedoscalar
+          auto a = i->data().dlp.dual(); //I pseudoscalar
           for (auto& j : valence ){
             auto dn = ( j->a().dlp - i->data().dlp);
             auto nn = dn <= a;
@@ -227,14 +228,14 @@ struct MyApp : App {
             /*   //Ro::null( i->data().pnt.mot (td*t) ),1,1,0 ); // Ro::cen( i->data().pnt % (td*t)),1,1,0 ); // */
             /*   Draw( i->data().pnt.mot( td*t),0,0,1 ); */
             /* } */
-           } 
+           }
         }
       }
-        
-  }
-   
 
-  
+  }
+
+
+
 };
 
 
@@ -242,14 +243,14 @@ MyApp * app;
 
 
 int main(){
-                             
-  GLV glv(0,0);  
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
+  GLV glv(0,0);
+
+  Window * win = new Window(500,500,"Versor",&glv);
+  app = new MyApp( win );
   app -> initGui();
-  
-  
+
+
   glv << *app;
 
   Application::run();

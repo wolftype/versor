@@ -79,8 +79,6 @@ void Renderable<vsr::HEGraph<MyData>, 0>::DrawImmediate (
   glEnd ();
 }
 
-
-
 struct MeshRender
 {
 
@@ -229,7 +227,6 @@ struct MyApp : App
 
   bool bFlipX, bFlipY, bFlipTx, bFlipTy;
 
-
   Frame fa, fb, fc, fd, fe, ff;
   Frame net;
 
@@ -341,11 +338,10 @@ struct MyApp : App
 
 
   /*-----------------------------------------------------------------------------
-   *  Draw Routines 
+   *  Draw Routines
    *-----------------------------------------------------------------------------*/
   void onDraw ()
   {
-
 
     GL::lightPos (lightX, lightY, lightZ);
 

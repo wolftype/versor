@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_simplex.h
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  06/03/2014 12:17:02

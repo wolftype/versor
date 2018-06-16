@@ -11,14 +11,14 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
 
-#include "vsr_cga3D.h"   
+#include "vsr_cga3D.h"
 #include "vsr_GLVimpl.h"
 
 #include "vsr_print.h"
@@ -31,12 +31,12 @@ using namespace vsr::cga3D;
 
 
 void printPsNode(const Vec& v, string name=""){
-   cout << "node(" << name << ") at (" << v[0] << "," << v[1] << "," << v[2] << "){};" << endl; 
+   cout << "node(" << name << ") at (" << v[0] << "," << v[1] << "," << v[2] << "){};" << endl;
 };
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -46,7 +46,7 @@ struct MyApp : App {
   bool bReset;
 
   MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
+    scene.camera.pos( 0,0,10 );
     time = 0;
   }
 
@@ -58,25 +58,25 @@ struct MyApp : App {
       gui(growamt,"growamt",0,TWOPI);
       gui(bReset,"reset");
   }
-  
+
     void getMouse(){
-      auto tv = interface.vd().ray; 
+      auto tv = interface.vd().ray;
       Vec z (tv[0], tv[1], tv[2] );
       auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1);
+      mouse = Round::point( ray,  Ori(1) );
   }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       getMouse();
 
 
       int n = num;
 
-      
+
     for (int j=0;j<3;++j){
-    
+
       vector<Vec> v;
 
       float grow = 1 + growamt*(float)j/3;
@@ -93,20 +93,20 @@ struct MyApp : App {
         Biv bnext = v[i] ^ v[next];
         Vec ra = -(v[prev] <= !bprev);
         Vec rb = (v[next] <= !bnext);
-        
+
         Draw(v[i]);
         DrawAt(ra, v[i]/2.0, 1,0,0); DrawAt(rb, v[i]/2.0, 0,1,0);
-        
+
         stringstream osa, osb; osa << "va" << i; osb <<"vb"<<i;
-       // cout << tikz::coord(osa.str(), ra) << endl;       
-        //cout << tikz::coord(osa.str(), rb) << endl;  
-        
-        cout << tikz::draw(Vec(0,0,0),v[i]) << endl;     
-        cout << tikz::draw(v[i]/2.0,ra, "red") << endl;     
-        //cout << tikz::draw(Vec(0,0,0),v[i]) << endl;     
+       // cout << tikz::coord(osa.str(), ra) << endl;
+        //cout << tikz::coord(osa.str(), rb) << endl;
+
+        cout << tikz::draw(Vec(0,0,0),v[i]) << endl;
+        cout << tikz::draw(v[i]/2.0,ra, "red") << endl;
+        //cout << tikz::draw(Vec(0,0,0),v[i]) << endl;
        // printPsNode(ra,osa.str());
        // printPsNode(rb,osb.str());
-        //ra.print();      
+        //ra.print();
         //rb.print();
 
 
@@ -125,9 +125,9 @@ struct MyApp : App {
 
 
   }
-   
 
-  
+
+
 };
 
 
@@ -135,14 +135,14 @@ MyApp * app;
 
 
 int main(){
-                             
-  GLV glv(0,0);  
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
+  GLV glv(0,0);
+
+  Window * win = new Window(500,500,"Versor",&glv);
+  app = new MyApp( win );
   app -> initGui();
-  
-  
+
+
   glv << *app;
 
   Application::run();

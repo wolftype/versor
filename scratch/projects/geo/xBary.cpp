@@ -22,6 +22,7 @@
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
 struct MyApp : App
 {
