@@ -317,7 +317,7 @@ namespace vsr { namespace cga {
       auto phi = atan2( (dir^tx).rnorm(), (dir<=tx)[0] );
       return phi;
     }
-    
+
 
     /*! Direction of Line
           @ingroup direction

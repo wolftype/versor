@@ -60,7 +60,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
     mMouseRay = mMouse3D ^ tz ^ vsr::cga::Infinity (1);
 
     //intersection of ray with plane
-    mMouse3D = vsr::cga::Construct::meet (mMouseRay, vsr::cga::DualPlane (tz));
+//    mMouse3D = vsr::cga::Construct::meet (mMouseRay, vsr::cga::DualPlane (tz));
     mMouse2D =
       vsr::cga::Construct::meet (mMouseRay, vsr::cga::DualPlane (0, 0, 1));
 

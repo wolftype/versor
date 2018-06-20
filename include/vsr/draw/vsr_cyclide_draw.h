@@ -214,7 +214,7 @@ struct CyclideDraw{
   void init(int w, int h){
     width =w ; height =h;
     mesh = vector<CyclideMeshData>( (width+1)*(height+1));
-    graph.UV( width+1,height+1,mesh);
+    graph.UV( width+1,height+1,mesh.data());
   }
 
   /// Draw a cylclidic patch using this data containers settings

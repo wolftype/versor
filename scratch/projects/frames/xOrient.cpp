@@ -16,10 +16,11 @@
  * =====================================================================================
  */
 
-#include "vsr_app.h"
+#include "vsr/vsr_app.h"
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
 struct MyApp : App {
 
@@ -31,11 +32,8 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(amt,"amt",-100,100)(bReset,"bReset");
-
   }
 
 
@@ -60,7 +58,7 @@ struct MyApp : App {
     DrawB(fa);
     Draw(fb.xy(),.3,.3,.2);
     DrawB(fb);
-    DrawAt( Vec(Op::project( Vec::y, fb.xy() )).unit(), fb.pos(), 0,1,0,.5 );
+    DrawAt( Vec(Op::project( Vec::y, fb.xy() )).unit(), fb.pos(), 1,1,0,.5 );
     DrawB(fc);
 
   }

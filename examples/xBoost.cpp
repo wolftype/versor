@@ -61,8 +61,8 @@ struct MyApp : App
     float planarity = (Round::carrier (tca).dual ().unit ()
                        ^ Round::carrier (tcb).dual ().unit ())
                         .wt ();
-    if (FERROR (planarity))
-      cout << "PLANAR" << endl;
+//    if (FERROR (planarity))
+//      cout << "PLANAR" << endl;
 
     int num = 100;
     for (int i = 0; i < num; ++i)

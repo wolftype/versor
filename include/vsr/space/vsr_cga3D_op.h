@@ -57,20 +57,20 @@ struct Op
   template <class A>
   static auto dual (const A &a) RETURNS (a.dual ())
 
-    template <class A>
-    static auto undual (const A &a) RETURNS (a.undual ())
+  template <class A>
+  static auto undual (const A &a) RETURNS (a.undual ())
 
-      template <class A>
-      static auto duale (const A &a) RETURNS (a.duale ())
+  template <class A>
+  static auto duale (const A &a) RETURNS (a.duale ())
 
-        template <class A>
-        static auto unduale (const A &a) RETURNS (a.unduale ())
+  template <class A>
+  static auto unduale (const A &a) RETURNS (a.unduale ())
 
-          template <class T>
-          static auto dl (const T &t) RETURNS (dual (t)) template <class T>
-          static auto udl (const T &t) RETURNS (udual (t)) template <class T>
-          static auto dle (const T &t) RETURNS (duale (t)) template <class T>
-          static auto udle (const T &t) RETURNS (unduale (t))
+  template <class T>
+  static auto dl (const T &t) RETURNS (dual (t)) template <class T>
+  static auto udl (const T &t) RETURNS (udual (t)) template <class T>
+  static auto dle (const T &t) RETURNS (duale (t)) template <class T>
+  static auto udle (const T &t) RETURNS (unduale (t))
 
     /// Sign of A with Respect to B
     template <class A>

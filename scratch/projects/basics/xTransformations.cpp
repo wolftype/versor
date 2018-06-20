@@ -23,6 +23,7 @@
 
 using namespace vsr;
 using namespace vsr::cga;
+using namespace gfx;
 
 struct MyApp : App {
 
@@ -34,9 +35,6 @@ struct MyApp : App {
   float amt1 = 0;
   float amt2 = 0;
 
-
- // bool bTranslate, bRotate, bScale, bTwist, bBoost;
-
   float switcher;
 
   float radius;
@@ -47,8 +45,6 @@ struct MyApp : App {
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Bind Gui
-    bindGLV();
     ///Add Variables to GUI
     gui(amt1,"amt1",-100,100)(amt2,"amt2",-100,100)(bToggle,"bToggle")(bSet,"bSet");
 

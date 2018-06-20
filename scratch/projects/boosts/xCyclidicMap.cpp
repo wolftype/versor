@@ -46,9 +46,13 @@ struct MyApp : App
     gui (bSetA, "bSetA");
     gui (bSetB, "bSetB");
 
+    //Top Left
     ta.pos () = PT (-5, 2, 0);
+    //Bottom Left
     tb.pos () = PT (-5, -2,0);
+    //Top Right
     tc.pos () = PT (5, 2, -1);
+    //Bottom Right
     td.pos () = PT (5, -2, 1);
 
     frame.pos () = PT (0, 0, -10);

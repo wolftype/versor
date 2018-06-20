@@ -1,6 +1,7 @@
 #include <vsr/vsr_app.h>
 
 using namespace vsr::cga;
+using namespace gfx;
 
 struct MyApp : App {
 
@@ -23,7 +24,8 @@ struct MyApp : App {
   void onDraw(){
 
     //Calculate  Intersection (which is the dual of the outer product of duals . . . )
-    auto pair_meet = Construct::meet(circle,dualplane);  //<---- i.e. (circle.dual() ^ dualplane).dual()
+    //i.e. (circle.dual() ^ dualplane).dual()
+    auto pair_meet = Construct::meet(circle,dualplane);
     auto circle_meet = Construct::meet(sphere,dualplane);
 
     //Draw 'em with colors

@@ -17,7 +17,7 @@
  */
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 
 using namespace vsr;
 using namespace vsr::cga;
@@ -29,7 +29,7 @@ struct MyApp : App {
   DualSphere sphereB = Construct::sphere(.5,0,0,1);
 
   void setup(){
-    
+
     ///Add spheres to objectController
     ///(hit "tab" and then "t" and "s" keys to translate and scale)
     objectController.attach(&sphereA);
@@ -45,19 +45,19 @@ struct MyApp : App {
     auto meet = (sphereA ^ sphereB).dual();
 
     draw(meet,0,1,0);                      ///<-- draw meet (circle) in green
-    
+
     draw(Round::surround(meet),0,0,1,.5);  ///<-- draw surround of meet (a sphere) in blue with half alpha
 
     draw(sphereA,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
     draw(sphereB,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
 
   }
-  
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
 

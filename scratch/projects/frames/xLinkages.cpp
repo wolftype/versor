@@ -22,7 +22,7 @@
 
 using namespace vsr;
 using namespace vsr::cga;
-
+using namespace gfx;
 
 struct MyApp : App
 {
@@ -41,7 +41,6 @@ struct MyApp : App
 
   void setup ()
   {
-    bindGLV ();
     gui (amt, "amt", -100, 100);
     gui (pinRatio, "pinRatio", 0, 100) (decayRate, "decayRate", -100, 100);
 

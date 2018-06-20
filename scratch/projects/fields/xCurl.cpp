@@ -1,6 +1,8 @@
 /**
  * Given a vector field, find and show divergence and curl
  * using Simplicial relations
+ *
+ * Also, find Conformal Energy (difference between 90 angles)
  */
 
 #include <vsr/vsr_app.h>
@@ -13,7 +15,7 @@ using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
 
-//Make a Half-Edge structure out of this
+//We'll make a Half-Edge structure out of this
 struct VertexData
 {
 
@@ -52,6 +54,8 @@ struct MyApp : App
   bool bPrintOut = false;
   //Use Mean or Gaussian values to color mesh
   bool bMean = false;
+  //Use Deficit or Differential to Calculate Curvature
+  bool bUseDeficit = true;
 
   float amt1 = 0;
   float amtGauss = 10;
@@ -76,6 +80,7 @@ struct MyApp : App
     gui (amtMean, "amtMean", -100, 100);
     gui (bToggle, "bToggle") (bSet, "bSet");
     gui (bMean, "bMean");
+    gui (bUseDeficit, "bUseDeficit");
     gui (bDrawRecip, "bDrawRecip");
     gui (bDrawEdges, "bDrawEdges");
     gui (bPrintOut, "bPrint");
@@ -90,7 +95,7 @@ struct MyApp : App
       mesh.add (VertexData (i));
     mesh.store ();
 
-    graph.UV (w, h, mesh);
+    graph.UV (w, h, mesh.vertex().data());
 
     // Add new simplices for each node
     for (auto &i : graph.node ())
@@ -113,12 +118,15 @@ struct MyApp : App
     for (int i = 0; i < mesh.vertex ().size (); ++i)
       {
         auto &tp = mesh.store (i).pnt;
-        float dist = Round::dist (tp, frame.pos ());
-        auto dll = Twist::Along (frame.dly (), dist * amt1, 0);
+        float dist = 1.0 / (.01+ Round::dist (tp, frame.pos ()));
+        auto dll = Gen::rot (frame.dly() * dist * amt1);
+           // Twist::Along (frame.dly (), dist * amt1, 0);
         auto mot = Gen::mot (dll);
         auto bst = Gen::bst (frame.tz () * dist * -amt1);
         mesh[i].pnt = Round::loc (tp.spin (mot));
+        //mesh[i].pnt = Round::loc (tp.spin (bst));
       }
+
     //calculate normal and reciprocal simplices in domain at v
     //to calc normal, we can use area or volume gradient, which
     //are different in the discrete case
@@ -214,6 +222,8 @@ struct MyApp : App
               (sim.ea * (raa + rab) + sim.eb * (rbb + rab)) * 2.0 * area;
             laplacian2 += lap2;
 
+            //dsum += raa + rbb + rab;
+
             // SUM OF ELEMENTS
             auto lap3 = (gab + gba + gaa + gbb) * area;
             laplacian3 += lap3;
@@ -281,31 +291,42 @@ struct MyApp : App
           }
       }
 
-
     // Now we have calculated normals
     // we can calculate shape
     for (auto &i : graph.node ())
       {
+        bool bBoundaryVertex = !i->closed();
+
         //Vertex Data
         auto &v = i->data ();
         //Normal calculated above
         Vec n = v.normal;
         //emanating edges
         auto e = i->valence ();
+        //eh, 
         //
+        Rot derivF;
         for (int j = 0; j < e.size (); ++j)
           {
-            if (e[j]->isBorder ())
-              bBoundaryVertex = true;
+            auto &na = e[j]->a ().normal;
+            auto &nb = e[j]->next->a ().normal;
 
-            auto &nb = e[j]->a ().normal;
-            auto &nc = e[j]->next->a ().normal;
-
-            // Get Simplex Data
+            // Get Simplex Data created previously
             Simplicial2 &sim = v.simplex[j];
+            derivF += sim.derivative (n, na, nb);
 
-//            auto dn =
           }
+
+        auto differential = derivF <= n.duale();
+        //differential.print();
+        auto gauss = !n.duale() <= differential;
+        cout << "GAU: " << gauss << endl;
+        cout << "DEF: " << v.gauss << endl;
+        cout << "DEF: " << v.gauss * TWOPI << endl;
+
+        if (!bUseDeficit)
+          v.gauss = gauss[0];
+      
       }
   }
 
@@ -371,16 +392,20 @@ struct MyApp : App
         float cb = bMean ? (b.mean * amtMean) : (b.gauss * amtGauss);
         float cc = bMean ? (c.mean * amtMean) : (c.gauss * amtGauss);
 
+        bool ba = bMean ? (a.mean < 0) : (a.gauss < 0);
+        bool bb = bMean ? (b.mean < 0) : (b.gauss < 0);
+        bool bc = bMean ? (c.mean < 0) : (c.gauss < 0);
+
         float alpha = 1;
-        GL::color (tr * ca, 0, tb * (1.0 - ca), alpha);
+        GL::color (tr * ca, ba, tb * (1.0 - ca), alpha);
         GL::normal (a.normal.begin ());
         GL::vertex (a.pnt.begin ());
 
-        GL::color (tr * cb, 0, tb * (1.0 - cb), alpha);
+        GL::color (tr * cb, bb, tb * (1.0 - cb), alpha);
         GL::normal (b.normal.begin ());
         GL::vertex (b.pnt.begin ());
 
-        GL::color (tr * cc, 0, tb * (1.0 - cc), alpha);
+        GL::color (tr * cc, bc, tb * (1.0 - cc), alpha);
         GL::normal (c.normal.begin ());
         GL::vertex (c.pnt.begin ());
       }

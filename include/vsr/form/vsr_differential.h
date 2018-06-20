@@ -49,7 +49,7 @@ struct Simplicial2
   VSR_PRECISION ca, cb, cc;    ///< cotangent of angles
   VSR_PRECISION raa, rbb, rab;  ///< inner products of gradients (cot-like)
   VSR_PRECISION rca, rcb;       ///< inner products of gradients (cot-like)
- // Vec lap;                      ///< laplacian of position
+  // Vec lap;                      ///< laplacian of position
 
   Simplicial2 () {}
 
@@ -76,7 +76,7 @@ struct Simplicial2
     rca = raa + rab;
     rcb = rbb + rab;
 
-//    lap = (ea * (raa + rab) + eb * (rbb + rab)) * 2 * area;
+    //    lap = (ea * (raa + rab) + eb * (rbb + rab)) * 2 * area;
 
     //superfluous cotan, just here for checking l2 norm of gradient identities
     //ca should equal rca, cb should equal rcb.
@@ -88,7 +88,6 @@ struct Simplicial2
     auto beta = acos ((ta <= -tc)[0]);
     auto gamma = acos ((-ta <= -tb)[0]);
     theta = gamma;
-     cout << "THETA: " << gamma << endl;
     ca = 1.0 / tan (alpha);
     cb = 1.0 / tan (beta);
     cc = 1.0 / tan (gamma);
@@ -106,18 +105,43 @@ struct Simplicial2
   // C) multiplied by raa+rab and rbb+rab
   // @todo
   // eliminate 2.0 muliplier (since it will be divided anyway)
-  // divide by 3 so other vertices can contribute their share 
+  // divide by 3 so other vertices can contribute their share
   template <class T>
   T laplacian0 (const T &n, const T &na, const T &nb)
   {
     T dna = na - n;
     T dnb = nb - n;
-//    // coefficients (partial derivatives along edges)
-//    auto pda = ea <= dna;
-//    auto pdb = eb <= dnb;
-//    return (dna * rca) + (dnb * rcb) * 2.0 * area;
+    //    // coefficients (partial derivatives along edges)
+    //    auto pda = ea <= dna;
+    //    auto pdb = eb <= dnb;
+    //    return (dna * rca) + (dnb * rcb) * 2.0 * area;
     return (dna * rca) + (dnb * rcb) * 2.0 * area;
   }
+
+  //wedged derivative / differential
+  template <typename T>
+  auto derivative (const T &n, const T &na, const T &nb)
+    -> decltype (Vec () * T ())
+  {
+    //diff along edges
+    auto dna = na - n;
+    auto dnb = nb - n;
+
+    // weighted reciprocals
+    return ((ra * dna) + (rb * dnb));
+  }
+
+//  //wedged derivative / differential
+//  Vec derivative (const float &n, const float &na, const float &nb)
+//  {
+//    //diff along edges
+//    auto dna = na - n;
+//    auto dnb = nb - n;
+//
+//    // weighted reciprocals
+//    return ((ra * dna) + (rb * dnb));
+//  }
+
 
   // Differential in X direction of some function F with values n, na, nb
   // on the simplex -- returns X'
@@ -127,12 +151,12 @@ struct Simplicial2
   //
   // if n's are normals, then wedging the result with n is the Shape Bivector
   template <class T>
-  Vec differential (const Vec& a, const T &n, const T& na, const T& nb)
+  Vec differential (const Vec &a, const T &n, const T &na, const T &nb)
   {
     T dna = na - n;
     T dnb = nb - n;
 
-    //Derivate of F is sum of 
+    //Derivate of F is sum of
     auto derivF = (ra * dna) + (rb * dnb);
 
     return a <= derivF;
@@ -160,9 +184,10 @@ struct Simplicial2
     return v;
   }
 
+  // what is exterior_derivative
   // rename this exterior derivative, and see curl
   template <class T>
-  Biv derivative (const T &n, const T &na, const T &nb)
+  Biv exterior_derivative (const T &n, const T &na, const T &nb)
   {
     //diff along edges
     auto dna = na - n;
@@ -172,21 +197,6 @@ struct Simplicial2
     auto pdb = eb <= dnb;
     // weighted reciprocals
     return ((ra * pda) ^ (rb * pdb)) / area;
-  }
-
-  //wedged derivative / differential
-  Biv derivative (const float &n, const float &na, const float &nb)
-  {
-    //diff along edges
-    auto dna = na - n;
-    auto dnb = nb - n;
-
-    // coefficients
-    auto wa = dna;  // <= ea;
-    auto wb = dnb;  // <= eb;
-                    // cout << wa << " " << wb << endl;
-    // weighted reciprocals
-    return ((ra * wa) ^ (rb * wb));  //q: divide by area sums after
   }
 
 
@@ -266,7 +276,7 @@ struct Simplicial2
   //  finds direct difference along outer edge, wedges with gradient
   //  (or derivative of position).. actually this almost the CURL
   template <class T>
-  Biv exterior_derivative (const T &n, const T &na, const T &nb)
+  Biv exterior_derivative0 (const T &n, const T &na, const T &nb)
   {
 
     //diff along outer edge
