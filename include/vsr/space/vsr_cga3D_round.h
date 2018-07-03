@@ -598,7 +598,7 @@ namespace vsr { namespace cga {
 
       @sa @ref tangent for a list of @ref cgatypes on which these methods operate
       @sa vsr::nga::Tangent for the @ref generic  n-dimensional implementation details
-
+      @todo at wt method for rounds
    */
    struct Tangent {
 
