@@ -273,8 +273,7 @@ Pair Gen::log (const DualSphere &a, const DualSphere &b, VSR_PRECISION t,
                bool bFlip)
 {
   Bst tbst = (b / a).runit ();
-  //if (tbst[0]<0)
-  if (bFlip)
+  if (tbst[0]<0 && bFlip)
     tbst = -tbst;  //restrict to positive <R>
   return Gen::log (tbst) * -t / 2.0;
 }

@@ -1,35 +1,10 @@
 #include <vsr/vsr_app.h>
 #include <vsr/form/vsr_tangent.h>
+#include <vsr/draw/vsr_cga3D_helpers.h>
 
 using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
-
-// Draw DualSphere as Plane if Flat
-// @todo -- make this part of Regular Draw method
-void Draw2 (const DualSphere &s, float r, float g, float b, float a = 1.0)
-{
-
-  auto c = Inf (1) <= s;
-  float cc = (c * c)[0];
-  if (cc == 0)
-    Draw (DualPlane (s), r, g, b, a);
-  else
-    Draw (s, r, g, b, a);
-}
-
-// Draw Circle as Line if Flat
-// @todo -- make this part of Regular Draw method
-void Draw2 (const Circle &s, float r, float g, float b, float a = 1.0)
-{
-
-  auto c = Inf (1) <= s;
-  float cc = (c * c)[0];
-  if (cc == 0)
-    Draw (Line (s), r, g, b, a);
-  else
-    Draw (s, r, g, b, a);
-}
 
 //TangentFrame
 
@@ -43,6 +18,8 @@ struct MyApp : App
   bool bMouseSet = false;
   float amtU = 0;
   float amtV = 0;
+  float amtV20 = 0;
+  float amtV21 = 0;
   float amtWU = 0;
   float amtWV = 0;
 
@@ -57,6 +34,8 @@ struct MyApp : App
     ///Add Variables to GUI
     gui (amtU, "amtU", -100, 100);
     gui (amtV, "amtV", -100, 100);
+    gui (amtV20, "amtV20", -100, 100);
+    gui (amtV21, "amtV21", -100, 100);
     gui (amtWU, "amtWU", -100, 100);
     gui (amtWV, "amtWV", -100, 100);
     gui (bToggle, "bToggle");
@@ -231,28 +210,38 @@ struct MyApp : App
       }
 
 
-    // NEW POINT is ADDED
-    DualSphere du2 = -fc.dyz ();
+    // Extrude in V direction
     DualSphere dv2 = fc.dxz ();
-    DualSphere dw2 = fc.dxy ();
+    // Curve
+    DualSphere sv20 = dv2.spin (Gen::bst (fc.ty() * - amtV20/2.0));
+    DualSphere sv21 = dv2.spin (Gen::bst (fc.ty() * - amtV20/2.0));
 
-    //plunge into its system from, say, top left front
-    Circle nkv010 = -tv010 ^ dv2;
-    Circle nkv110 = -tv110 ^ dv2;
-    Circle nkv011 = -tv011 ^ dv2;
-    Circle nkv111 = -tv111 ^ dv2;
+    //Get coordinate curve plunge into its system from front
+    Circle nkv010 = -tv010 ^ sv20;
+    Circle nkv110 = -tv110 ^ sv20;
+    //Get coordinate curve plunge into its system from back
+    Circle nkv011 = -tv011 ^ sv21;
+    Circle nkv111 = -tv111 ^ sv21;
+
     //Get intersection there
-    Pair tpairV010 = (nkv010.dual () ^ dv2).undual ();
-    Pair tpairV110 = (nkv110.dual () ^ dv2).undual ();
-    Pair tpairV011 = (nkv011.dual () ^ dv2).undual ();
-    Pair tpairV111 = (nkv111.dual () ^ dv2).undual ();
-
+    Pair tpairV010 = (nkv010.dual () ^ sv20).undual ();
+    Pair tpairV110 = (nkv110.dual () ^ sv20).undual ();
+    Pair tpairV011 = (nkv011.dual () ^ sv21).undual ();
+    Pair tpairV111 = (nkv111.dual () ^ sv21).undual ();
     Point npv020 = Round::split (tpairV010, false);
     Point npv120 = Round::split (tpairV110, false);
     Point npv021 = Round::split (tpairV011, false);
     Point npv121 = Round::split (tpairV111, false);
+
     //Get tangent there
-//    Pair ntV = Tangent::at (nkv010, npv);
+    Pair ntv020 = Tangent::at (nkv010, npv020);
+    Pair ntv120 = Tangent::at (nkv110, npv120);
+    Pair ntv021 = Tangent::at (nkv011, npv021);
+    Pair ntv121 = Tangent::at (nkv111, npv121);
+
+    //Get surface of constant v
+//    DualSphere sv2a = (ntv020.undual() ^ npv120).dual();
+//    DualSphere sv2b = (ntv020.undual() ^ npv120).dual();
 
     Draw (fc);
     Draw (npv020);
@@ -263,7 +252,14 @@ struct MyApp : App
     Draw (nkv110, 0, 1, 0);
     Draw (nkv011, 0, 1, 0);
     Draw (nkv111, 0, 1, 0);
-//    Draw (ntV);
+
+    Draw (p010 ^ p110 ^ npv020);
+    Draw (p110 ^ p111 ^ npv120);
+    Draw (npv020 ^ npv021 ^ npv120);
+
+    Draw (sv20, 0,1,0,.2);
+    Draw (sv21, 0,1,1,.2);
+
 
 
     Draw (Construct::sphere (p010, .2));

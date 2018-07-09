@@ -26,6 +26,38 @@
 namespace vsr {
 namespace cga {
 
+/// A much simpler rep
+struct TFrame
+{
+  Pair tu, tv, tw;
+
+  Vec du () { return -Round::Dir (tu).copy<Vec> ().unit (); }
+  Vec dv () { return -Round::Dir (tv).copy<Vec> ().unit (); }
+  Vec dw () { return -Round::Dir (tw).copy<Vec> ().unit (); }
+
+  Con uc (float kvu, float kwu, float dist)
+  {
+    return Gen::bst ((kvu * tv + kwu * tw) * -.5) * Gen::trs (du () * dist)
+  }
+  Con vc (float kuv, float kwv, float dist)
+  {
+    return Gen::bst ((kuv * tu + kwv * tw) * -.5) * Gen::trs (dv () * dist)
+  }
+  Con wc (float kuw, float kvw, float dist)
+  {
+    return Gen::bst ((kuw * tu + kvw * tv) * -.5) * Gen::trs (dw () * dist)
+  }
+  TFrame xf (const Con &k, bool uflip, bool vflip, bool wflip)
+  {
+    return {tu.spin (k) * (uflip ? -1 : 1), tv.spin (k) * (vflip ? -1 : 1),
+            tw.spin (k) * (wflip ? -1 : 1)};
+  }
+
+//  std::array<TFrame, 3> xf (float kvu, float kwu, float kuv, float kwv,
+//                            float kuw, float kvw, float dist)
+//  {
+//  }
+};
 
 /// 3D Frame of Tangent Vectors (Point Pairs)
 ///
@@ -162,6 +194,8 @@ struct TangentFrame : public Frame
   /// Get z DirectionVector
   Drv zdir () { return -Round::direction (tan[2]); }
 
+  ///@todo rename this to xcop, ycop, zcop (for Curvature OPerator)
+  //to disambiguate from xcurve
   /// Generate Boost Relative to x Tangent Vector
   Bst xcurve (float amt) { return Gen::bst (tan[0] * amt * -.5); }
   /// Generate Boost Relative to y Tangent Vector
@@ -169,6 +203,7 @@ struct TangentFrame : public Frame
   /// Generate Boost Relative to z Tangent Vector
   Bst zcurve (float amt) { return Gen::bst (tan[2] * amt * -.5); }
 
+  ///@todo rename these to xycop, yzcop, xzcop (for Curvature OPerator)
   /// Generate Boost Relative to const x and const y Tangent Vector
   Bst xycurve (float amtX, float amtY)
   {
