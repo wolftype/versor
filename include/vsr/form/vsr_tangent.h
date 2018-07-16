@@ -29,34 +29,81 @@ namespace cga {
 /// A much simpler rep
 struct TFrame
 {
-  Pair tu, tv, tw;
+  Pair tu = Tnv (1, 0, 0);
+  Pair tv = Tnv (0, 1, 0);
+  Pair tw = Tnv (0, 0, 1);
 
-  Vec du () { return -Round::Dir (tu).copy<Vec> ().unit (); }
-  Vec dv () { return -Round::Dir (tv).copy<Vec> ().unit (); }
-  Vec dw () { return -Round::Dir (tw).copy<Vec> ().unit (); }
+  DualSphere svu;
+  DualSphere swu;
+  DualSphere suv;
+  DualSphere swv;
+  DualSphere suw;
+  DualSphere svw;
+
+  DualSphere usurf (float ku)
+  {
+    return DualSphere (Inf (-1) <= tu).spin (Gen::bst (tu * -ku / 2.0));
+  }
+
+  DualSphere vsurf (float kv)
+  {
+    return DualSphere (Inf (-1) <= tv).spin (Gen::bst (tv * -kv / 2.0));
+  }
+
+  DualSphere wsurf (float kw)
+  {
+    return DualSphere (Inf (-1) <= tw).spin (Gen::bst (tw * -kw / 2.0));
+  }
+
+  void surfaces (float kvu, float kwu, float kuv, float kwv, float kuw,
+                 float kvw)
+  {
+    svu = vsurf (kvu);
+    swu = wsurf (kwu);
+    suv = usurf (kuv);
+    swv = wsurf (kwv);
+    suw = usurf (kuw);
+    svw = vsurf (kvw);
+  }
+
+  TFrame () {}
+
+  TFrame (const Pair &_u, const Pair &_v, const Pair &_w)
+      : tu (_u), tv (_v), tw (_w)
+  {
+  }
+
+  Vec du () { return -Round::dir (tu).copy<Vec> ().unit (); }
+  Vec dv () { return -Round::dir (tv).copy<Vec> ().unit (); }
+  Vec dw () { return -Round::dir (tw).copy<Vec> ().unit (); }
+
+  Point pos () { return Round::location (tu); }
 
   Con uc (float kvu, float kwu, float dist)
   {
-    return Gen::bst ((kvu * tv + kwu * tw) * -.5) * Gen::trs (du () * dist)
+    return Gen::bst ((tv * kvu + tw * kwu) * -.5) * Gen::trs (du () * dist);
   }
   Con vc (float kuv, float kwv, float dist)
   {
-    return Gen::bst ((kuv * tu + kwv * tw) * -.5) * Gen::trs (dv () * dist)
+    return Gen::bst ((tu * kuv + tw * kwv) * -.5) * Gen::trs (dv () * dist);
   }
   Con wc (float kuw, float kvw, float dist)
   {
-    return Gen::bst ((kuw * tu + kvw * tv) * -.5) * Gen::trs (dw () * dist)
-  }
-  TFrame xf (const Con &k, bool uflip, bool vflip, bool wflip)
-  {
-    return {tu.spin (k) * (uflip ? -1 : 1), tv.spin (k) * (vflip ? -1 : 1),
-            tw.spin (k) * (wflip ? -1 : 1)};
+    return Gen::bst ((tu * kuw + tv * kvw) * -.5) * Gen::trs (dw () * dist);
   }
 
-//  std::array<TFrame, 3> xf (float kvu, float kwu, float kuv, float kwv,
-//                            float kuw, float kvw, float dist)
-//  {
-//  }
+  template <typename R>
+  TFrame xf (const R &k, bool uflip, bool vflip, bool wflip)
+  {
+    return TFrame (tu.spin (k) * (uflip ? -1 : 1),
+                   tv.spin (k) * (vflip ? -1 : 1),
+                   tw.spin (k) * (wflip ? -1 : 1));
+  }
+
+  //  std::array<TFrame, 3> xf (float kvu, float kwu, float kuv, float kwv,
+  //                            float kuw, float kvw, float dist)
+  //  {
+  //  }
 };
 
 /// 3D Frame of Tangent Vectors (Point Pairs)

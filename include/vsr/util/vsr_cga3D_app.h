@@ -71,7 +71,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   void monoPrint ()
   {
     printf ("output ps mono\n");
-    ps.bTightBounds = false;
+//    ps.bTightBounds = false;
     gfx::GL::enablePreset ();
     this->scene.camera.stereo (false);
     this->scene.push (true);

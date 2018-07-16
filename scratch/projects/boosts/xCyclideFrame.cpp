@@ -58,7 +58,7 @@ struct MyApp : App
   void onDraw ()
   {
     GL::lightsOff ();
-    //calkvlate mouse position in world space
+    //calculate mouse position in world space
     if (bMouseSet)
       calcMouse3D ();
 
@@ -90,10 +90,6 @@ struct MyApp : App
     //Coordinate spheres sigma u and sigma v
     DualSphere su0 = du0.spin (kuv);
     DualSphere sv0 = dv0.spin (kvu);
-
-    //Coordinate spheres sigma wu and sigma wv
-    //DualSphere swu0 = dw0.spin (kwu);
-    //DualSphere swv0 = dw0.spin (kwv);
 
     //sv sphere at (1,1,1) orthogonal to su0
     DualSphere sv1 = (tv111.undual () ^ su0).dual ();
@@ -201,10 +197,31 @@ struct MyApp : App
                 Con con = bU * bV * bW;
                 //                auto p = Round::location (p000.spin (con));
                 //                Draw (Construct::sphere (p, .1), 1, 0, 0);
-                auto p1 = fa.cxy ();  //Construct::sphere (p000, .1);
-                auto p2 = fa.cyz ();  //Construct::sphere (p000, .1);
-                                      //    Draw (p1.spin (con), u, v, w, .5);
-                                      //    Draw (p2.spin (con), u, v, w, .5);
+                auto p1 = fa.cxy ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
+                auto p2 = fa.cxz ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
+                Draw (p1.spin (con), u, v, w, .5);
+                Draw (p2.spin (con), u, v, w, .5);
+              }
+          }
+      }
+
+    for (int i = 0; i <= numW; ++i)
+      {
+        float w = (float) i / numW;
+        Boost bW = Gen::bst (logW * -w);
+        for (int j = 0; j <= numV; ++j)
+          {
+            float v = (float) j / numV;
+            Boost bV = Gen::bst (logV * -v);
+
+            for (int k = 0; k <= numU; ++k)
+              {
+                float u = (float) k / numU;
+                Boost bU = Gen::bst (logU * -u);
+
+                Con con = bU * bV * bW;
+                auto p = Round::location(fa.pos ().spin(con));
+                GL::vertex (p);
               }
           }
       }
@@ -239,10 +256,6 @@ struct MyApp : App
     Pair ntv021 = Tangent::at (nkv011, npv021);
     Pair ntv121 = Tangent::at (nkv111, npv121);
 
-    //Get surface of constant v
-//    DualSphere sv2a = (ntv020.undual() ^ npv120).dual();
-//    DualSphere sv2b = (ntv020.undual() ^ npv120).dual();
-
     Draw (fc);
     Draw (npv020);
     Draw (npv120);
@@ -259,8 +272,6 @@ struct MyApp : App
 
     Draw (sv20, 0,1,0,.2);
     Draw (sv21, 0,1,1,.2);
-
-
 
     Draw (Construct::sphere (p010, .2));
     Draw (Construct::sphere (p100, .2));
@@ -300,30 +311,30 @@ struct MyApp : App
 
     if (bDrawCurves)
       {
-        Draw2 (kv000, 1, 1, 0);
-        Draw2 (ku000, 1, 1, 0);
-        Draw2 (kv100, 1, 1, 0);
-        Draw2 (ku010, 1, 1, 0);
-        Draw2 (ku111, 1, 1, .2);
-        Draw2 (kv111, 1, 1, .2);
-        Draw2 (ku101, 1, 1, .2);
-        Draw2 (kv011, 1, 1, .2);
+        DrawRound (kv000, 1, 1, 0);
+        DrawRound (ku000, 1, 1, 0);
+        DrawRound (kv100, 1, 1, 0);
+        DrawRound (ku010, 1, 1, 0);
+        DrawRound (ku111, 1, 1, .2);
+        DrawRound (kv111, 1, 1, .2);
+        DrawRound (ku101, 1, 1, .2);
+        DrawRound (kv011, 1, 1, .2);
 
         //w-curves
-        Draw2 (kw000, 0, 1, 1);
-        Draw2 (kw010, 0, 1, 1);
-        Draw2 (kw111, 0, 1, 1);
-        Draw2 (kw100, 0, 1, 1);
+        DrawRound (kw000, 0, 1, 1);
+        DrawRound (kw010, 0, 1, 1);
+        DrawRound (kw111, 0, 1, 1);
+        DrawRound (kw100, 0, 1, 1);
       }
 
-    //    Draw2 (sw00, 0, 1, 1, .3);
-    //    Draw2 (sw10, 0, 1, 1, .3);
-    //    Draw2 (sw01, 0, 1, 0, .3);
-    //    Draw2 (sw11, 0, 1, 0, .3);
-    //    Draw2 (su0, 1, .3, .1, .4);
-    //    Draw2 (sv0, .1, 1, .3, .4);
-    //    Draw2 (sv1, 0, 1, 0, .4);
-    //    Draw2 (su1, 1, 0, 0, .4);
+    //    DrawRound (sw00, 0, 1, 1, .3);
+    //    DrawRound (sw10, 0, 1, 1, .3);
+    //    DrawRound (sw01, 0, 1, 0, .3);
+    //    DrawRound (sw11, 0, 1, 0, .3);
+    //    DrawRound (su0, 1, .3, .1, .4);
+    //    DrawRound (sv0, .1, 1, .3, .4);
+    //    DrawRound (sv1, 0, 1, 0, .4);
+    //    DrawRound (su1, 1, 0, 0, .4);
   }
 
   /*-----------------------------------------------------------------------------

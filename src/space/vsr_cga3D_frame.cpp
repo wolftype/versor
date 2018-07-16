@@ -65,9 +65,13 @@ namespace vsr{ namespace cga {
     Dll Frame::dlz() const { return lz().dual(); }    ///< z direction dual line
 
     /* Homogenous Planes */
-    Dlp Frame::dxz() const  { return -z() <= dlx(); }    ///< xz dual plane
-    Dlp Frame::dxy() const { return y() <= dlx(); }      ///< xy dual plane
-    Dlp Frame::dyz() const  { return y() <= dlz(); }      ///< yz dual plane
+    //Dlp Frame::dxz() const  { return -z() <= dlx(); }    ///< xz dual plane
+    //Dlp Frame::dxy() const { return y() <= dlx(); }      ///< xy dual plane
+    //Dlp Frame::dyz() const  { return y() <= dlz(); }      ///< yz dual plane
+
+    Dlp Frame::dxz() const  { return -Inf(1) <= ty(); }    ///< xz dual plane
+    Dlp Frame::dxy() const { return -Inf(1) <= tz(); }      ///< xy dual plane
+    Dlp Frame::dyz() const  { return -Inf(1) <= tx(); }      ///< yz dual plane
 
     /* Real Pair of Points around Center */
     Par Frame::px() const { return  Round::produce( ibound(), x() ); }       ///< x direction point pair aproduce center
