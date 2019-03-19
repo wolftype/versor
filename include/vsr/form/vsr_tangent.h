@@ -95,9 +95,20 @@ struct TFrame
   template <typename R>
   TFrame xf (const R &k, bool uflip, bool vflip, bool wflip)
   {
-    return TFrame (tu.spin (k) * (uflip ? -1 : 1),
-                   tv.spin (k) * (vflip ? -1 : 1),
-                   tw.spin (k) * (wflip ? -1 : 1));
+    Pair ttu = tu.spin (k);
+    Pair ttv = tv.spin (k);
+    Pair ttw = tw.spin (k);
+    Pair ptu = Pair (-Round::dir (ttu).copy<Vec> ().unit ().copy<Tnv> ())
+                 .trs (Round::location (ttu));
+    Pair ptv = Pair (-Round::dir (ttv).copy<Vec> ().unit ().copy<Tnv> ())
+                 .trs (Round::location (ttv));
+    Pair ptw = Pair (-Round::dir (ttw).copy<Vec> ().unit ().copy<Tnv> ())
+                 .trs (Round::location (ttw));
+    //return TFrame (ptu.spin (k) * (uflip ? -1 : 1),
+    //               ptv.spin (k) * (vflip ? -1 : 1),
+    //               ptw.spin (k) * (wflip ? -1 : 1));
+    return TFrame (ptu * (uflip ? -1 : 1), ptv * (vflip ? -1 : 1),
+                   ptw * (wflip ? -1 : 1));
   }
 
   //  std::array<TFrame, 3> xf (float kvu, float kwu, float kuv, float kwv,

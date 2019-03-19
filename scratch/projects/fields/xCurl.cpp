@@ -16,8 +16,7 @@ using namespace vsr::cga;
 using namespace gfx;
 
 //We'll make a Half-Edge structure out of this
-struct VertexData
-{
+struct VertexData {
 
   //position of vertex
   Point pnt;
@@ -303,7 +302,7 @@ struct MyApp : App
         Vec n = v.normal;
         //emanating edges
         auto e = i->valence ();
-        //eh, 
+        //eh,
         //
         Rot derivF;
         for (int j = 0; j < e.size (); ++j)
@@ -326,7 +325,7 @@ struct MyApp : App
 
         if (!bUseDeficit)
           v.gauss = gauss[0];
-      
+
       }
   }
 

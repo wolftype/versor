@@ -42,6 +42,9 @@ using cga = vsr::algebra< vsr::metric<4,1,true>, double >;
 using twistor = vsr::algebra< vsr::metric<2,4,true>, double >;
 
 
+using ga4x4 = vsr::algebra< vsr::metric<5>, ega::types::rotor>;
+
+
 
 
 /*-----------------------------------------------------------------------------
@@ -137,6 +140,8 @@ int main(){
   a.print();
 
   (a*a).print();
+
+  ga4x4::types::rotor::basis::print();
 
   return 0;
 

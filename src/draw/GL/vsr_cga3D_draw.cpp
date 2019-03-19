@@ -98,6 +98,7 @@ namespace gfx{
 
           gfx::GL::translate ( p.begin() );
           (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t);
+//          (real) ? gfx::Glyph::SolidSphere(t, 5+ floor(10), 5+floor(10)) : Glyph::Sphere(t);
       } else {
        // printf("NOOOOOO\n");
           gfx::Glyph::Point(s);

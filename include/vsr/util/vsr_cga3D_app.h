@@ -71,7 +71,6 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   void monoPrint ()
   {
     printf ("output ps mono\n");
-//    ps.bTightBounds = false;
     gfx::GL::enablePreset ();
     this->scene.camera.stereo (false);
     this->scene.push (true);
@@ -82,7 +81,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
 
   ///@todo move to gfx
   void stereoPrint ()
-  {
+  { bool b = ps.bTightBounds;
     printf ("output ps stereo\n");
     ps.bTightBounds = false;
     gfx::GL::enablePreset ();
@@ -98,6 +97,7 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
     this->scene.pop (true);
 
     gfx::GL::disablePreset ();
+    ps.bTightBounds = b;
   }
   /// Called when a keyboard key is pressed
   virtual void onKeyDown (const gfx::Keyboard &k)

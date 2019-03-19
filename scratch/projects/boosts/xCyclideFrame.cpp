@@ -180,6 +180,7 @@ struct MyApp : App
     int numU = 10;
     int numV = 10;
     int numW = 10;
+
     for (int i = 0; i <= numW; ++i)
       {
         float w = (float) i / numW;
@@ -195,12 +196,12 @@ struct MyApp : App
                 Boost bU = Gen::bst (logU * -u);
 
                 Con con = bU * bV * bW;
-                //                auto p = Round::location (p000.spin (con));
-                //                Draw (Construct::sphere (p, .1), 1, 0, 0);
-                auto p1 = fa.cxy ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
-                auto p2 = fa.cxz ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
-                Draw (p1.spin (con), u, v, w, .5);
-                Draw (p2.spin (con), u, v, w, .5);
+                auto p = Round::location (p000.spin (con));
+                Draw (Construct::sphere (p, .1), 1, 0, 0);
+                //auto p1 = fa.cxy ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
+                //auto p2 = fa.cxz ().dilate(fa.pos(), -.9);  //Construct::sphere (p000, .1);
+                //Draw (p1.spin (con), u, v, w, .5);
+                //Draw (p2.spin (con), u, v, w, .5);
               }
           }
       }
