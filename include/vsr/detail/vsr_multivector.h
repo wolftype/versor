@@ -294,10 +294,17 @@ namespace vsr{
       *  Sums
       *-----------------------------------------------------------------------------*/
       template<class B>
-      auto operator + (const MultivectorB<B>& b) -> decltype( algebra::sum(*this, b) ) {
+      auto operator + (const MultivectorB<B>& b) const -> decltype( algebra::sum(*this, b) ) {
         return algebra::sum(*this,b);
       }
 
+     /*-----------------------------------------------------------------------------
+      *  Sums
+      *-----------------------------------------------------------------------------*/
+      template<class B>
+      auto operator - (const MultivectorB<B>& b) const -> decltype( algebra::sum(*this, b) ) {
+        return algebra::sum(*this,-b);
+      }
 
       Multivector operator + (const Multivector& a) const {
         Multivector tmp;
