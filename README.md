@@ -82,17 +82,24 @@ At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Det
 
 
 
-	As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection.
-	-Joseph Louis Lagrange
+> As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection. 
+>
+> -Joseph Louis Lagrange
 
-	No attention should be paid to the fact that algebra and geometry are different in appearance.
-	-Omar Khayyám
 
-	L’algèbre n’est qu’une géométrie écrite; la géométrie n’est qu’une algèbre figurée.
-	-Sophie Germain
+> No attention should be paid to the fact that algebra and geometry are different in appearance.
+>
+> -Omar Khayyám
 
-	If you want to see, learn how to act
-	-Heinz von Foerster
+
+> L’algèbre n’est qu’une géométrie écrite; la géométrie n’est qu’une algèbre figurée.
+>
+> -Sophie Germain
+
+
+> If you want to see, learn how to act
+>
+> -Heinz von Foerster
 
 ## OTHER NICE SOFTWARE: ##
 * [Cinderella](http://www.cinderella.de/tiki-index.php) Standalone GA interface
@@ -216,7 +223,7 @@ One quick word: clifford algebras and the spatial relationships they embody can 
 ---
 
 
-####BACKGROUND
+#### BACKGROUND
 The homogenous 5D CGA model used here was initially proposed by David Hestenes, Hongbo Li, and Alan Rockwood in 2001, and given full form and weight through the excellent
 and careful work of Leo Dorst, Joan and Anthony Lasenby, and Eduardo Bayro-Corrochano, and others.  These researchers' writings have helped me quite a bit.  CGA is particular breed of _Clifford Algebras_ (also known as Geometric Algebras),
 which operate upon combinatoric hypercomplex vector spaces that emerged from William Clifford's attempt to fuse Hamilton's quaternions with Grassmans' extension algebras.  Thus
@@ -226,14 +233,14 @@ very helpful algorithms in rigid body dynamics and gravitational physics see the
 
 
 
-####SPEED
+#### SPEED
 Typical matrix operation libraries have templated inlined functions for Vector and Matrix multiplication.  Versor
 is similar, but on steroids, where _vectors_ and sparse _matrices_ of various sizes are all just called _multivectors_ and represent geometric
 elements beyond just xyz directions and transformation matrices. Circles, lines, spheres, planes, points are all algebraic elements, as are
 operators that spin, twist, dilate, and bend those variables.  Both these elements and operators are _multivectors_ which multiply together in many many many different ways.
 
 
-####What's new?
+#### What's new?
 
 Versor compiles much faster than before, and without any silly predetermined list
 of allowable operations or types.  Most notably, arbitrary metrics are now possible.  For example,
@@ -252,7 +259,7 @@ since it helps people out.
 
 	Draw(c);
 
-####How does it work?
+#### How does it work?
 
 If you like functional template metaprogramming, take a look at the code
 and please let me know what you think.  If you don't, then I wouldn't . . .
