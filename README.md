@@ -83,15 +83,22 @@ At C++ Now in Aspen I gave [a Presentation on Metaprogramming Implementation Det
 
 
 > As long as algebra and geometry have been separated, their progress have been slow and their uses limited; but when these two sciences have been united, they have lent each mutual forces, and have marched together towards perfection. 
+>
 > -Joseph Louis Lagrange
->
+
+
 > No attention should be paid to the fact that algebra and geometry are different in appearance.
+>
 > -Omar Khayyám
->
+
+
 > L’algèbre n’est qu’une géométrie écrite; la géométrie n’est qu’une algèbre figurée.
-> -Sophie Germain
 >
+> -Sophie Germain
+
+
 > If you want to see, learn how to act
+>
 > -Heinz von Foerster
 
 ## OTHER NICE SOFTWARE: ##
