@@ -86,8 +86,12 @@ struct Instruction{
 template<bool F, bits::type A, bits::type B, int IDXA, int IDXB>
 struct Inst{
   static const bits::type Res = A ^ B; 
+  //Whether Left Contraction Product Exists
   static const bool IP = bits::inner(A,B);
+  //Whether Outer Product Exists
   static const bool OP = bits::outer(A,B);  
+  //Whether Scalar Product Exists
+  static const bool SP = bits::scalar(A,B);  
  
   template<class TA, class TB>
   static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
@@ -102,8 +106,12 @@ struct Inst{
 template<bits::type A, bits::type B, int IDXA, int IDXB>
 struct Inst<true, A,B,IDXA,IDXB>{
   static const bits::type Res = A ^ B; 
+  //Whether Left Contraction Product Exists
   static const bool IP = bits::inner(A,B);
+  //Whether Outer Product Exists
   static const bool OP = bits::outer(A,B);  
+  //Whether Scalar Product Exists
+  static const bool SP = bits::scalar(A,B);  
  
   template<class TA, class TB>
   static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
