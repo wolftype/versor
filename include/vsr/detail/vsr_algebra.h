@@ -112,18 +112,21 @@ namespace vsr {
         template <class A, class B> using  gp_basis_t = typename impl::template gp_arrow_t<A,B>::basis;
         template <class A, class B> using  op_basis_t = typename impl::template op_arrow_t<A,B>::basis;
         template <class A, class B> using  ip_basis_t = typename impl::template ip_arrow_t<A,B>::basis;
+        template <class A, class B> using  sp_basis_t = typename impl::template sp_arrow_t<A,B>::basis;
 
         // lift functions of A and B into the multivector form
         template <class A, class B> using sum_lift_t = mv_t< sum_basis_t< A, B>>;
         template <class A, class B> using gp_lift_t =  mv_t< gp_basis_t<A,B> >;
         template <class A, class B> using op_lift_t =  mv_t< op_basis_t< A, B> >;
         template <class A, class B> using ip_lift_t =  mv_t< ip_basis_t< A, B> >;
+        template <class A, class B> using sp_lift_t =  mv_t< sp_basis_t< A, B> >;
 
         // bind the contents of multivectors A and B into the functions
         template <class A, class B> using sum_t = sum_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using gp_t = gp_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using op_t = op_lift_t<typename A::basis,typename B::basis>;
         template <class A, class B> using ip_t = ip_lift_t<typename A::basis,typename B::basis>;
+        template <class A, class B> using sp_t = sp_lift_t<typename A::basis,typename B::basis>;
 
         /*-----------------------------------------------------------------------------
          *  Sum Functions
@@ -186,6 +189,12 @@ namespace vsr {
          template<class A, class B>
          static constexpr auto ip(const A& a, const B& b) -> ip_t<A,B> {
            typedef typename impl::template ip_arrow_t<typename A::basis, typename B::basis> x;
+           typedef mv_t<typename x::basis> type;
+           return x::Arrow::template Make<type>(a,b);
+         }
+         template<class A, class B>
+         static constexpr auto sp(const A& a, const B& b) -> sp_t<A,B> {
+           typedef typename impl::template sp_arrow_t<typename A::basis, typename B::basis> x;
            typedef mv_t<typename x::basis> type;
            return x::Arrow::template Make<type>(a,b);
          }
@@ -262,6 +271,7 @@ namespace vsr {
        template <class A, class B> using  gp_arrow_t = EGProd<A,B>;
        template <class A, class B> using  op_arrow_t = EOProd<A,B>;
        template <class A, class B> using  ip_arrow_t = EIProd<A,B>;
+       template <class A, class B> using  sp_arrow_t = ESProd<A,B>;
 
        template< class R, class A, class B> using  rot_arrow_t = REGProd< R, A, B>;
 
@@ -281,6 +291,7 @@ namespace vsr {
        template <class A, class B> using  gp_arrow_t = MGProd<A, B, metric_type>;
        template <class A, class B> using  op_arrow_t = MOProd<A, B, metric_type>;
        template <class A, class B> using  ip_arrow_t = MIProd<A, B, metric_type>;
+       template <class A, class B> using  sp_arrow_t = MSProd<A, B, metric_type>;
 
        template< class R, class A, class B> using  rot_arrow_t = RMGProd< R, A, B, metric_type>;
 
@@ -298,6 +309,7 @@ namespace vsr {
        template <class A, class B> using  gp_arrow_t = CGProd<A, B, metric_type>;
        template <class A, class B> using  op_arrow_t = COProd<A, B, metric_type>;
        template <class A, class B> using  ip_arrow_t = CIProd<A, B, metric_type>;
+       template <class A, class B> using  sp_arrow_t = CSProd<A, B, metric_type>;
 
        template< class R, class A, class B> using  rot_arrow_t = RCGProd< R, A, B, metric_type>;
   };

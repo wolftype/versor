@@ -137,6 +137,31 @@ struct SplitIP< XList<>, B, M>{
 	typedef XList<> Type;  
 };
 
+template <class A, class B, class M>
+struct SubSplitSP{                                                                      
+	static const int Met = MSign< M, A::BIT & B::HEAD::BIT, bits::signFlip(A::BIT , B::HEAD::BIT) ? -1 : 1 >::Val;   	
+	typedef Blade<  A::BIT ^ B::HEAD::BIT, Met * A::SIGN * B::HEAD::SIGN > One;    
+	typedef typename XCat< 
+		 typename Maybe< bits::scalar( A::BIT, B::HEAD::BIT), 
+			XList<One> ,
+			XList<> >::Type, 
+		  typename SubSplitSP<A, typename B::TAIL, M>::Type 
+	>::Type Type;  
+};
+template<class A, class M> 
+struct SubSplitSP< A, XList<>, M >{
+    typedef XList<> Type;  
+};
+template <class A, class B, class M>
+struct SplitSP{
+	typedef typename XCat< typename SubSplitSP< typename A::HEAD, B, M>::Type, typename SplitSP< typename A::TAIL, B, M>::Type >::Type Type;  
+
+};
+template<class B, class M> 
+struct SplitSP< XList<>, B, M>{
+	typedef XList<> Type;  
+};
+
 
 
 template<class A, bits::type dim>
@@ -250,6 +275,17 @@ struct SplitIProd{
 	typedef typename PushMink<A, DIM>::Type TA;
 	typedef typename PushMink<B, DIM>::Type TB;
 	typedef typename SplitIP< TA, TB, M >::Type P1; 
+	typedef typename Pop<P1, DIM>::Type P2; 
+	typedef typename Compress<P2>::Type C; //Blades 
+	typedef typename EliminateZeros<C>::Type Type;  
+};
+
+template <bits::type A, bits::type B, class M>
+struct SplitSProd{   
+	static const int DIM = M::Num;
+	typedef typename PushMink<A, DIM>::Type TA;
+	typedef typename PushMink<B, DIM>::Type TB;
+	typedef typename SplitSP< TA, TB, M >::Type P1; 
 	typedef typename Pop<P1, DIM>::Type P2; 
 	typedef typename Compress<P2>::Type C; //Blades 
 	typedef typename EliminateZeros<C>::Type Type;  

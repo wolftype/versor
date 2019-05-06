@@ -134,6 +134,34 @@ struct EOP<Basis<>,B, idxA,idxB> {
 };
 
 
+/*-----------------------------------------------------------------------------
+ *  EUCLIDEAN SCALAR PRODUCT COMPILE-TIME TYPE METAPROGRAMMING ROUTINES
+ *-----------------------------------------------------------------------------*/
+/// Scalar Product Type Calculation Sub Loop
+template<bits::type A, class B, int idxA, int idxB>
+struct SubESP{
+  typedef Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef typename Maybe< INST::SP, XList< INST >, XList<> >::Type ELEM;
+  typedef typename XCat< ELEM, typename SubESP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type;
+};
+/// Scalar Product Type Calculation Sub Loop End Case
+template<bits::type A, int idxA, int idxB>
+struct SubESP<A, Basis<>, idxA, idxB >{
+  typedef XList<> Type;
+};
+/// Scalar Product Type Calculation Main loop
+template<class A, class B, int idxA=0, int idxB=0>
+struct ESP{
+  typedef typename XCat<
+                        typename SubESP<A::HEAD,B, idxA,idxB>::Type,
+                        typename ESP<typename A::TAIL, B, idxA+1,idxB>::Type
+                       >::Type Type;
+};
+/// Scalar Product Type Calculation Main Loop End Case
+template<class B, int idxA, int idxB>
+struct ESP<Basis<>,B, idxA,idxB> {
+  typedef XList<> Type;
+};
 
 /*-----------------------------------------------------------------------------
  *  EUCLIDEAN INNER PRODUCT COMPILE-TIME TYPE METAPROGRAMMING ROUTINES
@@ -190,7 +218,13 @@ struct EIProd{
   typedef typename Fun::Type basis;
   typedef typename Fun::DO Arrow;
 };
-
+template<class A, class B>
+struct ESProd{
+  typedef typename ESP<A,B>::Type List;
+  typedef Product<List> Fun;
+  typedef typename Fun::Type basis;
+  typedef typename Fun::DO Arrow;
+};
 
 /*-----------------------------------------------------------------------------
  * EUCLIDEAN Product Type of A and B cast to R (Explicit Return Type Control)
@@ -282,6 +316,31 @@ struct MIP<Basis<>,B, Metric, idxA,idxB> {
   typedef XList<> Type;
 };
 
+/*-----------------------------------------------------------------------------
+ *  METRIC SCALAR PRODUCT COMPILE-TIME TYPE METAPROGRAMMING ROUTINES
+ *-----------------------------------------------------------------------------*/
+
+template<bits::type A, class B,  class Metric, int idxA, int idxB>
+struct SubMSP{
+  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;
+  typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
+  typedef typename Maybe< INST::SP, XList< INST >, XList<> >::Type ELEM;
+  typedef typename XCat< ELEM, typename SubMSP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
+};
+template<bits::type A, class Metric, int idxA, int idxB>
+struct SubMSP<A, Basis<>, Metric, idxA, idxB >{
+  typedef XList<> Type;
+};
+
+template<class A, class B, class Metric, int idxA=0, int idxB=0>
+struct MSP{
+  typedef typename XCat< typename SubMSP<A::HEAD,B, Metric, idxA,idxB>::Type, typename MSP<typename A::TAIL, B, Metric, idxA+1,idxB>::Type >::Type Type;
+};
+template<class B, class Metric,  int idxA, int idxB>
+struct MSP<Basis<>,B, Metric, idxA,idxB> {
+  typedef XList<> Type;
+};
+
 
 /*-----------------------------------------------------------------------------
  *  METRIC Product Construction
@@ -311,6 +370,13 @@ struct MIProd{
   typedef typename Fun::DO Arrow;
 };
 
+template<class A, class B, class Metric>
+struct MSProd{
+  typedef typename MSP<A,B,Metric>::Type List;
+  typedef Product<List> Fun;
+  typedef typename Fun::Type basis;
+  typedef typename Fun::DO Arrow;
+};
 
 /*-----------------------------------------------------------------------------
  * METRIC Product Explicit Control
@@ -332,7 +398,7 @@ struct RMGProd{
 
 
 /*-----------------------------------------------------------------------------
- *  SPLIbits::typeING OF INSTRUCTIONS (PUSHING AND POPPING of Minkowskian Diagonal Metric)
+ *  SPLITTING OF INSTRUCTIONS (PUSHING AND POPPING of Minkowskian Diagonal Metric)
  *-----------------------------------------------------------------------------*/
 template<class S, int idxA, int idxB>
 struct SplitInstructions{
@@ -455,6 +521,40 @@ struct CIP<Basis<>,B, Metric, idxA,idxB> {
 
 
 /*-----------------------------------------------------------------------------
+ *  INNER PRODUCT COMPILE-TIME TYPE CALCULATION ROUTINES
+ *-----------------------------------------------------------------------------*/
+/// Inner Product Type Calculation Sub Loop
+template<bits::type A, class B, class Metric, int idxA, int idxB>
+struct SubCSP{
+  typedef typename SplitSProd< A, B::HEAD, Metric>::Type Split;
+  typedef typename SplitInstructions< Split, idxA, idxB >::Type XL;
+
+  typedef typename XCat<
+    XL,
+    typename SubCSP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type
+  >::Type Type;
+};
+/// Inner Product Type Calculation Sub Loop End Case
+template<bits::type A, class Metric, int idxA, int idxB>
+struct SubCSP<A, Basis<>, Metric, idxA, idxB >{
+  typedef XList<> Type;
+};
+/// Inner Product Type Calculation Main Loop
+template<class A, class B, class Metric, int idxA=0, int idxB=0>
+struct CSP{
+  typedef typename XCat<
+    typename SubCSP<A::HEAD,B, Metric, idxA,idxB>::Type,
+    typename CSP<typename A::TAIL, B, Metric, idxA+1,idxB>::Type
+  >::Type Type;
+};
+/// Inner Product Type Calculation Main Loop End Case
+template<class B, class Metric,  int idxA, int idxB>
+struct CSP<Basis<>,B, Metric, idxA,idxB> {
+  typedef XList<> Type;
+};
+
+
+/*-----------------------------------------------------------------------------
  *  Product Construction Instructions
  *-----------------------------------------------------------------------------*/
 template<class A, class B, class Metric>
@@ -482,6 +582,13 @@ struct CIProd{
 
 };
 
+template<class A, class B, class Metric>
+struct CSProd{
+  typedef typename CSP<A,B,Metric>::Type List;
+  typedef Product<List> Fun;
+  typedef typename Fun::Type basis;
+  typedef typename Fun::DO Arrow;
+};
 
 /*-----------------------------------------------------------------------------
  *  Geometric Product Type Explicit Control

@@ -112,6 +112,11 @@ constexpr bool outer( type a, type b){
   return !( a & b );
 } 
 
+/// scalar product check is legit
+constexpr bool scalar( type a, type b){
+  return !( a ^ b );
+} 
+
 /// Product is xor
 constexpr type product(type a, type b){
   return a ^ b;

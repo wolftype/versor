@@ -118,6 +118,19 @@ int main(){
   printf("some combinatorics: product of bivectors a and b in twistor algebra: \n");
   twistor::impl::gp_arrow_t< sta::make_grade<2>::basis, sta::make_grade<2>::basis >::Arrow::print();
 
+
+  printf("some combinatorics: inner product of rotors a and b in euclidean 3D algebra: \n");
+  ega::impl::ip_arrow_t< ega::types::rotor::basis, ega::types::rotor::basis>::Arrow::print();
+
+  printf("some combinatorics: scalar product of rotors a and b in euclidean 3D algebra: \n");
+  ega::impl::sp_arrow_t< ega::types::rotor::basis, ega::types::rotor::basis>::Arrow::print();
+
+  printf("some combinatorics: inner product of twist motors a and b in conformal 5D algebra: \n");
+  cga::impl::ip_arrow_t< cga::types::motor::basis, cga::types::motor::basis>::Arrow::print();
+
+  printf("some combinatorics: scalar product of twist motors a and b in conformal 5D algebra: \n");
+  cga::impl::sp_arrow_t< cga::types::motor::basis, cga::types::motor::basis>::Arrow::print();
+
   printf("some conformal 3D types\n");
 
   printf("point\n");

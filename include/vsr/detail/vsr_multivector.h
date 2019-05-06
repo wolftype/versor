@@ -160,7 +160,7 @@ namespace vsr{
         return algebra::op(*this, b);
       }
 
-      /// Inner Product \\(a \\cdot b \\)
+      /// Left Contraction Inner Product \\(a \\cdot b \\)
       /// Uses Hestenes Inner Contraction (a must be of lower grade than b)
       template<class B>
       auto operator <= ( const MultivectorB<B>&  b) const-> decltype( algebra::ip(*this,b)) {
@@ -171,6 +171,13 @@ namespace vsr{
       template<class B>
       auto operator % (const MultivectorB<B>& b ) const -> decltype( algebra::gp(*this,b) ){
         return ( (*this * b) - (b * (*this) ) ) * .5;
+      }
+
+      /// Scalar Product \\(a \\cdot b \\)
+      /// Returns Scalar valued product
+      template<class B>
+      auto scalar_product ( const MultivectorB<B>&  b) const-> decltype( algebra::sp(*this,b)) {
+        return algebra::sp(*this, b);
       }
 
       /// Rotor (even) transformation \\(RA\\tilde{R}\\)
