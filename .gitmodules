@@ -1,3 +1,6 @@
 [submodule "ext/gfx"]
 	path = ext/gfx
 	url = https://github.com/wolftype/gfx.git
+[submodule "ext/gtest"]
+	path = ext/gtest
+	url = https://github.com/google/googletest.git

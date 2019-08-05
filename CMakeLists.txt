@@ -5,9 +5,9 @@
 cmake_minimum_required(VERSION 3.0)
 
 #POLICIES
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 OLD)
-endif(COMMAND cmake_policy)
+#if(COMMAND cmake_policy)
+#  cmake_policy(SET CMP0003 OLD)
+#endif(COMMAND cmake_policy)
 
 #PROJECT
 project(VERSOR)
@@ -72,19 +72,29 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/bin")
 
-file(GLOB tests tests/*.cpp)
-foreach(filename ${tests})
-  get_filename_component(target ${filename} NAME_WE)
-  add_executable(${target} ${filename} )
-  target_link_libraries(${target} vsr )
-endforeach()
-
 #Add Headers as Custom Target for Editing in IDES (such as QT Creator, etc)
 FILE(GLOB_RECURSE HeaderFiles "${PROJECT_SOURCE_DIR}/include/*")
 add_custom_target(headers SOURCES ${HeaderFiles})
 #Add scripts as custom target for same reason
 FILE(GLOB ScriptFiles "${PROJECT_SOURCE_DIR}/*.sh")
 add_custom_target(scr SOURCES ${ScriptFiles})
+
+
+#build googletest
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+enable_testing()
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory(ext/gtest EXCLUDE_FROM_ALL)
+file(GLOB tests tests/*.cpp)
+foreach(filename ${tests})
+  get_filename_component(target ${filename} NAME_WE)
+  add_executable(${target} ${filename} )
+  target_link_libraries(${target} vsr gtest_main)
+  add_test (NAME ${target}_test COMMAND ${target})
+endforeach()
+
+
 
 #build libvsrGfx
 if(${BUILD_GRAPHICS})
