@@ -291,6 +291,8 @@ struct NotType< Basis<>, A >{
 
 /*-----------------------------------------------------------------------------
  *  METRIC TENSOR SIGN
+ *  Takes a <metric, bitwise &, signflip>
+ *  
  *-----------------------------------------------------------------------------*/
 template<class M, int AB, int SF>
 struct MSign{
@@ -376,9 +378,9 @@ struct metric{
   using up = metric<P+1,Q,bConformal>;
   ///Next Lower (positive)
   using down = metric<P-1,Q,bConformal>;
-  ///Euclidean Subspace
+  ///Euclidean Subspace (assuming conformal)
   using euclidean = metric<P-1>;
-  ///Conformal Mapping
+  ///Conformal Mapping (assuming euclidean)
   using conformal = metric<P+1,1,true>;
 
 
