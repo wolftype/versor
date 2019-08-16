@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <tests/Common.h>
 #include <vsr/detail/vsr_basis.h>
 
 using namespace vsr;

@@ -33,7 +33,7 @@ struct product {
 };
 
 /*-----------------------------------------------------------------------------
- *  use of product to calculate value
+ *  use of product to calculate value (unused)
  *-----------------------------------------------------------------------------*/
 template<bool positive, int idxA, int idxB>
 struct binary_function_token {
@@ -53,6 +53,7 @@ struct binary_function_token {
 //  }      
 //};
 
+//unused
 template<bool positive, int idx>
 struct unary_function_token {
   template<class TA>
@@ -67,6 +68,7 @@ struct unary_function_token {
 
 /*-----------------------------------------------------------------------------
  *  Single Word of an Instruction -- multiples a[IDXA] by b[IDXB]
+ *  unused ? (see Inst)
  *-----------------------------------------------------------------------------*/
 template<bool Flip, int IDXA, int IDXB>
 struct Instruction{
@@ -83,8 +85,10 @@ struct Instruction{
 }; 
 
 
-template<bool F, bits::type A, bits::type B, int IDXA, int IDXB>
+template<int F, bits::type A, bits::type B, int IDXA, int IDXB>
 struct Inst{
+  static const int METRIC = F;
+
   static const bits::type Res = A ^ B; 
   //Whether Left Contraction Product Exists
   static const bool IP = bits::inner(A,B);
@@ -92,6 +96,8 @@ struct Inst{
   static const bool OP = bits::outer(A,B);  
   //Whether Scalar Product Exists
   static const bool SP = bits::scalar(A,B);  
+  //Whether Geometric Product Exists
+  static const bool GP = true;  
  
   template<class TA, class TB>
   static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
@@ -104,7 +110,9 @@ struct Inst{
 };   
 
 template<bits::type A, bits::type B, int IDXA, int IDXB>
-struct Inst<true, A,B,IDXA,IDXB>{
+struct Inst<-1, A,B,IDXA,IDXB>{
+  static const int METRIC = -1;
+
   static const bits::type Res = A ^ B; 
   //Whether Left Contraction Product Exists
   static const bool IP = bits::inner(A,B);
@@ -112,6 +120,8 @@ struct Inst<true, A,B,IDXA,IDXB>{
   static const bool OP = bits::outer(A,B);  
   //Whether Scalar Product Exists
   static const bool SP = bits::scalar(A,B);  
+  //Whether Geometric Product Exists
+  static const bool GP = true;  
  
   template<class TA, class TB>
   static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
@@ -123,9 +133,36 @@ struct Inst<true, A,B,IDXA,IDXB>{
   }  
 }; 
 
+template<bits::type A, bits::type B, int IDXA, int IDXB>
+struct Inst<0, A,B,IDXA,IDXB>{
+  static const int METRIC = 0;
+
+  static const bits::type Res = A ^ B; 
+  //Whether Left Contraction Product Exists
+  static const bool IP = false;
+  //Whether Outer Product Exists
+  static const bool OP = false;  
+  //Whether Scalar Product Exists
+  static const bool SP = false;  
+  //Whether Geometric Product Exists
+  static const bool GP = false;  
+
+  // Never called or used . . . 
+  template<class TA, class TB>
+  static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){
+    return 0;
+  } 
+  
+  static void print(){
+    printf("0 x a[%d] * b[%d] /*%s*/\t",IDXA, IDXB,  bits::estring(Res).c_str());
+  }  
+}; 
+
 //ok, like Inst but without the product calculations inside it (assumes RULE has been invoked)
+//unused?
 template<bool F, bits::type R, int IDXA, int IDXB>
 struct Instruct{
+  static const bool Flip = false;
   static const bits::type Res = R;
   static const int idxA = IDXA;
   static const int idxB = IDXB;
@@ -140,6 +177,7 @@ struct Instruct{
 }; 
 template< bits::type R, int IDXA, int IDXB>
 struct Instruct<true, R, IDXA, IDXB>{
+  static const bool Flip = true;
   static const bits::type Res = R;
   static const int idxA = IDXA;
   static const int idxB = IDXB;

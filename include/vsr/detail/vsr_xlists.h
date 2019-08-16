@@ -292,7 +292,7 @@ struct NotType< Basis<>, A >{
 /*-----------------------------------------------------------------------------
  *  METRIC TENSOR SIGN
  *  Takes a <metric, bitwise &, signflip>
- *  
+ * 
  *-----------------------------------------------------------------------------*/
 template<class M, int AB, int SF>
 struct MSign{

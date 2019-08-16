@@ -1,16 +1,29 @@
 #include <gtest/gtest.h>
+#include <tests/Common.h>
 #include <vsr/detail/vsr_xlists.h>
 
 using namespace vsr;
 // Test Basic Concatenation and Type-level List Processing
 
+TEST(XListsTest, CommonTest)
+{
+  EXPECT_EQ (e1, 1);
+  EXPECT_EQ (e2, 2);
+  EXPECT_EQ (e3, 4);
+  EXPECT_EQ (e4, 8);
+  EXPECT_EQ (e12, 3);
+  EXPECT_EQ (e13, 5);
+  EXPECT_EQ (e14, 9);
+  EXPECT_EQ (e24, 10);
+  EXPECT_EQ (e34, 12);
+  EXPECT_EQ (e15, 17);
+  EXPECT_EQ (e25, 18);
+  EXPECT_EQ (e35, 20);
+  EXPECT_EQ (e45, 24);
+}
+
 TEST(XListsTest, BasisTest)
 {
-  EXPECT_EQ (bit<0>(), 1);
-  EXPECT_EQ (bit<1>(), 2);
-  EXPECT_EQ (bit<2>(), 4);
-  EXPECT_EQ (bit<3>(), 8);
-
   EXPECT_EQ (Basis<>::Num, 0);
   EXPECT_EQ ((Basis<1,2,3>::Num), 3);
 
@@ -26,7 +39,6 @@ TEST(XListsTest, BasisTest)
 
 TEST(XListTest, MetricTest)
 {
-  using ega3 = metric<3>;
   ::testing::StaticAssertTypeEq<ega3::type, Basis<1,1,1>>();
   ::testing::StaticAssertTypeEq<ega3::up::type, Basis<1,1,1,1>>();
   ::testing::StaticAssertTypeEq<ega3::down::type, Basis<1,1>>();
@@ -34,12 +46,10 @@ TEST(XListTest, MetricTest)
   ASSERT_FALSE(ega3::is_conformal);
   ASSERT_TRUE(ega3::is_euclidean);
 
-  using mga31 = metric<3,1>;
   ::testing::StaticAssertTypeEq<mga31::type, Basis<1,1,1,-1>>();
   ASSERT_FALSE(mga31::is_conformal);
   ASSERT_FALSE(mga31::is_euclidean);
 
-  using cga3 = metric<4,1,true>;
   ::testing::StaticAssertTypeEq<cga3::type, Basis<1,1,1,1,-1>>();
   ASSERT_TRUE (cga3::is_conformal);
   ASSERT_FALSE(cga3::is_euclidean);
@@ -59,7 +69,6 @@ TEST (XListTest, MetricSignTest)
   constexpr int e24 = e2 ^ e4;
   constexpr int e34 = e3 ^ e4;
 
-  using mga31 = metric<3,1>;
   EXPECT_EQ ((MSign <mga31::type, e1 & e1, 1 >::Val), 1);
   EXPECT_EQ ((MSign <mga31::type, e2 & e2, 1 >::Val), 1);
   EXPECT_EQ ((MSign <mga31::type, e3 & e3, 1 >::Val), 1);
