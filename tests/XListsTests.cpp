@@ -54,6 +54,10 @@ TEST(XListTest, MetricTest)
   ASSERT_TRUE (cga3::is_conformal);
   ASSERT_FALSE(cga3::is_euclidean);
 
+  ::testing::StaticAssertTypeEq<pga3::type, Basis<1,1,1,0>>();
+  ASSERT_FALSE(pga3::is_conformal);
+  ASSERT_FALSE(pga3::is_euclidean);
+  ASSERT_TRUE(pga3::is_degenerate);
 }
 
 TEST (XListTest, MetricSignTest)

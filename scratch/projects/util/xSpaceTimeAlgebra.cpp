@@ -21,7 +21,7 @@
 
 using namespace vsr;
 
-using sta = algebra< metric<1,3>, double>;
+using sta = algebra< metric<1,3,0,false>, double>;
 
 // proper vector
 using vec = sta::vec;

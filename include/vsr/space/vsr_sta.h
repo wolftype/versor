@@ -12,7 +12,7 @@ namespace vsr{
 	
 	namespace sta {
 
-    using algebra = algebra< metric<1,3>, double >;
+    using algebra = algebra< metric<1,3,0,false>, double >;
          
 		/*STANDARD FRAME of Orthonormal vectors decribes an Event ( time + location )
 	      An event, "proper vector" can be a proper momentum ( energy-momentum vector ) of a particle 

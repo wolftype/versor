@@ -1,7 +1,7 @@
 /*! @file
     generic multivector class, templated on a geometric algebra and a field
 
-    using Vec = vsr::algebra< metric<3>, float>::types::Vec;
+    using Vec = vsr::algebra< metric<3,0,0,false>, float>::types::Vec;
     Vec v(1,0,0);
 
  * =====================================================================================
@@ -493,8 +493,8 @@ struct GAE{
     template <bits::type ... NN> using e = typename algebra::types::template e<NN...>;// Multivector<algebra, typename algebra::types::e_basis::template e<NN...> >;
 };
 
-template<bits::type N, typename T=VSR_PRECISION> using euclidean = algebra< metric<N>,T>;
-template<bits::type N, typename T=VSR_PRECISION> using conformal = algebra< metric<N-1,1,true>,T>;
+template<bits::type N, typename T=VSR_PRECISION> using euclidean = algebra< metric<N,0,0,false>,T>;
+template<bits::type N, typename T=VSR_PRECISION> using conformal = algebra< metric<N-1,1,0,true>,T>;
 
 /*-----------------------------------------------------------------------------
  *  EUCLIDEAN TEMPLATE ALIAS UTILITY

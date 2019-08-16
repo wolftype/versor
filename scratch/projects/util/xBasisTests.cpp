@@ -22,7 +22,7 @@
 using namespace vsr;
 
 
-using c = GAE< algebra< metric<3>, float >>::e<2>;//types::e_basis<2>;
+using c = GAE< algebra< metric<3,0,0,false>, float >>::e<2>;//types::e_basis<2>;
 
 int main(){
 
