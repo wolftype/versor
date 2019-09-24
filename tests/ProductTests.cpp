@@ -58,7 +58,7 @@ struct TestAllSigns {
     TestAllSigns <typename A::TAIL, typename B::TAIL>::DoTest();
   }
 };
-   
+
 template <>
 struct TestAllSigns<XList<>, XList<>>{
   static void DoTest(){}
@@ -75,7 +75,7 @@ TEST(ProductTest, Cga3ProductTest)
 
   // Test for correct flipping of largest rotor ratio
   using pair_arrow = CGProd<pair, pair, cga3::type>::Arrow;
-  using tsign = XList< 
+  using tsign = XList<
                   Basis<0, 0, 0, 0, 0, 0, 0, 1, 1, 1>,
                   Basis<1, 0, 1, 0, 0, 1>,
                   Basis<1, 0, 1, 0, 1, 0>,

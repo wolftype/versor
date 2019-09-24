@@ -21,6 +21,7 @@ constexpr bits::type e35 = e3 ^ e5;
 constexpr bits::type e45 = e4 ^ e5;
 
 using ega3= metric<3,0,0,false>;
+using ega4= metric<4,0,0,false>;
 using mga21= metric<2,1,0,false>;
 using mga31 = metric<3,1,0,false>;
 using cga3 = metric<4,1,0,true>;

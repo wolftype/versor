@@ -20,13 +20,14 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   SET( WINDOWS 1)
 endif()
 
-
 #optional flags and their defaults for building graphics and examples
 set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
-set (CMAKE_CXX_STANDARD 14)
+set(USE_DOUBLE_PRECISION ON CACHE BOOL "double precision")
+
+set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
@@ -36,6 +37,15 @@ if (WINDOWS)
 set (VERSOR_FLAGS "-ftemplate-depth-1200")
 else()
 set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+endif()
+
+#double or float precision
+if (${USE_DOUBLE_PRECISION})
+  message ("BUILDING VERSOR USING DOUBLE PRECISION (DEFAULT)")
+  set (VERSOR_FLAGS "${VERSOR_FLAGS} -DVSR_PRECISION_DOUBLE")
+else()
+  message ("BUILDING VERSOR USING FLOAT PRECISION")
+  set (VERSOR_FLAGS "${VERSOR_FLAGS} -DVSR_PRECISION_FLOAT")
 endif()
 
 #default release type if none specified
@@ -56,11 +66,16 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 
-#All .cpp files in src/space get built into libvsr
+#All .cpp files in src/space get built into static libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
 link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 set(vsr_libraries vsr)
+
+#And a bundle
+add_library (vsr_shared MODULE ${core})
+set_target_properties(vsr_shared PROPERTIES BUNDLE TRUE)
+
 
 #project include directories
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})

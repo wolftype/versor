@@ -346,9 +346,6 @@ namespace vsr {
       using trivector = Multivector<alg, tri>;
       using rotor = Multivector<alg, rot>;
 
-      template <typename B> using mv = Multivector<alg, B>;
-
-
     };
 
    /*-----------------------------------------------------------------------------

@@ -19,7 +19,11 @@
 namespace vsr{
 
 /** The value type of data (default is double) */
+#ifdef VSR_PRECISION_DOUBLE
 #define VSR_PRECISION double
+#elif VSR_PRECISION_FLOAT
+#define VSR_PRECISION float
+#endif 
 
 /*-----------------------------------------------------------------------------
  *  Lowest level product for when to Flip product, calculate inner, or calculate outer
