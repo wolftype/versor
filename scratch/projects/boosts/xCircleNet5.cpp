@@ -202,7 +202,7 @@ struct MyApp : App
 
     // Half-edge data structure over the deformed mesh
     HEGraph<Vertex> graph;
-    graph.UV (w, h, obj, true);
+    graph.UV (w, h, obj.data(), true);
     // calc normals @todo put this somewhere more useful
     for (auto &i : graph.node ())
       {

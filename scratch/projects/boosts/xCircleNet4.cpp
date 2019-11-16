@@ -146,7 +146,7 @@ struct CyclideDraw
     width = w;
     height = h;
     mesh = vector<MyData> ((width + 1) * (height + 1));
-    graph.UV (width + 1, height + 1, mesh);
+    graph.UV (width + 1, height + 1, mesh.data());
   }
 
   void draw (const CyclideQuad &cyclide, int surf = 0)

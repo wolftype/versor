@@ -127,7 +127,7 @@ struct MyApp : App
     posA = posB = posC = posD = 0;
 
     mesh = vector<MyData> ((width + 1) * (height + 1));
-    graph.UV ((width + 1), height + 1, mesh);
+    graph.UV ((width + 1), height + 1, mesh.data());
 
     bDrawA = bDrawB = bDrawC = bDrawD = bDrawE = bDrawF = bDrawNormal = false;
 
