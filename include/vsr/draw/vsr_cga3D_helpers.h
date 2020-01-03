@@ -77,6 +77,39 @@ void DrawLine (const TFrame &f)
   DrawUnitLine (f.tw, 0, 0, 1);
 }
 
+void DrawCurve (const Point &p, const Pair &log, int res, float r, float g, float b, float a= 1.0)
+{
+    glColor4f (r, g, b, a);
+    glBegin (GL_LINE_STRIP);
+    for (int i = 0; i <= res; ++i)
+       {
+         float t = (float) i / res;
+         Boost bst = Gen::bst (log * t);
+//         TFrame tmp = tf.xf (bu, false, false, false);
+         Point tmp = p.spin (bst);        
+         GL::vertex (Round::loc(tmp));
+        }
+    glEnd ();
+
+}
+
+void DrawPoints (const Point &p, const Pair &logU, const Pair &logV,
+    int res, float r, float g, float b, float a = 1.0)
+{
+   for (int i = 0; i <= res; ++i)
+   {
+     float tu = float (i)/res;
+     Boost bu = Gen::boost (logU * tu);
+     
+     for (int j = 0; j <= res; ++j)
+     {
+       float tv = float (j)/res;
+       Boost bv = Gen::boost (logV * tv);
+       Draw ( Round::location(p.spin (bu *bv)), r, g, b, a);
+     }
+   }
+}
+
 template <typename T>
 void DrawLineStrip (const T &t, float r, float g, float b)
 {

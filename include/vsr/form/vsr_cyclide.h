@@ -693,7 +693,7 @@ struct CyclidicVolume
   };
 
   /// Default Constructor
-  CyclidicVolume () {}
+  CyclidicVolume () { set(); }
   /// Construct from SixSphere coordinates
   CyclidicVolume (const SixSphere &o) : mOrigin (o) { set (); }
 

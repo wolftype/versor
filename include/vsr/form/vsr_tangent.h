@@ -27,12 +27,35 @@ namespace vsr {
 namespace cga {
 
 /// A much simpler rep
+//  @todo determine how much this should just be operational and storage free
+//  for instance are the DualSpheres needed?
 struct TFrame
 {
-  Pair tu = Tnv (1, 0, 0);
-  Pair tv = Tnv (0, 1, 0);
-  Pair tw = Tnv (0, 0, 1);
 
+  TFrame () : tu (Tnv(1,0,0)), tv (Tnv(0,1,0)), tw(Tnv(0,0,1))
+  {
+    flatSurfaces();
+  }
+  TFrame (const Pair& _tu, const Pair &_tv, const Pair &_tw)
+    : tu(_tu), tv(_tv), tw(_tw)
+  {
+    flatSurfaces();
+  }
+
+   void flatSurfaces ()
+   {
+     svu = svw = Inf(-1) <= tv;
+     suv = suw = Inf(-1) <= tu;
+     swu = swv = Inf(-1) <= tw;
+   }
+
+  // Tangents (orthonormal)
+  Pair tu;
+  Pair tv;
+  Pair tw;
+  // Spheres of constant p in direction q (spq)
+  // @todo should these be set by the usurf funcions below?
+  // as is right now these default to planes
   DualSphere svu;
   DualSphere swu;
   DualSphere suv;
@@ -40,21 +63,25 @@ struct TFrame
   DualSphere suw;
   DualSphere svw;
 
+  /// Surface of constant u with curvature ku
   DualSphere usurf (float ku)
   {
     return DualSphere (Inf (-1) <= tu).spin (Gen::bst (tu * -ku / 2.0));
   }
 
+  /// Surface of constant v with curvature kv
   DualSphere vsurf (float kv)
   {
     return DualSphere (Inf (-1) <= tv).spin (Gen::bst (tv * -kv / 2.0));
   }
 
+  /// Surface of constant w with curvature kw
   DualSphere wsurf (float kw)
   {
     return DualSphere (Inf (-1) <= tw).spin (Gen::bst (tw * -kw / 2.0));
   }
 
+  // Make the surfaces (needed to calculate rotor)
   void surfaces (float kvu, float kwu, float kuv, float kwv, float kuw,
                  float kvw)
   {
@@ -66,27 +93,23 @@ struct TFrame
     svw = vsurf (kvw);
   }
 
-  TFrame () {}
-
-  TFrame (const Pair &_u, const Pair &_v, const Pair &_w)
-      : tu (_u), tv (_v), tw (_w)
-  {
-  }
-
   Vec du () { return -Round::dir (tu).copy<Vec> ().unit (); }
   Vec dv () { return -Round::dir (tv).copy<Vec> ().unit (); }
   Vec dw () { return -Round::dir (tw).copy<Vec> ().unit (); }
 
   Point pos () { return Round::location (tu); }
 
+  // Generate conformal transformation along u curve (fusion of kvu and kwu)
   Con uc (float kvu, float kwu, float dist)
   {
     return Gen::bst ((tv * kvu + tw * kwu) * -.5) * Gen::trs (du () * dist);
   }
+  // Generate conformal transformation along v curve (fusion of kuv and kwv)
   Con vc (float kuv, float kwv, float dist)
   {
     return Gen::bst ((tu * kuv + tw * kwv) * -.5) * Gen::trs (dv () * dist);
   }
+  // Generate conformal transformation along w curve (fusion of kuw and kvw)
   Con wc (float kuw, float kvw, float dist)
   {
     return Gen::bst ((tu * kuw + tv * kvw) * -.5) * Gen::trs (dw () * dist);
@@ -104,17 +127,37 @@ struct TFrame
                  .trs (Round::location (ttv));
     Pair ptw = Pair (-Round::dir (ttw).copy<Vec> ().unit ().copy<Tnv> ())
                  .trs (Round::location (ttw));
-    //return TFrame (ptu.spin (k) * (uflip ? -1 : 1),
-    //               ptv.spin (k) * (vflip ? -1 : 1),
-    //               ptw.spin (k) * (wflip ? -1 : 1));
     return TFrame (ptu * (uflip ? -1 : 1), ptv * (vflip ? -1 : 1),
                    ptw * (wflip ? -1 : 1));
   }
 
-  //  std::array<TFrame, 3> xf (float kvu, float kwu, float kuv, float kwv,
-  //                            float kuw, float kvw, float dist)
-  //  {
-  //  }
+  // some extra stuff here -- the pair log generators bringing surf to surf
+  // note surfaces() must have been called
+  // this sweeps the v direction curve "over" along u
+  Pair uvlog (const TFrame &tf){
+    return Gen::log (-(tf.suv/suv).runit()) / 2.0;
+  }
+  // this sweeps the w direction curve "over" along u
+  Pair uwlog (const TFrame &tf){
+    return Gen::log (-(tf.suw/suw).runit()) / 2.0;
+  }
+  // this sweeps the u direction curve "up" along v
+  Pair vulog (const TFrame &tf){
+    return Gen::log (-(tf.svu/svu).runit()) / 2.0;
+  }
+  // this sweeps the w direction curve "up" along v
+  Pair vwlog (const TFrame &tf){
+    return Gen::log (-(tf.svw/svw).runit()) / 2.0;
+  }
+  // this sweeps the u direction curve "in" along w
+  Pair wulog (const TFrame &tf){
+    return Gen::log (-(tf.swu/swu).runit()) / 2.0;
+  }
+  // this sweeps the v direction curve "in" along w
+  Pair wvlog (const TFrame &tf){
+    return Gen::log (-(tf.swv/swv).runit()) / 2.0;
+  }
+
 };
 
 /// 3D Frame of Tangent Vectors (Point Pairs)
