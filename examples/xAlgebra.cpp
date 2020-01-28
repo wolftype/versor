@@ -21,7 +21,21 @@
 
 /*-----------------------------------------------------------------------------
 
-  a geometric algebra is constructed by first defining a bilinear form (i.e. a "metric tensor") over a field
+  A geometric algebra is constructed by first defining a bilinear form
+  (i.e. a "metric tensor") over a field.
+
+  The algebra is itself a type, and is defined by the p,q,r metric, which is the
+  number of dimensions that square to +1, -1, and 0.
+
+  Additionally, we define the field, which is any ring that can be multiplied
+  and summed, we typically use floats or doubles.  But this could be dual
+  numbers, complex numbers, rotors, or even an entire algebra.
+
+  In the code that follows, you'll notice there is also a boolean which lets
+  the compiler know whether to conformalize the metric, that is, re-interpret
+  the minkowkski metric (p=1, q=1) in terms of a null-metric.
+
+  This is all done at compile-time..
 
  *-----------------------------------------------------------------------------*/
 
@@ -43,6 +57,9 @@ using cga = vsr::algebra< vsr::metric<4,1,0,true>, double >;
 //a twistor algebra of conformalized spacetime
 //...................................<p,q>, field  >
 using twistor = vsr::algebra< vsr::metric<2,4,0,true>, double >;
+
+//minkowksi
+using mga = vsr::algebra< vsr::metric<1,1,0, false>, double>;
 
 //a projective algebra of euclidean 3D space
 //...................................<p,q>, field  >
@@ -152,6 +169,8 @@ int main(){
   a.print();
   (a*a).print();
 
+  mga::types::Pss().print();
+
   printf("some PGA 3D types\n");
   auto pva = pga::types::vector(1,1,1,1);
   auto pvb = pga::types::vector(2,3,4,5);
@@ -167,7 +186,8 @@ int main(){
 
   ega4::impl::gp_arrow_t< ega4::types::biv, ega4::types::biv>::Arrow::print();
   pga::impl::gp_arrow_t< pga::types::biv, pga::types::biv>::Arrow::print();
-//  EGProd<eva.basis, evb.basis>::Arrow::print();
+
+
 
   return 0;
 

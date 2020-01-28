@@ -93,7 +93,7 @@ namespace vsr {
              using ega = vsr::algebra< metric<3,0,0,false>, float>;
 
          Some helpers exist which wrap the above up in a bit of sugar:
-             
+
              using ega = vsr::euclidean<3,float>;
 
      *-----------------------------------------------------------------------------*/
