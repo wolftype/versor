@@ -335,7 +335,12 @@ namespace vsr {
       using tri = typename alg::template op_basis_t<vec,biv>;
       using rot = typename alg::template sum_basis_t<biv,sca>;
 
-
+      using Sca = Multivector<alg,sca >;
+      using Pss = Multivector<alg,pss >;
+      using Vec = Multivector<alg,vec >;
+      using Biv = Multivector<alg,biv >;
+      using Tri = Multivector<alg,tri >;
+      using Rot = Multivector<alg,rot >;
     };
 
    /*-----------------------------------------------------------------------------

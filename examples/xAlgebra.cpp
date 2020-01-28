@@ -41,6 +41,9 @@ using cga = vsr::algebra< vsr::metric<4,1,true>, double >;
 //...................................<p,q>, field  >
 using twistor = vsr::algebra< vsr::metric<2,4,true>, double >;
 
+//minkowksi
+using mga = vsr::algebra< vsr::metric<1,1>, double>;
+
 
 
 
@@ -150,6 +153,8 @@ int main(){
   a.print();
 
   (a*a).print();
+
+  mga::types::Pss().print();
 
   return 0;
 
