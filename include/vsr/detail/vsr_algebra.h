@@ -346,6 +346,12 @@ namespace vsr {
       using trivector = Multivector<alg, tri>;
       using rotor = Multivector<alg, rot>;
 
+      using Sca = Multivector<alg, sca>;
+      using Pss = Multivector<alg, pss>;
+      using Vec = Multivector<alg, vec>;
+      using Biv = Multivector<alg, biv>;
+      using Tri = Multivector<alg, tri>;
+      using Rot = Multivector<alg, rot>;
     };
 
    /*-----------------------------------------------------------------------------

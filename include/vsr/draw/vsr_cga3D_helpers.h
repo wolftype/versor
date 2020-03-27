@@ -36,7 +36,7 @@ void DrawRound (const DualSphere &s, float r, float g, float b, float a = 1.0)
 {
   auto c = Inf (1) <= s;
   float cc = (c * c)[0];
-  if (cc == 0)
+  if (fabs(cc) < .001)
     {
       //      Draw (DualPlane (s), r, g, b, 1.0);
       render::begin (r, g, b, a);

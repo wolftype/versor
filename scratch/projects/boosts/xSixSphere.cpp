@@ -37,6 +37,7 @@ std::vector<Point> Transform (const Point &p, Boost b, int num)
   return res;
 }
 
+
 std::vector<Point> Transform (const std::vector<Point> &p, Boost b)
 {
   std::vector<Point> res;

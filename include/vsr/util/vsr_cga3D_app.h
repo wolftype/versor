@@ -116,7 +116,6 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
           printf ("save mouse position\n");
           bSetMouse = !bSetMouse;
           break;
-
         case 'm':
           printf ("mono / stereo toggle\n");
           mRenderGraph.mStereoMode =
