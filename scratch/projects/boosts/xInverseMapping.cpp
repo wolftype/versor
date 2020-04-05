@@ -47,6 +47,7 @@ struct MyApp : App
     float uSpacing = 3;
     float vSpacing = 3;
     float wSpacing = 3;
+
     // Conformal Rotors along u,v,w curves, passing in two curvatures
     Con uc = tf.uc (kVU, kWU, uSpacing);
     Con vc = tf.vc (kUV, kWV, vSpacing);
@@ -56,9 +57,9 @@ struct MyApp : App
     tf.surfaces (kVU, kWU, kUV, kWV, kUW, kVW);
 
     // New frames in respective directions, bools specify whether to "flip"
-    TFrame uf = tf.xf (uc, true, false, false);
-    TFrame vf = tf.xf (vc, false, true, false);
-    TFrame wf = tf.xf (wc, false, false, true);
+    TFrame uf = tf.xf (uc, false, false, false);
+    TFrame vf = tf.xf (vc, false, false, false);
+    TFrame wf = tf.xf (wc, false, false, false);
 
     // Here we can make three surfaces by bending
     // "Top Going Right"
@@ -67,6 +68,7 @@ struct MyApp : App
     uf.suw = uf.usurf (kU1W);
     // "Front Going Up"
     wf.swv = wf.wsurf (kW1V);
+
 
 
   }

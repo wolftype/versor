@@ -320,6 +320,8 @@ VSR_PRECISION Gen::theta (const Bst &b, bool bCW, bool bTwoPI)
 /*! Log of a simple rotor (uses atanh2, passes in boolean for direction of interpolation) */
 Pair Gen::log (const Bst &b, bool bCW, bool bTwoPI)
 {
+  //stay positive
+//  Bst tb = b * ( b[0] < 0 ? -1 : 1);
   return atanh2 (Pair (b), b[0], bCW, bTwoPI);
 }
 

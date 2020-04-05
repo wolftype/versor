@@ -100,51 +100,93 @@ struct MyApp : App {
     DrawFrame(tv2.uwf());
     DrawFrame(tv2.uvwf());
 
+    int tnum = 8;
+//    for (int i = 0 ; i< tnum; ++i){
+//     for (int j = 0 ; j< tnum; ++j){
+//      float ti = (float)i/tnum;
+//      float tj = (float)j/tnum;
+//      Con c = tv2.calcMapping (ti,tj,0);
+//      Draw (Round::location(tv2.tf().pos().spin(c)));
+//     }
+//    }
+
     TVolume::Mapping cmap = tv.calcMapping(num);
     TVolume::Mapping cmap2= tv2.calcMapping(num);
 
     for (auto& i : cmap.mCon)
       Draw (Round::location(tv.tf().pos().spin(i)));
 
-    auto cdraw = [=](const Point &origin, const TVolume::Mapping& mapping){
-      for (int i = 0; i < num; ++i)
-      {
-       glColor4f (0, .3, 0, 1);
-       glBegin (GL_LINE_STRIP);
-         for (int j = 0; j < num; ++j)
-         {
-           Con c = mapping.at(j,i,num-1);
-           Point pw = Round::location(origin.spin(c));
-           GL::vertex (pw);
-          }
-       glEnd();
-      }
-    };
+    for (auto& i : cmap2.mCon)
+      Draw (Round::location(tv2.tf().pos().spin(i)));
 
-    cdraw(tv.tf().pos(), cmap);
+//    auto cdraw = [=](const Point &origin, const TVolume::Mapping& mapping){
+//      for (int i = 0; i < num; ++i)
+//      {
+//       glColor4f (0, .3, 0, 1);
+//       glBegin (GL_LINE_STRIP);
+//         for (int j = 0; j < num; ++j)
+//         {
+//           Con c = mapping.at(j,i,num-1);
+//           Point pw = Round::location(origin.spin(c));
+//           GL::vertex (pw);
+//          }
+//       glEnd();
+//      }
+//    };
+//
+//    cdraw(tv.tf().pos(), cmap);
+//
+//   for (int i = 0; i < num; ++i)
+//   {
+//
+//     float ti = (float)i/(num-1);
+//     Con c = cmap.at(num-1,i,num-1);
+//     Point pw = Round::location(tv.tf().pos().spin(c));
+//     Draw (Construct::sphere (pw, .1), 1,0,0);
+//
+//     TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
+//
+//     auto tmp = [](const DualSphere& a, const DualSphere& b){
+//       auto ratio = a/b.tunit();
+//     //  cout << ratio [0] << endl;
+//       return Ori(1) <= (Gen::log (ratio) * .5); 
+//     };
+//
+//     auto sv = pw <= tv2.dvuw1();
+//     auto su =  pw <= tv2.duvw1();
+//
+//     auto vpair  = tmp(sv, tv2.wf().svu);
+//     auto vpair2 = tmp(tv2.vwf().svu, tv2.wf().svu);
+//     float tv = (vpair <= !vpair2)[0];
+//
+//     DrawRound (sv, ti, 0, 1-ti,.4);
+//
+//     glColor4f (0, .5, .5, 1);
+//     glBegin (GL_LINE_STRIP);
+//     for (int j = 0; j < num; ++j){
+//       float tj = (float)j/(num-1);
+//       Con c2 = bInverse ? tv2.calcMapping (tj, tv, 1.0) : tv2.calcMapping (tj, ti, 1.0);
+//       Point pw2 = Round::location (tv2.tf().pos().spin(c2));
+//       GL::vertex (pw2);
+//     }
+//     glEnd();
+//
+//   }
 
-
-   for (int i = 0; i < num; ++i)
-   {
-     float ti = (float)i/(num-1);
-     Con c = cmap.at(num-1,i,num-1);
-     Point pw = Round::location(tv.tf().pos().spin(c));
-     Draw (Construct::sphere (pw, .05), 1,0,0);
-
-     TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
-
-     glColor4f (0, .5, .5, 1);
-     glBegin (GL_LINE_STRIP);
-     for (int j = 0; j < num; ++j){
-       float tj = (float)j/(num-1);
-       Con c2 = bInverse ? tv2.calcMapping (tj, tc.v, 1.0) : tv2.calcMapping (tj, ti, 1.0);
-       Point pw2 = Round::location (tv2.tf().pos().spin(c2));
-       GL::vertex (pw2);
-     }
-     glEnd();
-   }
-
-
+//   Draw (tv2.tf().suv, 1,0,0,.1);
+//   Draw (tv2.uf().suv, 1,0,0,.1);
+//     Draw (tv2.uvf().suw, 1.0, 0.0, 0.0, .1);
+//     Draw (tv2.uvf().svw, 1.0, 0.0, 0.0, .1);
+//     Draw (tv2.uvf().swu, 1.0, 0.0, 0.0, .1);
+//
+//     cout << "A: " << (tv2.tf().suv <= tv2.tf().tu)[3] << endl;
+//     cout << "B: " << (tv2.uf().suv <= tv2.uf().tu)[3] << endl;
+//
+//     cout << "C: " << (tv2.tf().svu <= tv2.tf().tv)[3] << endl;
+//     cout << "D: " << (tv2.vf().svu <= tv2.vf().tv)[3] << endl;
+//
+//     cout << "E: " << (tv2.tf().svu <= tv2.tf().tv)[3] << endl;
+//     cout << "E: " << (tv2.vf().svu <= tv2.vf().tv)[3] << endl;
    }
 
 };

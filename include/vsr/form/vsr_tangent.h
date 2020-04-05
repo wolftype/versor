@@ -42,11 +42,12 @@ struct TFrame
     flatSurfaces();
   }
 
+  // not negated unless tv are defined no^t and not t^no
    void flatSurfaces ()
    {
-     svu = svw = Inf(-1) <= tv;
-     suv = suw = Inf(-1) <= tu;
-     swu = swv = Inf(-1) <= tw;
+     svu = svw = Inf(1) <= tv;
+     suv = suw = Inf(1) <= tu;
+     swu = swv = Inf(1) <= tw;
    }
 
   // Tangents (orthonormal)
@@ -64,22 +65,25 @@ struct TFrame
   DualSphere suw;
   DualSphere svw;
 
-  /// Surface of constant u with curvature ku
+  /// Surface of constant u with curvature ku (simplified)
   DualSphere usurf (float ku)
   {
-    return DualSphere (Inf (-1) <= tu).spin (Gen::bst (tu * -ku / 2.0));
+    //return DualSphere (Inf (-1) <= tu).spin (Gen::bst (tu * -ku / 2.0));
+    return Normalize( (Inf (1) <= tu) * ((tu * ku) + 1));
   }
 
   /// Surface of constant v with curvature kv
   DualSphere vsurf (float kv)
   {
-    return DualSphere (Inf (-1) <= tv).spin (Gen::bst (tv * -kv / 2.0));
+    //return DualSphere (Inf (-1) <= tv).spin (Gen::bst (tv * -kv / 2.0));
+    return Normalize( (Inf (1) <= tv) * ((tv * kv) + 1));
   }
 
   /// Surface of constant w with curvature kw
   DualSphere wsurf (float kw)
   {
-    return DualSphere (Inf (-1) <= tw).spin (Gen::bst (tw * -kw / 2.0));
+    //return DualSphere (Inf (-1) <= tw).spin (Gen::bst (tw * -kw / 2.0));
+    return Normalize ((Inf (1) <= tw) * ((tw * kw) + 1));
   }
 
   // Make the surfaces (needed to calculate rotor)
@@ -132,6 +136,8 @@ struct TFrame
                    ptw * (wflip ? -1 : 1));
   }
 
+
+
   void uflip()
   {
     tu *= -1;
@@ -146,32 +152,57 @@ struct TFrame
   {
     tw *= -1;
   }
+ 
+  static DualSphere Normalize (const DualSphere&s ){
+    float flip = (s[3] < 0) ? -1.0 : 1.0; 
+    return ((s[3] == 0) ? s : s/s[3]) * flip;
+  }
   // some extra stuff here -- the pair log generators bringing surf to surf
+  static Pair CalcGen2 (const Point& p, const DualSphere& beg, const DualSphere&end)
+  {
+    auto ratio = (end/beg).tunit();
+    bool isense = (p <= end)[0] > 0;
+    bool iratio = ratio[0] < 0;;
+    ratio *= iratio ? (isense ? -1.0 : 1.0) : 1.0;
+//    ratio *= (isense ? -1.0 : 1.0);
+    return Gen::log(ratio) / 2.0;
+  }
+
+  static Pair CalcGen (const Pair& p1, const Pair& p2, const DualSphere& beg, const DualSphere&end)
+  {
+    auto ratio = (end/beg).tunit();
+    bool flipA = (beg <= p1)[3] > 0; 
+    bool flipB = (end <= p2)[3] > 0; 
+    bool flipC =  ((Round::location(p1) <= end)[0] > 0) ;
+    float flip = ((flipA != flipB) ) ? -1.0 : 1.0;
+    return Gen::log(ratio * flip, flipC, true) / 2.0;
+  }
   // note surfaces() must have been called
   // this sweeps the v direction curve "over" along u
-  // @todo rename these to duv, duw, etc
   Pair duv (const TFrame &tf){
-    return Gen::log (-(tf.suv/suv).bunit()) / 2.0;
+    return CalcGen(tu, tf.tu, suv, tf.suv);
   }
   // this sweeps the w direction curve "over" along u
   Pair duw (const TFrame &tf){
-    return Gen::log (-(tf.suw/suw).bunit()) / 2.0;
+    return CalcGen(tu, tf.tu, suw, tf.suw);
   }
   // this sweeps the u direction curve "up" along v
   Pair dvu (const TFrame &tf){
-    return Gen::log (-(tf.svu/svu).bunit()) / 2.0;
+    return CalcGen(tv, tf.tv, svu, tf.svu);
   }
   // this sweeps the w direction curve "up" along v
   Pair dvw (const TFrame &tf){
-    return Gen::log (-(tf.svw/svw).bunit()) / 2.0;
+    return CalcGen(tv, tf.tv, svw, tf.svw);
   }
   // this sweeps the u direction curve "in" along w
   Pair dwu (const TFrame &tf){
-    return Gen::log (-(tf.swu/swu).bunit()) / 2.0;
+    //return Gen::log ((tf.swu/swu).tunit()) / 2.0;
+    return CalcGen(tw, tf.tw, swu, tf.swu);
   }
   // this sweeps the v direction curve "in" along w
   Pair dwv (const TFrame &tf){
-    return Gen::log (-(tf.swv/swv).bunit()) / 2.0;
+    //return Gen::log ((tf.swv/swv).tunit()) / 2.0;
+    return CalcGen(tw, tf.tw, swv, tf.swv);
   }
 
 };
@@ -244,11 +275,6 @@ struct TVolume {
              vf() = tv.uvf();
              vwf() = tv.uvwf();
 
-             tf().uflip();
-             wf().uflip();
-             vf().uflip();
-             vwf().uflip();
-
              calcSurfacesFromFace (Face::LEFT);
 
              break;
@@ -256,7 +282,6 @@ struct TVolume {
          default:
            break;
       }
-
     };
 
     TVolume (float kvu, float kwu,
@@ -321,8 +346,8 @@ struct TVolume {
     float& kvu(){ return mK[0]; }
     float& kwu(){ return mK[1]; }
     float& kuv(){ return mK[2]; }
-    float& kwv(){ return mK[4]; }
-    float& kuw(){ return mK[3]; }
+    float& kwv(){ return mK[3]; }
+    float& kuw(){ return mK[4]; }
     float& kvw(){ return mK[5]; }
     float& kv1u(){ return mK[6]; }
     float& ku1w(){ return mK[7]; }
@@ -331,8 +356,8 @@ struct TVolume {
     const float& kvu() const { return mK[0]; }
     const float& kwu() const { return mK[1]; }
     const float& kuv() const { return mK[2]; }
-    const float& kwv() const { return mK[4]; }
-    const float& kuw() const { return mK[3]; }
+    const float& kwv() const { return mK[3]; }
+    const float& kuw() const { return mK[4]; }
     const float& kvw() const { return mK[5]; }
     const float& kv1u() const { return mK[6]; }
     const float& ku1w() const { return mK[7]; }
@@ -388,15 +413,17 @@ struct TVolume {
       switch (face){
         case Face::LEFT:
           {
-            tf().suv = -vf().pos() <= tf().tu;
-            tf().swv = -vf().pos() <= tf().tw;
-            tf().suw = -wf().pos() <= tf().tu;
-            tf().svw = -wf().pos() <= tf().tv;
-            vf().suw = -wf().pos() <= vf().tu;
-            vf().svw = -wf().pos() <= vf().tv;
-            wf().suv = -vwf().pos() <= wf().tu;
-            wf().swv = -vwf().pos() <= wf().tw;
+            tf().suv = TFrame::Normalize(vf().pos() <= tf().tu);
+            tf().swv = TFrame::Normalize(vf().pos() <= tf().tw);
+            tf().suw = TFrame::Normalize(wf().pos() <= tf().tu);
+            tf().svw = TFrame::Normalize(wf().pos() <= tf().tv);
+            vf().suw = TFrame::Normalize(wf().pos() <= vf().tu);
+            vf().svw = TFrame::Normalize(wf().pos() <= vf().tv);
+            wf().suv = TFrame::Normalize(vwf().pos() <= wf().tu);
+            wf().swv = TFrame::Normalize(vwf().pos() <= wf().tw);
 
+            kvu() = .3;
+            kv1u() = -.3;
             // Conformal Rotors along u,v,w curves, passing in two curvatures
             Con uc = tf().uc (kvu(), kwu(), uSpacing());
 
@@ -405,16 +432,15 @@ struct TVolume {
             vf().svu = vf().vsurf (kv1u());
             uf().suw = uf().usurf (ku1w());
 
-           uf() = tf().xf (uc, true, false, false);
-//           uf() = tf().xf (uc, false, false, false);
+            uf() = tf().xf (uc, false, false, false);
 
             //ortho
-            uf().suv = -vf().svu <= uf().tu;
-            uf().swv = -vf().svu <= uf().tw;
-            wf().swu = -uf().suw <= wf().tw;
-            wf().svu = -uf().suw <= wf().tv;
-            uf().svw = -wf().swu <= uf().tv;
-            vf().swu = -uf().suv <= vf().tw;
+            uf().suv = TFrame::Normalize(vf().svu <= uf().tu);
+            uf().swv = TFrame::Normalize(vf().svu <= uf().tw);
+            wf().swu = TFrame::Normalize(uf().suw <= wf().tw);
+            wf().svu = TFrame::Normalize(uf().suw <= wf().tv);
+            uf().svw = TFrame::Normalize(wf().swu <= uf().tv);
+            vf().swu = TFrame::Normalize(uf().suv <= vf().tw);
 
             duvw0() = tf().duv (uf());
             duwv0() = tf().duw (uf());
@@ -423,8 +449,8 @@ struct TVolume {
             dwuv0() = tf().dwu (wf());
             dwvu0() = tf().dwv (wf());
 
-            uvf() = vf().xf( Gen::boost(duvw0()), true, false, false);
-            uwf() = uf().xf( Gen::boost(dwuv0()), false, false, true);
+            uvf() = vf().xf( Gen::boost(duvw0()), false, false, false);
+            uwf() = uf().xf( Gen::boost(dwuv0()), false, false, false);
 
             //uvf() = vf().xf( Gen::boost(duvw0()), false, false, false);
             //uwf() = uf().xf( Gen::boost(dwuv0()), false, false, false);
@@ -437,21 +463,21 @@ struct TVolume {
             Point np = p.null();
 
             //these each have two defined surfaces
-            uvf().suw = -np <= uvf().tu;
-            uvf().svw = -np <= uvf().tv;
-            vwf().svu = -np <= vwf().tv;
-            vwf().swu = -np <= vwf().tw;
-            uwf().swv = -np <= uwf().tw;
-            uwf().suv = -np <= uwf().tu;
+            uvf().suw = TFrame::Normalize(np <= uvf().tu);
+            uvf().svw = TFrame::Normalize(np <= uvf().tv);
+            vwf().svu = TFrame::Normalize(np <= vwf().tv);
+            vwf().swu = TFrame::Normalize(np <= vwf().tw);
+            uwf().swv = TFrame::Normalize(np <= uwf().tw);
+            uwf().suv = TFrame::Normalize(np <= uwf().tu);
 
             //grab the tangent frame at np too
             //uvwf().tu = (np <= uvf().suw.undual()).dual();
             //uvwf().tv = (np <= uvf().svw.undual()).dual();
             //uvwf().tw = (np <= vwf().swu.undual()).dual();
 
-            uvwf().tu = (np ^ uvf().suw);
-            uvwf().tv = (np ^ uvf().svw);
-            uvwf().tw = (np ^ vwf().swu);
+            uvwf().tu = uvf().suw ^ np;
+            uvwf().tv = uvf().svw ^ np;
+            uvwf().tw = vwf().swu ^ np;
             //and with that, we have all the surfaces that can be defined with
             //nine coefficients -- 24 surfaces!  Which pair up into 12 Generators
             //now we find the remaining 6 generators
@@ -486,13 +512,9 @@ struct TVolume {
       tf().surfaces (kvu(), kwu(), kuv(), kwv(), kuw(), kvw());
 
       // New frames in respective directions, bools specify whether to "flip"
-      uf() = tf().xf (uc, true, false, false);
-      vf() = tf().xf (vc, false, true, false);
-      wf() = tf().xf (wc, false, false, true);
-
-//      uf() = tf().xf (uc, false, false, false);
-//      vf() = tf().xf (vc, false, false, false);
-//      wf() = tf().xf (wc, false, false, false);
+      uf() = tf().xf (uc, false, false, false);
+      vf() = tf().xf (vc, false, false, false);
+      wf() = tf().xf (wc, false, false, false);
 
       // Here we can make three surfaces by bending
       // "Top Going Right"
@@ -505,24 +527,24 @@ struct TVolume {
       //Now all other surfaces must be orthogonal to these
       //"Back Right Edge Going Up"
       //At u1, const u1 and const w0 in v dir are both ortho to const v1 in u dir
-      uf().suv = -vf().svu <= uf().tu;
-      uf().swv = -vf().svu <= uf().tw;
+      uf().suv = TFrame::Normalize(vf().svu <= uf().tu);
+      uf().swv = TFrame::Normalize(vf().svu <= uf().tw);
       //"Front Bottom Edge Going Over"
       //At w1, const w1 and const v0 in u dir are both ortho to const u1 in w dir
-      wf().swu = -uf().suw <= wf().tw;
-      wf().svu = -uf().suw <= wf().tv;
+      wf().swu = TFrame::Normalize(uf().suw <= wf().tw);
+      wf().svu = TFrame::Normalize(uf().suw <= wf().tv);
       //"Top Left Edge Going Forward"
       //At v1, const v1 and const u0 are both ortho to const w1 in v dir
-      vf().svw = -wf().swv <= vf().tv;
-      vf().suw = -wf().swv <= vf().tu;
+      vf().svw = TFrame::Normalize(wf().swv <= vf().tv);
+      vf().suw = TFrame::Normalize(wf().swv <= vf().tu);
 
       //now, what about the other surfaces to match the three bends?
       //"Bottom Going Forward"
-      uf().svw = -wf().swu <= uf().tv;
+      uf().svw = TFrame::Normalize(wf().swu <= uf().tv);
       //"Back Going Right"
-      vf().swu = -uf().suv <= vf().tw;
+      vf().swu = TFrame::Normalize(uf().suv <= vf().tw);
       //"Left Going Up"
-      wf().suv = -vf().svw <= wf().tu;
+      wf().suv = TFrame::Normalize(vf().svw <= wf().tu);
 
       // first letter indicates direction of sweep.
       // second letter indicates curvature line that is swept.
@@ -543,13 +565,9 @@ struct TVolume {
 
       // we need to calculate the other frames
       // to calculate the other surfaces
-      uvf() = vf().xf( Gen::boost(duvw0()), true, false, false);
-      vwf() = wf().xf( Gen::boost(dvwu0()), false, true, false);
-      uwf() = uf().xf( Gen::boost(dwuv0()), false, false, true);
-
-//      uvf() = vf().xf( Gen::boost(duvw0()), false, false, false);
-//      vwf() = wf().xf( Gen::boost(dvwu0()), false, false, false);
-//      uwf() = uf().xf( Gen::boost(dwuv0()), false, false, false);
+      uvf() = vf().xf( Gen::boost(duvw0()), false, false, false);
+      vwf() = wf().xf( Gen::boost(dvwu0()), false, false, false);
+      uwf() = uf().xf( Gen::boost(dwuv0()), false, false, false);
 
       auto topPlane = vf().pos() ^ uvf().pos() ^ vwf().pos() ^ Inf(1);
       auto frontPlane = wf().pos() ^ vwf().pos() ^ uwf().pos() ^ Inf(1);
@@ -559,21 +577,21 @@ struct TVolume {
       Point np = p.null();
 
       //these each have two defined surfaces
-      uvf().suw = -np <= uvf().tu;
-      uvf().svw = -np <= uvf().tv;
-      vwf().svu = -np <= vwf().tv;
-      vwf().swu = -np <= vwf().tw;
-      uwf().swv = -np <= uwf().tw;
-      uwf().suv = -np <= uwf().tu;
+      uvf().suw = TFrame::Normalize(np <= uvf().tu);
+      uvf().svw = TFrame::Normalize(np <= uvf().tv);
+      vwf().svu = TFrame::Normalize(np <= vwf().tv);
+      vwf().swu = TFrame::Normalize(np <= vwf().tw);
+      uwf().swv = TFrame::Normalize(np <= uwf().tw);
+      uwf().suv = TFrame::Normalize(np <= uwf().tu);
 
       //grab the tangent frame at np too
 //      uvwf().tu = (np <= uvf().suw.undual()).dual();
 //      uvwf().tv = (np <= uvf().svw.undual()).dual();
 //      uvwf().tw = (np <= vwf().swu.undual()).dual();
 
-        uvwf().tu = (np ^ uvf().suw);
-        uvwf().tv = (np ^ uvf().svw);
-        uvwf().tw = (np ^ vwf().swu);
+      uvwf().tu = uvf().suw ^ np;
+      uvwf().tv = uvf().svw ^ np;
+      uvwf().tw = vwf().swu ^ np;
       //and with that, we have all the surfaces that can be defined with
       //nine coefficients -- 24 surfaces!  Which pair up into 12 Generators
       //now we find the remaining 6 generators
@@ -599,13 +617,33 @@ struct TVolume {
       Boost wuv0 = Gen::bst (dwuv0() * tk);
       Boost wuv1 = Gen::bst (dwuv1() * tk);
 
-      DualSphere su0v = tf().suv.spin (wvu0);
-      DualSphere su1v = uf().suv.spin (wvu1);
-      DualSphere sv0u = tf().svu.spin (wuv0);
-      DualSphere sv1u = vf().svu.spin (wuv1);
+      DualSphere su0v = TFrame::Normalize(tf().suv.spin (wvu0));
+      DualSphere su1v = TFrame::Normalize(uf().suv.spin (wvu1));
+      DualSphere sv0u = TFrame::Normalize(tf().svu.spin (wuv0));
+      DualSphere sv1u = TFrame::Normalize(vf().svu.spin (wuv1));
 
-      Pair duv  = Gen::log (-(su1v/su0v).bunit())/2.0;
-      Pair dvu  = Gen::log (-(sv1u/sv0u).bunit())/2.0;
+      auto u0 = (tf().tu.spin (wvu0));
+      auto u1 = (uf().tu.spin (wvu1));
+      Pair duv = TFrame::CalcGen (u0, u1, su0v, su1v);
+      
+//      cout << "U: " << endl;
+//      cout << (su0v <= u0)[3] << endl;
+//      cout << (su1v <= u1)[3] << endl;
+//      cout << (su1v <= su0v) << endl; 
+//      cout << (tf().pos() <= su1v) << endl; 
+//
+      auto v0 = (tf().tv.spin (wuv0));
+      auto v1 = (vf().tv.spin (wuv1));
+      Pair dvu = TFrame::CalcGen (v0, v1, sv0u, sv1u);
+
+//      cout << "V: " << endl;
+//      cout << (sv0u <= v0)[3] << endl;
+//      cout << (sv1u <= v1)[3] << endl;
+//      cout << (sv1u <= sv0u) << endl; 
+//      cout << (tf().pos() <= sv1u) << endl; 
+      //Pair duv = Gen::log((su1v/su0v).tunit()) * .5;
+//      Pair dvu = Gen::log((sv1u/sv0u).tunit()) * .5;
+      
       Boost uv = Gen::bst(duv * ti);
       Boost vu = Gen::bst(dvu * tj);
 
@@ -623,17 +661,29 @@ struct TVolume {
         // Back to Front
         Boost wvu0 = Gen::bst (dwvu0() * ti);
         Boost wvu1 = Gen::bst (dwvu1() * ti);
+
         Boost wuv0 = Gen::bst (dwuv0() * ti);
         Boost wuv1 = Gen::bst (dwuv1() * ti);
 
-        DualSphere su0v = tf().suv.spin (wvu0);
-        DualSphere su1v = uf().suv.spin (wvu1);
-        DualSphere sv0u = tf().svu.spin (wuv0);
-        DualSphere sv1u = vf().svu.spin (wuv1);
+        DualSphere su0v = TFrame::Normalize(tf().suv.spin (wvu0));
+        DualSphere su1v = TFrame::Normalize(uf().suv.spin (wvu1));
 
-        Pair duv  = Gen::log (-(su1v/su0v).bunit())/2.0;
-        Pair dvu  = Gen::log (-(sv1u/sv0u).bunit())/2.0;
+        DualSphere sv0u = TFrame::Normalize(tf().svu.spin (wuv0));
+        DualSphere sv1u = TFrame::Normalize(vf().svu.spin (wuv1));
+       
+        auto pmod = [](const Pair& pair){
+           return Pair (-Round::dir (pair).copy<Vec> ().unit ().copy<Tnv> ())
+                 .trs (Round::location (pair));
+        }; 
 
+        auto u0 = (tf().tu.spin (wvu0));
+        auto u1 = (uf().tu.spin (wvu1));
+        Pair duv = TFrame::CalcGen (u0, u1, su0v, su1v);
+
+        auto v0 = (tf().tv.spin (wuv0));
+        auto v1 = (vf().tv.spin (wuv1));
+        Pair dvu = TFrame::CalcGen (v0, v1, sv0u, sv1u);
+        
        for (int j = 0; j < res; ++j)
        {
          float tj = (float)j/(res-1);
@@ -646,7 +696,6 @@ struct TVolume {
 
            Con Kw = vu * uv * wvu0;
            result.at (j,k,i) = Kw;
-
          }
        }
      }
@@ -662,12 +711,12 @@ struct TVolume {
      switch (face){
        case Face::LEFT:
          {
-            auto sv  = -p <= dvwu0();
-            auto vpair  = Gen::log ( -(sv/tf().svw).bunit()) * .5;
+            auto sv  = p <= dvwu0();
+            auto vpair  = Gen::log ( (sv/tf().svw).tunit()) * .5;
             auto tv = vpair <= !dvwu0();
 
-            auto sw =  -p <= dwvu0();
-            auto wpair  = Gen::log ( -(sw/tf().swv).bunit()) * .5;
+            auto sw =  p <= dwvu0();
+            auto wpair  = Gen::log ( (sw/tf().swv).tunit()) * .5;
             auto tw = wpair <= !dwvu0();
             return {0.0, tv[0], tw[0]};
 
@@ -675,12 +724,12 @@ struct TVolume {
          }
        case Face::RIGHT:
          {
-            auto sv  = -p <= dvwu1();
-            auto vpair  = Gen::log ( -(sv/uf().svw).bunit()) * .5;
+            auto sv  = p <= dvwu1();
+            auto vpair  = Gen::log ( (sv/uf().svw).tunit()) * .5;
             auto tv = vpair <= !dvwu1();
 
-            auto sw =  -p <= dwvu1();
-            auto wpair  = Gen::log ( -(sw/uf().swv).bunit()) * .5;
+            auto sw =  p <= dwvu1();
+            auto wpair  = Gen::log ( (sw/uf().swv).tunit()) * .5;
             auto tw = wpair <= !dwvu1();
             return {1.0, tv[0], tw[0]};
 
@@ -688,12 +737,12 @@ struct TVolume {
          }
        case Face::BACK:
          {
-            auto sv  = -p <= dvuw0();
-            auto vpair  = Gen::log ( -(sv/tf().svu).bunit()) * .5;
+            auto sv  = p <= dvuw0();
+            auto vpair  = Gen::log ( (sv/tf().svu).tunit()) * .5;
             auto tv = vpair <= !dvuw0();
 
-            auto su =  -p <= duvw0();
-            auto upair  = Gen::log ( -(su/tf().suv).bunit()) * .5;
+            auto su =  p <= duvw0();
+            auto upair  = Gen::log ( (su/tf().suv).tunit()) * .5;
             auto tu = upair <= !duvw0();
             return {tu[0], tv[0], 1.0};
 
@@ -701,16 +750,24 @@ struct TVolume {
          }
        case Face::FRONT:
          {
-            auto sv  = -p <= dvuw1();
-            auto vpair  = Gen::log ( -(sv/wf().svu).bunit()) * .5;
-            auto tv = vpair <= !dvuw1();
+            auto tmp = [](const DualSphere& a, const DualSphere& b){
+              return Ori(1) <= (Gen::log ((a/b).tunit()) * .5); 
+            };
 
-            auto su =  -p <= duvw1();
-            auto upair  = Gen::log ( -(su/wf().suv).bunit()) * .5;
-            auto tu = upair <= !duvw1();
-            return {tu[0], tv[0], 1.0};
+            auto sv  = p <= dvuw1();
+            auto su =  p <= duvw1();
 
-           break;
+            auto vpair  = tmp(sv, wf().svu);
+            auto vpair2 = tmp(vwf().svu, wf().svu);
+            auto tv = vpair <= !vpair2;
+
+            auto upair = tmp (su, wf().suv);
+            auto upair2 = tmp (uwf().suv, wf().suv);
+            auto tu = upair <= !upair2;
+
+            return {-tu[0], -tv[0], 1.0};
+
+            break;
          }
        default:
             return {0.0, 0.0, 0.0};
@@ -825,7 +882,7 @@ struct TangentFrame : public Frame
         tf.sphere[idx] = sphere[idx] / (Round::direction (sphere[idx])[0]);
         tf.bitan[idx] =
           Circle (
-            Round::direction (bitan[idx]).copy<Biv> ().bunit ().copy<Tnb> ())
+            Round::direction (bitan[idx]).copy<Biv> ().tunit ().copy<Tnb> ())
             .translate (pos ());
         tf.tan[idx] = tf.bitan[idx].dual ();
       }
