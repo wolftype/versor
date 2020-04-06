@@ -290,7 +290,8 @@ Pair Gen::atanh2 (const Pair &p, VSR_PRECISION cs, bool bCW, bool bTwoPI)
   else if (tp < 0)
     {
       if (bCW)
-        norm = -((bTwoPI ? TWOPI : PI) - atan2 (sq, cs)) / sq;  //alt direction
+        //norm = -((bTwoPI ? TWOPI : PI) - atan2 (sq, cs)) / sq;  //alt direction
+        norm = (atan2 (sq, cs) - (bTwoPI ? TWOPI : PI)) / sq;  //alt direction
       else
         norm = atan2 (sq, cs) / sq;
     }
@@ -320,8 +321,6 @@ VSR_PRECISION Gen::theta (const Bst &b, bool bCW, bool bTwoPI)
 /*! Log of a simple rotor (uses atanh2, passes in boolean for direction of interpolation) */
 Pair Gen::log (const Bst &b, bool bCW, bool bTwoPI)
 {
-  //stay positive
-//  Bst tb = b * ( b[0] < 0 ? -1 : 1);
   return atanh2 (Pair (b), b[0], bCW, bTwoPI);
 }
 

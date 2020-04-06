@@ -10,8 +10,38 @@ using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
 
+void DrawGraph (const HEGraph<Point>& graph)
+{
+   glBegin(GL_TRIANGLES);
+   bool bC= false;
+   bool bS= false;
+   for (auto& i : graph.face()){
+       auto& a = i->a();
+       auto& b = i->b();
+       auto& c = i->c(); 
+       //glColor4f(.2,1,.2,.7);
+       Vec normal = (Vec(b-a).unit() ^ Vec(c-a).unit()).duale();
+       GL::normal( normal.begin() );
+       glColor3f(bC,bC,bC);
+       GL::vertex( a.begin() );
+       GL::vertex( b.begin() );
+       GL::vertex( c.begin() );
+       if (bS) bC = !bC;
+       bS = !bS;
+   }
+   glEnd();
+}
+
 
 struct MyApp : App {
+
+  HEGraph<Point> graph;
+  std::vector<Point> dpnts;
+  HEGraph<Point> graph2;
+  std::vector<Point> dpnts2;
+
+  float stacks = 10;
+  float slices = 10;
 
   bool bInverse;
   //Some Variables
@@ -49,6 +79,9 @@ struct MyApp : App {
     gui (wSpacing, "wSpacing", 1, 10);
     gui (bInverse, "bInverse");
 
+    gui (stacks, "stacks", 1, 100);
+    gui (slices, "slices", 1, 100);
+
 
     gui (ps.bShadedOutput, "bShadedOutput");  ///< default for output
     gui (ps.bSortOutput, "bSortOutput");      ///< default
@@ -59,6 +92,11 @@ struct MyApp : App {
     gui (ps.bPDF, "bPDF");  ///< pdf or eps
 
     scene.camera.pos(0,0,10);
+    
+    dpnts.resize(stacks * slices);
+    dpnts2.resize(stacks * slices);
+    graph.UV (stacks, slices, dpnts.data (), false, false);
+    graph2.UV (stacks, slices, dpnts2.data (), false, false);
   }
 
   /*-----------------------------------------------------------------------------
@@ -72,13 +110,7 @@ struct MyApp : App {
                 kV1U, kU1W, kW1V,
                 uSpacing, vSpacing, wSpacing);
 
-    int num = 5;
-
-//    for (auto& i : cmap.mCon)
-//    {
-//       Point pw = Round::location(tv.tf().pos().spin(i));
-//       Draw (pw, 1,1,0);
-//    }
+    int num = 10;
 
     DrawFrame(tv.tf());
     DrawFrame(tv.uf());
@@ -89,6 +121,7 @@ struct MyApp : App {
     DrawFrame(tv.uwf());
     DrawFrame(tv.uvwf());
 
+    // Attach another Volume to the RIGHT face
     TVolume tv2 (tv, TVolume::Face::RIGHT);
 
     DrawFrame(tv2.tf());
@@ -100,93 +133,47 @@ struct MyApp : App {
     DrawFrame(tv2.uwf());
     DrawFrame(tv2.uvwf());
 
-    int tnum = 8;
-//    for (int i = 0 ; i< tnum; ++i){
-//     for (int j = 0 ; j< tnum; ++j){
-//      float ti = (float)i/tnum;
-//      float tj = (float)j/tnum;
-//      Con c = tv2.calcMapping (ti,tj,0);
-//      Draw (Round::location(tv2.tf().pos().spin(c)));
-//     }
-//    }
-
     TVolume::Mapping cmap = tv.calcMapping(num);
     TVolume::Mapping cmap2= tv2.calcMapping(num);
 
-    for (auto& i : cmap.mCon)
-      Draw (Round::location(tv.tf().pos().spin(i)));
+//    for (auto& i : cmap.mCon)
+//      Draw (Round::location(tv.tf().pos().spin(i)));
+//
+//    for (auto& i : cmap2.mCon)
+//      Draw (Round::location(tv2.tf().pos().spin(i)));
+//
 
-    for (auto& i : cmap2.mCon)
-      Draw (Round::location(tv2.tf().pos().spin(i)));
+      for (int i = 0; i < num; ++i)
+      {
+         for (int j = 0; j < num; ++j)
+         {
+           Con c = cmap.at(i,j,num-1);
+           Point pw = Round::location(tv.tf().pos().spin(c));
+           dpnts [i*num +j] = pw;   
+         }
+      }
 
-//    auto cdraw = [=](const Point &origin, const TVolume::Mapping& mapping){
-//      for (int i = 0; i < num; ++i)
-//      {
-//       glColor4f (0, .3, 0, 1);
-//       glBegin (GL_LINE_STRIP);
-//         for (int j = 0; j < num; ++j)
-//         {
-//           Con c = mapping.at(j,i,num-1);
-//           Point pw = Round::location(origin.spin(c));
-//           GL::vertex (pw);
-//          }
-//       glEnd();
-//      }
-//    };
-//
-//    cdraw(tv.tf().pos(), cmap);
-//
-//   for (int i = 0; i < num; ++i)
-//   {
-//
-//     float ti = (float)i/(num-1);
-//     Con c = cmap.at(num-1,i,num-1);
-//     Point pw = Round::location(tv.tf().pos().spin(c));
-//     Draw (Construct::sphere (pw, .1), 1,0,0);
-//
-//     TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
-//
-//     auto tmp = [](const DualSphere& a, const DualSphere& b){
-//       auto ratio = a/b.tunit();
-//     //  cout << ratio [0] << endl;
-//       return Ori(1) <= (Gen::log (ratio) * .5); 
-//     };
-//
-//     auto sv = pw <= tv2.dvuw1();
-//     auto su =  pw <= tv2.duvw1();
-//
-//     auto vpair  = tmp(sv, tv2.wf().svu);
-//     auto vpair2 = tmp(tv2.vwf().svu, tv2.wf().svu);
-//     float tv = (vpair <= !vpair2)[0];
-//
-//     DrawRound (sv, ti, 0, 1-ti,.4);
-//
-//     glColor4f (0, .5, .5, 1);
-//     glBegin (GL_LINE_STRIP);
-//     for (int j = 0; j < num; ++j){
-//       float tj = (float)j/(num-1);
-//       Con c2 = bInverse ? tv2.calcMapping (tj, tv, 1.0) : tv2.calcMapping (tj, ti, 1.0);
-//       Point pw2 = Round::location (tv2.tf().pos().spin(c2));
-//       GL::vertex (pw2);
-//     }
-//     glEnd();
-//
-//   }
 
-//   Draw (tv2.tf().suv, 1,0,0,.1);
-//   Draw (tv2.uf().suv, 1,0,0,.1);
-//     Draw (tv2.uvf().suw, 1.0, 0.0, 0.0, .1);
-//     Draw (tv2.uvf().svw, 1.0, 0.0, 0.0, .1);
-//     Draw (tv2.uvf().swu, 1.0, 0.0, 0.0, .1);
-//
-//     cout << "A: " << (tv2.tf().suv <= tv2.tf().tu)[3] << endl;
-//     cout << "B: " << (tv2.uf().suv <= tv2.uf().tu)[3] << endl;
-//
-//     cout << "C: " << (tv2.tf().svu <= tv2.tf().tv)[3] << endl;
-//     cout << "D: " << (tv2.vf().svu <= tv2.vf().tv)[3] << endl;
-//
-//     cout << "E: " << (tv2.tf().svu <= tv2.tf().tv)[3] << endl;
-//     cout << "E: " << (tv2.vf().svu <= tv2.vf().tv)[3] << endl;
+     for (int i = 0; i < num; ++i)
+     {
+       float ti = (float)i/(num-1);
+       Con c = cmap.at(num-1,i,num-1);
+       Point pw = Round::location(tv.tf().pos().spin(c));
+       Draw (Construct::sphere (pw, .1), 1,0,0);
+
+       TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
+       for (int j = 0; j < num; ++j)
+       {
+         float tj = (float)j/(num-1);
+         Con c2 = bInverse ? tv2.calcMapping (tj, tc.v, 1.0) : tv2.calcMapping (tj, ti, 1.0);
+         Point pw2 = Round::location (tv2.tf().pos().spin(c2));
+         dpnts2 [i*num+j] = pw2;
+       }
+     }
+
+      DrawGraph(graph);
+      DrawGraph(graph2);
+
    }
 
 };

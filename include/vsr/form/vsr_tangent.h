@@ -26,6 +26,8 @@
 namespace vsr {
 namespace cga {
 
+#define FSIGN 1
+
 /// A much simpler rep
 //  @todo determine how much this should just be operational and storage free
 //  for instance are the DualSpheres needed?
@@ -45,9 +47,9 @@ struct TFrame
   // not negated unless tv are defined no^t and not t^no
    void flatSurfaces ()
    {
-     svu = svw = Inf(1) <= tv;
-     suv = suw = Inf(1) <= tu;
-     swu = swv = Inf(1) <= tw;
+     svu = svw = Inf(FSIGN) <= tv;
+     suv = suw = Inf(FSIGN) <= tu;
+     swu = swv = Inf(FSIGN) <= tw;
    }
 
   // Tangents (orthonormal)
@@ -69,21 +71,21 @@ struct TFrame
   DualSphere usurf (float ku)
   {
     //return DualSphere (Inf (-1) <= tu).spin (Gen::bst (tu * -ku / 2.0));
-    return Normalize( (Inf (1) <= tu) * ((tu * ku) + 1));
+    return Normalize( (Inf (FSIGN) <= tu) * ((tu * ku) + 1));
   }
 
   /// Surface of constant v with curvature kv
   DualSphere vsurf (float kv)
   {
     //return DualSphere (Inf (-1) <= tv).spin (Gen::bst (tv * -kv / 2.0));
-    return Normalize( (Inf (1) <= tv) * ((tv * kv) + 1));
+    return Normalize( (Inf (FSIGN) <= tv) * ((tv * kv) + 1));
   }
 
   /// Surface of constant w with curvature kw
   DualSphere wsurf (float kw)
   {
     //return DualSphere (Inf (-1) <= tw).spin (Gen::bst (tw * -kw / 2.0));
-    return Normalize ((Inf (1) <= tw) * ((tw * kw) + 1));
+    return Normalize ((Inf (FSIGN) <= tw) * ((tw * kw) + 1));
   }
 
   // Make the surfaces (needed to calculate rotor)
@@ -155,7 +157,8 @@ struct TFrame
  
   static DualSphere Normalize (const DualSphere&s ){
     float flip = (s[3] < 0) ? -1.0 : 1.0; 
-    return ((s[3] == 0) ? s : s/s[3]) * flip;
+    bool is_flat = (s[3] == 0);
+    return ((is_flat) ? DualSphere(s[0], s[1], s[2], 0, s[4]) : s/s[3]) * flip;
   }
   // some extra stuff here -- the pair log generators bringing surf to surf
   static Pair CalcGen2 (const Point& p, const DualSphere& beg, const DualSphere&end)
@@ -173,10 +176,16 @@ struct TFrame
     auto ratio = (end/beg).tunit();
     bool flipA = (beg <= p1)[3] > 0; 
     bool flipB = (end <= p2)[3] > 0; 
-    bool flipC =  ((Round::location(p1) <= end)[0] > 0) ;
-    float flip = ((flipA != flipB) ) ? -1.0 : 1.0;
+    bool flipC =  ((Round::location(p1) <= end)[0] > FPERROR) ;
+    float flip = ((flipA != flipB) ) ? -1.0 : 1.0;      
     return Gen::log(ratio * flip, flipC, true) / 2.0;
   }
+
+  static Pair NormalizePair (const Pair &pair)
+  {
+    return Pair(-Round::dir (pair).copy<Vec> ().unit ().copy<Tnv> ())
+                 .trs (Round::location (pair));
+  };
   // note surfaces() must have been called
   // this sweeps the v direction curve "over" along u
   Pair duv (const TFrame &tf){
@@ -475,9 +484,12 @@ struct TVolume {
             //uvwf().tv = (np <= uvf().svw.undual()).dual();
             //uvwf().tw = (np <= vwf().swu.undual()).dual();
 
-            uvwf().tu = uvf().suw ^ np;
-            uvwf().tv = uvf().svw ^ np;
-            uvwf().tw = vwf().swu ^ np;
+            auto normT = [] (const Pair& pair){
+               return Pair (-Round::dir (pair).copy<Vec> ().unit ().copy<Tnv> ());
+            };
+            uvwf().tu = normT(uvf().suw ^ np);
+            uvwf().tv = normT(uvf().svw ^ np);
+            uvwf().tw = normT(vwf().swu ^ np);
             //and with that, we have all the surfaces that can be defined with
             //nine coefficients -- 24 surfaces!  Which pair up into 12 Generators
             //now we find the remaining 6 generators
@@ -754,18 +766,40 @@ struct TVolume {
               return Ori(1) <= (Gen::log ((a/b).tunit()) * .5); 
             };
 
-            auto sv  = p <= dvuw1();
-            auto su =  p <= duvw1();
+            auto tmp2 = [](const Pair& pa, const Pair& pb, const DualSphere& a, const DualSphere& b){
+              return Ori(1) <= TFrame::CalcGen(pa, pb, a, b);; 
+            };
 
-            auto vpair  = tmp(sv, wf().svu);
-            auto vpair2 = tmp(vwf().svu, wf().svu);
+            auto normT = [] (const Pair& pair){
+               return pair;//Pair (-Round::dir (pair).copy<Vec> ().unit ().copy<Tnv> ());
+            };
+
+            auto sv = TFrame::Normalize(-p <= dvuw1());
+            auto su = TFrame::Normalize(-p <= duvw1());
+
+            auto svt = normT(sv ^ p);
+            auto sut = normT(su ^ p);
+
+            //auto vpair  = tmp(sv, wf().svu);
+            //auto vpair2 = tmp(vwf().svu, wf().svu);
+            //auto tv = vpair <= !vpair2;
+
+            //auto upair = tmp (su, wf().suv);
+            //auto upair2 = tmp (uwf().suv, wf().suv);
+            //auto tu = upair <= !upair2;
+
+            auto vpair  = tmp2(wf().tv, svt,  wf().svu, sv);
+            auto vpair2 = tmp2(wf().tv, vwf().tv, wf().svu, vwf().svu);
             auto tv = vpair <= !vpair2;
 
-            auto upair = tmp (su, wf().suv);
-            auto upair2 = tmp (uwf().suv, wf().suv);
+            auto upair = tmp2 (wf().tu, sut, wf().suv, su);
+            auto upair2 = tmp2 (wf().tu, uwf().tu, wf().suv, uwf().suv);
             auto tu = upair <= !upair2;
 
-            return {-tu[0], -tv[0], 1.0};
+            float fv = FERROR(tv[0]) ? 0 : tv[0];
+            float fu = FERROR(tu[0]) ? 0 : tu[0];
+
+            return {fu, fv, 1.0};
 
             break;
          }

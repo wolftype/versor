@@ -153,6 +153,9 @@ struct MyApp : App {
     // dw of v direction (sweeps back to front LEFT veritical) |
     Pair dwvu0 = tf.dwv (wf);
 
+    cout << (tf.svu[3]) << " " << (vf.svu[3]) << endl;
+    cout << (tf.pos() <= vf.svu) << endl;
+
 
    // we need to calculate the other frames
     // to calculate the other surfaces
@@ -233,22 +236,21 @@ struct MyApp : App {
        DrawCurve (v0pos, dwuv0, 20, 0,0,1);
        DrawCurve (v1pos, dwuv1, 20, 0,0,1);
 
-
     }
 
-    DrawCurve (tf.pos(), dwuv0, 20, 0,0,1);
-
-//    DrawCurve (vf.pos(), duwv1, 20, 1,0,0);
-    DrawCurve (wf.pos(), dvwu0, 20, 0,1,0);
-    DrawCurve (uf.pos(), dwuv0, 20, 0,0,1);
-
-    DrawCurve (wf.pos(), duvw1, 20, 1,0,0);
-    DrawCurve (uf.pos(), dvuw0, 20, 0,1,0);
-    DrawCurve (vf.pos(), dwvu0, 20, 0,0,1); //
-
-    DrawCurve (vwf.pos(),duwv1,20,1,0,0);
-    DrawCurve (wuf.pos(),dvuw1,20,0,1,0);
-    DrawCurve (uvf.pos(),dwvu1,20,0,0,1);
+//    DrawCurve (tf.pos(), dwuv0, 20, 0,0,1);
+//
+////    DrawCurve (vf.pos(), duwv1, 20, 1,0,0);
+//    DrawCurve (wf.pos(), dvwu0, 20, 0,1,0);
+//    DrawCurve (uf.pos(), dwuv0, 20, 0,0,1);
+//
+//    DrawCurve (wf.pos(), duvw1, 20, 1,0,0);
+//    DrawCurve (uf.pos(), dvuw0, 20, 0,1,0);
+//    DrawCurve (vf.pos(), dwvu0, 20, 0,0,1); //
+//
+//    DrawCurve (vwf.pos(),duwv1,20,1,0,0);
+//    DrawCurve (wuf.pos(),dvuw1,20,0,1,0);
+//    DrawCurve (uvf.pos(),dwvu1,20,0,0,1);
 
     Boost wvu0 = Gen::bst (dwvu0 * amt1);
     Boost wvu1 = Gen::bst (dwvu1 * amt1);
