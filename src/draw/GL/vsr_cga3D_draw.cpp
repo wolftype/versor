@@ -61,8 +61,8 @@ namespace gfx{
   template<> void Renderable< cga::DualPlane,0 >::DrawImmediate (const  cga::DualPlane& s){
     gfx::GL::translate( Op::Pos(s).begin() );
     gfx::GL::rotate( Op::AA(s).begin() );
-    Glyph::SolidGrid(6,6,5);
-      //Glyph::Rect(10,10);
+    //Glyph::SolidGrid(6,6,5);
+     Glyph::Rect(10,10);
   }
   template<> void Renderable< cga::Plane,0 >::DrawImmediate (const  cga::Plane& s){
     Renderable< cga::DualPlane >::DrawImmediate(s.dual());

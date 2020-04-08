@@ -27,6 +27,7 @@ namespace vsr {
 namespace cga {
 
 #define FSIGN 1
+#define FLIP false 
 
 /// A much simpler rep
 //  @todo determine how much this should just be operational and storage free
@@ -179,6 +180,7 @@ struct TFrame
     bool flipC =  ((Round::location(p1) <= end)[0] > FPERROR) ;
     float flip = ((flipA != flipB) ) ? -1.0 : 1.0;      
     return Gen::log(ratio * flip, flipC, true) / 2.0;
+    //return Gen::log(-ratio, flipC, true) / 2.0;
   }
 
   static Pair NormalizePair (const Pair &pair)
@@ -243,18 +245,19 @@ struct TVolume {
   struct Mapping {
 
        std::vector<Con> mCon;
-       int mRes;
+       int mResU, mResV, mResW;
 
-       Mapping (int res) : mRes (res){
-         mCon.resize(res * res * res);
+       Mapping (int resU, int resV, int resW) : 
+         mResU (resU), mResV (resV), mResW (resW) {
+         mCon.resize(resU * resV * resW);
        }
 
        Con& at (int i, int j, int k){
-         return mCon [i * mRes * mRes + j * mRes + k];
+         return mCon [i * mResV * mResW + j * mResW + k];
        }
 
        const Con& at (int i, int j, int k) const {
-         return mCon [i * mRes * mRes + j * mRes + k];
+         return mCon [i * mResV * mResW + j * mResW + k];
        }
 
     };
@@ -524,39 +527,39 @@ struct TVolume {
       tf().surfaces (kvu(), kwu(), kuv(), kwv(), kuw(), kvw());
 
       // New frames in respective directions, bools specify whether to "flip"
-      uf() = tf().xf (uc, false, false, false);
-      vf() = tf().xf (vc, false, false, false);
-      wf() = tf().xf (wc, false, false, false);
+      uf() = tf().xf (uc, FLIP, false, false);
+      vf() = tf().xf (vc, false, FLIP, false);
+      wf() = tf().xf (wc, false, false, FLIP);
 
       // Here we can make three surfaces by bending
       // "Top Going Right"
-      vf().svu = vf().vsurf (kv1u());
       // "Right Going Forward"
-      uf().suw = uf().usurf (ku1w());
       // "Front Going Up"
+      vf().svu = vf().vsurf (kv1u());
+      uf().suw = uf().usurf (ku1w());
       wf().swv = wf().wsurf (kw1v());
 
       //Now all other surfaces must be orthogonal to these
       //"Back Right Edge Going Up"
       //At u1, const u1 and const w0 in v dir are both ortho to const v1 in u dir
-      uf().suv = TFrame::Normalize(vf().svu <= uf().tu);
-      uf().swv = TFrame::Normalize(vf().svu <= uf().tw);
       //"Front Bottom Edge Going Over"
       //At w1, const w1 and const v0 in u dir are both ortho to const u1 in w dir
-      wf().swu = TFrame::Normalize(uf().suw <= wf().tw);
-      wf().svu = TFrame::Normalize(uf().suw <= wf().tv);
       //"Top Left Edge Going Forward"
       //At v1, const v1 and const u0 are both ortho to const w1 in v dir
-      vf().svw = TFrame::Normalize(wf().swv <= vf().tv);
-      vf().suw = TFrame::Normalize(wf().swv <= vf().tu);
+      uf().suv = TFrame::Normalize(vf().svu <= uf().tu * FSIGN);
+      uf().swv = TFrame::Normalize(vf().svu <= uf().tw * FSIGN);
+      wf().swu = TFrame::Normalize(uf().suw <= wf().tw * FSIGN);
+      wf().svu = TFrame::Normalize(uf().suw <= wf().tv * FSIGN);
+      vf().svw = TFrame::Normalize(wf().swv <= vf().tv * FSIGN);
+      vf().suw = TFrame::Normalize(wf().swv <= vf().tu * FSIGN);
 
       //now, what about the other surfaces to match the three bends?
       //"Bottom Going Forward"
-      uf().svw = TFrame::Normalize(wf().swu <= uf().tv);
       //"Back Going Right"
-      vf().swu = TFrame::Normalize(uf().suv <= vf().tw);
       //"Left Going Up"
-      wf().suv = TFrame::Normalize(vf().svw <= wf().tu);
+      uf().svw = TFrame::Normalize(wf().swu <= uf().tv * FSIGN);
+      vf().swu = TFrame::Normalize(uf().suv <= vf().tw * FSIGN);
+      wf().suv = TFrame::Normalize(vf().svw <= wf().tu * FSIGN);
 
       // first letter indicates direction of sweep.
       // second letter indicates curvature line that is swept.
@@ -577,9 +580,9 @@ struct TVolume {
 
       // we need to calculate the other frames
       // to calculate the other surfaces
-      uvf() = vf().xf( Gen::boost(duvw0()), false, false, false);
-      vwf() = wf().xf( Gen::boost(dvwu0()), false, false, false);
-      uwf() = uf().xf( Gen::boost(dwuv0()), false, false, false);
+      uvf() = vf().xf( Gen::boost(duvw0()), FLIP, false, false);
+      vwf() = wf().xf( Gen::boost(dvwu0()), false, FLIP, false);
+      uwf() = uf().xf( Gen::boost(dwuv0()), false, false, FLIP);
 
       auto topPlane = vf().pos() ^ uvf().pos() ^ vwf().pos() ^ Inf(1);
       auto frontPlane = wf().pos() ^ vwf().pos() ^ uwf().pos() ^ Inf(1);
@@ -589,21 +592,21 @@ struct TVolume {
       Point np = p.null();
 
       //these each have two defined surfaces
-      uvf().suw = TFrame::Normalize(np <= uvf().tu);
-      uvf().svw = TFrame::Normalize(np <= uvf().tv);
-      vwf().svu = TFrame::Normalize(np <= vwf().tv);
-      vwf().swu = TFrame::Normalize(np <= vwf().tw);
-      uwf().swv = TFrame::Normalize(np <= uwf().tw);
-      uwf().suv = TFrame::Normalize(np <= uwf().tu);
+      uvf().suw = TFrame::Normalize(np <= uvf().tu * FSIGN);
+      uvf().svw = TFrame::Normalize(np <= uvf().tv * FSIGN);
+      vwf().svu = TFrame::Normalize(np <= vwf().tv * FSIGN);
+      vwf().swu = TFrame::Normalize(np <= vwf().tw * FSIGN);
+      uwf().swv = TFrame::Normalize(np <= uwf().tw * FSIGN);
+      uwf().suv = TFrame::Normalize(np <= uwf().tu * FSIGN);
 
       //grab the tangent frame at np too
 //      uvwf().tu = (np <= uvf().suw.undual()).dual();
 //      uvwf().tv = (np <= uvf().svw.undual()).dual();
 //      uvwf().tw = (np <= vwf().swu.undual()).dual();
 
-      uvwf().tu = uvf().suw ^ np;
-      uvwf().tv = uvf().svw ^ np;
-      uvwf().tw = vwf().swu ^ np;
+      uvwf().tu = uvf().suw ^ np * FSIGN;
+      uvwf().tv = uvf().svw ^ np * FSIGN;
+      uvwf().tw = vwf().swu ^ np * FSIGN;
       //and with that, we have all the surfaces that can be defined with
       //nine coefficients -- 24 surfaces!  Which pair up into 12 Generators
       //now we find the remaining 6 generators
@@ -622,7 +625,7 @@ struct TVolume {
 
     }
 
-   Con calcMapping (float ti, float tj, float tk){
+   Con calcMappingAt (float ti, float tj, float tk){
       // Back to Front
       Boost wvu0 = Gen::bst (dwvu0() * tk);
       Boost wvu1 = Gen::bst (dwvu1() * tk);
@@ -637,39 +640,24 @@ struct TVolume {
       auto u0 = (tf().tu.spin (wvu0));
       auto u1 = (uf().tu.spin (wvu1));
       Pair duv = TFrame::CalcGen (u0, u1, su0v, su1v);
-      
-//      cout << "U: " << endl;
-//      cout << (su0v <= u0)[3] << endl;
-//      cout << (su1v <= u1)[3] << endl;
-//      cout << (su1v <= su0v) << endl; 
-//      cout << (tf().pos() <= su1v) << endl; 
-//
       auto v0 = (tf().tv.spin (wuv0));
       auto v1 = (vf().tv.spin (wuv1));
       Pair dvu = TFrame::CalcGen (v0, v1, sv0u, sv1u);
-
-//      cout << "V: " << endl;
-//      cout << (sv0u <= v0)[3] << endl;
-//      cout << (sv1u <= v1)[3] << endl;
-//      cout << (sv1u <= sv0u) << endl; 
-//      cout << (tf().pos() <= sv1u) << endl; 
-      //Pair duv = Gen::log((su1v/su0v).tunit()) * .5;
-//      Pair dvu = Gen::log((sv1u/sv0u).tunit()) * .5;
-      
+     
       Boost uv = Gen::bst(duv * ti);
       Boost vu = Gen::bst(dvu * tj);
 
       return vu * uv * wvu0;
    }
 
-   Mapping calcMapping (int res)
+   Mapping calcMapping (int resU, int resV, int resW)
    {
 
-     Mapping result (res);
+     Mapping result (resU, resV, resW);
 
-     for (int i = 0; i < res; ++i)
+     for (int i = 0; i < resW; ++i)
      {
-        float ti = (float)i/(res-1);
+        float ti = (float)i/(resW-1);
         // Back to Front
         Boost wvu0 = Gen::bst (dwvu0() * ti);
         Boost wvu1 = Gen::bst (dwvu1() * ti);
@@ -696,14 +684,14 @@ struct TVolume {
         auto v1 = (vf().tv.spin (wuv1));
         Pair dvu = TFrame::CalcGen (v0, v1, sv0u, sv1u);
         
-       for (int j = 0; j < res; ++j)
+       for (int j = 0; j < resU; ++j)
        {
-         float tj = (float)j/(res-1);
+         float tj = (float)j/(resU-1);
          Boost uv = Gen::bst(duv * tj);
 
-         for (int k = 0; k < res; ++k)
+         for (int k = 0; k < resV; ++k)
          {
-           float tk = (float)k/(res-1);
+           float tk = (float)k/(resV-1);
            Boost vu = Gen::bst(dvu * tk);
 
            Con Kw = vu * uv * wvu0;

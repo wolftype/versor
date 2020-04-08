@@ -11,6 +11,8 @@ using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
 
+#define FLIP false 
+
 
 struct Triple {
    Point point[3];
@@ -87,13 +89,13 @@ struct MyApp : App {
 
 
     // New frames in respective directions, bools specify whether to "flip"
-    //TFrame uf = tf.xf (uc, true, false, false);
-    //TFrame vf = tf.xf (vc, false, true, false);
-    //TFrame wf = tf.xf (wc, false, false, true);
+    TFrame uf = tf.xf (uc, FLIP, false, false);
+    TFrame vf = tf.xf (vc, false, FLIP, false);
+    TFrame wf = tf.xf (wc, false, false, FLIP);
 
-    TFrame uf = tf.xf (uc, false, false, false);
-    TFrame vf = tf.xf (vc, false, false, false);
-    TFrame wf = tf.xf (wc, false, false, false);
+    //TFrame uf = tf.xf (uc, false, false, false);
+    //TFrame vf = tf.xf (vc, false, false, false);
+    //TFrame wf = tf.xf (wc, false, false, false);
     // Here we can make three surfaces by bending
     // "Top Going Right"
     vf.svu = vf.vsurf (kV1U);
@@ -105,28 +107,28 @@ struct MyApp : App {
     //Now all other surfaces must be orthogonal to these
     //"Back Right Edge Going Up"
     //At u1, const u1 and const w0 in v dir are both ortho to const v1 in u dir
-    uf.suv = TFrame::Normalize(vf.svu <= uf.tu);
-    uf.swv = TFrame::Normalize(vf.svu <= uf.tw);
+    uf.suv = TFrame::Normalize(-vf.svu <= uf.tu);
+    uf.swv = TFrame::Normalize(-vf.svu <= uf.tw);
     //"Front Bottom Edge Going Over"
     //At w1, const w1 and const v0 in u dir are both ortho to const u1 in w dir
-    wf.swu = TFrame::Normalize(uf.suw <= wf.tw);
-    wf.svu = TFrame::Normalize(uf.suw <= wf.tv);
+    wf.swu = TFrame::Normalize(-uf.suw <= wf.tw);
+    wf.svu = TFrame::Normalize(-uf.suw <= wf.tv);
     //"Top Left Edge Going Forward"
     //At v1, const v1 and const u0 are both ortho to const w1 in v dir
-    vf.svw = TFrame::Normalize(wf.swv <= vf.tv);
-    vf.suw = TFrame::Normalize(wf.swv <= vf.tu);
+    vf.svw = TFrame::Normalize(-wf.swv <= vf.tv);
+    vf.suw = TFrame::Normalize(-wf.swv <= vf.tu);
 
     //now, what about the other surfaces to match the three bends?
     //"Bottom Going Forward"
-    uf.svw = TFrame::Normalize(wf.swu <= uf.tv);
+    uf.svw = TFrame::Normalize(-wf.swu <= uf.tv);
     //"Back GTFrame::Normalize(oing Right"
-    vf.swu = TFrame::Normalize(uf.suv <= vf.tw);
+    vf.swu = TFrame::Normalize(-uf.suv <= vf.tw);
     //"Left GTFrame::Normalize(oing Up"
-    wf.suv = TFrame::Normalize(vf.svw <= wf.tu);
+    wf.suv = TFrame::Normalize(-vf.svw <= wf.tu);
 
-    vf.svu = TFrame::Normalize(uf.suv <= vf.tv);
-    uf.suw = TFrame::Normalize(wf.swu <= uf.tu);
-    wf.swv = TFrame::Normalize(vf.svw <= wf.tw);
+    vf.svu = TFrame::Normalize(-uf.suv <= vf.tv);
+    uf.suw = TFrame::Normalize(-wf.swu <= uf.tu);
+    wf.swv = TFrame::Normalize(-vf.svw <= wf.tw);
 
     //(uf.suv <= vf.tv).print();
 
@@ -159,13 +161,13 @@ struct MyApp : App {
 
    // we need to calculate the other frames
     // to calculate the other surfaces
-    //TFrame uvf = vf.xf( Gen::boost(duvw0), true, false, false);
-    //TFrame vwf = wf.xf( Gen::boost(dvwu0), false, true, false);
-    //TFrame wuf = uf.xf( Gen::boost(dwuv0), false, false, true);
+    TFrame uvf = vf.xf( Gen::boost(duvw0), FLIP, false, false);
+    TFrame vwf = wf.xf( Gen::boost(dvwu0), false, FLIP, false);
+    TFrame wuf = uf.xf( Gen::boost(dwuv0), false, false, FLIP);
 
-    TFrame uvf = vf.xf( Gen::boost(duvw0), false, false, false);
-    TFrame vwf = wf.xf( Gen::boost(dvwu0), false, false, false);
-    TFrame wuf = uf.xf( Gen::boost(dwuv0), false, false, false);
+    //TFrame uvf = vf.xf( Gen::boost(duvw0), false, false, false);
+    //TFrame vwf = wf.xf( Gen::boost(dvwu0), false, false, false);
+    //TFrame wuf = uf.xf( Gen::boost(dwuv0), false, false, false);
 
     auto topPlane = vf.pos() ^ uvf.pos() ^ vwf.pos() ^ Inf(1);
     auto frontPlane = wf.pos() ^ vwf.pos() ^ wuf.pos() ^ Inf(1);
@@ -175,12 +177,12 @@ struct MyApp : App {
     Point np = p.null();
 
     //these each have two defined surfaces
-    uvf.suw = TFrame::Normalize(np <= uvf.tu);
-    uvf.svw = TFrame::Normalize(np <= uvf.tv);
-    vwf.svu = TFrame::Normalize(np <= vwf.tv);
-    vwf.swu = TFrame::Normalize(np <= vwf.tw);
-    wuf.swv = TFrame::Normalize(np <= wuf.tw);
-    wuf.suv = TFrame::Normalize(np <= wuf.tu);
+    uvf.suw = TFrame::Normalize(-np <= uvf.tu);
+    uvf.svw = TFrame::Normalize(-np <= uvf.tv);
+    vwf.svu = TFrame::Normalize(-np <= vwf.tv);
+    vwf.swu = TFrame::Normalize(-np <= vwf.tw);
+    wuf.swv = TFrame::Normalize(-np <= wuf.tw);
+    wuf.suv = TFrame::Normalize(-np <= wuf.tu);
 
     //Draw (uvf.suw);
 
