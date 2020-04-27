@@ -285,9 +285,14 @@ Pair Gen::atanh2 (const Pair &p, VSR_PRECISION cs, bool bCW, bool bTwoPI)
 
   auto tp = p.wt ();
   auto sq = sqrt (fabs (tp));
-  if (tp > 0)
-    norm = asinh (sq) / sq;
-  else if (tp < 0)
+  if (tp > FPERROR)
+  {
+//    if (bCW)
+//      norm = (asinh (sq)-(bTwoPI ? TWOPI: PI)) / sq  ;
+//    else
+      norm = asinh (sq) / sq;
+  }
+  else if (tp < -FPERROR)
     {
       if (bCW)
         //norm = -((bTwoPI ? TWOPI : PI) - atan2 (sq, cs)) / sq;  //alt direction

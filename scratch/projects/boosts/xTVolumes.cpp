@@ -19,7 +19,7 @@ void DrawGraph (const HEGraph<Point>& graph, int resU, int resV)
    for (auto& i : graph.face()){
        auto& a = i->a();
        auto& b = i->b();
-       auto& c = i->c(); 
+       auto& c = i->c();
        //glColor4f(.2,1,.2,.7);
        Vec normal = (Vec(b-a).unit() ^ Vec(c-a).unit()).duale();
        GL::normal( normal.begin() );
@@ -48,7 +48,7 @@ struct MyApp : App {
   HEGraph<Point> graph2;
   std::vector<Point> dpnts2;
 
-  float resU = 11;
+  float resU = 10;
   float resV = 10;
 
   bool bInverse;
@@ -68,6 +68,8 @@ struct MyApp : App {
   float uSpacing = 3;
   float vSpacing = 3;
   float wSpacing = 3;
+
+  bool bUseAltMap;
 
   void setup(){
     ///Add Variables to GUI
@@ -90,6 +92,8 @@ struct MyApp : App {
     gui (resU, "resU", 1, 100);
     gui (resV, "resV", 1, 100);
 
+    gui (bUseAltMap, "useAltMap");
+
 
     gui (ps.bShadedOutput, "bShadedOutput");  ///< default for output
     gui (ps.bSortOutput, "bSortOutput");      ///< default
@@ -100,7 +104,7 @@ struct MyApp : App {
     gui (ps.bPDF, "bPDF");  ///< pdf or eps
 
     scene.camera.pos(0,0,10);
-    
+
     dpnts.resize(resU * resV);
     dpnts2.resize(resU * resV);
     graph.UV (resU, resV, dpnts.data (), false, false);
@@ -140,47 +144,64 @@ struct MyApp : App {
     DrawFrame(tv2.uwf());
     DrawFrame(tv2.uvwf());
 
-    int resW = 2;
+    int resW = 11;
     TVolume::Mapping cmap = tv.calcMapping(resU, resV, resW);
-    TVolume::Mapping cmap2= tv2.calcMapping(resU, resV, resW);
+    if (bUseAltMap)
+       cmap = tv.calcMapping2(resU, resV, resW);
+//    TVolume::Mapping cmap2= tv2.calcMapping(resU, resV, resW);
 
-//    for (auto& i : cmap.mCon)
-//      Draw (Round::location(tv.tf().pos().spin(i)));
+    for (auto& i : cmap.mCon)
+      Draw (Round::location(tv.tf().pos().spin(i)));
+ //   for (auto& i : cmap2.mCon)
+ //     Draw (Round::location(tv2.tf().pos().spin(i)), 1,0,0);
+//      Draw (TFrame::NormalizePair(tv2.tf().tv.spin(i)), 1,0,0);
+
+//    for (int i = 0; i < resU; ++i)
+//    {
+//       for (int j = 0; j < resV; ++j)
+//       {
+//         Con c = cmap.at(i,j,resW-1);
+//         Point pw = Round::location(tv.tf().pos().spin(c));
+//         dpnts [i*resV +j] = pw;
+//       }
+//    }
 //
-//    for (auto& i : cmap2.mCon)
-//      Draw (Round::location(tv2.tf().pos().spin(i)));
+//     for (int i = 0; i < resV; ++i)
+//     {
+//       Con c = cmap.at(resU-1,i,resW-1);
+//       Point pw = Round::location(tv.tf().pos().spin(c));
+//       Draw (Construct::sphere (pw, .1), 1,0,0);
+//       TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
 //
-
-      for (int i = 0; i < resU; ++i)
-      {
-         for (int j = 0; j < resV; ++j)
-         {
-           Con c = cmap.at(i,j,resW-1);
-           Point pw = Round::location(tv.tf().pos().spin(c));
-           dpnts [i*resV +j] = pw;   
-         }
-      }
-
-     for (int i = 0; i < resV; ++i)
-     {
-       Con c = cmap.at(resU-1,i,resW-1);
-       Point pw = Round::location(tv.tf().pos().spin(c));
-       Draw (Construct::sphere (pw, .1), 1,0,0);
-       TVolume::Coord tc = tv2.inverseMapping (pw, TVolume::Face::FRONT);
-
-       float ti = (float)i/(resV-1);
-       for (int j = 0; j < resU; ++j)
-       {
-         float tj = (float)j/(resU-1);
-         Con c2 = bInverse ? tv2.calcMappingAt (tj, tc.v, 1.0) : tv2.calcMappingAt (tj, ti, 1.0);
-         Point pw2 = Round::location (tv2.tf().pos().spin(c2));
-         dpnts2 [j*resV+i] = pw2;
-       }
-     }
-
-      DrawGraph(graph, resU, resV);
-      DrawGraph(graph2, resU, resV);
-
+//       float ti = (float)i/(resV-1);
+//       for (int j = 0; j < resU; ++j)
+//       {
+//         float tj = (float)j/(resU-1);
+//         Con c2 = bInverse ? tv2.calcMappingAt (tj, tc.v, 1.0) : tv2.calcMappingAt (tj, ti, 1.0);
+//         Point pw2 = Round::location (tv2.tf().pos().spin(c2));
+//         dpnts2 [j*resV+i] = pw2;
+//       }
+//     }
+//
+//      DrawGraph(graph, resU, resV);
+//      DrawGraph(graph2, resU, resV);
+//
+//      auto tan1 = tv2.tf().tv;
+//      auto tan2 = tv2.vf().tv;
+//      auto sph1 = tv2.tf().svu;
+//      auto sph2 = tv2.vf().svu;
+//
+//      bool flipA = (sph1 <= tan1)[3] > 0;
+//      bool flipB = (sph2 <= tan2)[3] > 0;
+//      bool flipC = (Round::location (tan1) <= sph2)[0] > FPERROR;
+//      bool flipD = flipA != flipB;
+//      float flip = ((flipD) ) ? -1.0 : 1.0;
+//      bool flipE = (flipC) && !flipD;
+//      bool flipF = flipC == flipB;
+//      cout << "Approach: " << flipC << endl;
+//      cout << "Sense: " << flipD << endl;
+//      cout << "Result: " << flipE << endl;
+//      cout << "Result2: " << flipF << endl;
    }
 
 };
