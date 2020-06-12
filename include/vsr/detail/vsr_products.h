@@ -80,7 +80,7 @@ namespace vsr {
 template<bits::type A, class B, int idxA, int idxB>
 struct SubEGP{
   typedef typename XCat<
-                        XList< Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> >,
+                        XList< Inst<bits::signFlip( A, B::HEAD ) ? -1 : 1, A, B::HEAD, idxA, idxB> >,
                         typename SubEGP<A, typename B::TAIL, idxA, idxB+1>::Type
                        >::Type Type;
 };
@@ -110,7 +110,7 @@ struct EGP<Basis<>,B, idxA,idxB> {
 /// Outer Product Type Calculation Sub Loop
 template<bits::type A, class B, int idxA, int idxB>
 struct SubEOP{
-  typedef Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef Inst<bits::signFlip( A, B::HEAD ) ? -1 : 1, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEOP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type;
 };
@@ -140,7 +140,7 @@ struct EOP<Basis<>,B, idxA,idxB> {
 /// Scalar Product Type Calculation Sub Loop
 template<bits::type A, class B, int idxA, int idxB>
 struct SubESP{
-  typedef Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef Inst<bits::signFlip( A, B::HEAD ) ? -1 : 1, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::SP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubESP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type;
 };
@@ -169,7 +169,7 @@ struct ESP<Basis<>,B, idxA,idxB> {
 /// Inner Product Type Calculation Sub Loop
 template<bits::type A, class B, int idxA, int idxB>
 struct SubEIP{
-  typedef Inst<bits::signFlip( A, B::HEAD ), A, B::HEAD, idxA, idxB> INST;
+  typedef Inst<bits::signFlip( A, B::HEAD ) ? -1 : 1, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubEIP<A, typename B::TAIL, idxA, idxB+1>::Type >::Type Type;
 };
@@ -244,11 +244,21 @@ struct REGProd{
 
 /*-----------------------------------------------------------------------------
  *  METRIC GEOMETRIC PRODUCT COMPILE-TIME TYPE METAPROGRAMMING ROUTINES
+ *
+ *  Note: to change to add support for degenerate metric,
+ *  1 - no need to change MSign
+ *  2 - will need to change BFlip to an unsigned byte metric (0=0, 1=1, 2=-1)
+ *  3 - Inst will need to return an empty list if metric is 0
+ *
+ *  That should be it?
+ *
  *-----------------------------------------------------------------------------*/
 template<bits::type A, class B, class Metric, int idxA, int idxB>
 struct SubMGP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;
-  typedef typename XCat< XList< Inst< BFlip, A, B::HEAD, idxA, idxB> >, typename SubMGP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
+  static const int MVAL = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val;
+  typedef Inst< MVAL, A, B::HEAD, idxA, idxB> INST;
+  typedef typename Maybe< INST::GP, XList< INST >, XList<> >::Type ELEM;
+  typedef typename XCat< ELEM, typename SubMGP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
 };
 template<bits::type A, class Metric, int idxA, int idxB>
 struct SubMGP<A, Basis<>, Metric, idxA, idxB >{
@@ -271,8 +281,8 @@ struct MGP<Basis<>,B, Metric, idxA,idxB> {
 
 template<bits::type A, class B, class Metric, int idxA, int idxB>
 struct SubMOP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;
-  typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
+  static const int MVAL = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val;
+  typedef Inst< MVAL, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::OP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubMOP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
 };
@@ -297,8 +307,8 @@ struct MOP<Basis<>,B, Metric,idxA,idxB> {
 
 template<bits::type A, class B,  class Metric, int idxA, int idxB>
 struct SubMIP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;
-  typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
+  static const int MVAL = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val;
+  typedef Inst< MVAL, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::IP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubMIP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
 };
@@ -322,8 +332,8 @@ struct MIP<Basis<>,B, Metric, idxA,idxB> {
 
 template<bits::type A, class B,  class Metric, int idxA, int idxB>
 struct SubMSP{
-  static const bool BFlip = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val == -1;
-  typedef Inst< BFlip, A, B::HEAD, idxA, idxB> INST;
+  static const int MVAL = MSign< Metric, A & B::HEAD, bits::signFlip(A , B::HEAD) ? -1 : 1 >::Val;
+  typedef Inst< MVAL, A, B::HEAD, idxA, idxB> INST;
   typedef typename Maybe< INST::SP, XList< INST >, XList<> >::Type ELEM;
   typedef typename XCat< ELEM, typename SubMSP<A, typename B::TAIL, Metric, idxA, idxB+1>::Type >::Type Type;
 };

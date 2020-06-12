@@ -1,7 +1,9 @@
 /*! @file
     generic multivector class, templated on a geometric algebra and a field
 
-    using Vec = vsr::algebra< metric<3>, float>::types::Vec;
+    e.g:
+
+    using Vec = vsr::algebra< metric<3,0,0,false>, float>::types::Vec;
     Vec v(1,0,0);
 
  * =====================================================================================
@@ -66,7 +68,7 @@ namespace vsr{
 
       /// the Dual Type (product of this and algebra::types::pseudoscalar)
       using Dual = typename algebra::template make_gp< typename blade<algebra::dim,algebra::dim>::type, basis>;
-      /// the Euclidan subspace Dual Type (product of this and algebra::types::euclidean_pseudoscalar)
+      /// the Euclidean subspace Dual Type (product of this and algebra::types::euclidean_pseudoscalar)
       using DualE = typename algebra::template make_gp< Basis<bits::pss(algebra::dim-2)>, basis>;
 
       value_t val[Num];                                   ///< %Data Array
@@ -174,7 +176,7 @@ namespace vsr{
       }
 
       /// Scalar Product \\(a \\cdot b \\)
-      /// Returns Scalar valued product
+      /// Returns Scalar valued product \todo should return 0 if grades are different
       template<class B>
       auto scalar_product ( const MultivectorB<B>&  b) const-> decltype( algebra::sp(*this,b)) {
         return algebra::sp(*this, b);
@@ -265,7 +267,7 @@ namespace vsr{
 
 
       /*-----------------------------------------------------------------------------
-       *  Duality
+       *  Duality by product with Pseudoscalar (will not work in degen metrics)
        *-----------------------------------------------------------------------------*/
       auto dual() const -> Dual {
         return algebra::gp( *this , typename space::Pss(-1) );
@@ -291,10 +293,12 @@ namespace vsr{
       value_t rwt() const{ return (*this <= ~(*this))[0]; }
       value_t norm() const { value_t a = rwt(); if(a<0) return 0; return sqrt( a ); }
       value_t rnorm() const{ value_t a = rwt(); if(a<0) return -sqrt( -a ); return sqrt( a );  }
+      value_t bnorm() const{ value_t a = wt(); if(a<0) return -sqrt( rwt() ); return sqrt( rwt());  }
 
       Multivector unit() const { value_t t = sqrt( fabs( (*this <= *this)[0] ) ); if (t == 0) return Multivector(); return *this / t; }
       Multivector runit() const { value_t t = rnorm(); if (t == 0) return  Multivector(); return *this / t; }
       Multivector tunit() const { value_t t = norm(); if (t == 0) return Multivector(); return *this / t; }
+      Multivector bunit() const { value_t t = bnorm(); if (t == 0) return Multivector(); return *this / t; }
 
 
      /*-----------------------------------------------------------------------------
@@ -493,8 +497,8 @@ struct GAE{
     template <bits::type ... NN> using e = typename algebra::types::template e<NN...>;// Multivector<algebra, typename algebra::types::e_basis::template e<NN...> >;
 };
 
-template<bits::type N, typename T=VSR_PRECISION> using euclidean = algebra< metric<N>,T>;
-template<bits::type N, typename T=VSR_PRECISION> using conformal = algebra< metric<N-1,1,true>,T>;
+template<bits::type N, typename T=VSR_PRECISION> using euclidean = algebra< metric<N,0,0,false>,T>;
+template<bits::type N, typename T=VSR_PRECISION> using conformal = algebra< metric<N-1,1,0,true>,T>;
 
 /*-----------------------------------------------------------------------------
  *  EUCLIDEAN TEMPLATE ALIAS UTILITY

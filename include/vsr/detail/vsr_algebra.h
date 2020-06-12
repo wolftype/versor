@@ -1,7 +1,7 @@
 /*!
  * @file
 
-    implementations of algebras (Euclidean, PQ-metric, and conformal)
+    implementations of algebras (Euclidean, PQR-metric, and conformal)
 
 
  *       Filename:  vsr_algebra.h
@@ -76,21 +76,25 @@ namespace vsr {
     /*!-----------------------------------------------------------------------------
        An algebra instance is templated on:
 
-       metric_type: a metric (e.g. Metric<3,0> for euclidean 3 space or Metric<4,1,true> for conformal 5D space )
+       metric_type: a metric (e.g. metric<3,0,0> for euclidean 3 space or metric<4,1,0,true> for conformal 5D space or metric<3,0,1,false> for 3d projective)
        value_type:  a field value type (i.e. real, complex, or some other arithmetic element).
 
        The value type can be anything that commutatively multiplies and adds in a closed group,
        allowing for tensor metrics C x C, etc a la Bott periodicity.
 
 
-         algebra is a vsr::algebra< vsr::metric< P, Q, bConformal>, value_t>
+         algebra is a vsr::algebra< vsr::metric< P, Q, R, bConformal>, value_t>
             where:
-            * P and Q are integers representing the **signature** of a diagonal metric
+            * P and Q and R are integers representing the **signature** of a diagonal metric
             * bConformal is a boolean value specifing whether the metric should be **split**
 
          For example:
 
-             using ega = vsr::algebra< metric<3>, float>;
+             using ega = vsr::algebra< metric<3,0,0,false>, float>;
+
+         Some helpers exist which wrap the above up in a bit of sugar:
+
+             using ega = vsr::euclidean<3,float>;
 
      *-----------------------------------------------------------------------------*/
     template< class metric_type, class value_type >
@@ -318,7 +322,7 @@ namespace vsr {
 
 
    /*-----------------------------------------------------------------------------
-    *  Default Metric Types don't exist . . . use ::vector
+    *  Default Metric Types don't exist . . .
     *-----------------------------------------------------------------------------*/
    template<typename A>
    struct named_types{
@@ -335,12 +339,19 @@ namespace vsr {
       using tri = typename alg::template op_basis_t<vec,biv>;
       using rot = typename alg::template sum_basis_t<biv,sca>;
 
-      using Sca = Multivector<alg,sca >;
-      using Pss = Multivector<alg,pss >;
-      using Vec = Multivector<alg,vec >;
-      using Biv = Multivector<alg,biv >;
-      using Tri = Multivector<alg,tri >;
-      using Rot = Multivector<alg,rot >;
+      using scalar = Multivector<alg, sca>;
+      using pseudoscalar = Multivector<alg, pss>;
+      using vector = Multivector<alg, vec>;
+      using bivector = Multivector<alg, biv>;
+      using trivector = Multivector<alg, tri>;
+      using rotor = Multivector<alg, rot>;
+
+      using Sca = Multivector<alg, sca>;
+      using Pss = Multivector<alg, pss>;
+      using Vec = Multivector<alg, vec>;
+      using Biv = Multivector<alg, biv>;
+      using Tri = Multivector<alg, tri>;
+      using Rot = Multivector<alg, rot>;
     };
 
    /*-----------------------------------------------------------------------------

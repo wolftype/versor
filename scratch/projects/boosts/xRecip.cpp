@@ -45,7 +45,7 @@ struct MyApp : App
       calcMouse3D ();
 
     auto s1 = Construct::sphere (-2.0, 0.0, 0.0, 1.0);
-    auto s2 = Construct::sphere (2.0, 0.0, 0.0, 1.0);
+    auto s2 = Construct::sphere (2.0, 0.0, 0.0, 2.0);
 
     auto sy0 = Construct::sphere (0.0, -2.0, 0.0, 0.0);
     auto sy1 = Construct::sphere (0.0, 2.0, 0.0, 0.0);
@@ -135,7 +135,8 @@ struct MyApp : App
     //hmmm, use to generate a transformation?
 //    draw (Cir (tanX ^ Inf (1)).bst (tanX * amt2));
 
-    auto s1p = s1.bst (log * amt1);
+    auto s1p = frame.pos() <= (Gen::log(-(s2/s1).runit()));
+    auto s1p2 = s1.bst (log * amt1);
     auto sublog = Gen::log (-(s1p / s1).runit ());
 
     for (int i = 0; i < 100; ++i)
@@ -145,7 +146,11 @@ struct MyApp : App
         draw (Round::loc (tp), 0, 1, 1);
       }
 
-    auto tmp = Gen::log ((s1p / s1).runit ()) <= !Gen::log ((s2 / s1).runit ());
+    //auto tmp = Gen::log ((s1p / s1).runit ()) <= !Gen::log ((s2 / s1).runit ());
+    auto tmp = Gen::log (-(s1p / s1).runit ()) <= !Gen::log (-(s2 / s1).runit ());
+    cout << "RATIO: " << tmp << endl;
+    draw (s1p, 1,0,0,.1);
+    draw (s1p2, 1,1,0,.1);
 
     auto pss = !(begin ^ s1 ^ s2);
     auto rn = (s1 ^ s2) <= pss;

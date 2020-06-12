@@ -10,7 +10,7 @@ using vsr::nga::Proj;
 using vsr::nga::Gen;
  
 typedef NEVec<4> V4;
-typedef algebra< metric<4>,double> Algebra;
+typedef algebra< metric<4,0,0,false>,double> Algebra;
                                                                        
 
 auto D4 = Root::System( V4(1,0,0,0), V4(0,1,0,0), V4(0,0,1,0), ( V4(-1,-1,-1, 1) * .5 ) );

@@ -35,6 +35,7 @@ struct MyApp : App
 
   CyclideDraw cydraw;
 
+
   //Some Variables
   bool bToggle = false;
   bool bSet = false;
@@ -93,6 +94,7 @@ struct MyApp : App
    *-----------------------------------------------------------------------------*/
   void setup ()
   {
+    ps.bTightBounds = true;
     ///Add Variables to GUI
     gui (radius, "radius", -100, 100);
     gui (height, "height", -100, 100);

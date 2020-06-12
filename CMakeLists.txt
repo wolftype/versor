@@ -5,9 +5,9 @@
 cmake_minimum_required(VERSION 3.0)
 
 #POLICIES
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 OLD)
-endif(COMMAND cmake_policy)
+#if(COMMAND cmake_policy)
+#  cmake_policy(SET CMP0003 OLD)
+#endif(COMMAND cmake_policy)
 
 #PROJECT
 project(VERSOR)
@@ -20,11 +20,12 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   SET( WINDOWS 1)
 endif()
 
-
 #optional flags and their defaults for building graphics and examples
 set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
+
+set(USE_DOUBLE_PRECISION ON CACHE BOOL "double precision")
 
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,6 +37,15 @@ if (WINDOWS)
 set (VERSOR_FLAGS "-ftemplate-depth-1200")
 else()
 set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+endif()
+
+#double or float precision
+if (${USE_DOUBLE_PRECISION})
+  message ("BUILDING VERSOR USING DOUBLE PRECISION (DEFAULT)")
+  set (VERSOR_FLAGS "${VERSOR_FLAGS} -DVSR_PRECISION_DOUBLE")
+else()
+  message ("BUILDING VERSOR USING FLOAT PRECISION")
+  set (VERSOR_FLAGS "${VERSOR_FLAGS} -DVSR_PRECISION_FLOAT")
 endif()
 
 #default release type if none specified
@@ -56,11 +66,16 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 
-#All .cpp files in src/space get built into libvsr
+#All .cpp files in src/space get built into static libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
 link_directories(${CMAKE_SOURCE_DIR}/build/lib)
 set(vsr_libraries vsr)
+
+#And a bundle
+add_library (vsr_shared MODULE ${core})
+set_target_properties(vsr_shared PROPERTIES BUNDLE TRUE)
+
 
 #project include directories
 include_directories(BEFORE ${PROJECT_SOURCE_DIR})
@@ -72,19 +87,29 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/bin")
 
-file(GLOB tests tests/*.cpp)
-foreach(filename ${tests})
-  get_filename_component(target ${filename} NAME_WE)
-  add_executable(${target} ${filename} )
-  target_link_libraries(${target} vsr )
-endforeach()
-
 #Add Headers as Custom Target for Editing in IDES (such as QT Creator, etc)
 FILE(GLOB_RECURSE HeaderFiles "${PROJECT_SOURCE_DIR}/include/*")
 add_custom_target(headers SOURCES ${HeaderFiles})
 #Add scripts as custom target for same reason
 FILE(GLOB ScriptFiles "${PROJECT_SOURCE_DIR}/*.sh")
 add_custom_target(scr SOURCES ${ScriptFiles})
+
+
+#build googletest
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+enable_testing()
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory(ext/gtest EXCLUDE_FROM_ALL)
+file(GLOB tests tests/*.cpp)
+foreach(filename ${tests})
+  get_filename_component(target ${filename} NAME_WE)
+  add_executable(${target} ${filename} )
+  target_link_libraries(${target} vsr gtest_main)
+  add_test (NAME ${target}_test COMMAND ${target})
+endforeach()
+
+
 
 #build libvsrGfx
 if(${BUILD_GRAPHICS})

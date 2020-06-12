@@ -203,7 +203,7 @@ constexpr type eplane(){
 	return (1 << (dim-1)) | ( 1 << (dim-2) ); 
 }
 
-/// check for split
+/// check for split (oddly, this boolean seems flipped logically)
 template< type a, type dim >    
 constexpr bool checkMink() {
 	return ( (a & eplane<dim>()) == 0) || ( ( a & eplane<dim>()) == eplane<dim>() );

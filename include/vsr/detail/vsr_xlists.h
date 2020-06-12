@@ -77,7 +77,6 @@ struct Basis<X, XS...>{
   typedef Basis<XS...> TAIL;
 
   static void print() { printf("%s\t%s\t%d\n", bits::estring(X).c_str(), bits::bitString<6>(X).c_str(), X);  TAIL::print(); }
-
 };
 
 /*-----------------------------------------------------------------------------
@@ -291,6 +290,8 @@ struct NotType< Basis<>, A >{
 
 /*-----------------------------------------------------------------------------
  *  METRIC TENSOR SIGN
+ *  Takes a <metric, bitwise &, signflip>
+ * 
  *-----------------------------------------------------------------------------*/
 template<class M, int AB, int SF>
 struct MSign{
@@ -358,32 +359,47 @@ struct RPlus<0>{
   typedef Basis<> Type;
 };
 
-template<int P>
+template<int Q>
 struct RMinus{
-  typedef typename Cat< Basis<-1>, typename RMinus<P-1>::Type>::Type Type;
+  typedef typename Cat< Basis<-1>, typename RMinus<Q-1>::Type>::Type Type;
 };
 template<>
 struct RMinus<0>{
   typedef Basis<> Type;
 };
 
-template<int P, int Q=0, bool bConformal=false>
+template<int R>
+struct RZero{
+  typedef typename Cat< Basis<0>, typename RZero<R-1>::Type>::Type Type;
+};
+template<>
+struct RZero<0>{
+  typedef Basis<> Type;
+};
+
+template<int P, int Q, int R, bool bConformal>
 struct metric{
 
-  using type = typename Cat< typename RPlus<P>::Type, typename RMinus<Q>::Type >::Type;  //metric as list of type T
+  using type = typename Cat<
+                  typename Cat<
+                    typename RPlus<P>::Type,
+                    typename RMinus<Q>::Type
+                  >::Type,
+                  typename RZero<R>::Type
+                >::Type;  //metric as list of type T
 
   ///Next Higher (positive)
-  using up = metric<P+1,Q,bConformal>;
+  using up = metric<P+1,Q,R,bConformal>;
   ///Next Lower (positive)
-  using down = metric<P-1,Q,bConformal>;
-  ///Euclidean Subspace
-  using euclidean = metric<P-1>;
-  ///Conformal Mapping
-  using conformal = metric<P+1,1,true>;
+  using down = metric<P-1,Q,R,bConformal>;
+  ///Euclidean Subspace (assuming conformal)
+  using euclidean = metric<P-1,0,0,false>;
+  ///Conformal Mapping (assuming euclidean)
+  using conformal = metric<P+1,1,0,true>;
 
-
-  static const bool is_euclidean = Q==0;       //whether to use Euclidean Products
-  static const bool is_conformal = bConformal; //whether to project metric stereographically
+  static const bool is_euclidean = Q==0 && R==0;       //whether to use Euclidean Products
+  static const bool is_degenerate = R!=0;              //whether Zero is in the metric
+  static const bool is_conformal = bConformal;         //whether to project metric stereographically
 };
 
 

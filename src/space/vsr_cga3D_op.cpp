@@ -273,8 +273,7 @@ Pair Gen::log (const DualSphere &a, const DualSphere &b, VSR_PRECISION t,
                bool bFlip)
 {
   Bst tbst = (b / a).runit ();
-  //if (tbst[0]<0)
-  if (bFlip)
+  if (tbst[0]<0 && bFlip)
     tbst = -tbst;  //restrict to positive <R>
   return Gen::log (tbst) * -t / 2.0;
 }
@@ -286,12 +285,18 @@ Pair Gen::atanh2 (const Pair &p, VSR_PRECISION cs, bool bCW, bool bTwoPI)
 
   auto tp = p.wt ();
   auto sq = sqrt (fabs (tp));
-  if (tp > 0)
-    norm = asinh (sq) / sq;
-  else if (tp < 0)
+  if (tp > FPERROR)
+  {
+//    if (bCW)
+//      norm = (asinh (sq)-(bTwoPI ? TWOPI: PI)) / sq  ;
+//    else
+      norm = asinh (sq) / sq;
+  }
+  else if (tp < -FPERROR)
     {
       if (bCW)
-        norm = -((bTwoPI ? TWOPI : PI) - atan2 (sq, cs)) / sq;  //alt direction
+        //norm = -((bTwoPI ? TWOPI : PI) - atan2 (sq, cs)) / sq;  //alt direction
+        norm = (atan2 (sq, cs) - (bTwoPI ? TWOPI : PI)) / sq;  //alt direction
       else
         norm = atan2 (sq, cs) / sq;
     }
