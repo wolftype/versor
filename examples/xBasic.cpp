@@ -37,6 +37,15 @@ struct MyApp : App {
     draw(circle_meet,0,1,0);     //<-- Draw circle (intersection)
 
 //    text("use t, r and s keys and drag with mouse to Translate, Rotate and Scale the Circle");
+//
+    DualPlane dly (0,1,0,0);
+    DualPlane dlx (1,0,0,0);
+
+    (dly ^ dlx).print();
+
+    Vec(1,0,0).duale().print();
+
+
   }
 
 };

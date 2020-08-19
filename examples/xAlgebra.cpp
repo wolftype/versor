@@ -61,7 +61,7 @@ using twistor = vsr::algebra< vsr::metric<2,4,0,true>, double >;
 //minkowksi
 using mga = vsr::algebra< vsr::metric<1,1,0, false>, double>;
 
-//a projective algebra of euclidean 3D space
+//a plane-based algebra of euclidean 3D space
 //...................................<p,q>, field  >
 using pga = vsr::algebra< vsr::metric<3,0,1,false>, double >;
 
@@ -186,6 +186,9 @@ int main(){
 
   ega4::impl::gp_arrow_t< ega4::types::biv, ega4::types::biv>::Arrow::print();
   pga::impl::gp_arrow_t< pga::types::biv, pga::types::biv>::Arrow::print();
+
+
+
 
   return 0;
 

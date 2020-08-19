@@ -100,11 +100,8 @@ struct Inst{
   static const bool OP = bits::outer(A,B);
   //Whether Scalar Product Exists
   static const bool SP = bits::scalar(A,B);
-<<<<<<< HEAD
-=======
   //Whether Geometric Product Exists
   static const bool GP = true;
->>>>>>> gtest
 
   template<class TA, class TB>
   static constexpr typename TA::algebra::value_t Exec( const TA& a, const TB& b){

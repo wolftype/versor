@@ -70,7 +70,8 @@ namespace vsr {
     template<class algebra, class basis> struct Multivector;
     //forward declaration of algebraImpl
     template<class algebra, bool, bool> struct algebra_impl;
-    //forward declaration of named_types
+    //forward declaration of named_types -- these will be used
+    //by vsr_generic_op, so the naming convention can feel strict at times
     template<class algebraimpl> struct named_types;
 
     /*!-----------------------------------------------------------------------------
@@ -322,7 +323,9 @@ namespace vsr {
 
 
    /*-----------------------------------------------------------------------------
-    *  Default Metric Types don't exist . . .
+    *  Default Metric Types . . .
+    *  you will need to make your own spinors
+    *  see examples/xPGA.cpp
     *-----------------------------------------------------------------------------*/
    template<typename A>
    struct named_types{
@@ -337,25 +340,102 @@ namespace vsr {
       using vec = typename Blade1<alg::dim>::VEC;
       using biv = typename alg::template op_basis_t<vec,vec>;
       using tri = typename alg::template op_basis_t<vec,biv>;
-      using rot = typename alg::template sum_basis_t<biv,sca>;
+//      using rot = typename alg::template sum_basis_t<biv,sca>;
 
       using scalar = Multivector<alg, sca>;
       using pseudoscalar = Multivector<alg, pss>;
       using vector = Multivector<alg, vec>;
       using bivector = Multivector<alg, biv>;
       using trivector = Multivector<alg, tri>;
-      using rotor = Multivector<alg, rot>;
+      //using rotor = Multivector<alg, rot>;
 
       using Sca = Multivector<alg, sca>;
       using Pss = Multivector<alg, pss>;
       using Vec = Multivector<alg, vec>;
       using Biv = Multivector<alg, biv>;
       using Tri = Multivector<alg, tri>;
-      using Rot = Multivector<alg, rot>;
+      //using Rot = Multivector<alg, rot>;
     };
+
+   //PGA on any field
+   template<typename T>
+   struct named_types<algebra_impl<algebra<metric<3,0,1,false>,T>,false,false>>{
+
+      using alg = algebra<metric<3,0,1,false>,T>;
+      //use as e<1,2,3> will return e123 blade
+      template<bits::type ... N> using e_basis = Basis< bits::blade((1<<(N-1))...)>;
+      template<bits::type ... N> using e = Multivector<alg, e_basis<N...>>;
+
+      using sca = Basis<0>;
+      using euc = Basis<bits::pss(alg::dim-1)>;
+      using inf = typename basis_t::infinity<alg::dim> ;
+
+      using vec = typename Blade1<alg::dim-1>::VEC;
+      using biv = typename alg::template op_basis_t<vec,vec>;
+      using tri = typename alg::template op_basis_t<vec,biv>;
+      using rot = typename alg::template sum_basis_t<biv,sca>;
+
+      using drv = typename alg::template op_basis_t<vec,inf>;
+      using drb = typename alg::template op_basis_t<biv,inf>;
+      using drt = typename alg::template sum_basis_t<tri,inf>;
+
+      using dlp = typename Blade1<alg::dim>::VEC;
+      using dll = typename alg::template op_basis_t<dlp,dlp>;
+      using dfp = typename alg::template op_basis_t<dlp,dll>;
+
+      using trs = typename alg::template sum_basis_t<drv,sca>;
+      using grt = typename alg::template sum_basis_t<dll,sca>;
+      using mot = typename alg::template gp_basis_t<rot,trs>;
+
+      using Scalar = Multivector<alg, sca>;
+      using EuclideanPseudoscalar = Multivector<alg, euc>;
+      using Infinity = Multivector<alg, inf>;
+
+      using Vector = Multivector<alg, vec>;
+      using Bivector = Multivector<alg, biv>;
+      using Trivector = Multivector<alg, tri>;
+      using Rotor = Multivector<alg, rot>;
+
+      using DirectionVector = Multivector<alg, drv>;
+      using DirectionBivector = Multivector<alg, drb>;
+      using DirectionTrivector = Multivector<alg, drt>;
+      using Pseudoscalar = Multivector<alg, drt>;
+
+      using Translator = Multivector<alg, trs>;
+      using Motor = Multivector<alg, mot>;
+      using GeneralRotor = Multivector<alg, grt>;
+
+      //in pga::namespace, these are renamed more directly
+      using DualPlane = Multivector<alg, dlp>;
+      using DualLine = Multivector<alg, dll>;
+      using DualFlatPoint = Multivector<alg, dfp>;
+
+      using Sca = Multivector<alg, sca>;
+      using Euc = Multivector<alg, euc>;
+      using Inf = Multivector<alg, inf>;
+
+      using Vec = Multivector<alg, vec>;
+      using Biv = Multivector<alg, biv>;
+      using Tri = Multivector<alg, tri>;
+      using Rot = Multivector<alg, rot>;
+
+      using Drv = Multivector<alg, drv>;
+      using Drb = Multivector<alg, drb>;
+      using Pss = Multivector<alg, drt>;
+      using Drt = Multivector<alg, drt>;
+
+      using Trs = Multivector<alg, trs>;
+      using Mot = Multivector<alg, mot>;
+      using Grt = Multivector<alg, grt>;
+
+      using Dlp = Multivector<alg, dlp>;
+      using Dll = Multivector<alg, dll>;
+      using Dfp = Multivector<alg, dfp>;
+   };
 
    /*-----------------------------------------------------------------------------
     *  Default Euclidean Basis Types (specialize named_types to your own needs)
+    *  accessed in vsr_generic_op via GAType def'ing
     *-----------------------------------------------------------------------------*/
    template<typename alg>
    struct named_types<algebra_impl<alg,true,false>>{
@@ -434,6 +514,7 @@ namespace vsr {
             using cir = typename algebra::template op_basis_t<par,pnt>;
             using sph = typename algebra::template op_basis_t<cir,pnt>;
             using flp = typename algebra::template op_basis_t<pnt,inf>;
+            using dfp = typename algebra::template gp_basis_t<flp,pss>;
            // using dll = typename algebra::template sum_basis_t<biv,drv>;
             using lin = typename algebra::template op_basis_t<pnt,flp>;
             using dll = typename algebra::template gp_basis_t<lin,pss>;
@@ -471,6 +552,7 @@ namespace vsr {
             using Cir = Multivector<alg,cir>;
             using Sph = Multivector<alg,sph>;
             using Flp = Multivector<alg,flp>;
+            using Dfp = Multivector<alg,dfp>;
             using Dll = Multivector<alg,dll>;
             using Lin = Multivector<alg,lin>;
             using Dlp = Multivector<alg,dlp>;
@@ -507,6 +589,7 @@ namespace vsr {
             using circle = Multivector<alg,cir>;
             using sphere = Multivector<alg,sph>;
             using flat_point = Multivector<alg,flp>;
+            using dual_flat_point = Multivector<alg,dfp>;
             using dual_line = Multivector<alg,dll>;
             using line = Multivector<alg,lin>;
             using dual_plane = Multivector<alg,dlp>;
@@ -543,6 +626,7 @@ namespace vsr {
             using Circle = Multivector<alg,cir>;
             using Sphere = Multivector<alg,sph>;
             using FlatPoint = Multivector<alg,flp>;
+            using DualFlatPoint = Multivector<alg,dfp>;
             using DualLine = Multivector<alg,dll>;
             using Line = Multivector<alg,lin>;
             using DualPlane = Multivector<alg,dlp>;
