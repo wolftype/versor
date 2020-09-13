@@ -1104,7 +1104,7 @@ inline HEGraph<T, E> &HEGraph<T, E>::UV (int w, int h, S *p, bool bCloseU,
           int idxR = ((w - 2) * (h - 1) + j) * 6 + 5;
           int idxL = j * 6;
           graph.close (graph.edge (idxR), *graph.edge (idxL).node);
-          graph.close (graph.edge (-3), *graph.edge (idxL + 6).node);
+          graph.close (graph.edge (-3), *graph.edge (idxL).prev().node);
         }
     }
 

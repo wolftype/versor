@@ -11,7 +11,7 @@ using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
 
-#define FLIP false 
+#define FLIP false
 
 
 struct Triple {
@@ -188,7 +188,7 @@ struct MyApp : App {
 
     //and with that, we have all the surfaces that can be defined with
     //nine coefficients -- 24 surfaces!  Which pair up into 12 Generators
-    
+
     //now we find the remaining 6 generators
     // du of v direction at w=1 (sweeps left to right FRONT) |
     Pair duvw1 = wf.duv(wuf);
@@ -222,7 +222,7 @@ struct MyApp : App {
        Point tpos = Round::location(tf.pos().spin(tbst));
        DrawCurve (tpos, duvw0, 20, 1,0,0);
 
-       Boost w1bst = Gen::boost (dvuw1 * ti); 
+       Boost w1bst = Gen::boost (dvuw1 * ti);
        Point wpos = Round::location(wf.pos().spin(w1bst));
        DrawCurve (wpos, duvw1, 20, 1,0,0);
 

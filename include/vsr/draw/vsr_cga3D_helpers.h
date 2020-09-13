@@ -13,6 +13,11 @@ namespace gfx {
 using namespace vsr;
 using namespace vsr::cga;
 
+void DrawPoint (const Point& p, float r =1.0, float g=1.0, float b =1.0, float a=1.0)
+{
+  Draw (Round::sphere(p,.1),r,g,b,a);
+}
+
 void DrawUnit (const Pair &p, float r, float g, float b)
 {
   Point pos = Round::location (p);
@@ -80,6 +85,7 @@ void DrawLine (const TFrame &f)
 
 void DrawCurve (const Point &p, const Pair &log, int res, float r, float g, float b, float a= 1.0)
 {
+    GL::lightsOff();
     glColor4f (r, g, b, a);
     glBegin (GL_LINE_STRIP);
     for (int i = 0; i <= res; ++i)
@@ -87,10 +93,11 @@ void DrawCurve (const Point &p, const Pair &log, int res, float r, float g, floa
          float t = (float) i / res;
          Boost bst = Gen::bst (log * t);
 //         TFrame tmp = tf.xf (bu, false, false, false);
-         Point tmp = p.spin (bst);        
+         Point tmp = p.spin (bst);
          GL::vertex (Round::loc(tmp));
         }
     glEnd ();
+    GL::lightsOn();
 
 }
 
@@ -101,7 +108,7 @@ void DrawPoints (const Point &p, const Pair &logU, const Pair &logV,
    {
      float tu = float (i)/res;
      Boost bu = Gen::boost (logU * tu);
-     
+
      for (int j = 0; j <= res; ++j)
      {
        float tv = float (j)/res;
@@ -142,6 +149,18 @@ void DrawQuadSurf (const T &t, float r, float g, float b)
         }
     }
   glEnd ();
+}
+
+//DrawFrames of a TVolume (TangentVolume);
+void DrawVolumeFrames (const TVolume& vol){
+    DrawFrame(vol.tf());
+    DrawFrame(vol.uf());
+    DrawFrame(vol.vf());
+    DrawFrame(vol.wf());
+    DrawFrame(vol.uvf());
+    DrawFrame(vol.vwf());
+    DrawFrame(vol.uwf());
+    DrawFrame(vol.uvwf());
 }
 
 
