@@ -76,6 +76,7 @@ using Sph = NSph<5>; ///< @ref Sphere
 using Dls = NDls<5>; ///< @ref DualSphere
 
 using Flp = NFlp<5>; ///< @ref FlatPoint
+using Dfp = decltype( Flp().dual() ); ///< @ref Dual Flat Point
 using Dll = NDll<5>; ///< @ref DualLine
 using Lin = NLin<5>; ///< @ref Line
 using Dlp = NDlp<5>; ///< @ref DualPlane
@@ -140,6 +141,7 @@ typedef  Tnt TangentTrivector;    ///< Tangent Trivector  \\(\\boldsymbol{I}n_o\
 typedef  Dll DualLine;            ///< Dual Line bivector \\(\\lambda=\\boldsymbol{B}+\\boldsymbol{x}n_\\infty\\)
 typedef  Lin Line;                ///< Direct Line Trivector \\(p_a \\wedge p_b \\wedge n_\\infty\\)
 typedef  Flp FlatPoint;           ///< Flat Point \\(p \\wedge n_\\infty\\)
+typedef  Dfp DualFlatPoint;        ///< Dual Flat Point;
 typedef  Pln Plane;               ///< Direct Plane \\(p_a \\wedge p_b \\wedge p_c \\wedge n_\\infty\\)
 typedef  Dlp DualPlane;           ///< Dual Plane   \\(\\boldsymbol{n}+n_\\infty\\)
 typedef  Trs Translator;          ///< Translating Rotor \\(1-\\boldsymbol{v}n_\\infty\\)

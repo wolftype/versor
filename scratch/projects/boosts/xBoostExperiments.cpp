@@ -11,13 +11,13 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_knot.h>
 #include <vsr/util/vsr_stat.h>
 
@@ -25,8 +25,8 @@ using namespace vsr;
 using namespace vsr::cga;
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -38,7 +38,7 @@ struct MyApp : App {
   vector<Pnt> pnt;
 
   void setup(){
-    
+
       Rand::Seed();
 
       bindGLV();
@@ -54,7 +54,7 @@ struct MyApp : App {
       reset();
 
   }
-  
+
 
     Pnt random(){
       Vec v = Vec::x.sp( Gen::rot( (-1 + Rand::Num(2))*PI, -1 + Rand::Num(2) * PIOVERFOUR) ) * Rand::Num(.3,2);
@@ -65,8 +65,8 @@ struct MyApp : App {
       for (auto&i : pnt ) i = random();
     }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       mouse = calcMouse3D();
       TorusKnot tk(P,Q);
 
@@ -76,18 +76,18 @@ struct MyApp : App {
 
       //For each seeded point
       for(auto& tp : pnt ){
-         
+
          //save temp
          Pnt tmp = tp;
 
          //Boost
          tp = Round::loc( tp.spin( bst ) );
-         Draw(tp);  
-         
-         //make movement  
-         Par tpar = tmp ^ tp; 
+         Draw(tp);
+
+         //make movement
+         Par tpar = tmp ^ tp;
          Pnt cpnt = Round::point( tpar.dual(), 0 );
-         Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );          
+         Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );
          Pnt p = cpnt;//Round::loc( cpnt.spin( mot * bst ) ) ;
          Draw(p,1,1,0);
          //tp = p;
@@ -99,9 +99,9 @@ struct MyApp : App {
       }
 
       if (bReset) { bReset = 0; reset(); }
-    
+
   }
-   
+
 
 };
 
@@ -109,10 +109,10 @@ struct MyApp : App {
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
-  
+
   return 0;
 
 }

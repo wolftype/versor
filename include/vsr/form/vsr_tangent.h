@@ -291,7 +291,7 @@ struct TVolume {
       zeroInit();
     };
 
-    TVolume (const TVolume& tv, Face face)
+    TVolume (const TVolume& tv, Face face, float kA = 0.0, float kB = 0.0, float kC=0.0, float kD=0.0)
     {
       zeroInit();
       switch (face)
@@ -307,6 +307,11 @@ struct TVolume {
              vf() =  tv.uvf();
              vwf() = tv.uvwf();
 
+             kvu() = kA;
+             kwu() = kB;
+             kv1u() = kC;
+             ku1w() = kD;
+
              calcSurfacesFromFace (Face::LEFT);
 
              break;
@@ -315,6 +320,29 @@ struct TVolume {
            break;
       }
     };
+
+    TVolume (const TVolume &tvol){
+      mK[0] = tvol.kvu();
+      mK[1] = tvol.kwu();
+      mK[2] = tvol.kuv();
+      mK[3] = tvol.kwv();
+      mK[4] = tvol.kuw();
+      mK[5] = tvol.kvw();
+      mK[6] = tvol.kv1u();
+      mK[7] = tvol.ku1w();
+      mK[8] = tvol.kw1v();
+
+      mSpacing[0] = tvol.uSpacing();
+      mSpacing[1] = tvol.vSpacing();
+      mSpacing[2] = tvol.wSpacing();
+
+      calcSurfaces();
+    }
+
+//    TVolume& operator = (const TVolume &tvol)
+//    {
+//      return tvol;
+//    }
 
     TVolume (float kvu, float kwu,
              float kuv, float kwv,
@@ -494,12 +522,13 @@ struct TVolume {
             // Conformal Rotors along u,v,w curves, passing in two curvatures
             Con uc = tf().uc (kvu(), kwu(), uSpacing());
 
+            uf() = tf().xf (uc, TMP_FLIP, false, false);
+
             tf().svu = tf().vsurf (kvu());
             tf().swu = tf().wsurf (kwu());
             vf().svu = vf().vsurf (kv1u());
-            uf().suw = uf().usurf (ku1w());
 
-            uf() = tf().xf (uc, TMP_FLIP, false, false);
+            uf().suw = uf().usurf (ku1w());
 
             //ortho
             uf().suv = TFrame::Normalize(vf().svu <= uf().tu * TMP_FSIGN);
@@ -744,8 +773,10 @@ struct TVolume {
       DualSphere su0 = TFrame::Normalize(vf().svw <= tu);
       DualSphere sv0 = TFrame::Normalize(uf().suw <= tv);
 
-      DualSphere su1 = (sv0 <= tuv1);
-      DualSphere sv1 = (su0 <= tvu1);
+   //   DualSphere su1 = (sv0 <= tuv1);
+   //   DualSphere sv1 = (su0 <= tvu1);
+      DualSphere su1 = (uvf().svw <= tu1);
+      DualSphere sv1 = (uvf().suw <= tv1);
 
       Pair logU = TFrame::CalcGen (tu, tu1, su0, su1);
       Pair logV = TFrame::CalcGen (tv, tv1, sv0, sv1);

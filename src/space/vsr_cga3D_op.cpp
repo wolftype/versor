@@ -855,7 +855,7 @@ Point Construct::meet (const Line &lin, const DualPlane &dlp)
 Point Construct::meet (const Dll &dll, const DualPlane &dlp)
 {
   auto flp = (dll ^ dlp).dual ();
-  return flp.null ();
+  return (flp / flp[3]).null ();
 }
 
 

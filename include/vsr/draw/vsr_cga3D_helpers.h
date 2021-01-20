@@ -92,7 +92,6 @@ void DrawCurve (const Point &p, const Pair &log, int res, float r, float g, floa
        {
          float t = (float) i / res;
          Boost bst = Gen::bst (log * t);
-//         TFrame tmp = tf.xf (bu, false, false, false);
          Point tmp = p.spin (bst);
          GL::vertex (Round::loc(tmp));
         }
@@ -163,6 +162,25 @@ void DrawVolumeFrames (const TVolume& vol){
     DrawFrame(vol.uvwf());
 }
 
+// Draw Edges of a TVolume
+void DrawVolumeEdges (const TVolume& tf, float r=0.0, float g=.7, float b=1.0){
+   DrawCurve (tf.pos(), tf.duvw0(), 9,r,g,b, 1.0);
+   DrawCurve (tf.pos(), tf.dvuw0(), 9,r,g,b, 1.0);
+   DrawCurve (tf.pos(), tf.dwuv0(), 9,r,g,b, 1.0);
+
+   DrawCurve (tf.uf().pos(), tf.dvuw0(), 9,r,g,b, 1.0);
+   DrawCurve (tf.uf().pos(), tf.dwuv0(), 9,r,g,b, 1.0);
+
+   DrawCurve (tf.vf().pos(), tf.duvw0(), 9,r,g,b, 1.0);
+   DrawCurve (tf.vf().pos(), tf.dwvu0(), 9,r,g,b, 1.0);
+
+   DrawCurve (tf.wf().pos(), tf.duwv0(), 9,r,g,b, 1.0);
+   DrawCurve (tf.wf().pos(), tf.dvwu0(), 9,r,g,b, 1.0);
+
+   DrawCurve (tf.uvf().pos(), tf.dwvu1(), 9,r,g,b, 1.0);
+   DrawCurve (tf.vwf().pos(), tf.duvw1(), 9,r,g,b, 1.0);
+   DrawCurve (tf.uwf().pos(), tf.dvwu1(), 9,r,g,b, 1.0);
+}
 
 }
 
