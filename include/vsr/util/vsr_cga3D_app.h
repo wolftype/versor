@@ -20,23 +20,23 @@
 #ifndef vsr_cga3D_app_INC
 #define vsr_cga3D_app_INC
 
-#include <vsr/space/vsr_cga3D_op.h>  //<-- conformal 3D types and basic operations
+#include <vsr/space/vsr_cga3D_op.h>     //<-- conformal 3D types and basic operations
 
 #include <vsr/draw/vsr_cga3D_draw.h>    //<-- fixed pipeline draw routines
 #include <vsr/draw/vsr_cga3D_render.h>  //<-- programmable pipeline draw routines
 
 #include <vsr/util/vsr_cga3D_control.h>  //<-- interface controls (mouse and keyboard)
 #include <gfx/util/gfx_glv_app.h>        //<-- an app class with built-in gui
-#include <gfx/util/glut_window.hpp>  //<-- an app class with built-in gui
+#include <gfx/util/glfw_window.hpp>      //<-- an app class with built-in gui
 
 #include <gfx/gfx_postscript.h>
 
 
 ///@todo namespace this
-struct App : public gfx::GFXAppGui<gfx::GlutContext>
+struct App : public gfx::GFXAppGui<gfx::GLFWContext>
 {
 
-  using GuiApp = gfx::GFXAppGui<gfx::GlutContext>;
+  using GuiApp = gfx::GFXAppGui<gfx::GLFWContext>;
 
   vsr::cga::Point mMouse2D;
   vsr::cga::Point mMouse3D;
@@ -102,10 +102,17 @@ struct App : public gfx::GFXAppGui<gfx::GlutContext>
   /// Called when a keyboard key is pressed
   virtual void onKeyDown (const gfx::Keyboard &k)
   {
-
-    // Frame f;
+    cout << "KEY DOWN:" << k.code << endl; // Frame f;
     switch (k.code)
       {
+        case 67:
+        case 'c':
+          {
+          scene.camera.pos(0,0,10);
+          scene.camera.quat() = gfx::Quat(1,0,0,0);
+          scene.model.quat() = gfx::Quat(1,0,0,0);
+          break;
+          }
         case 'i':
           monoPrint ();
           break;

@@ -21,7 +21,7 @@ namespace vsr{
 /** The value type of data (default is double) */
 #ifdef VSR_PRECISION_DOUBLE
 #define VSR_PRECISION double
-#elif VSR_PRECISION_FLOAT
+#else
 #define VSR_PRECISION float
 #endif
 
