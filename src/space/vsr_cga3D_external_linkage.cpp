@@ -14,17 +14,18 @@ namespace vsr { namespace cga {
 OBJ * cga_ ## OBJ ## _create () {\
 OBJ * p = new OBJ;\
   return p;\
-}\
+};\
 OBJ * cga_ ## OBJ ## _create_n (unsigned int n) {\
 OBJ * p = new OBJ [n];\
   return p;\
-}\
+};\
 void cga_ ## OBJ ## _destroy (OBJ * o) {\
   if (o) delete o;\
-}\
+};\
 void cga_ ## OBJ ## _destroy_n (OBJ * o) {\
   if (o) delete[] o;\
-}\
+};
+
 
 #define APPLY_FUNC(OBJ, XF)\
 OBJ * cga_ ## OBJ ## _apply_ ## XF (OBJ * p, XF * xf) {\
@@ -88,6 +89,11 @@ TO * cga_copy_ ## FROM ## _ ## TO (FROM * from, TO * to){\
 
 extern "C" {
 
+  Point * cga_tpoint_create() {
+    Point * p = new Point();
+    return p;
+  };
+
   struct vec3 { VSR_PRECISION x,y,z; };
   struct quat { VSR_PRECISION w,x,y,z; };
 
@@ -95,31 +101,31 @@ extern "C" {
   //
   //Rotor from Direction vector y
   Rotor * cga_Rotor_from_Direction_y (Rotor * res, DirectionVector * drv){
-    *res = Gen::ratio (Vec::y, (*drv).copy<Vec>());   
+    *res = Gen::ratio (Vec::y, (*drv).copy<Vec>());
     return res;
   };
 
   //Rotor from vector y
   Rotor * cga_Rotor_from_Vec_y (Rotor * res, Vector * vec){
-    *res = Gen::ratio (Vec::y, (*vec).unit());   
+    *res = Gen::ratio (Vec::y, (*vec).unit());
     return res;
   };
 
   //Rotor from DirectionBivector xz
   Rotor * cga_Rotor_from_Direction_xz (Rotor * res, DirectionBivector * drb){
-    *res = Gen::ratio (Vec::y, (*drb).copy<Biv>().duale().unit());   
+    *res = Gen::ratio (Vec::y, (*drb).copy<Biv>().duale().unit());
     return res;
   };
 
   //Rotor from Bivector xz
   Rotor * cga_Rotor_from_Biv_xz (Rotor * res, Bivector * biv){
-    *res = Gen::ratio (Vec::y, (*biv).duale().unit());   
+    *res = Gen::ratio (Vec::y, (*biv).duale().unit());
     return res;
   };
 
-  //Rotor from DualLine 
+  //Rotor from DualLine
   Rotor * cga_Rotor_from_DualLine(Rotor * res, DualLine * dll){
-    *res = Gen::ratio (Vec::y, Biv(*dll).duale().unit());   
+    *res = Gen::ratio (Vec::y, Biv(*dll).duale().unit());
     return res;
   };
 
@@ -259,6 +265,11 @@ extern "C" {
   void cga_line_through_points (Line *res, Point * pa, Point *pb)
   {
     *res = (*pa) ^ (*pb) ^ Inf(1);
+  }
+
+  void cga_dualline_through_points (DualLine *res, Point * pa, Point *pb)
+  {
+    *res = ((*pa) ^ (*pb) ^ Inf(1)).dual();
   }
 
   void cga_line_from_vec_dir (Line *res, Vec * v, Vec *dir)

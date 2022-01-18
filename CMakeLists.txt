@@ -69,12 +69,17 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLA
 #All .cpp files in src/space get built into static libvsr
 file(GLOB core src/space/*.cpp)
 add_library(vsr ${core})
-link_directories(${CMAKE_SOURCE_DIR}/build/lib)
+link_directories(${CMAKE_SOURCE_DIR}/${BUILD_DIRECTORY}/lib)
 set(vsr_libraries vsr)
 
 #And a bundle
-add_library (vsr_shared MODULE ${core})
+add_library (vsr_shared SHARED ${core})
+
+if (APPLE)
 set_target_properties(vsr_shared PROPERTIES BUNDLE TRUE)
+else()
+set_target_properties(vsr_shared PROPERTIES BUNDLE FALSE)
+endif()
 
 
 #project include directories
@@ -84,8 +89,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality
 #set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
 #set( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin )
-set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build/bin")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/${BUILD_DIRECTORY}/lib")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/${BUILD_DIRECTORY}/bin")
 
 #Add Headers as Custom Target for Editing in IDES (such as QT Creator, etc)
 FILE(GLOB_RECURSE HeaderFiles "${PROJECT_SOURCE_DIR}/include/*")

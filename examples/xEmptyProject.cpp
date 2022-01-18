@@ -41,7 +41,9 @@ struct MyApp : App {
    *  Keyboard
    *-----------------------------------------------------------------------------*/
   void onKeyDown(const gfx::Keyboard &k){
-   if (k.code=='s') bMouseSet = !bMouseSet;
+//   if (k.code=='s') bMouseSet = !bMouseSet;
+
+    App::onKeyDown(k);
   }
 };
 
