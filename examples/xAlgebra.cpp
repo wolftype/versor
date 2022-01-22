@@ -63,7 +63,7 @@ using mga = vsr::algebra< vsr::metric<1,1,0, false>, double>;
 
 //a plane-based algebra of euclidean 3D space
 //...................................<p,q>, field  >
-using pga = vsr::algebra< vsr::metric<3,0,1,false>, double >;
+//using pga = vsr::algebra< vsr::metric<3,0,1,false>, double >;
 
 
 /*-----------------------------------------------------------------------------
@@ -171,21 +171,21 @@ int main(){
 
   mga::types::Pss().print();
 
-  printf("some PGA 3D types\n");
-  auto pva = pga::types::vector(1,1,1,1);
-  auto pvb = pga::types::vector(2,3,4,5);
+//  printf("some PGA 3D types\n");
+//  auto pva = pga::types::vector(1,1,1,1);
+//  auto pvb = pga::types::vector(2,3,4,5);
 
   auto eva = ega4::types::vector(1,1,1,1);
   auto evb = ega4::types::vector(2,3,4,5);
 //
-  (eva * evb).print();
-  (pva * pvb).print();
+  //(eva * evb).print();
+  //(pva * pvb).print();
 
   ega4::impl::gp_arrow_t< ega4::types::vec, ega4::types::vec>::Arrow::print();
-  pga::impl::gp_arrow_t< pga::types::vec, pga::types::vec>::Arrow::print();
+//  pga::impl::gp_arrow_t< pga::types::vec, pga::types::vec>::Arrow::print();
 
   ega4::impl::gp_arrow_t< ega4::types::biv, ega4::types::biv>::Arrow::print();
-  pga::impl::gp_arrow_t< pga::types::biv, pga::types::biv>::Arrow::print();
+  //pga::impl::gp_arrow_t< pga::types::biv, pga::types::biv>::Arrow::print();
 
 
 
