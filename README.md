@@ -122,7 +122,7 @@ See the [Troubleshooting](#TROUBLESHOOTING) section below for instructions on in
 You'll need to initialize the submodules to build any graphics examples:
 
 	cd versor
-  git submodule update --init --recursive
+	git submodule update --init --recursive
 
 To build library
 
