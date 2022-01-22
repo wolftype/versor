@@ -26,6 +26,9 @@ jobs:
       - run:
           name: "build script"
           command: "./build.sh"
+      - run:
+          name: "run tests"
+          command: "./run.sh examples/xAlgebra.cpp && ./run.sh examples/xBasic.cpp"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
