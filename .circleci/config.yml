@@ -21,6 +21,9 @@ jobs:
           name: "submodule upddate"
           command: "git submodule update --init --recursive"
       - run:
+          name: "apt get"
+          command: "sudo apt-get install -y libglew-dev freeglut3-dev libxi-dev libxmu-dev"
+      - run:
           name: "build script"
           command: "./build.sh"
 
