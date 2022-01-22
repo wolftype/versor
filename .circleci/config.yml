@@ -22,7 +22,7 @@ jobs:
           command: "git submodule update --init --recursive"
       - run:
           name: "apt get"
-          command: "sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt-get install -y libxrandr-dev libxinerama-dev libglew-dev freeglut3-dev libxi-dev libxmu-dev"
+          command: "sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt-get install -y libxrandr-dev libxinerama-dev libxcursor-dev libglew-dev freeglut3-dev libxi-dev libxmu-dev"
       - run:
           name: "build script"
           command: "./build.sh"
