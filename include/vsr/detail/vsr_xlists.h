@@ -85,6 +85,9 @@ struct Basis<X, XS...>{
 
 // -> prevents undefines on linux
 template<bits::type X, bits::type ... XS>
+const bits::type Basis<X,XS...>::HEAD;
+
+template<bits::type X, bits::type ... XS>
 const int Basis<X, XS...>::Num;
 
 /*-----------------------------------------------------------------------------
@@ -299,24 +302,35 @@ struct NotType< Basis<>, A >{
 /*-----------------------------------------------------------------------------
  *  METRIC TENSOR SIGN
  *  Takes a <metric, bitwise &, signflip>
- * 
+ *
  *-----------------------------------------------------------------------------*/
 template<class M, int AB, int SF>
 struct MSign{
   static constexpr int Val =  (AB & 1) ? MSign< typename M::TAIL, (AB>>1) , ( SF * ( M::HEAD ) ) >::Val : MSign<typename M::TAIL, (AB>>1), SF >::Val;
 };
+template<class M, int AB, int SF>
+constexpr int MSign<M,AB,SF>::Val;
+
 template<class M, int SF >
 struct MSign<M, 0, SF>{
   static constexpr int Val = SF;
 };
+template<class M, int SF>
+constexpr int MSign<M,0,SF>::Val;
+
 template<int AB, int SF >
 struct MSign<Basis<>, AB, SF >{
   static constexpr int Val = SF;
 };
+template<int AB, int SF>
+constexpr int MSign<Basis<>,AB,SF>::Val;
+
 template<int SF >
 struct MSign<Basis<>, 0, SF >{
   static constexpr int Val = SF;
 };
+template<int SF>
+constexpr int MSign<Basis<>, 0, SF>::Val;
 
 template<int N>
 constexpr bits::type bit(){ return 1 << N; }
