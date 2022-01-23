@@ -110,7 +110,7 @@ file(GLOB tests tests/*.cpp)
 foreach(filename ${tests})
   get_filename_component(target ${filename} NAME_WE)
   add_executable(${target} ${filename} )
-  target_link_libraries(${target} vsr gtest_main)
+  target_link_libraries(${target} gtest_main)
   add_test (NAME ${target}_test COMMAND ${target})
 endforeach()
 
