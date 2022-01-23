@@ -141,10 +141,16 @@ if(${BUILD_GRAPHICS})
     add_library(vsrGfx ${graphicsGLES})
   else()
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
+    target_link_libraries(vsrGfx vsr)
   endif()
 
   set(vsr_libraries ${vsr_libraries} vsrGfx)
   set(libraries ${vsr_libraries} ${GFX_LIBRARIES}  )
+
+  message ("LIBBBBS: ")
+  foreach(lib ${libraries})
+    message (${lib})
+  endforeach()
 
   #potentially build examples
   file(GLOB examples examples/*.cpp)
