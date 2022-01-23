@@ -83,6 +83,10 @@ struct Basis<X, XS...>{
   static void print() { printf("%s\t%s\t%d\n", bits::estring(X).c_str(), bits::bitString<6>(X).c_str(), X);  TAIL::print(); }
 };
 
+// -> prevents undefines on linux
+template<bits::type X, bits::type ... XS>
+const int Basis<X, XS...>::Num;
+
 /*-----------------------------------------------------------------------------
  *  CONCATENATE
  *-----------------------------------------------------------------------------*/
