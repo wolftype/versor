@@ -24,6 +24,8 @@ TEST(XListsTest, CommonTest)
 
 TEST(XListsTest, BasisTest)
 {
+  Basis<> b;
+
   EXPECT_EQ (Basis<>::Num, 0);
   EXPECT_EQ ((Basis<1,2,3>::Num), 3);
 
