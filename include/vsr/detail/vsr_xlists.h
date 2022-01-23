@@ -64,6 +64,10 @@ struct Basis{
   static void print(){ printf("\n");}
 };
 
+// -> prevents undefines on linux
+template<bits::type ... XS>
+const int Basis<XS...>::Num;
+
 /*-----------------------------------------------------------------------------
  *  TYPE COMBINATORICS ONLY (NO STORAGE)
  *-----------------------------------------------------------------------------*/
