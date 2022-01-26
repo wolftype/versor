@@ -33,10 +33,10 @@
 
 
 ///@todo namespace this
-struct App : public gfx::GFXAppGui<gfx::GLFWContext>
+struct App : public gfx::GFXAppGui<gfx::GlutContext>
 {
 
-  using GuiApp = gfx::GFXAppGui<gfx::GLFWContext>;
+  using GuiApp = gfx::GFXAppGui<gfx::GlutContext>;
 
   vsr::cga::Point mMouse2D;
   vsr::cga::Point mMouse3D;
