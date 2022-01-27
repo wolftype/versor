@@ -41,9 +41,9 @@ struct MyApp : App {
     DualPlane dly (0,1,0,0);
     DualPlane dlx (1,0,0,0);
 
-    (dly ^ dlx).print();
+    //(dly ^ dlx).print();
 
-    Vec(1,0,0).duale().print();
+    //Vec(1,0,0).duale().print();
 
 
   }
