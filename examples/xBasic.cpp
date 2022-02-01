@@ -5,6 +5,7 @@ using namespace gfx;
 
 struct MyApp : App {
 
+  float time = 0.0;
   //DualSphere at 2,0,0 with radius .5
   DualSphere sphere = Construct::sphere(2,0,0,.5);;
 
@@ -37,13 +38,11 @@ struct MyApp : App {
     draw(circle_meet,0,1,0);     //<-- Draw circle (intersection)
 
 //    text("use t, r and s keys and drag with mouse to Translate, Rotate and Scale the Circle");
-//
-    DualPlane dly (0,1,0,0);
-    DualPlane dlx (1,0,0,0);
 
-    //(dly ^ dlx).print();
 
-    //Vec(1,0,0).duale().print();
+    draw(Vec(1,0,0).rot(Biv(time,0,0)), 1,0,1);
+
+    time += .01;
 
 
   }
