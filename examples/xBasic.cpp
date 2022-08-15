@@ -20,6 +20,8 @@ struct MyApp : App {
     //Enable Mouse Control with 't' 'r' and 's' keys
     objectController.attach(&circle);
     objectController.attach(&sphere);
+
+    time = 0.0;
   }
 
   void onDraw(){
@@ -37,10 +39,9 @@ struct MyApp : App {
     draw(sphere,1,0,0);          //<-- Draw Red Sphere
     draw(circle_meet,0,1,0);     //<-- Draw circle (intersection)
 
-//    text("use t, r and s keys and drag with mouse to Translate, Rotate and Scale the Circle");
-
-
-    draw(Vec(1,0,0).rot(Biv(time,0,0)), 1,0,1);
+    auto rot = Gen::rot(Biv(-PI * time,0,0));
+    draw(Vec(1,0,0).spin(rot), 1,0,1);
+    draw(Vec(1,0,0), 1,1,1);
 
     time += .01;
 
