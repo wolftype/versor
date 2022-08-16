@@ -11,12 +11,12 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
-#include "vsr_cga3D.h"   
+#include "vsr_cga3D.h"
 #include "vsr_GLVimpl.h"
 #include "vsr_cga3D_frame.h"
 #include "vsr_fiber.h"
@@ -24,8 +24,8 @@
 using namespace vsr;
 using namespace vsr::cga3D;
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -36,7 +36,7 @@ struct MyApp : App {
   float weight, scaleA, scaleB, radius;
 
   MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
+    scene.camera.pos( 0,0,10 );
     time = 0;
   }
 
@@ -57,17 +57,17 @@ struct MyApp : App {
       scaleA = scaleB = 1;
 
   }
-  
+
     void getMouse(){
-      auto tv = interface.vd().ray; 
+      auto tv = interface.vd().ray;
       Vec z (tv[0], tv[1], tv[2] );
       auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1);
+      mouse = Round::point( ray,  Ori(1) );
   }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       getMouse();
 
       //Frame
@@ -110,9 +110,9 @@ struct MyApp : App {
 
 
   }
-   
 
-  
+
+
 };
 
 
@@ -120,14 +120,14 @@ MyApp * app;
 
 
 int main(){
-                             
-  GLV glv(0,0);  
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
+  GLV glv(0,0);
+
+  Window * win = new Window(500,500,"Versor",&glv);
+  app = new MyApp( win );
   app -> initGui();
-  
-  
+
+
   glv << *app;
 
   Application::run();

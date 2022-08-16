@@ -11,6 +11,11 @@ xTrajectory.cpp
   Elliptic and Hyperbolic Orbits of knot based on point weighting (or radius increasing)
   Questions: can we use this to make non-torus knots?
 
+xCyclidicVolumes.cpp
+---
+
+xCyclidicVolumes2.cpp
+---
 
 geo
 ===

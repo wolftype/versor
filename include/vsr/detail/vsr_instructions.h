@@ -187,6 +187,19 @@ struct Instruct{
     printf(" a[%d] * b[%d] /*%s*/\t", idxA, idxB, bits::estring(Res).c_str());
   }
 };
+
+template<bool F, bits::type R, int IDXA, int IDXB>
+const bool Instruct<F,R,IDXA,IDXB>::Flip;
+
+template<bool F, bits::type R, int IDXA, int IDXB>
+const bits::type Instruct<F,R,IDXA,IDXB>::Res;
+
+template<bool F, bits::type R, int IDXA, int IDXB>
+const int Instruct<F,R,IDXA,IDXB>::idxA;
+
+template<bool F, bits::type R, int IDXA, int IDXB>
+const int Instruct<F,R,IDXA,IDXB>::idxB;
+
 template< bits::type R, int IDXA, int IDXB>
 struct Instruct<true, R, IDXA, IDXB>{
   static const bool Flip = true;
@@ -203,6 +216,18 @@ struct Instruct<true, R, IDXA, IDXB>{
   }
 };
 
+
+template< bits::type R, int IDXA, int IDXB>
+const bool Instruct<true,R,IDXA,IDXB>::Flip;
+
+template< bits::type R, int IDXA, int IDXB>
+const bits::type Instruct<true,R,IDXA,IDXB>::Res;
+
+template< bits::type R, int IDXA, int IDXB>
+const int Instruct<true,R,IDXA,IDXB>::idxA;
+
+template< bits::type R, int IDXA, int IDXB>
+const int Instruct<true,R,IDXA,IDXB>::idxB;
 
 /*-----------------------------------------------------------------------------
  *  Single Token of a Sign Flip Instruction
