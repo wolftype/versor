@@ -36,6 +36,14 @@ struct product {
   static const bool has_outer = bits::outer(A,B);
 };
 
+template<bits::type A, bits::type B> const bool
+product<A,B>::is_positive;
+
+template<bits::type A, bits::type B> const bool
+product<A,B>::has_inner;
+
+template<bits::type A, bits::type B> const bool
+product<A,B>::has_outer;
 /*-----------------------------------------------------------------------------
  *  use of product to calculate value (unused)
  *-----------------------------------------------------------------------------*/
