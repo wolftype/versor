@@ -3,7 +3,7 @@
  *
  *       Filename:  vsr_cga2D_render.h
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  06/02/2014 16:12:26
@@ -11,7 +11,7 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
@@ -34,31 +34,31 @@ namespace vsr {
   namespace XF{
    inline gfx::Mat4f mat( const Vec& v, VT s) {
          double x = v[0]; double y = v[1]; //double z = v[2];
-          return gfx::Mat4f( s , 0 , 0 , 0, 
+          return gfx::Mat4f( s , 0 , 0 , 0,
                              0 , s , 0 , 0,
                              0 , 0 , s , 0,
                              x , y , 0 , 1 );
    }
   }
 
-  MBO& MeshBuffer(const Dll& s ) {  static MBO mbo( Mesh::Line( Vec(-50,0), Vec(50,0) ), GL::DYNAMIC ); return mbo; }  
-  MBO& MeshBuffer(const Lin& s ) {  return MeshBuffer( Dll() ); }  
+  MBO& MeshBuffer(const Dll& s ) {  static MBO mbo( Mesh::Line( Vec(-50,0), Vec(50,0) ), GL::DYNAMIC ); return mbo; }
+  MBO& MeshBuffer(const Lin& s ) {  return MeshBuffer( Dll() ); }
 
-  /* vector<MBO>& MeshBuffer(const Vec& s){ */ 
-  /*   static vector<MBO> m = { Mesh::Cone(.3), MBO( Mesh::Line( Vec(0,0,0), s), GL::DYNAMIC )  }; */ 
-  /*   return m; */ 
+  /* vector<MBO>& MeshBuffer(const Vec& s){ */
+  /*   static vector<MBO> m = { Mesh::Cone(.3), MBO( Mesh::Line( Vec(0,0,0), s), GL::DYNAMIC )  }; */
+  /*   return m; */
   /* } */
 
-  vector<MBO>& MeshBuffer(const Pnt& s){ 
+  vector<MBO>& MeshBuffer(const Pnt& s){
     static vector<MBO> m = { Mesh::Circle(), Mesh::Point( Pnt() ) };
-    return m; 
+    return m;
   }
 
   vector<MBO>& MeshBuffer(const Sph& s ) { return MeshBuffer( Pnt() ); }
 
-  vector<MBO>& MeshBuffer(const Par& s ) { 
+  vector<MBO>& MeshBuffer(const Par& s ) {
     static vector<MBO> m = { Mesh::Sphere(), Mesh::Points( Ro::split(s) ) };
-    return m; 
+    return m;
   }
 
 
@@ -67,7 +67,7 @@ namespace vsr {
    *
    *  If point is above a certain size, rendered as a Circle
    */
-  void Render( const Pnt& pnt, Renderer * re, 
+  void Render( const Pnt& pnt, Renderer * re,
    bool bUpdate=false, float r=1.0,float g=1.0,float b=1.0, float a=1.0 )  {
 
     auto& mbo = MeshBuffer( pnt );
@@ -78,10 +78,10 @@ namespace vsr {
 
     if ( fabs(ta) >  FPERROR ) {
 
-        bool real = ta > 0 ? 1 : 0;  
+        bool real = ta > 0 ? 1 : 0;
 
         re -> modelview( XF::mat( pnt, sqrt( fabs(ta) ) ) );
-        if (bUpdate) { circle.mesh.color(r,g,b,a); circle.update(); }  
+        if (bUpdate) { circle.mesh.color(r,g,b,a); circle.update(); }
         re -> pipe.line( circle );
 
     } else {
@@ -95,7 +95,7 @@ namespace vsr {
 
     }
 
-  } 
+  }
 
   } //vsr2D::
 

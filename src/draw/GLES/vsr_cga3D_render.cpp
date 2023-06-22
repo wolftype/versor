@@ -253,18 +253,18 @@ namespace gfx{
   }
 
 
- template void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
- template void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
- template void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
- template void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
- template void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
- template void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
- template void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
- template void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
- template void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
- template void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
- template void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
- template void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
+ //template void Renderable<Frame>::Draw(const Frame&, GFXSceneNode * s);
+ //template void Renderable<Cir>::Draw(const Cir&, GFXSceneNode * s);
+ //template void Renderable<vector<Cir>>::Draw(const vector<Cir>&, GFXSceneNode * s);
+ //template void Renderable<Pnt>::Draw(const Pnt&, GFXSceneNode * s);
+ //template void Renderable<Sph>::Draw(const Sph&, GFXSceneNode * s);
+ //template void Renderable<Par>::Draw(const Par&, GFXSceneNode * s);
+ //template void Renderable<Dll>::Draw(const Dll&, GFXSceneNode * s);
+ //template void Renderable<Lin>::Draw(const Lin&, GFXSceneNode * s);
+ //template void Renderable<Pln>::Draw(const Pln&, GFXSceneNode * s);
+ //template void Renderable<Biv>::Draw(const Biv&, GFXSceneNode * s);
+ //template void Renderable<Field<Vec>>::Draw(const Field<Vec>&, GFXSceneNode * s);
+ //template void Renderable<Field<Pnt>>::Draw(const Field<Pnt>&, GFXSceneNode * s);
 
 
 
