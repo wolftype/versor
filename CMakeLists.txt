@@ -36,7 +36,7 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 if (WINDOWS)
 set (VERSOR_FLAGS "-ftemplate-depth-1200")
 else()
-set (VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+set (VERSOR_FLAGS "-fcommon -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
 endif()
 
 #double or float precision
