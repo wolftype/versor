@@ -589,53 +589,53 @@ struct Construct
 };
 
 /*-----------------------------------------------------------------------------
-      *  EVALUATION LAMBDAS
+      *  EVALUATION LAMBDAS  [TDDO repair these mucked up poorly linking autos]
       *-----------------------------------------------------------------------------*/
 
-/*!
-     *  \brief  Point on line closest to another point v
-     */
-auto pointOnLine = [](const Line &lin, const Point &v) {
-  return Round::null (Flat::loc (lin, v, false));
-};
-
-/// a single point on circle c at theta t
-auto pointOnCircle = [](const Circle &c, VSR_PRECISION t) {
-  return Construct::point (c, t);
-};
-/// n points on circle c
-auto pointsOnCircle = [](const Circle &c, int num) {
-  vector<Point> out;
-  for (int i = 0; i <= num; ++i)
-    {
-      out.push_back (pointOnCircle (c, TWOPI * (float) i / num));
-    }
-  return out;
-};
-/// a pair on dual sphere
-auto pairOnSphere = [](const DualSphere &s, VSR_PRECISION t, VSR_PRECISION p) {
-  return Construct::pair (s, Vec::x.sp (Gen::rot (t, p)));
-};
-/// a single point on dual sphere s at theta t and phi p
-auto pointOnSphere = [](const DualSphere &s, VSR_PRECISION t, VSR_PRECISION p) {
-  return Construct::pointA (pairOnSphere (s, t, p)).null ();
-};
-/// many points on sphere (could use map func from gfx::data)
-auto pointsOnSphere = [](const DualSphere &s, int u, int v) {
-  vector<Point> out;
-  for (int i = 0; i < u; ++i)
-    {
-      for (int j = 0; j < v; ++j)
-        {
-
-          float tu = TWOPI * i / u;  //-1 + 2.0 * i/num;
-          float tv = -PIOVERTWO + PI * j / v;
-
-          out.push_back (pointOnSphere (s, tu, tv));
-        }
-    }
-  return out;
-};
+///*!
+//     *  \brief  Point on line closest to another point v
+//     */
+//auto pointOnLine = [](const Line &lin, const Point &v) {
+//  return Round::null (Flat::loc (lin, v, false));
+//};
+//
+///// a single point on circle c at theta t
+//auto pointOnCircle = [](const Circle &c, VSR_PRECISION t) {
+//  return Construct::point (c, t);
+//};
+///// n points on circle c
+//auto pointsOnCircle = [](const Circle &c, int num) {
+//  vector<Point> out;
+//  for (int i = 0; i <= num; ++i)
+//    {
+//      out.push_back (pointOnCircle (c, TWOPI * (float) i / num));
+//    }
+//  return out;
+//};
+///// a pair on dual sphere
+//auto pairOnSphere = [](const DualSphere &s, VSR_PRECISION t, VSR_PRECISION p) {
+//  return Construct::pair (s, Vec::x.sp (Gen::rot (t, p)));
+//};
+///// a single point on dual sphere s at theta t and phi p
+//auto pointOnSphere = [](const DualSphere &s, VSR_PRECISION t, VSR_PRECISION p) {
+//  return Construct::pointA (pairOnSphere (s, t, p)).null ();
+//};
+///// many points on sphere (could use map func from gfx::data)
+//auto pointsOnSphere = [](const DualSphere &s, int u, int v) {
+//  vector<Point> out;
+//  for (int i = 0; i < u; ++i)
+//    {
+//      for (int j = 0; j < v; ++j)
+//        {
+//
+//          float tu = TWOPI * i / u;  //-1 + 2.0 * i/num;
+//          float tv = -PIOVERTWO + PI * j / v;
+//
+//          out.push_back (pointOnSphere (s, tu, tv));
+//        }
+//    }
+//  return out;
+//};
 
 
 }  //cga::

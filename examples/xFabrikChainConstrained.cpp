@@ -26,7 +26,6 @@ using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
 
-
 struct MyApp : App {
 
   //Some Variables
@@ -37,6 +36,7 @@ struct MyApp : App {
   Point point;
 
   bool bTrack = true;
+
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -56,6 +56,7 @@ struct MyApp : App {
   void onKeyDown( const gfx::Keyboard& k){
     //hit 's' to start/stop tracking of mouse position
     if (k.code == 's' ){
+        cout << "Start / Stop Tracking Mouse Position"
         bTrack = !bTrack;
     }
     App::onKeyDown(k);
@@ -65,9 +66,10 @@ struct MyApp : App {
     chain.reset();
 
     //set up relative links (90 degree rotation)
-    for (int i =0;i<chain.num();++i){
+    for (int i =0; i<chain.num(); ++i){
       chain.link(i).rot() = Gen::rot( Biv::xz * PIOVERFOUR);
     }
+
     chain.fk();
   }
 
