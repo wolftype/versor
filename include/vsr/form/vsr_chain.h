@@ -145,17 +145,26 @@ struct  Spherical : public Joint {
         _init();
       }
 
-      Chain(const string& s) {
+//      Chain( const Chain& c) {
+//        mBaseFrame = c.mBaseFrame;
+//        mJoint = c.mJoint;
+//        mLink = c.mLink;
+//        mFrame = c.mFrame;
+//        mNum = c.mNum;
+//      }
 
+      Chain () : mNum (0) {};
+
+      Chain(const string& s) {
         //mNum = s.length();
         alloc(s);
-        _init();
+        //_init();
       }
 
-      Chain(int n = 3) : mNum(n) {
+      Chain(int n) : mNum(n) {
 
           alloc(n);
-          _init();
+          //_init();
 
       }
 
@@ -375,17 +384,17 @@ struct  Spherical : public Joint {
       }
 
       /// Dual Line Forward: Line from kth frame to kth Link
-      Dll linkf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
+      Dll linkf(int k) const { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
       /// Dual Line Forward: Line from kth frame to kth+1 joint
-      Dll linf(int k) { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
+      Dll linf(int k) const { return Op::dl( mFrame[k].pos() ^ mFrame[k+1].pos() ^ Inf(1) ).runit() ; }
       /// Dual Line Forward
-      Dll nextLine(int k) { return linf(k); }
+      Dll nextLine(int k) const { return linf(k); }
       /// Dual Line Backward: Line from kth frame to kth-1 joint
-      Dll linb(int k ) { return Op::dl( mFrame[k].pos() ^ mFrame[k-1].pos() ^ Inf(1) ).runit() ; }
+      Dll linb(int k ) const { return Op::dl( mFrame[k].pos() ^ mFrame[k-1].pos() ^ Inf(1) ).runit() ; }
       /// Dual Line Backward
-      Dll prevLine(int k) { return linb(k); }
+      Dll prevLine(int k) const { return linb(k); }
       /// Dual Line From Kth Joint to Input Target (Default is From Last joint)
-      Dll lin(const Pnt& p ) { return Op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
+      Dll lin(const Pnt& p ) const { return Op::dl( mFrame[mNum-1].pos() ^ p ^ Inf(1) ).runit() ; }
 
       /// relative transformation (lagrangian) at kth joint
       Mot rel(int k){

@@ -28,12 +28,13 @@ using namespace gfx;
 
 struct MyApp : App {
 
+
   //Some Variables
   bool bReset = false;
   float amt,amt2,amt3,linewidth = 0;
 
   Chain chain = Chain(10);
-  Point point;
+  Point point = Point();
 
   bool bTrack = true;
 
@@ -45,18 +46,22 @@ struct MyApp : App {
     gui(amt,"amt",-100,100);
     gui(bReset,"bReset")(linewidth,"linewidth",1,10);
 
+    if (mRenderGraph.immediate() )
+      cout << "IMMEDIATE MODE" << endl;
+    else
+      cout << "PROGAMMABLE PIPELINE" << endl;
     //reset chain
     reset();
 
     amt = .001;
 
-    scene.camera.pos(0,0,13);
+    scene.camera.pos(0,0,8);
   }
 
   void onKeyDown( const gfx::Keyboard& k){
     //hit 's' to start/stop tracking of mouse position
     if (k.code == 's' ){
-        cout << "Start / Stop Tracking Mouse Position"
+        cout << "Start / Stop Tracking Mouse Position" << endl;
         bTrack = !bTrack;
     }
     App::onKeyDown(k);
@@ -91,25 +96,31 @@ struct MyApp : App {
      }
 
      //Draw the chain
-     Draw(chain);
+//     DrawChain(chain);
 
-     //Draw circle of rotation of each joint
-     for (auto& i : chain.frame()){
-        Draw( i.cxy(),1,0,0);
+     for (int i = 0;i<chain.num(); ++i){
+       Draw(chain[i].cxy());
      }
 
-     //Draw the in-socket rotation of each joint
-     for (int i=1;i<chain.num();++i){
+//       cout << chain[i].
 
-        auto tyb = chain[i].y();
-        auto tya = Vec::y.spin( chain[i].rot() * !chain.joint(i).rot() );
-        auto biv = Gen::log( Gen::ratio(tya,tyb) );
-        for (int j=0;j<10;++j){
-          float t = (float)j/10;
-          DrawAt(tya.rotate(-biv*t), chain[i].pos(), 1,t,1-t);
-        }
-
-     }
+//     //Draw circle of rotation of each joint
+//     for (auto& i : chain.frame()){
+//        Draw( i.cxy(),1,0,0);
+//     }
+//
+//     //Draw the in-socket rotation of each joint
+//     for (int i=1;i<chain.num();++i){
+//
+//        auto tyb = chain[i].y();
+//        auto tya = Vec::y.spin( chain[i].rot() * !chain.joint(i).rot() );
+//        auto biv = Gen::log( Gen::ratio(tya,tyb) );
+//        for (int j=0;j<10;++j){
+//          float t = (float)j/10;
+//          DrawAt(tya.rotate(-biv*t), chain[i].pos(), 1,t,1-t);
+//        }
+//
+//     }
   }
 
 };
@@ -117,7 +128,9 @@ struct MyApp : App {
 
 int main(){
 
-  MyApp app;
+//  MyApp * app = new MyApp();
+//  app -> start();
+  MyApp app{};
   app.start();
 
   return 0;

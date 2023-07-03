@@ -22,9 +22,21 @@ namespace gfx{
   using vsr::cga::Rot;
   using vsr::cga::Vec;
   using vsr::cga::Gen;
-  
+
+  void DrawChain (const Chain& chain)
+  {
+    for (int i = 0;i<chain.num(); ++i){
+      render::draw( chain[i]);
+      render::begin(1,0,0);
+      render::draw( chain.nextLine(i));
+      render::begin(0,1,1,.3);
+      render::draw( chain.nextSphere(i));
+    }
+
+  }
+
   void Draw(const Chain& c, bool bLoop = false, bool bFrame=true, float r=1.0, float g=1.0, float b=1.0, float a=1.0){
-    
+
    if(bFrame){
     for (int i = 0; i<c.num(); ++i){
         float t=(float)i/c.num();
@@ -43,14 +55,14 @@ namespace gfx{
         auto cvec = c[i].vec();
         auto nvec = c.link(i).vec() <= Vec::y; //for chains with R offset
         gfx::GL::vertex( cvec.begin() );
-        gfx::GL::vertex( (cvec+c[i].y()*nvec).begin() ); 
+        gfx::GL::vertex( (cvec+c[i].y()*nvec).begin() );
     }
     glEnd();
   }
 
 
   void DrawR(const Frame& f, float r= 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
-        
+
     static gfx::Mesh ma = gfx::Mesh::Cylinder( .5, 2, 4);
 
       //Frame f = r();
@@ -59,30 +71,30 @@ namespace gfx{
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );// - 2 * f.scale() );
       gfx::GL::rotate( nga::Gen::aa( rot * Gen::rot( Biv::yz * PIOVERFOUR ) ).begin() );
       gfx::GL::scale( f.scale() );
-      glColor4f(r,g,b,a); 
+      glColor4f(r,g,b,a);
       ma.drawElements();
     glPopMatrix();
 
     glPushMatrix();
-    
+
       gfx::GL::translate( f.pos()[0], f.pos()[1], f.pos()[2] );
       gfx::GL::rotate( nga::Gen::aa( rot ).begin() );
       gfx::GL::translate( 0, f.scale() * .5, 0 );
-    
+
      // glPushMatrix();
-        gfx::GL::scale( f.scale() * .5 );    
-        glColor4f(g,r,b,a); 
-        ma.drawElements(); 
+        gfx::GL::scale( f.scale() * .5 );
+        glColor4f(g,r,b,a);
+        ma.drawElements();
      // glPopMatrix();
-    
-      /* gfx::GL::scale( 1, 10, 1); */    
-      /* ma.drawElements(g,r,b,a); */ 
-                 
+
+      /* gfx::GL::scale( 1, 10, 1); */
+      /* ma.drawElements(g,r,b,a); */
+
     glPopMatrix();
   }
 
 
-  
+
   void DrawR(const Chain& c, float r= 1.0, float g = 1.0, float b = 1.0, float a = 1.0){
     for (int i = 0; i<c.num(); ++i){
         DrawR(c[i], r, g,b,a);
@@ -128,15 +140,15 @@ namespace tikz{
     auto x = f.x(); auto y = f.y(); auto z = f.z();
     auto sx = name("cx",n); auto sy = name("cy",n); auto sz = name("cz",n);
     os << "\\coordinate"<<c<<" at "<<coord(v)<<";"<<endl;
-    
+
     if (bx) os << "\\coordinate"<<sx<<" at "<<coord(x)<<";"<<endl;
     if (by) os << "\\coordinate"<<sy<<" at "<<coord(y)<<";"<<endl;
     if (bz) os << "\\coordinate"<<sz<<" at "<<coord(z)<<";"<<endl;
-    
+
     if (bx) os << "\\draw [->]"<<c<<"--+"<<sx<<";"<<endl;
     if (by) os << "\\draw [->]"<<c<<"--+"<<sy<<";"<<endl;
     if (bz) os << "\\draw [->]"<<c<<"--+"<<sz<<";"<<endl;
-    
+
     auto sxp = name("cxp",n); auto sxn = name("cxn",n);
     auto syp = name("cyp",n); auto syn = name("cyn",n);
     auto szp = name("czp",n); auto szn = name("czn",n);
@@ -164,7 +176,7 @@ namespace tikz{
     return s+ end();
   }
 }//tikz::
-  
+
 }
 
 #endif   /* ----- #ifndef vsr_chain_draw_INC  ----- */

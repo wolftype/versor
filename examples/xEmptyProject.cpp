@@ -32,8 +32,10 @@ struct MyApp : App {
     if (bMouseSet) calcMouse3D();
     //use mouse position in world space to construct a circle
     Circle cxy = Construct::circle(mMouse3D, 1);
+    Frame frame;
     //draw the circle
     draw (cxy);
+    draw (frame);
 
    }
 
