@@ -69,6 +69,7 @@ void ObjectController::ObjectPtr<A>::transform ()
     {
 
       case 's':  //SCALE
+      case 83:
         {
 
           Vec3f tm1 = i->io ().pos () - sc;
@@ -84,12 +85,14 @@ void ObjectController::ObjectPtr<A>::transform ()
           break;
         }
       case 't':  //TRANSLATE
+      case 84:
         {
           Vec3f mdc = i->dragCat () * 10;
           ts = ps.trs (mdc[0], mdc[1], mdc[2]);
           break;
         }
       case 'r':  //ROTATE
+      case 71:
         {
           auto b = i->axisCat ();
           cga::Dll td = pnt <= (cga::Drv (b[0], b[1], b[2]).dual ());
@@ -125,6 +128,7 @@ void ObjectController::ObjectPtr<cga::Frame>::transform ()
   switch (i->io ().keyboard.code)
     {
       case 's':  //SCALE
+      case 83:  //SCALE
         {
           Vec3f tm1 = i->io ().pos () - sc;
           Vec3f tm2 = i->io ().click () - sc;
@@ -137,12 +141,14 @@ void ObjectController::ObjectPtr<cga::Frame>::transform ()
           break;
         }
       case 't':  //TRANSLATE
+      case 84:
         {
           Vec3f mdc = i->dragCat () * 3;
           ts.pos () = ps.pos ().trs (mdc[0], mdc[1], mdc[2]);
           break;
         }
       case 'r':  //ROTATE
+      case 71:
         {
           auto b = -i->axisCat ();
           cga::Rot tr = cga::Gen::rot (cga::Vec (b[0], b[1], b[2]).duale ());
