@@ -5,188 +5,19 @@
 #include <vsr/draw/vsr_cga3D_helpers.h>
 #include "vsr/form/vsr_graph.h"
 #include "vsr/draw/vsr_graph_draw.h"
+#include "vsr/util/vsr_draw_util.h"
+#include "vsr/util/vsr_gui_util.h"
 
 using namespace vsr;
 using namespace vsr::cga;
 using namespace gfx;
-
-void DrawGraph (const HEGraph<Point>& graph, int resU, int resV, bool bStart,
-    float red=1.0, float green=1.0, float blue=1.0, float alpha=1.0)
-{
-   glBegin(GL_TRIANGLES);
-   bool bC= bStart;
-   bool bS= false;
-   int iter =0;
-   //black and white
-   for (auto& i : graph.face()){
-       auto& a = i->a();
-       auto& b = i->b();
-       auto& c = i->c();
-       //glColor4f(.2,1,.2,.7);
-       Vec normal = (Vec(b-a) ^ Vec(c-a)).duale().unit();
-       GL::normal( normal.begin() );
-
-       glColor4f(bC * red,bC * green,bC * blue, alpha);
-       GL::vertex( a.begin() );
-       GL::vertex( b.begin() );
-       GL::vertex( c.begin() );
-       if (bS) bC = !bC;
-       bS = !bS;
-   }
-
-   glEnd();
-
-}
-
-struct Cylinder {
-
-  HEGraph<Point> graph;
-  std::vector<Point> pnts;
-  std::vector<Vec> coords;
-
-  int resU, resV;
-  float height, radius;
-
-  void init(int _resU, int _resV) {
-    resU = _resU;
-    resV = _resV;
-    pnts.resize(resU * resV);
-    coords.resize(resU * resV);
-
-    graph.UV (resU, resV, pnts.data (), true, false );
-
-    makeCoordsX();
-    //diagCoords();
-  }
-
-  void makeCoordsX(){
-
-    for (int i = 0; i < resU; ++i)
-    {
-      for (int j = 0; j < resV; ++j)
-      {
-            int idx = i * resV + j;
-            auto tu = (float) i / resU * PI;
-            auto tv = (float) j / (resV-1);
-
-            auto rot = Gen::rot (Biv::yz * tu);
-            auto vecx = Vec::y.spin (rot) * 0.5 + Vec(0.0, 0.5, 0.5);
-            coords[idx] = vecx + Vec(tv,0,0);
-      }
-    }
-  }
-  void makeCoordsZ(){
-
-    for (int i = 0; i < resU; ++i)
-    {
-      for (int j = 0; j < resV; ++j)
-      {
-            int idx = i * resV + j;
-            auto tu = (float) i / resU * PI;
-            auto tv = (float) j / (resV-1);
-
-            auto rot = Gen::rot (Biv::xy * tu);
-            auto vecx = Vec::x.spin (rot) * 0.5 + Vec(0.5, 0.5, 0.0);
-            //coords[idx] = vecx + Vec(tv,0,0);
-            coords[idx] = vecx + Vec(0,0,tv);
-      }
-    }
-  }
-
-  void diagCoords(){
-
-    Vec vec (1.0, 1.0, 1.0);
-    Rot rotax = Gen::ratio (Vec::y, vec.unit());
-
-    for (int i = 0; i < resU; ++i)
-    {
-      for (int j = 0; j < resV; ++j)
-      {
-            int idx = i * resV + j;
-
-            auto tu = (float) i / resU;
-            auto tv = (float) j / (resV-1);
-
-            auto rot = Gen::rot (Biv::xz * tu * PI);
-            auto vecx = Vec::x.spin (rot)  * tv * .2;
-            Vec tvec = vecx + Vec(0,tv * ROOT2,0);
-            coords[idx] = tvec.spin(rotax);
-      }
-    }
-  }
-  void coneCoords(){
-
-    Vec vec (1.0, 1.0, 1.0);
-    Rot rotax = Gen::ratio (Vec::y, vec.unit());
-
-    for (int i = 0; i < resU; ++i)
-    {
-      for (int j = 0; j < resV; ++j)
-      {
-            int idx = i * resV + j;
-
-            auto tu = (float) i / resU;
-            auto tv = (float) j / (resV-1);
-
-            auto rot = Gen::rot (Biv::xz * tu * PI);
-            auto vecx = Vec::x.spin (rot) * tv * .5;
-            Vec tvec = vecx + Vec(0,tv,0);
-            coords[idx] = tvec.spin(rotax);
-      }
-    }
-  }
-
-  void draw(bool bStart){
-    DrawGraph (graph, resU, resV, bStart, 1.0, .3, .3, 1.0);
-  }
-};
-
-struct TFace {
-
-  HEGraph<Point> graph;
-  std::vector<Point> pnts;
-
-  int resU, resV;
-
-  void init(int _resU, int _resV) {
-    resU = _resU;
-    resV = _resV;
-    pnts.resize(resU * resV);
-    graph.UV (resU, resV, pnts.data (), false, false);
-  }
-
-  void draw(bool bStart, float alpha){
-    DrawGraph (graph, resU, resV, bStart, 1.0, 1.0, 1.0, alpha);
-  }
-
-};
-
-/// Curvature Parameter
-struct CParam {
-
-  float val = 0;
-  float frq = .02;
-  bool osc = false;
-  bool bAbs = false;
-  string name;
-
-  CParam (string _name) : name(_name) {}
-
-  float eval(float timer)
-  {
-    float ts = sin(timer * frq);
-    float ts2 = bAbs ? (ts+1)/2.0 : ts;
-    return osc ? val * ts2 : val;
-  }
-
-};
-
+using namespace vsr::util;
 
 struct MyApp : App {
 
   Cylinder cylinder;
   Cylinder cylinderB;
-  std::array<TFace, 12> faces;
+  std::array<vsr::util::Grid, 12> faces;
 
   float resU = 10;
   float resV = 10;
@@ -204,21 +35,22 @@ struct MyApp : App {
   float vSpacing = 3;
   float wSpacing = 3;
 
-  CParam kVU = CParam("kVU");
-  CParam kWU = CParam("kWU");;
-  CParam kUV =  CParam("kUV");
-  CParam kWV =  CParam("kWV");
-  CParam kUW =  CParam("kUW");
-  CParam kVW =  CParam("kVW");
-  CParam kV1U = CParam("kV1U");
-  CParam kU1W = CParam("kU1W");
-  CParam kW1V = CParam("kW1V");
+  // OParam from Util creates an oscillating parameter value
+  OParam kVU = OParam("kVU");
+  OParam kWU = OParam("kWU");;
+  OParam kUV =  OParam("kUV");
+  OParam kWV =  OParam("kWV");
+  OParam kUW =  OParam("kUW");
+  OParam kVW =  OParam("kVW");
+  OParam kV1U = OParam("kV1U");
+  OParam kU1W = OParam("kU1W");
+  OParam kW1V = OParam("kW1V");
 
   //second volume
-  CParam kVU2 = CParam("kVU2");
-  CParam kWU2 = CParam("kWU2");
-  CParam kV1U2 = CParam("kV1U2");
-  CParam kU1W2 = CParam("kU1W2");
+  OParam kVU2 = OParam("kVU2");
+  OParam kWU2 = OParam("kWU2");
+  OParam kV1U2 = OParam("kV1U2");
+  OParam kU1W2 = OParam("kU1W2");
 
   float preset = 0;
   float decay = 0.0;
@@ -245,7 +77,7 @@ struct MyApp : App {
 
   float timer = 0;
 
-  void guiElement(CParam& cp)
+  void guiElement(OParam& cp)
   {
     gui (cp.val, cp.name, -100,100);
     gui (cp.frq, "frq", 0,10);
@@ -267,7 +99,7 @@ struct MyApp : App {
     guiElement (kV1U);
     guiElement (kU1W);
     guiElement (kW1V);
-    
+
     guiElement (kVU2);
     guiElement (kWU2);
     guiElement (kV1U2);
@@ -416,7 +248,7 @@ struct MyApp : App {
         kv1u *= decay;
         ku1w *= decay;
 
-        int citer =0;         
+        int citer =0;
         float final_v, final_w;
         for (auto& i : cylinder.coords)
         {
@@ -433,7 +265,7 @@ struct MyApp : App {
 
         }
         cylinderB.draw(bStart);
-        bStart = !bStart; 
+        bStart = !bStart;
 
         tvol = nvol;
 
@@ -442,7 +274,7 @@ struct MyApp : App {
       cylinder.makeCoordsX();
     }
 
-    TVolume vol2 (vol, TVolume::Face::RIGHT, kVU2.eval(timer), kWU2.eval(timer), 
+    TVolume vol2 (vol, TVolume::Face::RIGHT, kVU2.eval(timer), kWU2.eval(timer),
         kV1U2.eval(timer), kU1W2.eval(timer));
 
     int citer = 0;
@@ -504,9 +336,9 @@ struct MyApp : App {
       DrawCurve(vol.pos(),vol.dvuw0(),20,.3,1,.3);
       DrawCurve(vol.pos(),vol.dwvu0(),20,.3,.3,1);
 
-      Draw (TFrame::NormalizePair(vol.tf().tu.spin (vol.ruvw0())),1,.3,.3);
-      Draw (TFrame::NormalizePair(vol.tf().tv.spin (vol.rvuw0())),.3,1,.3);
-      Draw (TFrame::NormalizePair(vol.tf().tw.spin (vol.rwvu0())),.3,.3,1);
+      Draw (Tops::NormalizePair(vol.tf().tu.spin (vol.ruvw0())),1,.3,.3);
+      Draw (Tops::NormalizePair(vol.tf().tv.spin (vol.rvuw0())),.3,1,.3);
+      Draw (Tops::NormalizePair(vol.tf().tw.spin (vol.rwvu0())),.3,.3,1);
     }
 
 
@@ -648,7 +480,7 @@ struct MyApp : App {
         glEnd();
       }
 
- 
+
       int iter = 0;
     for (auto& i : faces)
     {
@@ -660,8 +492,8 @@ struct MyApp : App {
       else if (bDrawVol2)
          i.draw(false, alpha);
       iter++;
-    } 
-    
+    }
+
 
     if (decay > 0)
     {

@@ -46,7 +46,8 @@ struct App : public gfx::GFXAppGui<gfx::GLFWContext>
 
   bool bSetMouse;
 
-  vsr::cga::Point calcMouse3D (float z = .99)
+  //z = 0 is at camera near plane, z=1 is far clipping plane
+  vsr::cga::Point calcMouse3D (float z = .95)
   {
 
     auto &vd = GuiApp::mContext.interface.io.viewdata;
@@ -119,6 +120,7 @@ struct App : public gfx::GFXAppGui<gfx::GLFWContext>
         case 'o':
           stereoPrint ();
           break;
+        case 88:
         case 'x':
           printf ("save mouse position\n");
           bSetMouse = !bSetMouse;

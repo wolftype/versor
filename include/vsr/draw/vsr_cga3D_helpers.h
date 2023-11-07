@@ -41,19 +41,16 @@ void DrawRound (const DualSphere &s, float r, float g, float b, float a = 1.0)
 {
   auto c = Inf (1) <= s;
   float cc = (c * c)[0];
+
   if (fabs(cc) < .001)
+//  if (FERROR (s[3]))
     {
-      //      Draw (DualPlane (s), r, g, b, 1.0);
-//      render::begin (r, g, b, a);
-//      glPushMatrix ();
-//      gfx::GL::translate (Op::Pos (DualPlane (s)).begin ());
-//      gfx::GL::rotate (Op::AA (DualPlane (s)).begin ());
-//      Glyph::Rect (10, 10);
-//      glPopMatrix ();
         Draw(DualPlane(s), r,g,b,a);
     }
   else
-    Draw (s, r, g, b, a);
+    {
+        Draw (s, r, g, b, a);
+    }
 }
 
 // Draw Circle as Line if Flat

@@ -14,10 +14,13 @@ project(VERSOR)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   SET( LINUX 1)
+  message ("LINUX" )
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   SET( APPLE 1 )
+  message ("APPLE")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   SET( WINDOWS 1)
+  message ("WINDOWS")
 endif()
 
 #optional flags and their defaults for building graphics and examples

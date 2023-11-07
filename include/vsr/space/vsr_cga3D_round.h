@@ -302,10 +302,10 @@ namespace vsr { namespace cga {
     ///@}
 
 
-    
+
     static DualSphere normalize( const DualSphere& x ){
       VSR_PRECISION wt = direction(x.undual())[0];
-      return x/wt;      
+      return x/wt;
     };
 
     static Sphere normalize( const Sphere& x ){
@@ -323,7 +323,7 @@ namespace vsr { namespace cga {
       return x/wt;
     };
 
-    
+
     static Pair renormalize( const Pair& x ){
       auto tmp = (-direction(x)).copy<Vec>().unit().copy<Tnv>();
       return Pair(tmp).translate( Round::location(x) );
@@ -332,12 +332,12 @@ namespace vsr { namespace cga {
       auto tmp = (direction(x)).copy<Biv>().runit().copy<Tnb>();
       return Circle(tmp).translate( Round::location(x) );
     };
-    
+
 //    static DualSphere renormalize( const DualSphere& x ){
 //      auto tmp = direction(x.undual())[0];
 //      return DualSphere(x/tmp).translate( Round::location(x) );
 //    };
-//    
+//
 //    static Circle renormalize( const Circle& x ){
 //      auto tmp = (direction(x)).copy<Biv>().runit().copy<Tnb>();
 //      return Circle(tmp).translate( Round::location(x) );
@@ -471,8 +471,8 @@ namespace vsr { namespace cga {
         @sa vsr::nga::pnt_cir for the @ref generic implementation
     */
     static Point point(const Circle& c, VSR_PRECISION t);
-  
-    /*! Theta in radians of point on circle relative to origin 
+
+    /*! Theta in radians of point on circle relative to origin
     */
     static VSR_PRECISION theta( const Circle& circle, const Point& point);
 

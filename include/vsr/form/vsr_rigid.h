@@ -21,9 +21,9 @@
  @file Rigid Body Sphere-based Constraint Networks
 
  @sa vsr_fold.h
- 
+
  @todo major clean up
- 
+
  */
 
 #ifndef  vsr_rigid_INC
@@ -57,11 +57,11 @@ struct Constrain {
 
     /// three distances, counter clockwise (deprecated, use Tetral)
     static Point Triple (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
-       return Round::loc( Round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
+       return Round::loc( Round::split( (da ^ db ^ dc).dual(), mtn ) ) ;
     }
     /// tetral constraint
     static Point Tetral (const Dls& da, const Dls& db, const Dls& dc, bool mtn){
-       return Round::loc( Round::split( (da ^ db ^ dc).dual(), mtn ) ) ; 
+       return Round::loc( Round::split( (da ^ db ^ dc).dual(), mtn ) ) ;
     }
     /// planar constraint: two distances and a plane
     static Point Planar( const Dls& da, const Dls& db, const Dls& dc, bool mtn){
@@ -80,7 +80,7 @@ struct Constrain {
       auto np = Round::split ( ( line.dual() ^ sur).dual(), false );
 
       return np;
-      
+
     }
 
      /// spherical tangency constrain, one distance and an original point (returns point on sphere closest to p);
@@ -90,7 +90,7 @@ struct Constrain {
        return np;
      }
 
-     /// Tension tangency constrain, one distance and an original point 
+     /// Tension tangency constrain, one distance and an original point
      /// (returns point on sphere closest to p if p is outside da, otherwise just p);
      static Point Tension(const Pnt& p, const Dls& da){
        if ( (p<=da)[0] > 0 ) return p;
@@ -101,9 +101,9 @@ struct Constrain {
 
     /// tension constraint from two distances
     static Point Tension(const Pnt& p, const Dls& da, const Dls& db){
-       
-       if ( ( (p<=da)[0] > 0 ) && ( (p<=db)[0] > 0 ) ) return p; // returns input point if it lies within both spheres 
-       
+
+       if ( ( (p<=da)[0] > 0 ) && ( (p<=db)[0] > 0 ) ) return p; // returns input point if it lies within both spheres
+
        //otherwise, constrain to lie on circle meet
        auto meet = (da ^ db).dual();
        auto tan =  Round::loc( Tangent::at( meet, p ) );
@@ -111,18 +111,18 @@ struct Constrain {
        auto line = tan ^ sur ^ Inf(1);
        auto np = Round::split ( ( line.dual() ^ sur).dual(), false );
 
-       return np;     
+       return np;
     }
 
 
     /// Constrain a point p to a circle c
     static Point PointToCircle( const Point& p, const Circle& c){
 
-      auto cen = Flat::location( Round::carrier(c), p );
-      auto sur = Round::surround(c);                    // dual sphere surround of c
-      auto line =  cen ^ sur ^ Infinity(1);             // line through center of circle and cen
-      auto meet = (line.dual() ^ sur).dual();           // meet of line and sphere
-      return Round::split( meet ,false);                // point on circle closest to p
+      auto proj = Flat::location( Round::carrier(c), p ); // point projected onto carrier plane
+      auto sur = Round::surround(c);                      // dual sphere surround of c
+      auto line =  proj ^ sur ^ Infinity(1);              // line through center of circle and cen
+      auto meet = (line.dual() ^ sur).dual();             // meet of line and sphere
+      return Round::split( meet ,false);                  // point on circle closest to p
     }
 
     // Constrain a point p to a sphere s
@@ -135,14 +135,14 @@ struct Constrain {
 
     /*       //repeat until distance is decreased to within error threshold, or give up after 20 iterations */
     /*       while (s[0] > err){ */
-              
+
     /*           Pnt tmpGoal = goal; */
     /*           Pnt tmpBase = base; */
-              
+
     /*           static Dls dls; //surround */
     /*           static Dll dll; //line */
     /*           static Par par; //intersection of line ^ surround */
-              
+
     /*           //backward reaching */
     /*           for (int i = end; i > begin; --i){ */
     /*               mFrame[i].pos( tmpGoal );           //set position of ith frame */
@@ -151,7 +151,7 @@ struct Constrain {
     /*               par = (dll ^ dls).dual();           //get point pair intersection of line and boundary sphere */
     /*               tmpGoal = Round::split(par,true);      //extract point from point pair intersection */
     /*           } */
-              
+
     /*           //forward correction */
     /*           for (int i = begin; i < end; ++i){ */
     /*               dls = nextDls(i);                   //set boundary sphere through i+1 th frame */
@@ -160,43 +160,43 @@ struct Constrain {
     /*               tmpBase = Round::split(par,true); */
     /*               mFrame[i+1].pos(tmpBase);           //set position of i+1th frame */
     /*           } */
-              
+
     /*           s = mFrame[ end ].pos() <= p * -2.0; */
-               
+
     /*           n++;  if (n > 20) {  break; } */
     /*       } */
 
     /* } */
 
-  
+
 };
 
 
-/// Holds a pointer to a source, and has a radius t, 
+/// Holds a pointer to a source, and has a radius t,
 /// the operator() generates a dual sphere at source with radius t
 struct DistancePtr {
-  
-  Point * src = NULL;      ///< Pointer to Point Source 
+
+  Point * src = NULL;      ///< Pointer to Point Source
   double t;                ///< Distance t from Source
 
   DistancePtr() : src(NULL) {};
 
   /// Feed a source and a target
-  DistancePtr( Pnt& a, const Pnt& target)  
+  DistancePtr( Pnt& a, const Pnt& target)
   {
-    set(a,target);  
+    set(a,target);
   }
 
   /// Set constraint from source and target
   void set(Pnt& a, const Pnt& target){
     src = &a; t = Round::rad( Round::at(*src,target) );
-    if (src==NULL) printf("null DistancePtr SET\n"); 
+    if (src==NULL) printf("null DistancePtr SET\n");
   }
 
   /// Evaluate Distance Constraint as a Dual Sphere
-  Dls operator()(){ 
-    if (src==NULL) { printf("null DistancePtr\n"); return Dls(); }  
-    return Round::dls( *src, t ); 
+  Dls operator()(){
+    if (src==NULL) { printf("null DistancePtr\n"); return Dls(); }
+    return Round::dls( *src, t );
   }
 
 };
@@ -210,7 +210,7 @@ struct MutualDistancePtr{
     da.set(a,b);
     db.set(b,a);
   }
-  
+
   Dls forward(){ return da(); }
   Dls backward(){ return db(); }
 
@@ -221,7 +221,7 @@ struct MutualDistancePtr{
 struct RNode  {
 
   RNode(const Point& p) : result(p){}
-  
+
   Point result = Point();
   bool bCalc = true;
   bool bVisited = false;
@@ -239,17 +239,17 @@ struct RNode  {
 struct REdge{
 
   bool bCalc = true;
-       
+
   bool bConstrained;            ///< Whether constrained?
-  
+
   double maxAngle = PI;         ///< angular constraint evaluated in range (-PI,PI) (experimental)
   double minAngle = -PI;        ///< angular constraint (experimental)
 
- 
-  //Point *ra;                  ///< pointer to first constraining point 
+
+  //Point *ra;                  ///< pointer to first constraining point
   //Point *rb;                  ///< pointer to second constrainig point
   Point *result;                ///< pointer to calculated result
-   
+
   DistancePtr da, db;           ///< Distance Pointer Constraint
 
   REdge(Point& t, Point& a, Point& b){
@@ -258,7 +258,7 @@ struct REdge{
 
   /// set rigid constraint based on target point and two other points
   void set(Point& target, Point& a, Point&b){
-    //ra = &a; rb = &b; 
+    //ra = &a; rb = &b;
     result = &target;
     da.set(a, target);
     db.set(b, target);
@@ -279,7 +279,7 @@ struct REdge{
   }
 
   void eval(double amt){
-    if (bCalc) *result = Round::point( (da() ^ db()).dual(), amt); 
+    if (bCalc) *result = Round::point( (da() ^ db()).dual(), amt);
   }
 
   void eval(){
@@ -287,15 +287,15 @@ struct REdge{
   }
 
 
-  
+
 };
 
 /// Feed in three points
 struct RSimplex{
-  
+
   RNode *ra,*rb,*rc;
   MutualDistancePtr ab, bc, ca;
-  
+
   void set(RNode * a, RNode *b, RNode *c){
     ra = a; rb = b; rc = c;
     ab.set(a->result, b->result);
@@ -318,9 +318,9 @@ struct RSimplex{
 
 
   void onEval(){
-    
+
   }
-  
+
 };
 
 struct RNodeN{
@@ -328,7 +328,7 @@ struct RNodeN{
   virtual void onEval(){
 
   }
-  
+
 };
 
 
@@ -342,7 +342,7 @@ struct RigidNode{
 
   /// Point original = Point();
   Point result = Point();                   ///< stored evaluated result
-  
+
   bool bCalc = true;                        ///< whether to Evaluate
   bool bVisited = false;                    ///< whether node has been visited already
 
@@ -350,10 +350,10 @@ struct RigidNode{
     bCalc = true;
     bVisited = false;
   }
-  
+
   virtual void onEval(double amt) = 0;      ///< evaluation implementation to be implemented by subclass
   virtual void onEvalAt(const Point& p)=0;  ///< evaluation dependendent on some point p (i.e. closest to p)
- 
+
   vector <RigidNode*> mParent;              ///< list of dependencies which might need to be evaluated before this one
   vector <RigidNode*> mChild;               ///< list of dependents which will need to be evaluated after this one
   vector <DistancePtr> mDistance;           ///< list of distance constraints i should satisfy w.r.t parents
@@ -395,7 +395,7 @@ struct RigidNode{
   }
 
   /// Set result (must do this initialization step first)
-  void initResult(const Point& p){         
+  void initResult(const Point& p){
     result = p;
   }
 
@@ -420,7 +420,7 @@ struct RigidNode{
 struct RigN : RigidNode {
 
     virtual void onEval(double amt){
-      
+
     }
 
     virtual void onEvalAt(const Point& p){}
@@ -432,12 +432,12 @@ struct RigN : RigidNode {
 
 /// A Rigid Constraint Node set by Two Distance Pointers
 struct Rig2 : RigidNode {
-  
+
 
   Rig2() : RigidNode() {}
-  
+
   Rig2(const Point& target, RigidNode * ra, RigidNode * rb) : RigidNode() {
-    set(target,ra,rb); 
+    set(target,ra,rb);
   }
 
   void set(const Point& target, RigidNode * ra, RigidNode * rb){
@@ -458,7 +458,7 @@ struct Rig2 : RigidNode {
 
 
   virtual void onEval(double amt){
-    result = Round::point( (mDistance[0]() ^ mDistance[1]()).dual(), amt); 
+    result = Round::point( (mDistance[0]() ^ mDistance[1]()).dual(), amt);
   }
 
 
@@ -471,12 +471,12 @@ struct Rig2 : RigidNode {
 
 /// Three Distances constraint, with optional co-planarity constraint
 struct Rig3 : RigidNode {
-  
+
   bool bMtn;               ///< fold is a mountain fold
   bool bCoplanar = false;  ///< is result coplanar with three constraints
 
   Rig3() : RigidNode() {}
-  
+
   /**
   * @brief Constructor
   *
@@ -513,7 +513,7 @@ struct Rig3 : RigidNode {
 
 
   virtual void onEval(double amt){
-    result = bCoplanar ? Constrain::Planar( mDistance[0](), mDistance[1](), mDistance[2](),bMtn) : 
+    result = bCoplanar ? Constrain::Planar( mDistance[0](), mDistance[1](), mDistance[2](),bMtn) :
                          Constrain::Triple( mDistance[0](), mDistance[1](), mDistance[2](),bMtn);
   }
 
@@ -542,28 +542,28 @@ struct Rig4 : RigidNode {
 
   /// feed current result back in
   virtual void onEvalRecursive(){
-    
+
   }
 };
 
 /// A Rigid Constraint Node set by Three Distance Pointers
 struct Rigid{
-  
+
   /// default calc is false until ra parents are set
   bool bCalc;
-  
+
   /// coplanar or not
   bool bTriple;
 
   /// stored evaluated result of (*this)()
   Pnt result;
-  
+
   /// mountain or valley
   bool mtn;
 
   /// three dual sphere distances
   DistancePtr da,db,dc;
-  
+
   /// linked to three parents
   Rigid *ra, *rb, *rc;
 
@@ -588,7 +588,7 @@ struct Rigid{
     result = res;
   }
 
-  Rigid( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true) 
+  Rigid( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true)
   {
     set(target,pa,pb,pc,m);
   }
@@ -597,10 +597,10 @@ struct Rigid{
   void set( const Pnt& target, Rigid * pa, Rigid * pb, Rigid * pc, bool m){
     mtn = m; bCalc=true;
     ra = pa; rb = pb; rc = pc;
-    result = target; 
+    result = target;
     da.set(ra->result,target);
     db.set(rb->result,target);
-    dc.set(rc->result,target); 
+    dc.set(rc->result,target);
   }
 
   /// set from constraints Counter Clockwise
@@ -609,7 +609,7 @@ struct Rigid{
     ra = pa; rb = pb; rc = pc;
     da.set(ra->result,result);
     db.set(rb->result,result);
-    dc.set(rc->result,result); 
+    dc.set(rc->result,result);
 
     //add this to children of three others
     ra->child.push_back(this); rb->child.push_back(this); rc->child.push_back(this);
@@ -628,8 +628,8 @@ struct Rigid{
     ra->child.push_back(this); rb->child.push_back(this); rc->child.push_back(this);
   }
 
-  void reset(){ 
-    if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; 
+  void reset(){
+    if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true;
   }
 
   Circle circleA(){
@@ -637,13 +637,13 @@ struct Rigid{
   }
   Circle circleB(){
     return (db()^dc()).dual();
-  }  
+  }
   void orbitA(float amt){
-    result = Round::point( circleA(), amt * ( mtn?1:-1) ); 
+    result = Round::point( circleA(), amt * ( mtn?1:-1) );
   }
   void orbitB(float amt){
-    result = Round::point( circleB(), amt * ( mtn?1:-1) ); 
-  } 
+    result = Round::point( circleB(), amt * ( mtn?1:-1) );
+  }
 
 
   Pnt up(){
@@ -672,9 +672,9 @@ struct Rigid{
           i -> update();
          // i -> satisfy();
           i -> down();
-        }             
-     //   up();  
-      } 
+        }
+     //   up();
+      }
   }
 
   Pair meet(){
@@ -702,7 +702,7 @@ struct Rigid{
 
 
 struct Rigid2{
-  
+
   /// Meet of parents
   Point result;
 
@@ -746,21 +746,21 @@ struct Rigid2{
 
   //add parents
   void add(Rigid2 *pa, Rigid2 *pb, bool m){
-    
+
     bCalc=true; bReCalc=true;
-    
+
     //make new parents
     Parents p;
     p.ra=pa; p.rb=pb;
-    
+
     //set distance contraints based on pa and pb
     p.da.set(pa->result,result);
     p.db.set(pb->result,result);
 
-    //add this to list of children of just pa 
+    //add this to list of children of just pa
     pa->child.push_back(this);
    // pb->child.push_back(this);
-    parents.push_back(p); 
+    parents.push_back(p);
   }
 
 
@@ -772,7 +772,7 @@ struct Rigid2{
 
   /*   ra->child.push_back(this); rb->child.push_back(this); */
   /* } */
- 
+
   void reset(){ bCalc=true; bReCalc=true; iter=0; }
 
   void operator()(){
@@ -813,7 +813,7 @@ struct Rigid2{
             if (!bCocircular) {
               result = Constrain::Tangency(result, i.da(), i.db());
               bRepeat = true;
-             }           
+             }
            }
           }
         }
@@ -903,7 +903,7 @@ struct Rigid2{
   }
 
   vector<Rigid2*> satisfy(int begin, int end){
-    
+
       if (!parents.empty()){
         int tIter=0;
         float tf;
@@ -912,14 +912,14 @@ struct Rigid2{
         for (auto& i : parents){
           if (i.ra->bReCalc){
             tr = i.ra;
-            break; 
+            break;
           }
         }
         //cout << parents[0].ra->hasA(this) << endl;
         bool bLoop = parents[0].ra->hasA(this);
         if (bLoop){
             do{
-              tIter++;         
+              tIter++;
               for (int i=begin; i<=end;++i){
                 parents[i].ra->satisfy_forward(this);
               }
@@ -930,9 +930,9 @@ struct Rigid2{
             }while( (tf>.001) && (tIter < 10));
         } else {
             do{
-              tIter++;         
+              tIter++;
               for (int i=begin; i<=end;++i){
-                parents[i].ra->satisfy_forward(this); 
+                parents[i].ra->satisfy_forward(this);
                 parents[i].rb->satisfy_forward(this); //only last one
               }
               for(int i =end; i >= begin; i-- ) {
@@ -945,7 +945,7 @@ struct Rigid2{
             //cout << "iter " << tIter << endl;
         }
       }
-      
+
        vector<Rigid2*> temp;
 
        //mark parents as satisfied
@@ -963,16 +963,16 @@ struct Rigid2{
        return temp;
   }
 
-  
+
   // go through all parents satisfy relationship to this
   void cascade(int begin, int end){
-   
+
       //do this forward and backward reach how many times?
       //until first node is within error of first forward meet
       auto rp = satisfy(begin,end);
       cout << "parents to solve: " <<  rp.size() << endl;
       while (!rp.empty()){
-        //cascade connections 
+        //cascade connections
         vector<Rigid2*> temp;
         for (auto& i : rp){
             auto r = i->satisfy(0, i->parents.size()-1);
@@ -1025,7 +1025,7 @@ struct Rig {
 
       //constrain a point p to spherical distance via strut or cable
       Point constrain(const Point& p){//, bool strut){
-        return bStrut ? Constrain::Tangency(p,da()) : Constrain::Tension(p, da()); 
+        return bStrut ? Constrain::Tangency(p,da()) : Constrain::Tension(p, da());
       }
 
       float distance(const Point& p){
@@ -1054,7 +1054,7 @@ struct Rig {
 
     //satisfy constraint to rig r
     void satisfy(Rig * r){
-      if (bReCalc){       
+      if (bReCalc){
         for (auto& i : parent){
           bool tCalc=false;
           //if parent is r
@@ -1075,8 +1075,8 @@ struct Rig {
       if (bCalc){
         iter++;
         if (iter>1000) {
-          bCalc=false;  
-        }   
+          bCalc=false;
+        }
         for (auto& i : child){
           i->satisfy(this);
         }
@@ -1089,8 +1089,8 @@ struct Rig {
 };
 
 /* ----------------------------------------------------------------------------- */
-/*  *  SIMPLICIAL CONSTRAINT . . . (n+1)-simplices to constrain (n)-chains connected by (n-1)-simplex edges */ 
-/*  *-----------------------------------------------------------------------------*/ 
+/*  *  SIMPLICIAL CONSTRAINT . . . (n+1)-simplices to constrain (n)-chains connected by (n-1)-simplex edges */
+/*  *-----------------------------------------------------------------------------*/
 /* struct Rigid_{ */
 /*   bool bCalc, bTriple; */
 /*   Pnt result; */
@@ -1109,7 +1109,7 @@ struct Rig {
 /*     result = res; */
 /*   } */
 
-/*   Rigid_( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true) */ 
+/*   Rigid_( const Pnt& target,  Rigid * pa,  Rigid * pb,  Rigid * pc, bool m) : bTriple(true) */
 /*   { */
 /*     set(target,pa,pb,pc,m); */
 /*   } */
@@ -1118,25 +1118,25 @@ struct Rig {
 /*   void set( const Pnt& target, Rigid * pa, Rigid * pb, Rigid * pc, bool m){ */
 /*     mtn = m; bCalc=true; */
 /*     ra = pa; rb = pb; rc = pc; */
-/*     result = target; */ 
+/*     result = target; */
 /*     da.set(ra->result,target); */
 /*     db.set(rb->result,target); */
-/*     dc.set(rc->result,target); */ 
+/*     dc.set(rc->result,target); */
 /*   } */
 
 /*   //Counter Clockwise */
 /*   void set( Rigid * ra, Rigid * rb, Rigid * rc, bool m){ */
-    
+
 /*     mtn = m; bCalc=true; */
 /*     da.set(ra->result,result); */
 /*     db.set(rb->result,result); */
-/*     dc.set(rc->result,result); */ 
+/*     dc.set(rc->result,result); */
 
 /*     //fasten cycle */
 /*     ra->set(rb, rc, this, m); */
 /*     rb->set(rc, this, ra, m); */
 /*     rc->set(this, ra, rb, m); */
-    
+
 /*   } */
 
 /*   /1* void set( Rigid * pa, Rigid * pb, bool m){ *1/ */
@@ -1147,8 +1147,8 @@ struct Rig {
 /*   /1*   dc.set(rc->result,result); *1/ */
 /*   /1* } *1/ */
 
-/*   void reset(){ */ 
-/*     if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; */ 
+/*   void reset(){ */
+/*     if (ra!=NULL && rb!=NULL && rc!=NULL) bCalc = true; */
 /*   } */
 
 /*   Pnt operator()(){ */
@@ -1168,7 +1168,7 @@ struct Rig {
 /*   Pnt satisfy(){ */
 /*     auto meet = Constrain::Triple( da(), db(), dc() ); */
 /*     if ( Round::size(meet,false) < -.0001 ){ */
-      
+
 /*     } */
 /*      return bTriple ? Constrain::Triple(da(),db(),dc(),mtn) : Constrain::Planar(da(),db(),dc(),mtn); */
 

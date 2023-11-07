@@ -92,7 +92,7 @@ void ObjectController::ObjectPtr<A>::transform ()
           break;
         }
       case 'r':  //ROTATE
-      case 71:
+      case 82:
         {
           auto b = i->axisCat ();
           cga::Dll td = pnt <= (cga::Drv (b[0], b[1], b[2]).dual ());
@@ -148,7 +148,7 @@ void ObjectController::ObjectPtr<cga::Frame>::transform ()
           break;
         }
       case 'r':  //ROTATE
-      case 71:
+      case 82:
         {
           auto b = -i->axisCat ();
           cga::Rot tr = cga::Gen::rot (cga::Vec (b[0], b[1], b[2]).duale ());

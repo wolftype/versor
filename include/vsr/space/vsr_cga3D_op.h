@@ -437,7 +437,7 @@ struct Construct
        *  \brief  Circle at point p with radius r, facing direction biv
       */
   static Circle circle (const Point &p, VSR_PRECISION r,
-                        const Biv &biv = Biv::xy);
+                        const Biv &biv);
   /*!
        *  \brief  Circle at origin in plane of bivector B
        */
