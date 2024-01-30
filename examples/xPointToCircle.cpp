@@ -52,43 +52,48 @@ struct MyApp : App
   void onDraw ()
   {
 
-    auto circle = frame.cxy ();
-
-    draw(frame);
-    draw (circle,1,0,1);                      //draw circle in white
-
-    //plane and plane2 are the same:
-    auto plane = Round::carrier (circle);
-    auto plane2 = frame.dxy().undual();
-
     //if amt = 0, point is at camera plane
     //hit 'x' to enable / disable mouse setting
     if (bSetMouse) point = calcMouse3D(amt);
-    draw (point, 0, 1, 0);
 
+    // The XY Unit Circle of our Frame
+    auto circle = frame.cxy ();
+    // The point on the circle closest to the mouse position
     auto constrainedPoint = Constrain::PointToCircle (point, circle);
+   
+    // draw 'em
+    draw (point, 0, 1, 0);
+    draw(frame);
+    draw (circle,1,0,1);
     draw (constrainedPoint, 1, 1, 0);
 
     //Done.  Now here we illustrate the geometry of How it works:
 
+    //plane
+    auto plane = Round::carrier (circle);
+    //(altnernative formulation of the same plane)
+    auto plane2 = frame.dxy().undual();
+
+
     // imaginary circle contraction -
-    // imagine the intersection of the plane with the sphere bisected by plane through point
+    // (red) intersection of the plane with the sphere bisected by plane
     auto icirc = point <= plane;
     draw(icirc,1,0,0);
 
-    //projection of point onto plane
+    //(white) projection of point onto plane
     Point p = ((icirc) / plane).null();
+    draw (p, 1,1,1);
+    //(green) circle at p
+    Frame fp (p, frame.rot());
+    fp.scale(.2);
+    draw (fp.cxy(), 0, 1, 0);
 
-    //line through point and point p
+
+    //(blue) line through point and point p (orthogonal to plane)
     Line line = point ^ p ^ Inf(1);
     draw (line, 0,0,1);
 
-    //circle at p
-    Frame fp (p, frame.rot());
-    fp.scale(.2);
-    draw (fp.cxy(), 0, 0, 0);
-
-    // line through coplanar point and circle center
+    // (red) line through coplanar point and circle center
     auto sur = Round::sur(circle);
     auto line2 = p ^ sur ^ Inf (1);
     draw (line2, 1, 0, 0);

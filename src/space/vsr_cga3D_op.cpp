@@ -90,6 +90,7 @@ Bst Gen::boost (const Pair &p)
   return nga::Gen::bst (p);
 }
 
+// TODO: swap to generic, single argument
 Tsd Gen::dil (const Pnt &p, VSR_PRECISION t)
 {
   return nga::Gen::dil (p, t);

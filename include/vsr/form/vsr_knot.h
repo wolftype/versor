@@ -20,7 +20,7 @@ namespace vsr { namespace cga {
 struct TKnot {
 
   double mP, mQ;
-  HopfFiber mHopf;  
+  HopfFiber mHopf;
   vector<double> mEnergy;
   vector<Point> mPoint;
   vector<Circle> mCircle;
@@ -81,7 +81,7 @@ struct TorusKnot  {
       float t = PI / num;
       return ( (HF.fiberA().dual().runit() * P) + (HF.fiberB().dual().runit() * Q) ) * t;
     }
-    
+
     Bst dbst(int num){
       return Gen::bst( dpar(num) );
     }
@@ -151,8 +151,8 @@ struct TorusKnot  {
     //energies
    // auto d = energy(0,num);
 
-    return pnt; 
-   
+    return pnt;
+
   }
 
   //currently only works on pairs and circles

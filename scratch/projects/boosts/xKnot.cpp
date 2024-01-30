@@ -11,14 +11,14 @@
  *       Compiler:  gcc
  *
  *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
  */
 
 
 
-#include <vsr/vsr_app.h>   
+#include <vsr/vsr_app.h>
 #include <vsr/form/vsr_knot.h>
 #include <vsr/form/vsr_twist.h>
 #include <vsr/util/vsr_stat.h>
@@ -27,8 +27,8 @@ using namespace vsr;
 using namespace vsr::cga;
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -46,9 +46,9 @@ struct MyApp : App {
 
 
   void setup(){
-    
+
     bindGLV();
-    
+
     Rand::Seed();
     int n = 30;
     frame = vector<Frame>(n);
@@ -83,7 +83,7 @@ struct MyApp : App {
        for(int j=0;j<frame.size();++j){
          if (i!=j){
            auto odist = 1.0 / (.01 + Round::dist( frame[i].pos(), frame[j].pos() ) );
-           par += tk[j].par() * odist; 
+           par += tk[j].par() * odist;
          }
        }
        bst[i] = Gen::bst( par * amt3 );
@@ -96,11 +96,11 @@ struct MyApp : App {
       }
   }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       mouse = calcMouse3D();
       time++;
-     
+
       for(auto& i : tk) { i.P=P; i.Q=Q; }
 
       if (bReset){
@@ -119,7 +119,7 @@ struct MyApp : App {
         for (int i=0;i<frame.size();++i){
           tframe[i].boost( bst[i] );
           Draw(tframe[i]);
-        }        
+        }
       }
 
       for (int j=0;j<amt2;++j){
@@ -136,7 +136,7 @@ struct MyApp : App {
       }
 
 
-      
+
       /*-----------------------------------------------------------------------------
        *  Camera
        *-----------------------------------------------------------------------------*/
@@ -145,18 +145,18 @@ struct MyApp : App {
         v += i.vec();
       }
       auto target = Round::null( v/(float)frame.size() );
-      Frame cam( Vec(target) + Vec(0,5,15) ); cam.orient(target);       
+      Frame cam( Vec(target) + Vec(0,5,15) ); cam.orient(target);
       scene.camera.set( cam.vec(), cam.quat() );
-      
-  }
-   
 
-  
+  }
+
+
+
 };
 
 
 int main(){
-                             
+
   MyApp app;
   app.start();
   return 0;

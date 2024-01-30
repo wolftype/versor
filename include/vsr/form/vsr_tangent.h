@@ -86,11 +86,13 @@ struct Tops {
     return Pair(Unit(pair).copy<Tnv> ()).trs (Round::location (pair));
   };
 
+  // no different from Tangent above
   static Pair Element (const Vec& v, const Point& p)
   {
     return Pair(v.copy<Tnv> ()).trs (p);
   }
 
+  // when to use?
   static Pair Element (const DualSphere& s, const Point& p)
   {
     return Pair(Unit(s^p)).copy<Tnv>().trs (p);
@@ -141,9 +143,9 @@ struct Tops {
     return Gen::log(ratio * flip, bRelApproach, true) / 2.0;
   }
 
-  // like above, but spheres are generated from curvature coeffiecients
+  // TO DO like above, but spheres are generated from curvature coeffiecients
   static Pair CalcGen (const Pair& p1, const Pair& p2, float k0, float k1) {
-
+    return CalcGen (p1, p2, Surface(p1, k0), Surface (p2, k1));
   }
  //given a point and two tensor generators, find the coefficents of each generator
   static Vec InverseMap (
