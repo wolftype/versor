@@ -5,6 +5,10 @@
  *
  *    Description:  tangent frames, contact methods, and coordinate surface six-spheres
                     in vsr::cga
+
+                    using in xTLattice and xTVolumes examples
+
+                    TFrame_
  *
  *        Version:  1.0
  *        Created:  04/21/2016 16:18:57
@@ -46,7 +50,7 @@ namespace cga {
 //};
 
 
-//Tangent Operationsa -- operational data-free class
+//Tangent Operationsa -- operational data-free static functions 
 struct Tops {
 
   //Generate a tangent from a Vec and a Position
@@ -111,14 +115,15 @@ struct Tops {
       return Round::location(p.spin(xf));
   }
 
-  // There are two key parameters to consider to generate
+  // There are two key parameters to be considered when generating
   // a transformation bivector
   //
-  // 1) if starting tangent and ending tangent have similar senses relative to
+  // 1) Similarity of Sense: if starting tangent and ending tangent have similar senses relative to
   // their constant coordinate spheres then do not negate the ratio
   //
-  // 2) if starting point is on the same side as ending tangent, use alt log to
-  // ensure we approach it from the correct direction.
+  // 2) Direction of Approach: if starting point is on the same side of the end sphere
+  // as the ending tangent, then use alt log to ensure we approach it from the
+  // correct direction.
 
   static Pair CalcGen (const Pair& p1, const Pair& p2, const DualSphere& beg, const DualSphere&end)
   {
@@ -191,6 +196,7 @@ struct TSX {
 //wip: Q: how to encode eitehr as curvature floats or surfaces directly
 //need to maintain flexibilty to do either
 struct TFrame_ {
+   Point pos;
    Pair t[3];
    float k[6];
    DualSphere s[6];
@@ -199,15 +205,13 @@ struct TFrame_ {
      for (int i = 0; i < 6; ++i) {
        k[i] = 0;
      }
-//     for (int i = 0; i < 3; ++i) {
-//       s[i*2] = s[i*2+1] = Tops::Surface (t[i]);
-//     }
      s[(int)TCS::uv] = s[(int)TCS::uw] = Tops::Surface (t[0],0.0);
      s[(int)TCS::vu] = s[(int)TCS::vw] = Tops::Surface (t[1],0.0);
      s[(int)TCS::wu] = s[(int)TCS::wv] = Tops::Surface (t[2],0.0);
     }
 
    TFrame_ (){
+     pos = PAO;
      t[0] = Pair(Tnv(1,0,0));
      t[1] = Pair(Tnv(0,1,0));
      t[2] = Pair(Tnv(0,0,1));
@@ -215,6 +219,11 @@ struct TFrame_ {
    }
 
   TFrame_ (const Frame& f) {
+    build (f);
+  }
+
+  void build (const Frame & f){
+     pos = f.pos();
      t[0] = Tops::Tangent (f.pos(), f.x());;
      t[1] = Tops::Tangent (f.pos(), f.y());;
      t[2] = Tops::Tangent (f.pos(), f.z());;
@@ -222,84 +231,95 @@ struct TFrame_ {
    }
 
    //Connecting TFrames:
-   //Given a point, another frame, and a direction coefficent to decrease
+   //Given a point to be at, another frame to be orthogonal to, 
+   //and a direction coefficent to decrease
    TFrame_ (const Point& p, const TFrame_& tf, const TDIR& idx) {
+     build (p, tf, idx);
+   }
+ 
+   void build (const Point& p, const TFrame_& tf, const TDIR& idx) {
      int tidx = (int)idx;
      switch (tidx) {
        case 0: //u direction
-         {
-           DualSphere svu  = Tops::Surface (p, tf.v());
-           DualSphere swu  = Tops::Surface (p, tf.w());
-           //Now we can get Vectors there
-           Vec v = Tops::Unit(svu ^ p);
-           Vec w = Tops::Unit(swu ^ p);
-           Vec u = (v ^ w).duale();
-           //and turn them into Tangents
-           t[0] = Tops::Element(u, p);
-           t[1] = Tops::Element(v, p);
-           t[2] = Tops::Element(w, p);
-
-           flatten();
-           s[(int)TCS::vu] = svu;
-           s[(int)TCS::wu] = swu;
-
-           break;
-         }
-       case 1: //v direction
-         {               //
-           DualSphere suv = Tops::Surface (p, tf.u());
-           DualSphere swv = Tops::Surface (p, tf.w());
-           //Now we can get Vectors there
-           Vec u = Tops::Unit(suv ^ p);
-           Vec w = Tops::Unit(swv ^ p);
-           Vec v = (w ^ u).duale();
-           //and turn them into Tangents
-           t[0] = Tops::Element(u, p);
-           t[1] = Tops::Element(v, p);
-           t[2] = Tops::Element(w, p);
-
-           flatten();
-           s[(int)TCS::uv] = suv;
-           s[(int)TCS::wv] = swv;
-           break;
-         }
-       case 2: //w direction
-         {
-           DualSphere suw = Tops::Surface (p, tf.u());
-           DualSphere svw = Tops::Surface (p, tf.v());
-           //Now we can get Vectors there
-           Vec u = Tops::Unit(suw ^ p);
-           Vec v = Tops::Unit(svw ^ p);
-           Vec w = (u ^ v).duale();
-           //and turn them into Tangents
-           t[0] = Tops::Element(u, p);
-           t[1] = Tops::Element(v, p);
-           t[2] = Tops::Element(w, p);
-
-           flatten();
-           s[(int)TCS::uw] = suw;
-           s[(int)TCS::vw] = svw;
-           break;
-         }
-        default:
+         buildU(p, tf);
+         break;
+       case 1: //u direction
+         buildV (p, tf);
+         break;
+       case 2: //u direction
+         buildW(p, tf);
          break;
      }
    }
 
-   void addSurfaces (const Point& p, const TFrame_& tf, const TDIR& td)
+   void buildU (const Point &p, const TFrame_& tf){
+     pos = p;
+     DualSphere svu  = Tops::Surface (p, tf.v());
+     DualSphere swu  = Tops::Surface (p, tf.w());
+     //Now we can get Vectors there
+     Vec v = Tops::Unit(svu ^ p);
+     Vec w = Tops::Unit(swu ^ p);
+     Vec u = (v ^ w).duale();
+     //and turn them into Tangents
+     t[0] = Tops::Element(u, p);
+     t[1] = Tops::Element(v, p);
+     t[2] = Tops::Element(w, p);
+
+     flatten();
+     s[(int)TCS::vu] = svu;
+     s[(int)TCS::wu] = swu;
+   }
+
+   void buildV(const Point &p, const TFrame_& tf){
+      pos = p;
+      DualSphere suv = Tops::Surface (p, tf.u());
+      DualSphere swv = Tops::Surface (p, tf.w());
+       //Now we can get Vectors there
+      Vec u = Tops::Unit(suv ^ p);
+      Vec w = Tops::Unit(swv ^ p);
+      Vec v = (w ^ u).duale();
+      //and turn them into Tangents
+      t[0] = Tops::Element(u, p);
+      t[1] = Tops::Element(v, p);
+      t[2] = Tops::Element(w, p);
+  
+      flatten();
+      s[(int)TCS::uv] = suv;
+      s[(int)TCS::wv] = swv;
+   }
+
+   void buildW(const Point &p, const TFrame_& tf){
+       pos = p;
+       DualSphere suw = Tops::Surface (p, tf.u());
+       DualSphere svw = Tops::Surface (p, tf.v());
+       //Now we can get Vectors there
+       Vec u = Tops::Unit(suw ^ p);
+       Vec v = Tops::Unit(svw ^ p);
+       Vec w = (u ^ v).duale();
+       //and turn them into Tangents
+       t[0] = Tops::Element(u, p);
+       t[1] = Tops::Element(v, p);
+       t[2] = Tops::Element(w, p);
+
+       flatten();
+       s[(int)TCS::uw] = suw;
+       s[(int)TCS::vw] = svw;
+   }
+
+   void addSurfaces (const TFrame_& tf, const TDIR& td)
    {
      switch ((int)td) {
        case 0:
-         s[(int)TCS::vu] = Tops::Surface (p, tf.v());
-         s[(int)TCS::wu] = Tops::Surface (p, tf.w());
+         s[(int)TCS::vu] = Tops::Surface (pos, tf.v());
+         s[(int)TCS::wu] = Tops::Surface (pos, tf.w());
          break;
        case 1:
-         s[(int)TCS::uv] = Tops::Surface (p, tf.u());
-         s[(int)TCS::wv] = Tops::Surface (p, tf.w());
+         s[(int)TCS::uv] = Tops::Surface (pos, tf.u());
+         s[(int)TCS::wv] = Tops::Surface (pos, tf.w());
          break;
        case 2:
-         s[(int)TCS::uw] = Tops::Surface (p, tf.u());
-         s[(int)TCS::vw] = Tops::Surface (p, tf.v());
+         s[(int)TCS::uw] = Tops::Surface (pos, tf.u());
+         s[(int)TCS::vw] = Tops::Surface (pos, tf.v());
          break;
      }
    }

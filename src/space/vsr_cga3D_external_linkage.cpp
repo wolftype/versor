@@ -403,56 +403,6 @@ extern "C" {
   }
 
 
-  //FRAMES
-  CREATE_FUNC(Frame);
-  SET_POS_FUNC(Frame);
-  SET_COORDS_FUNC(Frame);
-
-  Frame * cga_Frame_set_rot (Frame * f, Rotor *r){
-    (*f).rot (*r);
-    return f;
-  };
-
-  Rotor * cga_Frame_get_rot (Frame * f, Rotor *r){
-    *r = (*f).rot();
-    return r;
-  };
-
-  Point * cga_Frame_get_point (Frame * f, Point *p){
-    *p= (*f).pos();
-    return p;
-  };
-
-  // orient z axis to v direcion
-  Frame * cga_Frame_orient_z (Frame * f, Vec * v ){
-    (*f).orient (*v);
-    return f;
-  };
-
-  Frame * cga_Frame_set_pose (Frame * f,
-      VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z,
-      VSR_PRECISION xd, VSR_PRECISION yd, VSR_PRECISION zd){
-      (*f).pos(x,y,z);
-      (*f).orient(Vec(xd,yd,zd).unit());
-      return f;
-  };
-
-  DualLine * cga_Frame_get_x_axis (Frame *f, DualLine *dll)
-  {
-    *dll = (*f).dlx();
-    return dll;
-  }
-  DualLine * cga_Frame_get_y_axis (Frame *f, DualLine *dll)
-  {
-    *dll = (*f).dly();
-    return dll;
-  }
-  DualLine * cga_Frame_get_z_axis (Frame *f, DualLine *dll)
-  {
-    *dll = (*f).dlz();
-    return dll;
-  }
-
   // POINTS
   Point * cga_Point_from_coords (Point *p, VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z) {
     *p = Round::null (x,y,z);
@@ -558,7 +508,7 @@ extern "C" {
   {
     Pair pair = Tops::NormalizePair(*input);
     *output = pair;
-  } 
+  }
 
 
   // MEET
@@ -572,7 +522,88 @@ extern "C" {
     *p = Construct::meet ((*dll).dual(), (*dlp).dual());
   }
 
+  //FRAMES
+  CREATE_FUNC(Frame);
+  SET_POS_FUNC(Frame);
+  SET_COORDS_FUNC(Frame);
 
+  Frame * cga_Frame_set_rot (Frame * f, Rotor *r){
+    (*f).rot (*r);
+    return f;
+  };
+
+  Rotor * cga_Frame_get_rot (Frame * f, Rotor *r){
+    *r = (*f).rot();
+    return r;
+  };
+
+  Point * cga_Frame_get_point (Frame * f, Point *p){
+    *p= (*f).pos();
+    return p;
+  };
+
+  // orient z axis to v direcion
+  Frame * cga_Frame_orient_z (Frame * f, Vec * v ){
+    (*f).orient (*v);
+    return f;
+  };
+
+  Frame * cga_Frame_set_pose (Frame * f,
+      VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z,
+      VSR_PRECISION xd, VSR_PRECISION yd, VSR_PRECISION zd){
+      (*f).pos(x,y,z);
+      (*f).orient(Vec(xd,yd,zd).unit());
+      return f;
+  };
+
+  DualLine * cga_Frame_get_x_axis (Frame *f, DualLine *dll)
+  {
+    *dll = (*f).dlx();
+    return dll;
+  }
+  DualLine * cga_Frame_get_y_axis (Frame *f, DualLine *dll)
+  {
+    *dll = (*f).dly();
+    return dll;
+  }
+  DualLine * cga_Frame_get_z_axis (Frame *f, DualLine *dll)
+  {
+    *dll = (*f).dlz();
+    return dll;
+  }
+
+
+  // TFRAMES
+  CREATE_FUNC(TFrame_);
+
+  //from coords for point and coords for direction of z vector
+  void cga_TFrame_from_Coords ( TFrame_ *res, float px, float py, float pz,
+                                                float dx, float dy, float dz){
+     Frame frame(px, py, pz);
+     frame.orient(Vec(dx,dy,dz)); 
+
+     *res = TFrame_ (frame);
+  } 
+
+  void cga_TFrame_from_Point_TFrame ( TFrame_ *res, Point *p, TFrame_ *tf, 
+                                                                     int tdir){
+      *res = TFrame_(*p, *tf, static_cast<TDIR>(tdir));
+  }  
+
+  void cga_Pair_from_TFrame (Pair *pair, TFrame_*tf, int idx) {
+      *pair = (*tf).t[idx];
+  }
+
+//  void * cga_PairU_from_TFrame (Pair *pair, TFrame_*tf) {
+//    *pair = (*tf).u();
+//  }
+//  void * cga_PairV_from_TFrame (Pair *pair, TFrame_*tf) {
+//    *pair = (*tf).v();
+//  }
+//  void * cga_PairW_from_TFrame (Pair *pair, TFrame_*tf) {
+//    *pair = (*tf).w();
+//  }
+  
 } // extern "C"
 
 }} //vsr::cga::
