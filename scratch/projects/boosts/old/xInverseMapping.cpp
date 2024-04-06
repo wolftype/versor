@@ -1,4 +1,5 @@
-
+// Note: doesn't draw
+//
 #include <vsr/vsr_app.h>
 #include <vsr/form/vsr_tangent.h>
 #include <vsr/draw/vsr_cga3D_helpers.h>
@@ -25,19 +26,24 @@ struct MyApp : App
   float amt1 = 0;
   float amt2 = 0;
 
-  void setup () {
-    ///Add Variables to GUI
-    gui (kVU, "kVU", -100, 100);
-    gui (kWU, "kWU", -100, 100);
-    gui (kUV, "kUV", -100, 100);
-    gui (kWV, "kWV", -100, 100);
-    gui (kUW, "kUW", -100, 100);
-    gui (kVW, "kVW", -100, 100);
-    gui (kV1U, "kV1U", -100, 100);
-    gui (kU1W, "kU1W", -100, 100);
-    gui (kW1V, "kW1V", -100, 100);
-    gui (amt1, "amt1", 0, 1);
-    gui (amt2, "amt2", 0, 1);
+  void setup(){}
+
+  void onDrawGui() {
+    if (guiBegin()){
+      ///Add Variables to GUI
+      gui (kVU, "kVU", -100, 100);
+      gui (kWU, "kWU", -100, 100);
+      gui (kUV, "kUV", -100, 100);
+      gui (kWV, "kWV", -100, 100);
+      gui (kUW, "kUW", -100, 100);
+      gui (kVW, "kVW", -100, 100);
+      gui (kV1U, "kV1U", -100, 100);
+      gui (kU1W, "kU1W", -100, 100);
+      gui (kW1V, "kW1V", -100, 100);
+      gui (amt1, "amt1", 0, 1);
+      gui (amt2, "amt2", 0, 1);
+      guiEnd();
+    }
   }
 
   void onDraw () {
@@ -54,7 +60,7 @@ struct MyApp : App
     Con wc = tf.wc (kUW, kVW, wSpacing);
 
     //make the actual surfaces and store them
-    tf.surfaces (kVU, kWU, kUV, kWV, kUW, kVW);
+    tf.bendSurfaces (kVU, kWU, kUV, kWV, kUW, kVW);
 
     // New frames in respective directions, bools specify whether to "flip"
     TFrame uf = tf.xf (uc, false, false, false);

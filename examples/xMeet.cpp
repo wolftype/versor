@@ -35,8 +35,6 @@ struct MyApp : App {
     objectController.attach(&sphereA);
     objectController.attach(&sphereB);
 
-    //scene.camera.lens.ortho(true);
-    //mRenderGraph.immediate(false);
   }
 
   void onDraw(){

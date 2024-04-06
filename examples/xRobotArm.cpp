@@ -12,12 +12,14 @@ struct MyApp : App {
 	Pnt targetPos;
 	float distA;
 
-	void setup(){
+  void onDrawGui(){
       gui(distA, "LinkLength", 1,10);
       gui(linewidth,"linewidth",0,10);
+  }
+	
+  void setup(){
      	distA = 5.0;
       linewidth=3;
-      //immediate(false);
       scene.camera.pos(0,0,30);
 	}
 

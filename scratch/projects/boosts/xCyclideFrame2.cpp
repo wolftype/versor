@@ -23,9 +23,11 @@ struct MyApp : App
 
     fa.pos (0, 0, 0);
     fb.pos (4, 4, -4);
+  }
 
-    gui (ku, "ku", -100, 100);
-    gui (kv, "kv", -100, 100);
+  void onDrawGui(){
+    gui (ku, "ku", -1, 1);
+    gui (kv, "kv", -1, 1);
   }
 
   void onDraw ()

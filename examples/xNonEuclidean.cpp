@@ -25,13 +25,12 @@ struct MyApp : App
 {
 
   float time = 0;
-  float amt;
 
   bool bNonEuclidean, bHyperbolic;  //, bSpherical;
 
-  void setup ()
+  void setup (){}
+  void onDrawGui()
   {
-    gui (amt, "amt", -100, 100);
     gui (bNonEuclidean, "non_euclidean");
     gui (bHyperbolic, "hyperbolic");  //(bSpherical,"spherical");
   }

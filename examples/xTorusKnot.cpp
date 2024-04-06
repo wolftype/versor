@@ -10,8 +10,6 @@
 using namespace vsr;
 using namespace vsr::cga;
 
-using namespace glv;
-
 struct MyApp : App {
 
 	float amt,P, Q;
@@ -20,11 +18,15 @@ struct MyApp : App {
 
   bool bDrawMode, bAnimate;
 
+  void onDrawGui(){
+		gui(P,"P",0,10);
+    gui(Q,"Q",0,10);
+    gui(amt,"speed",0,1);
+    gui(bAnimate, "animate");
+    gui(bDrawMode,"draw mode");
+  }
+
 	virtual void setup(){
-
-		gui(P,"P",0,10)(Q,"Q",0,10)(amt,"speed",0,10);
-    gui(bAnimate, "animate")(bDrawMode,"draw mode");
-
     //starting knot parameters
 		amt = .01;
 		P = 5;
@@ -60,7 +62,7 @@ struct MyApp : App {
        draw(i,0,1,0);
 
     //Toggle between immediate (fixed function) and programmable pipelines
-    mRenderGraph.immediate(bDrawMode);
+  //  mRenderGraph.immediate(bDrawMode);
 
 	}
 };

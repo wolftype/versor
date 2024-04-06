@@ -26,23 +26,21 @@ struct MyApp : App {
 
   Field<Vec> f;
 
-  //Some Variables
-  bool button = false;
   float amt = 0;
 
-  void setup(){
+  void onDrawGui(){
     ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(button,"bImmediate");
+    gui(amt,"amt",-100,100);
+  }
 
+  void setup(){
     //allocate field
     f.resize(10,10,10);
 
   }
 
   void onDraw(){
-
     draw(f);
-   // mSceneRenderer.immediate(button);
   }
 
 };

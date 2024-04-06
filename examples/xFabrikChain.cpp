@@ -28,29 +28,22 @@ using namespace vsr::cga;
 
 struct MyApp : App {
 
-  //Some Variables
-  bool bReset = false;
-  float amt = 0;
-
+  //error threshold
+  float err= 0;
 
   //Chain of 10 links
   Chain chain = Chain(10);
 
-  //whether to relcaculate joint positions
-  bool bFK;
-  /*-----------------------------------------------------------------------------
-   *  Setup Variables
-   *-----------------------------------------------------------------------------*/
   void setup(){
-    ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bReset,"bReset");
+    scene.camera.pos(0,0,10); 
+  }
+
+  ///Add Variables to GUI
+  void onDrawGui(){
+    gui(err,"error",0,10);
 
   }
 
-
-  /*-----------------------------------------------------------------------------
-   *  Draw Routines
-   *-----------------------------------------------------------------------------*/
   void onDraw(){
     //intersection of ray cast by mouse into space and the xy plane
     calcMouse3D();
@@ -61,22 +54,17 @@ struct MyApp : App {
     draw(marker,1,0,0);
 
     //pass in beginning, ending index, adjust error threshold
-    chain.fabrik(point,chain.num()-1,0,amt);
+    chain.fabrik(point,chain.num()-1,0,err);
     //recalculate forward kinematics
     chain.fk();
 
-   // draw(chain);
-
     for (int i = 0;i<chain.num(); ++i){
+      float t = 1.0 * i/chain.num();
       draw( chain[i]);
       draw( chain.nextLine(i),1,0,0);
-      draw( chain.nextSphere(i),0,1,1,.3);
+      draw( chain.nextSphere(i),t,1,1-t,.3);
     }
 
-  }
-
-  void onKeyDown(const gfx::Keyboard &k){
-    if (k.code=='q') bFK = !bFK;
   }
 
 };

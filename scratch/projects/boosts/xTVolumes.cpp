@@ -79,70 +79,76 @@ struct MyApp : App {
 
   void guiElement(OParam& cp)
   {
-    gui (cp.val, cp.name, -100,100);
-    gui (cp.frq, "frq", 0,10);
-    gui (cp.osc, "bOsc");
+    gui (cp.val, cp.name, -1,10);
+    gui (cp.frq, "", 0,10);
+    gui (cp.osc, "");
   }
+
+  void onDrawGui(){
+    if (guiBegin()){
+      ///Add Variables to GUI
+      gui(preset,"preset",0,10);
+      gui(decay,"decay",-10,10);
+      guiElement (kVU);
+      guiElement (kWU);
+      guiElement (kUV);
+      guiElement (kWV);
+      guiElement (kUW);
+      guiElement (kVW);
+      guiElement (kV1U);
+      guiElement (kU1W);
+      guiElement (kW1V);
+
+      guiElement (kVU2);
+      guiElement (kWU2);
+      guiElement (kV1U2);
+      guiElement (kU1W2);
+
+      gui (alpha, "alpha", -1, 1);
+
+      gui (uc, "uc", 0, 1);
+      gui (vc, "vc", 0, 1);
+      gui (wc, "wc", 0, 1);
+
+      gui (uSpacing, "uSpacing", 1, 10);
+      gui (vSpacing, "vSpacing", 1, 10);
+      gui (wSpacing, "wSpacing", 1, 10);
+      gui (bInverse, "bInverse");
+      gui (bDrawOne, "bDrawOne");
+      gui (bDrawManyMany, "bDrawManyMany");
+      gui (bDrawVol1, "bDrawVol1");
+      gui (bDrawVol2, "bDrawVol2");
+      gui (bDrawBorderPoints, "bDrawBorderPoints");
+      gui (bDrawFrame, "bDrawFrame");
+      gui (bDrawIMapSurface, "bDrawIMapSurface");
+      gui (bDrawVolumeFrames, "bDrawVolumeFrames");
+      gui (bDrawEdges, "bDrawEdges");
+      gui (bDrawSection, "bDrawSection");
+      gui (bDrawCircle, "bDrawCircle");
+      gui (bDrawCylinder, "bDrawCylinder");
+      gui (bDrawBaseSpheres, "bDrawBaseSpheres");
+      gui (bDrawUVSpheres, "bDrawUVSpheres");
+      gui (bDrawLidSpheres, "bDrawLidSpheres");
+      gui (bDrawUSpheres, "bDrawUSpheres");
+      gui (bDrawVSpheres, "bDrawVSpheres");
+      gui (bDrawWSpheres, "bDrawWSpheres");
+      gui (bDrawVDirSpheres, "bDrawVDirSpheres");
+
+      gui (ps.bShadedOutput, "bShadedOutput");  ///< default for output
+      gui (ps.bSortOutput, "bSortOutput");      ///< default
+      gui (ps.bSimpleSort, "bSimpleSort");      ///< default
+      gui (ps.bOffsetOutput, "bOffsetOutput");
+      gui (ps.bOccludeOutput, "bOccludedOutput");
+      gui (ps.bTightBounds, "bTightBounds");
+      gui (ps.bPDF, "bPDF");  ///< pdf or eps
+      guiEnd();
+    }
+  }
+
 
   void setup(){
 
     mColor.set (.8,.8,.8);
-    ///Add Variables to GUI
-    gui(preset,"preset",0,10);
-    gui(decay,"decay",-10,10);
-    guiElement (kVU);
-    guiElement (kWU);
-    guiElement (kUV);
-    guiElement (kWV);
-    guiElement (kUW);
-    guiElement (kVW);
-    guiElement (kV1U);
-    guiElement (kU1W);
-    guiElement (kW1V);
-
-    guiElement (kVU2);
-    guiElement (kWU2);
-    guiElement (kV1U2);
-    guiElement (kU1W2);
-
-    gui (alpha, "alpha", -1, 1);
-
-    gui (uc, "uc", 0, 1);
-    gui (vc, "vc", 0, 1);
-    gui (wc, "wc", 0, 1);
-
-    gui (uSpacing, "uSpacing", 1, 10);
-    gui (vSpacing, "vSpacing", 1, 10);
-    gui (wSpacing, "wSpacing", 1, 10);
-    gui (bInverse, "bInverse");
-    gui (bDrawOne, "bDrawOne");
-    gui (bDrawManyMany, "bDrawManyMany");
-    gui (bDrawVol1, "bDrawVol1");
-    gui (bDrawVol2, "bDrawVol2");
-    gui (bDrawBorderPoints, "bDrawBorderPoints");
-    gui (bDrawFrame, "bDrawFrame");
-    gui (bDrawIMapSurface, "bDrawIMapSurface");
-    gui (bDrawVolumeFrames, "bDrawVolumeFrames");
-    gui (bDrawEdges, "bDrawEdges");
-    gui (bDrawSection, "bDrawSection");
-    gui (bDrawCircle, "bDrawCircle");
-    gui (bDrawCylinder, "bDrawCylinder");
-    gui (bDrawBaseSpheres, "bDrawBaseSpheres");
-    gui (bDrawUVSpheres, "bDrawUVSpheres");
-    gui (bDrawLidSpheres, "bDrawLidSpheres");
-    gui (bDrawUSpheres, "bDrawUSpheres");
-    gui (bDrawVSpheres, "bDrawVSpheres");
-    gui (bDrawWSpheres, "bDrawWSpheres");
-    gui (bDrawVDirSpheres, "bDrawVDirSpheres");
-
-    gui (ps.bShadedOutput, "bShadedOutput");  ///< default for output
-    gui (ps.bSortOutput, "bSortOutput");      ///< default
-    gui (ps.bSimpleSort, "bSimpleSort");      ///< default
-    gui (ps.bOffsetOutput, "bOffsetOutput");
-    gui (ps.bOccludeOutput, "bOccludedOutput");
-    gui (ps.bTightBounds, "bTightBounds");
-    gui (ps.bPDF, "bPDF");  ///< pdf or eps
-
     ps.bOffsetOutput = false;
     ps.bOccludeOutput = false;
     ps.bTightBounds= true;

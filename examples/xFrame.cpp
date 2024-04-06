@@ -32,14 +32,13 @@ struct MyApp : App {
   Frame frameB = Frame(3,0,0);
   Point mouse = Construct::point(0,0,0);
 
-  /*-----------------------------------------------------------------------------
-   *  Setup Variables
-   *-----------------------------------------------------------------------------*/
-  void setup(){
-
+  void onDrawGui(){
     ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bAbsolute,"bAbsolute_xf");
+    gui(amt,"amt",0,1);
+    gui(bAbsolute,"bAbsolute_xf");
+  }
 
+  void setup(){
     bAbsolute = true;
     amt = .3;
 

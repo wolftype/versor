@@ -21,13 +21,17 @@ struct MyApp : App
 
   Circle ca, cb;
 
-  virtual void setup ()
+  virtual void onDrawGui()
   {
+    gui (amt, "amt", -10.0f, 10.0f);
+    gui (dist, "dist", -10.0f, 10.0f);
 
-    gui (amt, "amt", -100, 100);
-    gui (dist, "dist", -100, 100);
     gui (bPos, "bPos");
     gui (bFlop, "bFlop");
+  }
+
+  virtual void setup ()
+  {
 
     amt = .01;
     dist = 1;

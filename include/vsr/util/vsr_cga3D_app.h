@@ -20,23 +20,26 @@
 #ifndef vsr_cga3D_app_INC
 #define vsr_cga3D_app_INC
 
-#include <vsr/space/vsr_cga3D_op.h>     //<-- conformal 3D types and basic operations
+#include <vsr/space/vsr_cga3D_op.h>      //<-- conformal 3D types and basic operations
 
-#include <vsr/draw/vsr_cga3D_draw.h>    //<-- fixed pipeline draw routines
-#include <vsr/draw/vsr_cga3D_render.h>  //<-- programmable pipeline draw routines
+#include <vsr/draw/vsr_cga3D_draw.h>     //<-- fixed pipeline draw routines
+#include <vsr/draw/vsr_cga3D_render.h>   //<-- programmable pipeline draw routines
 
 #include <vsr/util/vsr_cga3D_control.h>  //<-- interface controls (mouse and keyboard)
-#include <gfx/util/gfx_glv_app.h>        //<-- an app class with built-in gui
+#include <gfx/util/gfx_imgui_app.h>      //<-- an app class with built-in gui
 #include <gfx/util/glfw_window.hpp>      //<-- an app class with built-in gui
+#include <gfx/util/gfx_std_types.h>
 
 #include <gfx/gfx_postscript.h>
 
 
 ///@todo namespace this
-struct App : public gfx::GFXAppGui<gfx::GLFWContext>
+struct App : public gfx::GFXAppImGui
 {
 
-  using GuiApp = gfx::GFXAppGui<gfx::GLFWContext>;
+  App (int w = 800, int h = 600, string name = "Versor") : gfx::GFXAppImGui (w,h,name){}
+
+  using GuiApp = gfx::GFXAppImGui;
 
   vsr::cga::Point mMouse2D;
   vsr::cga::Point mMouse3D;
@@ -141,43 +144,3 @@ struct App : public gfx::GFXAppGui<gfx::GLFWContext>
 #endif /* ----- #ifndef vsr_cga3D_app_INC  ----- */
 
 
-
-//     case  '0':
-//
-//      f.pos( PT(0,0,5) );
-//      f.orient( Vec(0,0,0), false );
-
-//      scene.camera.set( f.pos(), f.quat() );
-//      break;
-
-//     case  '1':
-//      f.pos( PT(-5,0,0) );
-//      f.orient( Vec(0,0,0), false );
-
-//      scene.camera.set( f.pos(), f.quat() );
-//
-//      break;
-//     case  '2':
-//      f.pos( PT(5,0,0) );
-//      f.orient( Vec(0,0,0), false );
-
-//      scene.camera.set( f.pos(), f.quat() );
-//      break;
-//     case  '3':
-//      f.pos( PT(0,5,0) );
-//      f.orient( Vec(0,0,0), false );
-
-//      scene.camera.set( f.pos(), f.quat() );
-//      break;
-//     case  '4':
-//      f.pos( PT(0,-5,0) );
-//      f.orient( Vec(0,0,0), false );
-
-//      scene.camera.set( f.pos(), f.quat() );
-//      break;
-//     case  '5':
-//      f.pos( PT(0,0,-5) );
-//      f.orient( Vec(0,0,0), false);
-
-//      scene.camera.set( f.pos(), f.quat() );
-//      break;

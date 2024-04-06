@@ -50,7 +50,8 @@ namespace cga {
 //};
 
 
-//Tangent Operationsa -- operational data-free static functions 
+//Tangent Operationsa -- operational data-free static functions
+//operating on spheres
 struct Tops {
 
   //Generate a tangent from a Vec and a Position
@@ -231,12 +232,12 @@ struct TFrame_ {
    }
 
    //Connecting TFrames:
-   //Given a point to be at, another frame to be orthogonal to, 
+   //Given a point to be at, another frame to be orthogonal to,
    //and a direction coefficent to decrease
    TFrame_ (const Point& p, const TFrame_& tf, const TDIR& idx) {
      build (p, tf, idx);
    }
- 
+
    void build (const Point& p, const TFrame_& tf, const TDIR& idx) {
      int tidx = (int)idx;
      switch (tidx) {
@@ -252,6 +253,7 @@ struct TFrame_ {
      }
    }
 
+   // add TF in U direction
    void buildU (const Point &p, const TFrame_& tf){
      pos = p;
      DualSphere svu  = Tops::Surface (p, tf.v());
@@ -270,6 +272,7 @@ struct TFrame_ {
      s[(int)TCS::wu] = swu;
    }
 
+   // add TF in V direction
    void buildV(const Point &p, const TFrame_& tf){
       pos = p;
       DualSphere suv = Tops::Surface (p, tf.u());
@@ -282,12 +285,13 @@ struct TFrame_ {
       t[0] = Tops::Element(u, p);
       t[1] = Tops::Element(v, p);
       t[2] = Tops::Element(w, p);
-  
+
       flatten();
       s[(int)TCS::uv] = suv;
       s[(int)TCS::wv] = swv;
    }
 
+   // add TF in W direction
    void buildW(const Point &p, const TFrame_& tf){
        pos = p;
        DualSphere suw = Tops::Surface (p, tf.u());

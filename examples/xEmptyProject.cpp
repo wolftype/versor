@@ -17,10 +17,14 @@ struct MyApp : App {
   /*-----------------------------------------------------------------------------
    *  Setup Gui
    *-----------------------------------------------------------------------------*/
-  void setup(){
+  void setup(){}
+
+  void onDrawGui(){
     ///Add Variables to GUI
-    gui(amt1,"amt1",-100,100)(amt2,"amt2",-100,100);
-    gui(bToggle,"bToggle")(bSet,"bSet");
+    gui(amt1,"amt1",-100,100);
+    gui(amt2,"amt2",-100,100);
+    gui(bToggle,"bToggle");
+    gui(bSet,"bSet");
   }
 
 

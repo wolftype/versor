@@ -26,10 +26,7 @@ using namespace vsr::cga;
 struct MyApp : App
 {
 
-  //Some Variables
-  bool bReset = false;
-  float amt = 0;
-
+  float amt = .99;
 
   Frame frame;
   Point point;
@@ -39,13 +36,15 @@ struct MyApp : App
    *-----------------------------------------------------------------------------*/
   void setup ()
   {
-    ///Add Variables to GUI
-    gui (amt, "amt", -1.0, 1.0) (bReset, "bReset");
-
     objectController.attach (&frame);
   }
 
+  void onDrawGui(){
+    ///Add Variables to GUI
+    ImGui::DragFloat ("amt", &amt, .001, 0, 1.0);
+  }
 
+  
   /*-----------------------------------------------------------------------------
    *  Draw Routines
    *-----------------------------------------------------------------------------*/

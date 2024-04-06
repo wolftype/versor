@@ -38,14 +38,15 @@ struct MyApp : App {
 
   bool bTrack = true;
 
-  /*-----------------------------------------------------------------------------
-   *  Setup Variables
-   *-----------------------------------------------------------------------------*/
-  void setup(){
+  
+  void onDrawGui(){
     ///Add Variables to GUI
     gui(amt,"amt",-100,100);
-    gui(bReset,"bReset")(linewidth,"linewidth",1,10);
+    gui(bReset,"bReset");
+    gui(linewidth,"linewidth",1,10);
+  }
 
+  void setup(){
     if (mRenderGraph.immediate() )
       cout << "IMMEDIATE MODE" << endl;
     else
