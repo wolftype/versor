@@ -425,36 +425,36 @@ struct Construct
 
 
   /*-----------------------------------------------------------------------------
-       *  CIRCLES
-       *-----------------------------------------------------------------------------*/
+   *  CIRCLES
+   *-----------------------------------------------------------------------------*/
 
   /*!
-       *  \brief  Circle through three points
-       */
+   *  \brief  Circle through three points
+   */
   static Circle circle (const Point &a, const Point &b, const Point &c);
 
   /*!
-       *  \brief  Circle at point p with radius r, facing direction biv
-      */
-  static Circle circle (const Point &p, VSR_PRECISION r,
-                        const Biv &biv);
+   *  \brief  Circle at point p with radius r, facing direction biv
+   */
+  static Circle circle (const Point &p,
+                        const Biv &biv,
+                        VSR_PRECISION r);
   /*!
-       *  \brief  Circle at origin in plane of bivector B
-       */
+   *  \brief  Circle at origin in plane of bivector B
+  */
   static Circle circle (const Biv &B);
 
   //circle Facing v
-  static Circle circle (const Vec &v, VSR_PRECISION r = 1.0);
+  static Circle circle (const Vec &v, VSR_PRECISION r);
 
   //Circle at x,y,z facing in biv
   static Circle circle (VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z,
-                        Biv biv = Biv::xy, VSR_PRECISION r = 1.0);
-
+                        Biv biv, VSR_PRECISION r);
 
 
   /*-----------------------------------------------------------------------------
-       *  SPHERES
-       *-----------------------------------------------------------------------------*/
+   *  SPHERES
+   *-----------------------------------------------------------------------------*/
   static Sphere sphere (const Pnt &a, const Pnt &b, const Pnt &c, const Pnt &d);
   static DualSphere sphere (VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z,
                             VSR_PRECISION r = 1.0);
@@ -463,8 +463,8 @@ struct Construct
 
 
   /*-----------------------------------------------------------------------------
-       *  PLANES
-       *-----------------------------------------------------------------------------*/
+   *  PLANES
+   *-----------------------------------------------------------------------------*/
 
   ///Dual plane with normal and distance from center
   static DualPlane plane (VSR_PRECISION a, VSR_PRECISION b, VSR_PRECISION c,

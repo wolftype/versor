@@ -66,7 +66,10 @@ struct Simplicial2
     tpss = ea ^ eb;
     area = tpss.rnorm () * .5;
     pss = !(tpss);
+
+    //reciprocal frame of edge a is orthogonal to edge b
     ra = (eb <= pss);
+    //reciprocal frame of edge b is orthogonal to edge a
     rb = (-ea <= pss);
 
     raa = ra.wt ();
@@ -81,17 +84,36 @@ struct Simplicial2
     //superfluous cotan, just here for checking l2 norm of gradient identities
     //ca should equal rca, cb should equal rcb.
     //theta is used here to check gaussian against angle deficit
-    Vec ta = -ea.unit ();
-    Vec tb = -eb.unit ();
-    Vec tc = (ea - eb).unit ();
-    auto alpha = acos ((tb <= tc)[0]);
-    auto beta = acos ((ta <= -tc)[0]);
-    auto gamma = acos ((-ta <= -tb)[0]);
-    theta = gamma;
-    ca = 1.0 / tan (alpha);
-    cb = 1.0 / tan (beta);
-    cc = 1.0 / tan (gamma);
-  }
+    
+    Vec ec = c - b;
+    float dot = (ea <= eb)[0];
+
+    //cotangents at vertices a, b, c 
+    ca = dot / (ea ^ eb).norm();
+    cb = (-ea <= ec)[0] / (-ea ^ ec).norm();
+    cc = (-eb <= -ec)[0] / (-eb ^ -ec).norm();
+
+    //angle at a
+    theta = acos(dot);
+
+    printf ("%f\n", (ra ^ rb).rnorm());
+    printf ("%f %f %f %f %f\n", raa, rbb, rab, rca, rcb);
+    printf ("%f %f\n", ra.norm(), rb.norm());
+    printf ("%f %f %f\n", ca, cb, cc);
+
+    //older, less efficient trig
+    //Vec ta = -ea.unit ();
+    //Vec tb = -eb.unit ();
+    //Vec tc = (ea - eb).unit ();
+    //auto alpha = acos ((tb <= tc)[0]);
+    //auto beta = acos ((ta <= -tc)[0]);
+    //auto gamma = acos ((-ta <= -tb)[0]);
+    //ca = 1.0 / tan (alpha);
+    //cb = 1.0 / tan (beta);
+    //cc = 1.0 / tan (gamma);
+
+
+    }
 
   void print ()
   {
@@ -130,18 +152,6 @@ struct Simplicial2
     // weighted reciprocals
     return ((ra * dna) + (rb * dnb));
   }
-
-//  //wedged derivative / differential
-//  Vec derivative (const float &n, const float &na, const float &nb)
-//  {
-//    //diff along edges
-//    auto dna = na - n;
-//    auto dnb = nb - n;
-//
-//    // weighted reciprocals
-//    return ((ra * dna) + (rb * dnb));
-//  }
-
 
   // Differential in X direction of some function F with values n, na, nb
   // on the simplex -- returns X'
@@ -225,8 +235,10 @@ struct Simplicial2
     auto dna = na - n;
     auto dnb = nb - n;
     // coefficients (amt of change in ea and eb directions)
-    auto wa = dna <= ea;
-    auto wb = dnb <= eb;
+    //auto wa = dna <= ea;
+    //auto wb = dnb <= eb;
+    auto wa = ea <= dna;
+    auto wb = eb <= dnb;
     // return sum of weighted reciprocals
     return ((ra * wa) + (rb * wb));  //q: divid by area? or after sum
   }

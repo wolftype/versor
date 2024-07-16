@@ -71,19 +71,23 @@ struct MyApp : App
   /*-----------------------------------------------------------------------------
    *  Setup Gui
    *-----------------------------------------------------------------------------*/
-  void setup ()
+  void onDrawGui ()
   {
     ///Add Variables to GUI
     gui (amt1, "amt1", -100, 100);
     gui (amtGauss, "amtGauss", -100, 100);
     gui (amtMean, "amtMean", -100, 100);
-    gui (bToggle, "bToggle") (bSet, "bSet");
+    gui (bToggle, "bToggle");
+    gui (bSet, "bSet");
     gui (bMean, "bMean");
     gui (bUseDeficit, "bUseDeficit");
     gui (bDrawRecip, "bDrawRecip");
     gui (bDrawEdges, "bDrawEdges");
     gui (bPrintOut, "bPrint");
+  }
 
+  void setup ()
+  {
     //Generate SpaceGroup Tessellatation
     SpaceGroup2D<Vec> sg (3, 1.3628, true);
     //Hang on lattice, Graph
@@ -167,6 +171,9 @@ struct MyApp : App
         Vec laplacian1 (0, 0, 0);
         Vec laplacian2 (0, 0, 0);
         Vec laplacian3 (0, 0, 0);
+        Vec laplacian4 (0, 0, 0);
+
+        //iterate over emanatinig edges
         for (int j = 0; j < e.size (); ++j)
           {
 
@@ -176,12 +183,15 @@ struct MyApp : App
             auto &b = e[j]->a ().pnt;
             auto &c = e[j]->next->a ().pnt;
 
+//            auto &d = e[j]->prev(0)
+
             //Build simplex info from triangle positions
             Simplicial2 &sim = v.simplex[j];
             sim = Simplicial2 (Vec (a), Vec (b), Vec (c));
 
             //Classic cotangent formula for mean curvature
-            area_grad += sim.eb * sim.cb + sim.ea * sim.ca;
+            //area_grad += sim.eb * sim.cb + sim.ea * sim.ca; //used to be ca
+            area_grad += sim.eb * sim.cb + sim.ea * sim.cb; //used to be ca
 
             //Classic angle deficit formula for gauss curvature
             deficit -= sim.deficit ();  //theta;
@@ -213,10 +223,11 @@ struct MyApp : App
             auto gbb = sim.rb * (gradB);
 
             // COTAN (DIV of GRADIENT)
-            auto lap1 = sim.ea * sim.ca + sim.eb * sim.cb;
+            //auto lap1 = sim.ea * sim.ca + sim.eb * sim.cb;
+            auto lap1 = sim.ea * sim.cc + sim.eb * sim.cb;
             laplacian1 += lap1;
 
-            // EVERY COMBINATION (GREEN'S IDENITY <Grad U, Grad X>)
+            // EVERY COMBINATION (GREEN'S IDENTITY <Grad U, Grad X>)
             auto lap2 =
               (sim.ea * (raa + rab) + sim.eb * (rbb + rab)) * 2.0 * area;
             laplacian2 += lap2;
@@ -227,36 +238,40 @@ struct MyApp : App
             auto lap3 = (gab + gba + gaa + gbb) * area;
             laplacian3 += lap3;
 
+            auto lap4 = (sim.ra + sim.rb) * (gradA + gradB) * area;
+            laplacian4 += lap4;
+
             // SUM OF DIFFERENT ELEMENTS?
             auto tmpA = sim.ra * (sim.ea.wt ());
             auto tmpB = sim.rb * (sim.eb.wt ());
 
             if (bPrintOut)
               {
-                cout << "OTHER: " << tmpA + tmpB << endl;
-                cout << "OTHER: " << tmpB << endl;
-
-                cout << endl;
-                cout << " ************** " << endl;
-                cout << " ************** " << endl;
-                cout << " **** GOAL **** " << endl;
+//                cout << "OTHER: " << tmpA + tmpB << endl;
+//                cout << "OTHER: " << tmpB << endl;
+//
+//                cout << endl;
+//                cout << " ************** " << endl;
+//                cout << " ************** " << endl;
+//                cout << " **** GOAL **** " << endl;
                 cout << "CNTRL1: " << lap1 << endl;
-                cout << "MATCH2: " << lap2 << endl;
-                cout << "MATCH3: " << lap3 << endl;
-
-                cout << " **** COMPONENTS **** " << endl;
-                cout << "raa: " << raa << endl;
-                cout << "rbb: " << raa << endl;
-                cout << "rab: " << rab << endl;
+                cout << "Lap2: " << lap2 << endl;
+                cout << "Lap3: " << lap3 << endl;
+                cout << "Lap4: " << lap4 << endl;
+//
+//                cout << " **** COMPONENTS **** " << endl;
+//                cout << "raa: " << raa << endl;
+//                cout << "rbb: " << raa << endl;
+//                cout << "rab: " << rab << endl;
                 cout << " **** GRADIENT **** " << endl;
                 cout << "grad a: " << gradA << endl;
                 cout << "grad b: " << gradB << endl;
-                cout << " **** TEST GRADIENT **** " << endl;
-                cout << "GAA: " << gaa << endl;
-                cout << "GBB: " << gbb << endl;
-                cout << "GBA: " << gba << endl;
-                cout << "GAB: " << gab << endl;
-                //            cout << "GABBA: " << gba + gab << endl;
+//                cout << " **** TEST GRADIENT **** " << endl;
+//                cout << "GAA: " << gaa << endl;
+//                cout << "GBB: " << gbb << endl;
+//                cout << "GBA: " << gba << endl;
+//                cout << "GAB: " << gab << endl;
+//                //            cout << "GABBA: " << gba + gab << endl;
 
                 //            cout << " **** COMPONENT MATCH **** " << endl;
                 //            cout << "CNTRL A: " << sim.ea * raa << endl;
@@ -266,12 +281,17 @@ struct MyApp : App
                 //            cout << "CNTRL C: " << (sim.ea + sim.eb) * rab << endl;
 
                 //maybe L2 DOES multiply dot product by area . . .
-                cout << " COTA: " << .5 * (sim.cc + sim.ca)
+                cout << " COTCA: " << .5 * (sim.cc + sim.ca)
                      << " l2 * area: " << raa * area << endl;
-                cout << " COTB: " << .5 * (sim.cc + sim.cb)
+                cout << " COTBA: " << .5 * (sim.cb + sim.ca)
                      << " l2 * area: " << rbb * area << endl;
-                cout << " COTC: " << -.5 * (sim.cc)
+                cout << " COTA: " << -.5 * (sim.ca)
                      << " l2 * area: " << rab * area << endl;
+                cout << " COTB: " << .5 * (sim.cb) 
+                     << " l2 * area: " << (rbb + rab) * area << endl;
+                cout << " COTC: " << .5 * (sim.cc) 
+                     << " l2 * area: " << (raa + rab) * area << endl;
+
               }
           }
 

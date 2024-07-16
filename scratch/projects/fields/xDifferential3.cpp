@@ -82,7 +82,7 @@ struct MyApp : App
   bool bTrackMouse;
 
 
-  void setup ()
+  void onDrawGui()
   {
     gui (amt, "amt", -100, 100);   //<-- amt of transform
     gui (wt, "wt", -100, 100);     //<-- wt of diff
@@ -96,7 +96,10 @@ struct MyApp : App
     gui (bDrawMean, "bDrawMean");  //<-- draw mean color (vs gaussian)
     gui (bDrawNormals, "bDrawNormals");          //<-- draw normals
     gui (bDrawReciprocals, "bDrawReciprocals");  //<-- draw normals
-
+  }
+  
+  void setup ()
+  {
     //0. set starting parameters
     wt = 1.0;
     amt = 1.0;
@@ -111,7 +114,7 @@ struct MyApp : App
     for (auto &i : tmp)
       mesh.add (VertexData (i));
     mesh.store ();
-    graph.UV (w, h, mesh);
+    graph.UV (w, h, &(mesh[0]));
 
     //2. per node, add new simplices
     for (auto &i : graph.node ())
@@ -166,16 +169,16 @@ struct MyApp : App
 
             auto simplex = Simplicial2 (Vec (a), Vec (b), Vec (c));
 
-            //various methods of extracting normal
-            auto normalA =
+            //various methods of extracting normal, none accurate
+            Vec normalA =
               simplex.exterior_derivative (Vec (a), Vec (b), Vec (c)).duale ();
-            auto normalB =
-              simplex.derivative (Vec (a), Vec (b), Vec (c)).duale ();
+            Vec normalB =
+              simplex.derivative (Vec (a), Vec (b), Vec (c)).duale();
             auto normalC = simplex.full_derivative (Vec (a), Vec (b), Vec (c));
 
             v.normal += bFullDerivative
                           ? Biv (normalC).duale ()
-                          : bExteriorDerivativeNormals ? normalA : normalB;
+                          : (bExteriorDerivativeNormals ? normalA : normalB);
 
             area += simplex.area;  //sum area
 

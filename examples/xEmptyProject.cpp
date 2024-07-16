@@ -8,35 +8,22 @@ struct MyApp : App {
 
   //Some Variables
   bool bToggle = false;
-  bool bSet = false;
-  bool bMouseSet = false;
   float amt1 = 0;
-  float amt2 = 0;
 
-
-  /*-----------------------------------------------------------------------------
-   *  Setup Gui
-   *-----------------------------------------------------------------------------*/
   void setup(){}
 
   void onDrawGui(){
     ///Add Variables to GUI
-    gui(amt1,"amt1",-100,100);
-    gui(amt2,"amt2",-100,100);
+    gui(amt1,"amt1",-1,1);
     gui(bToggle,"bToggle");
-    gui(bSet,"bSet");
   }
 
-
-  /*-----------------------------------------------------------------------------
-   *  Draw Routine
-   *-----------------------------------------------------------------------------*/
   void onDraw(){
     //calculate mouse position in world space
-    if (bMouseSet) calcMouse3D();
+    if (bSetMouse) calcMouse3D(.99);
     //use mouse position in world space to construct a circle
-    Circle cxy = Construct::circle(mMouse3D, 1);
-    Frame frame;
+    Circle cxy = Construct::circle(mMouse3D, Biv::xy, 1);
+    Frame frame (mMouse3D);
     //draw the circle
     draw (cxy);
     draw (frame);

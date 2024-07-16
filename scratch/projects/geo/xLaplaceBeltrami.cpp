@@ -34,16 +34,19 @@ struct MyApp : App
 
   Frame frame;
 
-  void setup ()
+  void onDrawGui()
   {
-    gui (amt, "amt", -100, 100);
-    gui (amtB, "amtB", -100, 100);
-    gui (bReset, "reset") (bUseRecip, "bUseRecip");
+    gui (amt, "boost", -1, 1);
+    gui (amtB, "spread", 0, 2);
+    gui (bReset, "reset");
+    gui(bUseRecip, "bUseRecip");
+  }
 
+  void setup(){
     objectController.attach (&frame);
   }
 
-  virtual void onDraw ()
+  void onDraw ()
   {
 
     mouse = calcMouse3D ();

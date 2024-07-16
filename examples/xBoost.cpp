@@ -17,7 +17,8 @@ struct MyApp : App
 {
 
   float amt, dist;
-  bool bPos, bFlop;
+  bool bPos = 0;
+  bool bFlop = 0;
 
   Circle ca, cb;
 
@@ -36,18 +37,18 @@ struct MyApp : App
     amt = .01;
     dist = 1;
 
-    ca = Construct::circle (-3, 0, 0);  //<-- A circle at coordinate -3,0,0
-    cb = Construct::circle (3, 0, 0);   //<-- A circle at coordinate 3,0,0
+    ca = Construct::circle (-3, 0, 0, Biv::xy, 1);  //<-- A circle at coordinate -3,0,0
+    cb = Construct::circle (3, 0, 0, Biv::xy, 1);   //<-- A circle at coordinate 3,0,0
   }
 
 
   virtual void onDraw ()
   {
 
-    auto tca = Construct::circle (-dist / 2.0, 0, 0)
+    auto tca = Construct::circle (-dist / 2.0, 0, 0, Biv::xy, 1)
                  .twist (Construct::line (1, 0, 0).dual ()
                          * -amt);  //<-- twist circle b around x axis dualline
-    auto tcb = Construct::circle (dist / 2.0, 0, 0)
+    auto tcb = Construct::circle (dist / 2.0, 0, 0, Biv::xy, 1)
                  .twist (Construct::line (1, 0, 0).dual ()
                          * amt);  //<-- twist circle b around x axis dualline
 

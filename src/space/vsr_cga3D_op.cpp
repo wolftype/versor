@@ -10,11 +10,9 @@
 namespace vsr {
 namespace cga {
 
-
-
 /*-----------------------------------------------------------------------------
-   *  OP
-   *-----------------------------------------------------------------------------*/
+ *  OP
+ *-----------------------------------------------------------------------------*/
 Rot Op::AA (const Vec &s)
 {
   Rot r = nga::Gen::ratio (Vec::z, s.unit ());
@@ -693,7 +691,7 @@ Circle Construct::circle (const Biv &B)
 /*!
        *  \brief  Circle at point p with radius r, facing direction biv
       */
-Circle Construct::circle (const Point &p, VSR_PRECISION r, const Biv &biv)
+Circle Construct::circle (const Point &p, const Biv &biv, VSR_PRECISION r )
 {
   return Round::produce (Round::dls (p, r * -1), biv);
 }

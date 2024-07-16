@@ -50,7 +50,7 @@ struct App : public gfx::GFXAppImGui
   bool bSetMouse;
 
   //z = 0 is at camera near plane, z=1 is far clipping plane
-  vsr::cga::Point calcMouse3D (float z = .95)
+  vsr::cga::Point calcMouse3D (float z = .99)
   {
 
     auto &vd = GuiApp::mContext.interface.io.viewdata;
