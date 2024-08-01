@@ -25,37 +25,39 @@ using namespace vsr::cga;
 struct MyApp : App {
 
   bool bReset = false;
-  float amt = 0;
-  float amtB = 0;
+  float spread = 1;
+  float xpos = 0;
+  float xyrot = 0;
   float timer = 0;
   Frame frame;
 
-  /*-----------------------------------------------------------------------------
-   *  Setup Variables
-   *-----------------------------------------------------------------------------*/
-  void setup(){
-    ///Bind Gui
-    bindGLV();
-    ///Add Variables to GUI
-    gui(amt,"amt",-100,100)(bReset,"bReset");
-    gui(amtB,"amtB",-100,100);
-
-    objectController.attach(&frame);
-
+  void onDrawGui(){
+    gui(spread,"spread",0,10);
+    gui(xpos,"xpos",-10,10);
+    gui(xyrot,"xyrot",-100,100);
+    gui(bReset,"bReset");
   }
 
-  /*-----------------------------------------------------------------------------
-   *  Draw Routines
-   *-----------------------------------------------------------------------------*/
+  void setup(){
+    objectController.attach(&frame);
+  }
+
   void onDraw(){
 
-    auto cir = frame.cxz();
-    auto tcir = CXZ(2).rot( Biv(amtB,0,0) ).trs(amt,0,0);
+    gfx::GL::lightsOff();
 
     timer += .01;
+    auto cir = frame.cxz();
+    draw(cir,1,0,0);
 
-    Draw(cir,1,0,0);
-    Draw( tcir.spin( Gen::bst( cir.dual() * timer ) ), 0, 1, 0 );
+    auto tcir = CXZ(2).rot( Biv(xyrot,0,0) ).trs(xpos,0,0);
+
+    for (int i = 0; i < 10; ++i)
+    {
+      float t = 1.0 * i/10;
+      auto bst = Gen::bst( cir.dual() * (timer + (t * PI * spread)));
+      draw( tcir.spin( bst), t, 1-t, 0 );
+    }
 
   }
 

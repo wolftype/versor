@@ -1,5 +1,5 @@
-#include <vsr/boosts/vsr_cga2D_types.h>
-#include <vsr/boosts/vsr_cga2D_draw.h>
+#include <vsr/space/vsr_cga2D_types.h>
+#include <vsr/draw/vsr_cga2D_draw.h>
 #include <vsr/vsr_app.h>
 
 using namespace vsr;
@@ -16,9 +16,11 @@ struct MyApp : App {
 
 	float amt;
 
-	void setup(){
-    bindGLV();
+  void onDrawGui(){
 		gui(amt, "amt", -10,10);
+  }
+
+	void setup(){
 		width = 10; height = 10;
 		field = new Point[width * height];
 
@@ -42,7 +44,7 @@ struct MyApp : App {
     // A Point type is a "dual circle" in 2D, with a radius.  Here we translate it by sin(time)
 		Point cir = Round::dls( Vec(0,0),  1.0).translate( sin(time), 0 );
     //Draw it, red
-		Draw(cir,1,0,0);
+		draw(cir,1,0,0);
 
     // Two points, a and b.
 		Point a = Round::point(1,0);
@@ -51,12 +53,12 @@ struct MyApp : App {
     // Line through points a and b, rotated in plane by amt time*2.0 
     Line line = (a ^ b ^ Inf(1)).rotate( Biv(time) );
 		//Draw it, green
-    Draw(line, 0, 1, 0);
+    draw(line, 0, 1, 0);
 
     // Make point pair from intersection of line and circle
 		auto pp =  (line.dual() ^ cir ).dual();
 		// Draw it (blue)
-    Draw( pp,0,0,1);
+    draw( pp,0,0,1);
 
 
     // Generate Boost from Point pair and use to warp field of points
@@ -69,7 +71,7 @@ struct MyApp : App {
         // Warp points, renormalize
 				Point np = Round::location( field[idx].spin(bst) );
 				// Draw warped points (white)
-        Draw(np);
+        draw(np);
 		  }
 		}
 	}

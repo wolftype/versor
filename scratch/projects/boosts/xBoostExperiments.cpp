@@ -36,19 +36,21 @@ struct MyApp : App {
   bool bReset;
 
   vector<Pnt> pnt;
-
-  void setup(){
-
-      Rand::Seed();
-
-      bindGLV();
-      gui(amt,"amt",-100,100)(amt2,"amt2",-100,100);
+ 
+  virtual void onDrawGui(){
+      gui(amt,"amt",-100,100);
+      gui(amt2,"amt2",-100,100);
       gui(P,"P",0,10);
       gui(Q,"Q",0,10);
       gui(iter,"iter",0,10000);
       gui(bReset,"reset");
 
-      P=3;Q=2; amt = .01;
+      P=3; Q=2; amt=.01;
+  }
+
+  void setup(){
+
+      Rand::Seed();
 
       pnt = vector<Pnt>(10);
       reset();
@@ -82,19 +84,19 @@ struct MyApp : App {
 
          //Boost
          tp = Round::loc( tp.spin( bst ) );
-         Draw(tp);
+         draw(tp);
 
          //make movement
          Par tpar = tmp ^ tp;
          Pnt cpnt = Round::point( tpar.dual(), 0 );
          Mot mot = Gen::mot( ( tpar ^ Inf(1) ).dual().runit() * amt2 );
          Pnt p = cpnt;//Round::loc( cpnt.spin( mot * bst ) ) ;
-         Draw(p,1,1,0);
+         draw(p,1,1,0);
          //tp = p;
          for (int i=0;i<iter;++i){
            VSR_PRECISION t = (float)i/iter;
            p = Round::loc( p.spin( bst * mot ) );
-           Draw(p,0,1,0,1-t);
+           draw(p,0,1,0,1-t);
          }
       }
 
