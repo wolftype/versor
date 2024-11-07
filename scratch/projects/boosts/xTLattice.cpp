@@ -1,3 +1,4 @@
+//SURFACE PATCH
 
 #include <vsr/vsr_app.h>
 #include <vsr/form/vsr_tangent.h>
@@ -35,6 +36,7 @@ struct MyApp : App {
   Frame mFrame010;
   Frame mFrame110;
 
+  double time = 0.0;
   /*-----------------------------------------------------------------------------
    *  Setup Gui
    *-----------------------------------------------------------------------------*/
@@ -45,10 +47,10 @@ struct MyApp : App {
   }
 
   void setup(){
-    mFrame000.pos (-1,-1,0);
-    mFrame100.pos (1,-1,0);
+    mFrame000.pos (0,0,0);
+    mFrame100.pos (1,0,0);
     mFrame110.pos (1,1,0);
-    mFrame010.pos (-1,1,0);
+    mFrame010.pos (0,1,0);
 
     //top right patch
     objectController.attach(&mFrame110);
@@ -56,7 +58,7 @@ struct MyApp : App {
     grid.init (10,6);
   }
 
-
+ 
   /*-----------------------------------------------------------------------------
    *  Draw Routine
    *-----------------------------------------------------------------------------*/
@@ -64,9 +66,14 @@ struct MyApp : App {
     //calculate mouse position in world space
     if (bSetMouse) calcMouse3D();
 
+    time+=.01;
+
     //Lets design a surface you can pinch with your fingers
     //
     //Given: a Frame and three more points.
+
+    Vec target (sin(time)*10,1,1);
+    mFrame110.orient(target);
 
     Point pos100 = mFrame100.pos();
     Point pos010 = mFrame010.pos();
@@ -76,28 +83,59 @@ struct MyApp : App {
     Point pos000 = Constrain::PointToCircle (mMouse3D, circle);
 
     TFrame_ f110;
-    TFrame_ f100;
-    TFrame_ f010;
-    TFrame_ f000;
 
     f110.build (mFrame110);
-    f100.buildV (pos100, f110);//, TDIR::v);
-    f010.buildU (pos010, f110);//, TDIR::u);
-    f000.buildV (pos000, f010);//, TDIR::v);
+
+    TFrame_ f010(pos010, f110, TDIR::u);
+    TFrame_ f100(pos100, f110, TDIR::v);
+    TFrame_ f000(pos000, f010, TDIR::v);
+
+
+   // f100.buildV (pos100, f110);//, TDIR::v);
+   // f010.buildU (pos010, f110);//, TDIR::u);
+   // f000.buildV (pos000, f010);//, TDIR::v);
 
     f000.addSurfaces (f100, TDIR::u);
 
-    Pair genU  = f000.gen (f100, TSX::UV());
-    Pair genV  = f000.gen (f010, TSX::VU());
+    Pair genU  = f000.gen (f100, TCS::uv);//TSX::UV());
+    Pair genV  = f000.gen (f010, TCS::vu);//TSX::VU());
 
     grid.plot(pos000, genU, genV);
     grid.draw(true, 1.0);
 
-    DrawT (f000);
-    DrawT (f100);
-    DrawT (f010);
-    DrawT (f110);
+//    DrawT (f000);
+//    DrawT (f100);
+//    DrawT (f010);
+//    DrawT (f110);
     Draw(circle,0,1,0);
+
+    Frame fa (pos000, f000.rotor());
+    Frame fb (pos100, f100.rotor());
+    Frame fc (pos110, f110.rotor());
+    Frame fd (pos010, f010.rotor());
+
+    GL::lightsOff();
+
+    Draw(fa);
+    Draw(fb);
+    Draw(fc);
+    Draw(fd);
+//    // TMP find rotation
+//    Vec vx = -Round::dir(f100.t[0]).copy<Vec>();
+//    Vec vy = -Round::dir(f100.t[1]).copy<Vec>();
+//    Vec vz = -Round::dir(f100.t[2]).copy<Vec>();
+//
+//    Rotor rz = Gen::ratio (Vec::z, vz);
+//    Vec vxx = Vec::x.spin(rz);
+//    Rotor rx = Gen::ratio (vxx, vx);
+//
+//    Rotor rot = rx*rz; 
+//
+//    Frame ftmp (PAO, rot);
+//    Draw(ftmp);
+     
+
+    
 
     //Question, what about "any two circles"
     //thinking of two hands here, what does that afford us?

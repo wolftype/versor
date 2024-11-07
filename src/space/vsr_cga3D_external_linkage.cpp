@@ -7,7 +7,7 @@
 // MACROS:
 //
 // CREATE_FUNC(OBJ): creates, destroys, copies, creates_n, destroys_n
-// ARITH_FUNC(OBJ): adds, subtracts, multiples by float
+// ARITH_FUNC(OBJ): adds, subtracts, multiples by VSR_PRECISION
 // GP_FUNC(A,B): multiplies A * B
 // OP_FUNC(R,A,B): R = outer A ^ B
 // IP_FUNC(R,A,B): R = inner A <= B
@@ -30,6 +30,7 @@
 #include <vsr/space/vsr_cga3D_op.h>
 #include <vsr/form/vsr_tangent.h>
 #include <vsr/form/vsr_cga3D_frame.h>
+#include <vsr/form/vsr_rigid.h>
 
 namespace vsr { namespace cga {
 
@@ -112,7 +113,7 @@ void cga_ ## OBJ ## _plus (OBJ *r, OBJ * a, OBJ * b) {\
 void cga_ ## OBJ ## _minus (OBJ *r, OBJ * a, OBJ * b) {\
   *r = (*a) - (*b);\
 }\
-void cga_ ## OBJ ## _mult (OBJ *r,  OBJ * a, float b) {\
+void cga_ ## OBJ ## _mult (OBJ *r,  OBJ * a, VSR_PRECISION b) {\
   *r = (*a) * b;\
 }
 
@@ -301,17 +302,17 @@ extern "C" {
   GEN_FUNC(DualLine, DualLine);
   GEN_FUNC(Pair, DualSphere);
 
-  void cga_Rotor_gen (Rotor *r, Biv *b, float amt)
+  void cga_Rotor_gen (Rotor *r, Biv *b, VSR_PRECISION amt)
   {
     *r = Gen::rot (*b * amt);
   }
 
-  void cga_Motor_gen (Motor *m, Dll *d, float amt)
+  void cga_Motor_gen (Motor *m, Dll *d, VSR_PRECISION amt)
   {
     *m = Gen::mot (*d * amt);
   }
 
-  void cga_Boost_gen (Bst *b, Pair *p, float amt)
+  void cga_Boost_gen (Bst *b, Pair *p, VSR_PRECISION amt)
   {
     *b = Gen::bst (*p * amt);
   }
@@ -410,7 +411,7 @@ extern "C" {
   }
 
   Point * cga_DualSphere_from_coords (Point *p, VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION r) {
-    *p = Round::dls(x,y,z,r);
+    *p = Round::dls(r,x,y,z);
     return p;
   }
 
@@ -419,12 +420,13 @@ extern "C" {
     return p;
   }
 
-//  VSR_PRECISION cga_Point_get_coord (unsigned int n, Point *p){
-//    return (*p)[n];
-//  }
+  Point * cga_Point_on_Circle(Point *p, Point *pinput, Circle *cir){
+     *p = Constrain::PointToCircle(*pinput, *cir);
+     return p;
+  }
 
   // Basis weights
-  VSR_PRECISION cga_get_coord (unsigned int n, float *p){
+  VSR_PRECISION cga_get_coord (unsigned int n, VSR_PRECISION *p){
     return p[n];
   }
 
@@ -494,7 +496,7 @@ extern "C" {
 
   //TANGENTS from position and direction
   void cga_Pair_from_Coords (Pair *res,
-      float x, float y, float z, float dx, float dy, float dz)
+      VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z, VSR_PRECISION dx, VSR_PRECISION dy, VSR_PRECISION dz)
   {
      *res = Pair(Tnv(dx,dy,dz)).trs(x,y,z);
   }
@@ -542,7 +544,7 @@ extern "C" {
     return p;
   };
 
-  // orient z axis to v direcion
+  // orient z axis to v position 
   Frame * cga_Frame_orient_z (Frame * f, Vec * v ){
     (*f).orient (*v);
     return f;
@@ -552,7 +554,7 @@ extern "C" {
       VSR_PRECISION x, VSR_PRECISION y, VSR_PRECISION z,
       VSR_PRECISION xd, VSR_PRECISION yd, VSR_PRECISION zd){
       (*f).pos(x,y,z);
-      (*f).orient(Vec(xd,yd,zd).unit());
+      (*f).orient(Vec(xd,yd,zd));
       return f;
   };
 
@@ -576,34 +578,58 @@ extern "C" {
   // TFRAMES
   CREATE_FUNC(TFrame_);
 
+  // From a frame, builds tangents and flattens curves
+  void cga_TFrame_from_Frame ( TFrame_ *res, Frame *frame){
+    *res = TFrame_(*frame);
+  }
+
   //from coords for point and coords for direction of z vector
-  void cga_TFrame_from_Coords ( TFrame_ *res, float px, float py, float pz,
-                                                float dx, float dy, float dz){
+  void cga_TFrame_from_Coords ( TFrame_ *res, VSR_PRECISION px, VSR_PRECISION py, VSR_PRECISION pz,
+                                                VSR_PRECISION dx, VSR_PRECISION dy, VSR_PRECISION dz){
      Frame frame(px, py, pz);
      frame.orient(Vec(dx,dy,dz)); 
 
      *res = TFrame_ (frame);
   } 
 
+  //from a point in space and another frame, and a direction coeff to inscrease
+  //int should be u=0, v=1, w=2
   void cga_TFrame_from_Point_TFrame ( TFrame_ *res, Point *p, TFrame_ *tf, 
                                                                      int tdir){
       *res = TFrame_(*p, *tf, static_cast<TDIR>(tdir));
   }  
 
-  void cga_Pair_from_TFrame (Pair *pair, TFrame_*tf, int idx) {
+  void cga_TFrame_addSurfaces( TFrame_ *inout, TFrame_ *tf, int tdir){
+	  (*inout).addSurfaces(*tf, static_cast<TDIR>(tdir));
+  }
+
+  //Pair is a null tangent u=0, v=1, w=2
+  void cga_Pair_null_from_TFrame (Pair *pair, TFrame_*tf, int idx) {
       *pair = (*tf).t[idx];
   }
 
-//  void * cga_PairU_from_TFrame (Pair *pair, TFrame_*tf) {
-//    *pair = (*tf).u();
-//  }
-//  void * cga_PairV_from_TFrame (Pair *pair, TFrame_*tf) {
-//    *pair = (*tf).v();
-//  }
-//  void * cga_PairW_from_TFrame (Pair *pair, TFrame_*tf) {
-//    *pair = (*tf).w();
-//  }
-  
+  //Pair is a generator of constant uv, uw, vu, vw, wu, wv 
+  void cga_Pair_gen_from_TFrame (Pair *pair, TFrame_*from, TFrame_ *to, int idx) {
+      *pair = (*from).gen(*to, static_cast<TCS>(idx));
+  }
+
+  void cga_TFrame_get_rot(TFrame_ *f, Rotor *r){
+      *r = (*f).rotor();
+  }
+
+ // void * cga_PairU_from_TFrame (Pair *pair, TFrame_*tf) {
+ //   *pair = (*tf).u();
+ // }
+ // void * cga_PairV_from_TFrame (Pair *pair, TFrame_*tf) {
+ //   *pair = (*tf).v();
+ // }
+ // void * cga_PairW_from_TFrame (Pair *pair, TFrame_*tf) {
+ //   *pair = (*tf).w();
+ // }
+ 
+  //TOPS
+//  void cga_Pair_
+ 
 } // extern "C"
 
 }} //vsr::cga::

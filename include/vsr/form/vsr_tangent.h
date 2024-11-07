@@ -116,6 +116,14 @@ struct Tops {
       return Round::location(p.spin(xf));
   }
 
+  static Point Xf (const Point&p, const Boost& bu, const Boost& bv){
+     return Xf(p, bu * bv);
+  } 
+
+  static Point Xf (const Point&p, const Pair& genU, const Pair& genV, VSR_PRECISION amtU, VSR_PRECISION amtV){
+     return Xf(p, Gen::bst(genU * amtU) + Gen::bst(genV * amtV));
+  } 
+
   // There are two key parameters to be considered when generating
   // a transformation bivector
   //
@@ -182,7 +190,7 @@ enum class TCS{
   wv = 5
 };
 
-// Container for indices
+// Container for indices // correct???
 struct TSX {
   int tidx, kidx;
 
@@ -196,8 +204,9 @@ struct TSX {
 
 //wip: Q: how to encode eitehr as curvature floats or surfaces directly
 //need to maintain flexibilty to do either
+//Add ability to extract Rotor, and change pos to method
 struct TFrame_ {
-   Point pos;
+   Point mPos;
    Pair t[3];
    float k[6];
    DualSphere s[6];
@@ -211,8 +220,24 @@ struct TFrame_ {
      s[(int)TCS::wu] = s[(int)TCS::wv] = Tops::Surface (t[2],0.0);
     }
 
+   Point pos(){
+    return mPos;
+   }
+
+   Rotor rotor(){
+    Vec vx = -Round::dir(t[0]).copy<Vec>();
+    Vec vy = -Round::dir(t[1]).copy<Vec>();
+    Vec vz = -Round::dir(t[2]).copy<Vec>();
+
+    Rotor rz = Gen::ratio (Vec::z, vz);
+    Vec vxx = Vec::x.spin(rz);
+    Rotor rx = Gen::ratio (vxx, vx);
+
+    return rx*rz; 
+   }
+
    TFrame_ (){
-     pos = PAO;
+     mPos = PAO;
      t[0] = Pair(Tnv(1,0,0));
      t[1] = Pair(Tnv(0,1,0));
      t[2] = Pair(Tnv(0,0,1));
@@ -224,7 +249,7 @@ struct TFrame_ {
   }
 
   void build (const Frame & f){
-     pos = f.pos();
+     mPos = f.pos();
      t[0] = Tops::Tangent (f.pos(), f.x());;
      t[1] = Tops::Tangent (f.pos(), f.y());;
      t[2] = Tops::Tangent (f.pos(), f.z());;
@@ -255,7 +280,7 @@ struct TFrame_ {
 
    // add TF in U direction
    void buildU (const Point &p, const TFrame_& tf){
-     pos = p;
+     mPos = p;
      DualSphere svu  = Tops::Surface (p, tf.v());
      DualSphere swu  = Tops::Surface (p, tf.w());
      //Now we can get Vectors there
@@ -274,7 +299,7 @@ struct TFrame_ {
 
    // add TF in V direction
    void buildV(const Point &p, const TFrame_& tf){
-      pos = p;
+      mPos = p;
       DualSphere suv = Tops::Surface (p, tf.u());
       DualSphere swv = Tops::Surface (p, tf.w());
        //Now we can get Vectors there
@@ -293,7 +318,7 @@ struct TFrame_ {
 
    // add TF in W direction
    void buildW(const Point &p, const TFrame_& tf){
-       pos = p;
+       mPos = p;
        DualSphere suw = Tops::Surface (p, tf.u());
        DualSphere svw = Tops::Surface (p, tf.v());
        //Now we can get Vectors there
@@ -310,20 +335,21 @@ struct TFrame_ {
        s[(int)TCS::vw] = svw;
    }
 
+   //add surfaces of that define td direction 
    void addSurfaces (const TFrame_& tf, const TDIR& td)
    {
      switch ((int)td) {
        case 0:
-         s[(int)TCS::vu] = Tops::Surface (pos, tf.v());
-         s[(int)TCS::wu] = Tops::Surface (pos, tf.w());
+         s[(int)TCS::vu] = Tops::Surface (mPos, tf.v());
+         s[(int)TCS::wu] = Tops::Surface (mPos, tf.w());
          break;
        case 1:
-         s[(int)TCS::uv] = Tops::Surface (pos, tf.u());
-         s[(int)TCS::wv] = Tops::Surface (pos, tf.w());
+         s[(int)TCS::uv] = Tops::Surface (mPos, tf.u());
+         s[(int)TCS::wv] = Tops::Surface (mPos, tf.w());
          break;
        case 2:
-         s[(int)TCS::uw] = Tops::Surface (pos, tf.u());
-         s[(int)TCS::vw] = Tops::Surface (pos, tf.v());
+         s[(int)TCS::uw] = Tops::Surface (mPos, tf.u());
+         s[(int)TCS::vw] = Tops::Surface (mPos, tf.v());
          break;
      }
    }
@@ -351,6 +377,11 @@ struct TFrame_ {
 
    Pair gen (const TFrame_& f, const TSX& tsx) {
      return gen (f, tsx.tidx, tsx.kidx);
+   }
+
+   // NOT SURE THIS IS WORKING, should only need single idx
+   Pair gen (const TFrame_& f, const TCS& tcs) {
+     return gen (f, floor((int)tcs / 2.0), (int)tcs);
    }
 
    Pair u() const { return t[0]; }

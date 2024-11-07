@@ -87,6 +87,8 @@ namespace vsr { namespace cga {
     /// Reset to Origin
     Frame& reset() { mPos = Round::point(0,0,0); mRot = Rot(1,0,0,0); return *this; }
 
+    //To DO SET rotation from Othorgonal Vectors
+
     /// Get Scale
     VSR_PRECISION scale() const { return mScale; }
     VSR_PRECISION& scale() { return mScale; }
