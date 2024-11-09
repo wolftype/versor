@@ -1,137 +1,120 @@
 #include <vsr/vsr_app.h>
 #include <vsr/form/vsr_chain.h>
 
-
 using namespace vsr;
 using namespace vsr::cga;
 
 struct MyApp : App {
 
-	float amt,linewidth;
-	Chain k = Chain(5);
-	Pnt targetPos;
-	float distA;
+  float amt, linewidth;
+  Chain k = Chain(5);
+  Pnt targetPos;
+  float distA;
 
-  void onDrawGui(){
-      gui(distA, "LinkLength", 1,10);
-      gui(linewidth,"linewidth",0,10);
+  void onDrawGui() {
+    gui(distA, "LinkLength", 1, 10);
+    gui(linewidth, "linewidth", 0, 10);
   }
-	
-  void setup(){
-     	distA = 5.0;
-      linewidth=3;
-      scene.camera.pos(0,0,30);
-	}
 
-	void onDraw(){
+  void setup() {
+    distA = 5.0;
+    linewidth = 3;
+    scene.camera.pos(0, 0, 30);
+  }
+
+  void onDraw() {
 
     glLineWidth(linewidth);
 
-		Frame baseFrame;
+    Frame baseFrame;
 
     auto mouse = calcMouse3D();
 
     auto v = io().viewdata.ray;
-    auto line =  mouse ^ Vec(v[0],v[1],v[2]) ^ Inf(1);//Fl::line( mouse, io().viewdata.ray );
+    auto line = mouse ^ Vec(v[0], v[1], v[2]) ^
+                Inf(1); // Fl::line( mouse, io().viewdata.ray );
 
-		targetPos = Construct::point( line, Ori(1) );
+    targetPos = Construct::point(line, Ori(1));
 
-		Frame targetFrame ( targetPos );
+    Frame targetFrame(targetPos);
 
-		draw(targetPos, 1,0,0);
+    draw(targetPos, 1, 0, 0);
 
-    Frame secondFrame( 0, distA, 0 );
+    Frame secondFrame(0, distA, 0);
 
     // Make a sphere from a point and a radius, calls Round::dls( Pnt, float )
-	  auto firstSphere = Round::sphere( secondFrame.pos(), distA );
-    auto targetSphere = Round::sphere( targetPos, distA );
+    auto firstSphere = Round::sphere(secondFrame.pos(), distA);
+    auto targetSphere = Round::sphere(targetPos, distA);
 
-		 //Plane of Rotation formed by yaxis of base and target point
-		 auto rotationPlane = baseFrame.ly() ^ targetPos;
+    // Plane of Rotation formed by yaxis of base and target point
+    auto rotationPlane = baseFrame.ly() ^ targetPos;
 
-		 draw(rotationPlane,0,1,0);
+    draw(rotationPlane, 0, 1, 0);
 
- 		//XZ plane of Target
-		 DualPlane targetXZ = targetFrame.dxz();
-		 draw(targetXZ,0,.5,1);
+    // XZ plane of Target
+    DualPlane targetXZ = targetFrame.dxz();
+    draw(targetXZ, 0, .5, 1);
 
-		 //Line of Target
-		 Dll tline = targetXZ ^ rotationPlane.dual();
-		 draw(tline,1,1,0);
+    // Line of Target
+    Dll tline = targetXZ ^ rotationPlane.dual();
+    draw(tline, 1, 1, 0);
 
-		 //Point Pairs of Final joint
-		 Pair fjoint = ( tline ^ targetSphere ).dual();
-		 draw(fjoint);
+    // Point Pairs of Final joint
+    Pair fjoint = (tline ^ targetSphere).dual();
+    draw(fjoint);
 
- 	   	 //Pick the one closest to the base frame
-		 Frame finalFrame ( Round::split(fjoint,false), Rot(1,0,0,0) );
+    // Pick the one closest to the base frame
+    Frame finalFrame(Round::split(fjoint, false), Rot(1, 0, 0, 0));
 
-		 //Sphere around fframe
-		 auto ffsphere = Round::sphere( finalFrame.pos(), distA);
+    // Sphere around fframe
+    auto ffsphere = Round::sphere(finalFrame.pos(), distA);
 
-		 //Circle of Possibilities
-		 Circle cir = ( ffsphere ^ firstSphere).dual();
-		 draw(cir,.5,1,1);
+    // Circle of Possibilities
+    Circle cir = (ffsphere ^ firstSphere).dual();
+    draw(cir, .5, 1, 1);
 
-		 //TWo points where the middle joint could be
-		 Pair fpair = ( rotationPlane.dual() ^ cir.dual() ).dual();
-		 draw(fpair, 1,.5,.5);
+    // TWo points where the middle joint could be
+    Pair fpair = (rotationPlane.dual() ^ cir.dual()).dual();
+    draw(fpair, 1, .5, .5);
 
-		 //Pick One and put the middle frame there
-		 Frame middleFrame( Round::split(fpair,true) );
+    // Pick One and put the middle frame there
+    Frame middleFrame(Round::split(fpair, true));
 
+    // We can store the `positions in a chain class which will sort out relative
+    // orientations for us
+    k[0] = baseFrame;
+    k[1] = secondFrame;
+    k[2] = middleFrame;
+    k[3] = finalFrame;
+    k[4] = targetFrame;
 
-		 //We can store the `positions in a chain class which will sort out relative orientations for us
-		 k[0] = baseFrame;
-		 k[1] = secondFrame;
-		 k[2] = middleFrame;
-		 k[3] = finalFrame;
-		 k[4] = targetFrame;
+    // Base Frame will rotate to plane defined by its yaxis and target point
+    Rot r1 = Gen::ratio(Vec::z, Vec(rotationPlane.dual().unit()));
+    k[0].rot(r1);
 
-		 //Base Frame will rotate to plane defined by its yaxis and target point
-		 Rot r1 =  Gen::ratio( Vec::z, Vec( rotationPlane.dual().unit() ) );
-		 k[0].rot( r1 );
+    // for all the other frames, calculate joint rotations and link lengths from
+    // current positions
+    k.calcJoints(1);
+    k.links();
 
-		 //for all the other frames, calculate joint rotations and link lengths from current positions
-		 k.calcJoints(1);
-		 k.links();
+    for (int i = 0; i < 4; ++i) {
 
+      glColor3f(0, 1, 0);
+      gfx::Glyph::Line(k[i].pos(), k[i + 1].pos());
 
+      draw(k[i]);
+    }
 
-		 for (int i = 0; i < 4; ++i){
-
-			 glColor3f(0,1,0);
-			 gfx::Glyph::Line( k[i].pos(), k[i+1].pos() );
-
-		     draw(k[i]);
-		 }
-
-
-		 draw(ffsphere,1,0,0,.4);
-		 draw(firstSphere,1,0,0,.4);
-	}
+    draw(ffsphere, 1, 0, 0, .4);
+    draw(firstSphere, 1, 0, 0, .4);
+  }
 };
 
-
-int main(){
+int main() {
 
   MyApp app;
   app.start();
 
-	return 0;
-
+  return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
