@@ -54,7 +54,7 @@ struct MyApp : App {
     gui(bAbsolute, "bAbsolute_xf");
   }
 
-  void setup() {
+  void onSetup() {
     // attach frame to object controller
     objectController.attach(&frameA);
     objectController.attach(&frameB);
@@ -70,8 +70,6 @@ struct MyApp : App {
   void onDraw() {
     gfx::GL::lightsOff();
 
-    if (bSetMouse)
-      calcMouse3D();
     Point mouse = mMouse3D;
 
     draw(mouse, 1, 0, 0);

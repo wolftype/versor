@@ -65,7 +65,13 @@ struct App : public gfx::GFXAppImGui {
     return mMouse3D;
   }
 
-  ///@todo move to gfx
+  void _onDraw() override {
+    if (bSetMouse)
+      calcMouse3D();
+    gfx::GFXAppImGui::_onDraw();
+  }
+
+  /// itodo move to gfx
   void monoPrint() {
     printf("output ps mono\n");
     gfx::GL::enablePreset();
@@ -97,7 +103,7 @@ struct App : public gfx::GFXAppImGui {
     ps.bTightBounds = b;
   }
   /// Called when a keyboard key is pressed
-  virtual void onKeyDown(const gfx::Keyboard &k) {
+  virtual void onKeyDown(const gfx::Keyboard &k) override {
     cout << "KEY DOWN:" << k.code << endl; // Frame f;
     switch (k.code) {
     case 67:

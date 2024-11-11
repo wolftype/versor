@@ -131,7 +131,7 @@ struct MyApp : App {
     gui(ps.bPDF, "bPDF"); ///< pdf or eps
   }
 
-  void setup() {
+  void onSetup() {
 
     mColor.set(.8, .8, .8);
     ps.bOffsetOutput = false;
@@ -205,8 +205,6 @@ struct MyApp : App {
 
     timer++;
 
-    // Two volumes,
-    // one is attached to the RIGHT face of the first to the RIGHT face
     TVolume vol(kVU.eval(timer), kWU.eval(timer), kUV.eval(timer),
                 kWV.eval(timer), kUW.eval(timer), kVW.eval(timer),
                 kV1U.eval(timer), kU1W.eval(timer), kW1V.eval(timer), uSpacing,
@@ -293,15 +291,11 @@ struct MyApp : App {
                   0, 0);
         DrawCurve(Round::location(pt.boost(tsec.logU * ti)), tsec.logV, 10, 0,
                   0, 0);
-        // DrawCurve (Round::location(tsec.tv1), tsec.logU, 20, 0,0,0);
-        // DrawCurve (Round::location(tsec.tu1), tsec.logV, 20, 0,0,0);
       }
       Draw(tsec.tu, .3, 0.0, 0.0);
       Draw(tsec.tv, 0, .3, 0);
       Draw(tsec.tu1, .3, 0, 0);
       Draw(tsec.tv1, 0, .3, 0);
-      //     Draw (tsec.tuv1,.3,0,0);
-      //     Draw (tsec.tvu1,0,.3,0);
 
       if (bDrawCircle) {
         glColor3f(.3, .3, .3);

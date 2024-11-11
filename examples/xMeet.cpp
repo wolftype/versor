@@ -4,6 +4,7 @@
  *       Filename:  xMeet.cpp
  *
  *    Description:  meet of two spheres is a circle
+ *                  meet of three is a point pair
  *
  *        Version:  1.0
  *        Created:  02/10/2015 13:11:45
@@ -16,7 +17,6 @@
  * =====================================================================================
  */
 
-
 #include <vsr/vsr_app.h>
 
 using namespace vsr;
@@ -24,41 +24,47 @@ using namespace vsr::cga;
 
 struct MyApp : App {
 
-  ///DualSpheres centered at x=-.5 and x=.5, each with radius of 1
-  DualSphere sphereA = Construct::sphere(-.5,0,0,1);
-  DualSphere sphereB = Construct::sphere(.5,0,0,1);
+  /// DualSpheres with radius of 1        x  y  z  r
+  DualSphere sphereA = Construct::sphere(-.5, 0, 0, 1);
+  DualSphere sphereB = Construct::sphere(0.5, 0, 0, 1);
+  DualSphere sphereC = Construct::sphere(0.0, .5, 0, 1);
 
-  void setup(){
+  void onSetup() {
 
-    ///Add spheres to objectController
-    ///(hit "tab" and then "t" and "s" keys to translate and scale)
+    /// Add spheres to objectController
+    /// (hit "t" and "s" keys then click on them to translate and scale)
     objectController.attach(&sphereA);
     objectController.attach(&sphereB);
+    objectController.attach(&sphereC);
 
+    // Set background color
+    mColor.set(.91, .886, .824);
+    // Turn off immediate mode rendering
+    mRenderGraph.immediate(false);
   }
 
-  void onDraw(){
+  void onDraw() {
 
-    /// intersection of two spheres is the dual of their outer product
-    auto meet = (sphereA ^ sphereB).dual();
+    /// intersection of two elements is the dual of the outer product of duals
+    auto circle = (sphereA ^ sphereB).dual();
+    auto pair = (circle.dual() ^ sphereC).dual();
 
-    draw(meet,0,1,0);                      ///<-- draw meet (circle) in green
+    /// draw circle in green
+    draw(circle, 0, 1, 0);
+    /// draw pair in cyan
+    draw(pair, 0, 1, 1);
 
-    draw(Round::surround(meet),0,0,1,.5);  ///<-- draw surround of meet (a sphere) in blue with half alpha
-
-    draw(sphereA,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
-    draw(sphereB,1,0,0,.5);                ///<-- draw spheres in red, with half alpha
-
+    /// draw spheres in red
+    draw(sphereA, 1, 0, 0);
+    draw(sphereB, 1, 0, 0);
+    draw(sphereC, 1, 0, 0);
   }
-
 };
 
-
-int main(){
+int main() {
 
   MyApp app;
   app.start();
 
   return 0;
-
 }

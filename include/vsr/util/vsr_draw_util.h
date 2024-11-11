@@ -14,7 +14,7 @@ using namespace vsr::cga;
 using namespace gfx;
 
 struct GraphUtil {
-  static void DrawGrid(const HEGraph<Point>& graph, int resU, int resV,
+  static void DrawGrid(const HEGraph<Point> &graph, int resU, int resV,
                        bool bStart, float red = 1.0, float green = 1.0,
                        float blue = 1.0, float alpha = 1.0) {
     glBegin(GL_TRIANGLES);
@@ -22,10 +22,10 @@ struct GraphUtil {
     bool bS = false;
     int iter = 0;
     // black and white
-    for (auto& i : graph.face()) {
-      auto& a = i->a();
-      auto& b = i->b();
-      auto& c = i->c();
+    for (auto &i : graph.face()) {
+      auto &a = i->a();
+      auto &b = i->b();
+      auto &c = i->c();
       // glColor4f(.2,1,.2,.7);
       Vec normal = (Vec(b - a) ^ Vec(c - a)).duale().unit();
       GL::normal(normal.begin());
@@ -34,7 +34,8 @@ struct GraphUtil {
       GL::vertex(a.begin());
       GL::vertex(b.begin());
       GL::vertex(c.begin());
-      if (bS) bC = !bC;
+      if (bS)
+        bC = !bC;
       bS = !bS;
     }
 
@@ -50,7 +51,9 @@ struct Cylinder {
   int resU, resV;
   float height, radius;
 
-  void init(int _resU, int _resV) {
+  void init(int _resU, int _resV, float h = 3.0, float r = 1.0) {
+    height = h;
+    radius = r;
     resU = _resU;
     resV = _resV;
     pnts.resize(resU * resV);
@@ -58,8 +61,14 @@ struct Cylinder {
 
     graph.UV(resU, resV, pnts.data(), true, false);
 
-    makeCoordsX();
+    makeCoordsY();
     // diagCoords();
+  }
+
+  void set(float h, float r) {
+    height = h;
+    radius = r;
+    makeCoordsY();
   }
 
   void makeCoordsX() {
@@ -70,11 +79,30 @@ struct Cylinder {
         auto tv = (float)j / (resV - 1);
 
         auto rot = Gen::rot(Biv::yz * tu);
+        // from 0 to 1
         auto vecx = Vec::y.spin(rot) * 0.5 + Vec(0.0, 0.5, 0.5);
         coords[idx] = vecx + Vec(tv, 0, 0);
+        pnts[idx] = coords[idx].null();
       }
     }
   }
+
+  void makeCoordsY() {
+    for (int i = 0; i < resU; ++i) {
+      for (int j = 0; j < resV; ++j) {
+        int idx = i * resV + j;
+        auto tu = (float)i / resU * PI;
+        auto tv = (float)j / (resV - 1);
+
+        // spin around xz
+        auto rot = Gen::rot(Biv::xz * tu);
+        auto vecx = Vec::x.spin(rot); // * 0.5 + Vec(0.5, 0.0, 0.5);
+        coords[idx] = vecx + Vec(0, tv, 0);
+        pnts[idx] = vecx * radius + Vec(0, tv, 0) * height;
+      }
+    }
+  }
+
   void makeCoordsZ() {
     for (int i = 0; i < resU; ++i) {
       for (int j = 0; j < resV; ++j) {
@@ -153,8 +181,9 @@ struct Grid {
   }
 
   /// Plot according to two u,v log generators
-  void plot(const Point& p0, const Pair& genU, const Pair& genV) {
-    if (!bInit) return;
+  void plot(const Point &p0, const Pair &genU, const Pair &genV) {
+    if (!bInit)
+      return;
 
     for (int i = 0; i < resU; ++i) {
       float tu = 1.0 * i / (resU - 1);
@@ -168,12 +197,12 @@ struct Grid {
     }
   }
 
-  Point& at(int u, int v) { return pnts[u * resV + v]; }
+  Point &at(int u, int v) { return pnts[u * resV + v]; }
 
   // void plot (const Point& p0, )
 };
 
-}  // namespace util
-}  // namespace vsr
+} // namespace util
+} // namespace vsr
 
 #endif

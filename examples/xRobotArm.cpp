@@ -6,81 +6,77 @@ using namespace vsr::cga;
 
 struct MyApp : App {
 
-  float amt, linewidth;
+  float amt, linewidth, distA;
   Chain k = Chain(5);
   Pnt targetPos;
-  float distA;
 
   void onDrawGui() {
     gui(distA, "LinkLength", 1, 10);
     gui(linewidth, "linewidth", 0, 10);
   }
 
-  void setup() {
+  void onSetup() {
     distA = 5.0;
     linewidth = 3;
     scene.camera.pos(0, 0, 30);
+
+    //    mRenderGraph.immediate(false);
   }
 
   void onDraw() {
 
-    glLineWidth(linewidth);
+    // We are looking for the "elbow"
 
+    // A baseframe -- default constructor places it at the origin
     Frame baseFrame;
 
-    auto mouse = calcMouse3D();
+    // Line projected from mouse into infinity
+    auto line = mMouseRay;
 
-    auto v = io().viewdata.ray;
-    auto line = mouse ^ Vec(v[0], v[1], v[2]) ^
-                Inf(1); // Fl::line( mouse, io().viewdata.ray );
-
+    // Point on the line closest to the origin
     targetPos = Construct::point(line, Ori(1));
 
+    // targetFrame is the "finger tip""
     Frame targetFrame(targetPos);
 
-    draw(targetPos, 1, 0, 0);
+    // DualPlane of End Effector Target
+    DualPlane targetXZ = targetFrame.dxz();
 
+    // Make distance contraint sphere from a point and a radius
+    // this calls Round::dls( Pnt,float )
+    DualSphere targetSphere = Round::sphere(targetPos, distA);
+
+    // secondFrame is the "shoulder"
     Frame secondFrame(0, distA, 0);
 
-    // Make a sphere from a point and a radius, calls Round::dls( Pnt, float )
-    auto firstSphere = Round::sphere(secondFrame.pos(), distA);
-    auto targetSphere = Round::sphere(targetPos, distA);
+    // Make another Sphere constraint
+    DualSphere firstSphere = Round::sphere(secondFrame.pos(), distA);
 
-    // Plane of Rotation formed by yaxis of base and target point
-    auto rotationPlane = baseFrame.ly() ^ targetPos;
+    // Plane of Rotation formed by line axis of base and target point
+    Plane rotationPlane = baseFrame.ly() ^ targetPos;
 
-    draw(rotationPlane, 0, 1, 0);
+    // Line of Target is the meet of the two planes
+    DualLine tline = targetXZ ^ rotationPlane.dual();
 
-    // XZ plane of Target
-    DualPlane targetXZ = targetFrame.dxz();
-    draw(targetXZ, 0, .5, 1);
-
-    // Line of Target
-    Dll tline = targetXZ ^ rotationPlane.dual();
-    draw(tline, 1, 1, 0);
-
-    // Point Pairs of Final joint
+    // Point Pairs of Final joint position
     Pair fjoint = (tline ^ targetSphere).dual();
-    draw(fjoint);
 
-    // Pick the one closest to the base frame
+    // Of the two points, pick the point closest to the base frame
     Frame finalFrame(Round::split(fjoint, false), Rot(1, 0, 0, 0));
 
     // Sphere around fframe
     auto ffsphere = Round::sphere(finalFrame.pos(), distA);
 
-    // Circle of Possibilities
+    // A circle of possible positions
     Circle cir = (ffsphere ^ firstSphere).dual();
-    draw(cir, .5, 1, 1);
 
     // TWo points where the middle joint could be
     Pair fpair = (rotationPlane.dual() ^ cir.dual()).dual();
-    draw(fpair, 1, .5, .5);
 
     // Pick One and put the middle frame there
     Frame middleFrame(Round::split(fpair, true));
 
-    // We can store the `positions in a chain class which will sort out relative
+    // We can store the positions in a chain class which will sort out relative
     // orientations for us
     k[0] = baseFrame;
     k[1] = secondFrame;
@@ -105,6 +101,13 @@ struct MyApp : App {
       draw(k[i]);
     }
 
+    draw(rotationPlane, 0, 1, 0);
+    draw(targetXZ, 0, .5, 1);
+    draw(tline, 1, 1, 0);
+    draw(fjoint);
+    draw(cir, .5, 1, 1);
+    draw(fpair, 1, .5, .5);
+    draw(targetPos, 1, 0, 0);
     draw(ffsphere, 1, 0, 0, .4);
     draw(firstSphere, 1, 0, 0, .4);
   }

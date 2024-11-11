@@ -1,5 +1,6 @@
 /**
  * A few helper free functions for drawing planes, spheres, tangents, etc
+ * in immmediate mode
  * see also vsr_draw_util
  */
 
@@ -118,8 +119,7 @@ void DrawLineStrip(const T &t, float r, float g, float b) {
 }
 
 // T is a std::vector of std::vectors
-template <typename T>
-void DrawQuadSurf(const T &t, float r, float g, float b) {
+template <typename T> void DrawQuadSurf(const T &t, float r, float g, float b) {
   glColor3f(r, g, b);
   glBegin(GL_QUADS);
   int tx = t.size();
@@ -168,6 +168,6 @@ void DrawVolumeEdges(const TVolume &tf, float r = 0.0, float g = .7,
   DrawCurve(tf.uwf().pos(), tf.dvwu1(), 9, r, g, b, 1.0);
 }
 
-}  // namespace gfx
+} // namespace gfx
 
 #endif
