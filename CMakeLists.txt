@@ -2,7 +2,7 @@
 #github.com/wolftype/versor.git
 
 #VERSION
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.10)
 
 #POLICIES
 #if(COMMAND cmake_policy)
