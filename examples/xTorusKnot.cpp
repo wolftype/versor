@@ -26,7 +26,7 @@ struct MyApp : App {
     gui(bDrawMode,"draw mode");
   }
 
-	virtual void setup(){
+	virtual void onSetup(){
     //starting knot parameters
 		amt = .01;
 		P = 5;

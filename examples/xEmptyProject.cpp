@@ -9,7 +9,7 @@ struct MyApp : App {
   bool bToggle = false;
   float amt1 = 0;
 
-  void setup() {}
+  void onSetup() {}
 
   void onDrawGui() {
     /// Add Variables to GUI

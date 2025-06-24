@@ -48,7 +48,7 @@ using namespace gfx;
 
 struct MyApp : App {
 
-  void setup(){
+  void onSetup(){
 
 //    cout << "Plane" << endl;
 //    Plane().print();

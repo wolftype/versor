@@ -28,7 +28,7 @@ struct MyApp : App
 
   bool bNonEuclidean, bHyperbolic;  //, bSpherical;
 
-  void setup (){}
+  void onSetup (){}
   void onDrawGui()
   {
     gui (bNonEuclidean, "non_euclidean");

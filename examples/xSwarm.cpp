@@ -89,7 +89,7 @@ struct MyApp : App {
       gui(rotVel, "rotational_velocity",0,1);
   }
 
-  virtual void setup(){
+  virtual void onSetup(){
 
       initFrames();
       mColor.set(0,0,0);

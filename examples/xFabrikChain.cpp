@@ -32,7 +32,7 @@ struct MyApp : App {
   // Chain of 10 links
   Chain chain = Chain(10);
 
-  void setup() { scene.camera.pos(0, 0, 10); }
+  void onSetup() { scene.camera.pos(0, 0, 10); }
 
   /// Add Variables to GUI
   void onDrawGui() { gui(err, "error", 0, 10); }

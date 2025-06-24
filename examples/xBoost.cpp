@@ -27,7 +27,7 @@ struct MyApp : App {
     gui(bFlop, "bFlop");
   }
 
-  virtual void setup() {
+  virtual void onSetup() {
     amt = .01;
     dist = 1;
 

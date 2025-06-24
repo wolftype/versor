@@ -12,7 +12,7 @@ struct MyApp : App
   float time;
   float amt = .99;
 
-  void setup () {}
+  void onSetup () {}
 
   void onDrawGui(){
     ImGui::DragFloat("unproject z amt",&amt,.001,0,1);
