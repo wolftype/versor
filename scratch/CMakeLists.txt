@@ -1,7 +1,7 @@
 #CMAKE FILE FOR SCRATCH DIRECTORY OF VERSOR GEOMETRIC ALGEBRA LIBRARY
 
 #VERSION
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 #POLICIES
 #if(COMMAND cmake_policy)
