@@ -1321,15 +1321,15 @@ struct TVolume {
       // bottom right tu tangents
       auto tu1v0 = Tops::NormalizePair(uf().tu.spin(wuv0));
       // top right tu tangents
-      auto tu1v1 = Tops::NormalizePair(uvf().tu.spin(wuv1));
+      //auto tu1v1 = Tops::NormalizePair(uvf().tu.spin(wuv1));
 
       // right point
       Point pu1v0 = Round::location(tu1v0);
-      Point pu1v1 = Round::location(tu1v1);
+      //Point pu1v1 = Round::location(tu1v1);
       // right inverse map
       float cu1v0 = inverseMapping(pu1v0, TVolume::Face::RIGHT).w;
       // right inverse map
-      float cu1v1 = inverseMapping(pu1v1, TVolume::Face::RIGHT).w;
+      //float cu1v1 = inverseMapping(pu1v1, TVolume::Face::RIGHT).w;
 
       // right xf
       Boost wvu1 = Gen::bst(dwvu1() * cu1v0);
@@ -1632,14 +1632,19 @@ struct TangentFrame : public Frame {
   /// Calculate Edges as intersections of constant coordinates (legacy)
   Circle calcCurve(int idx) {
     Circle c;
-    switch (idx) {
-    case 0:
-      c = (sphere[1].dual() ^ sphere[2].dual()).undual();
-    case 1:
-      c = (sphere[0].dual() ^ sphere[2].dual()).undual();
-    case 2:
-      c = (sphere[0].dual() ^ sphere[1].dual()).undual();
-    }
+      switch (idx) {
+          case 0:
+              c = (sphere[1].dual() ^ sphere[2].dual()).undual();
+              break;
+              
+          case 1:
+              c = (sphere[0].dual() ^ sphere[2].dual()).undual();
+              break;
+              
+          case 2:
+              c = (sphere[0].dual() ^ sphere[1].dual()).undual();
+              break;
+      }
     return c;
   }
 
