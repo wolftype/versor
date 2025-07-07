@@ -448,7 +448,7 @@ namespace vsr {
 
             int a = idx(iw, 0, 0);
             int b = idx(iw+1, 0, 0);
-            int c = idx(iw+2, 0, 0);
+            //int c = idx(iw+2, 0, 0);
 
             return Patch(a, b, 0, 0, rw, 0);
         }
