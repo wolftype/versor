@@ -59,7 +59,9 @@ struct Tops {
 
   // Generate a Surface, Given a tangent and no curvature.  This will be flat.
   static DualSphere Surface(const Pair &tv) { return (Inf(TMP_PSIGN) <= tv); }
+
   // Generate a Surface, iven a tangent and a curvature. This will be a sphere.
+  // Contract Infinity with the tangent to make a plane and then multiply by (1+k*tangent)
   static DualSphere Surface(const Pair &tv, float k) {
     return Normalize((Inf(TMP_PSIGN) <= tv) * ((tv * k) + 1));
   }
@@ -113,6 +115,15 @@ struct Tops {
     return Xf(p, Gen::bst(genU * amtU) + Gen::bst(genV * amtV));
   }
 
+  // For a Is tangent on a sphere, is it pointing to the positive side the sphere?
+  static bool RelativeSense(const DualSphere &s, const Pair &p){
+    return (s <= p)[3] > FPERROR;
+  }
+
+  // Is tangent Pair inside the sphere?
+  static bool RelativePosition(const DualSphere &s, const Pair &p){
+    return (Round::location(p) <= s)[0] > FPERROR;
+  }
   // There are two key parameters to be considered when generating
   // a transformation bivector
   //
@@ -142,12 +153,16 @@ struct Tops {
     // As it's tangent?
     bool bRelApproach = flipC == flipB;
 
-    float flip = ((bRelSense)) ? -1.0 : 1.0;
-
+    // IMPORTANT: added check for bRelApproach as well
+    bool bFlip = bRelSense;// && !bRelApproach;
+    float flip = bFlip ? -1.0 : 1.0;
+    //float cw = bRelApproach && bFlip; 
+    //return Gen::log(ratio * flip, cw, true) / 2.0;
+   // cout << bRelSense << " " << bRelApproach << " " << flip << endl;
     return Gen::log(ratio * flip, bRelApproach, true) / 2.0;
   }
 
-  // TO DO like above, but spheres are generated from curvature coeffiecients
+  // like above, but spheres are generated from curvature coeffiecients
   static Pair CalcGen(const Pair &p1, const Pair &p2, float k0, float k1) {
     return CalcGen(p1, p2, Surface(p1, k0), Surface(p2, k1));
   }
@@ -161,7 +176,7 @@ struct Tops {
 
 enum class TDIR { u = 0, v = 1, w = 2 };
 
-// Constant Coordinate Suface Idx
+// Tangent Coordinate Suface Idx.  uv is surface of constant u in the v direction, etc.
 enum class TCS { uv = 0, uw = 1, vu = 2, vw = 3, wu = 4, wv = 5 };
 
 // Container for indices // correct???
@@ -179,11 +194,31 @@ struct TSX {
 // wip: Q: how to encode either as curvature floats or surfaces directly
 // need to maintain flexibilty to do either
 // Add ability to extract Rotor, and change pos to method
-struct TFrame_ {
+struct 
+TFrame_ {
+
   Point mPos;
   Pair t[3];
-  float k[6];
+  float k[6]; // needed?
   DualSphere s[6];
+
+  //accessors
+
+  Pair &u() { return t[0]; }
+  Pair &v() { return t[1]; }
+  Pair &w() { return t[2]; }
+
+  Pair u() const { return t[0]; }
+  Pair v() const { return t[1]; }
+  Pair w() const { return t[2]; }
+
+  DualSphere &suv() { return s[(int)TCS::uv]; }
+  DualSphere &suw() { return s[(int)TCS::uw]; }
+  DualSphere &svu() { return s[(int)TCS::vu]; }
+  DualSphere &svw() { return s[(int)TCS::vw]; }
+  DualSphere &swu() { return s[(int)TCS::wu]; }
+  DualSphere &swv() { return s[(int)TCS::wv]; }
+
 
   void flatten() {
     for (int i = 0; i < 6; ++i) {
@@ -234,6 +269,7 @@ struct TFrame_ {
   TFrame_(const Point &p, const TFrame_ &tf, const TDIR &idx) {
     build(p, tf, idx);
   }
+  
 
   void build(const Point &p, const TFrame_ &tf, const TDIR &idx) {
     int tidx = (int)idx;
@@ -241,10 +277,10 @@ struct TFrame_ {
     case 0: // u direction
       buildU(p, tf);
       break;
-    case 1: // u direction
+    case 1: // v direction
       buildV(p, tf);
       break;
-    case 2: // u direction
+    case 2: // w direction
       buildW(p, tf);
       break;
     }
@@ -341,24 +377,18 @@ struct TFrame_ {
   //      surface (tidx, kidx), f.surface (tidx, kidx) );
   //}
 
-  // Spheres are encoded already
+  // Pass in tangent (pair) and spheres (surfaces). Spheres are encoded already
   Pair gen(const TFrame_ &f, int tidx, int sidx) {
     return Tops::CalcGen(t[tidx], f.t[tidx], s[sidx], f.s[sidx]);
   }
 
-  // unused?
-  //  Pair gen(const TFrame_ &f, const TSX &tsx) {
-  //    return gen(f, tsx.tidx, tsx.kidx);
-  //  }
-
-  // Should only need single idx
+  // Only need single idx specifying the direction of movement
+  // TCS determines the direction of movement and the surface to use.
   Pair gen(const TFrame_ &f, const TCS &tcs) {
     return gen(f, floor((int)tcs / 2.0), (int)tcs);
   }
 
-  Pair u() const { return t[0]; }
-  Pair v() const { return t[1]; }
-  Pair w() const { return t[2]; }
+
 
   DualSphere surface(const TCS &tcs) const { return s[(int)tcs]; }
 
@@ -370,12 +400,6 @@ struct TFrame_ {
   //   float kwu() const { return k[4];}
   //   float kwv() const { return k[5];}
 
-  //   DualSphere suv () { return surface (0,0); }
-  //   DualSphere suw () { return surface (0,1); }
-  //   DualSphere svu () { return surface (1,2); }
-  //   DualSphere svw () { return surface (1,3); }
-  //   DualSphere swu () { return surface (2,4); }
-  //   DualSphere swv () { return surface (2,5); }
 
   //   Pair duv (const TFrame_& f) { return gen (f,0,0) ; }
   //   Pair duw (const TFrame_& f) { return gen (f,0,1) ; }
@@ -383,6 +407,216 @@ struct TFrame_ {
   //   Pair dvw (const TFrame_& f) { return gen (f,1,3) ; }
   //   Pair dwu (const TFrame_& f) { return gen (f,2,4) ; }
   //   Pair dwv (const TFrame_& f) { return gen (f,2,5) ; }
+};
+
+
+struct TFrameBox {
+
+    // 8 corners of a cube in bit representation
+    enum class CRD {
+        o = 0,  //p000
+        u = 1,  //p100
+        v = 2,  //p010
+        w = 4,  //p001
+        uv = 3, //p110
+        uw = 5, //p101
+        vw = 6, //p011
+        uvw = 7 //p111
+   };
+
+    // Tensor generators - uvw0 sweeps the surface of constant u in the v direction from u=0 to u=1 at w = 0, etc.
+    // equiv to duvw0 etc
+    enum class GEN {
+        uvw0 = 0,
+        uvw1 = 1,
+        uwv0 = 2,
+        uwv1 = 3,
+        vuw0 = 4,
+        vuw1 = 5,
+        vwu0 = 6,
+        vwu1 = 7,
+        wvu0 = 8,
+        wvu1 = 9,
+        wuv0 = 10,
+        wuv1 = 11,
+    };
+
+    struct Bitensor {
+        TFrame_ tf[4];
+
+        TFrame_& o() { return tf[(int)CRD::o]; }
+        TFrame_& u() { return tf[(int)CRD::u]; }
+        TFrame_& v() { return tf[(int)CRD::v]; }
+        TFrame_& uv() { return tf[(int)CRD::uv]; }
+    };
+
+    TFrame_ tf[8];
+    Pnt p[8];
+    Pair gen[12];
+
+    Pair genUV[2];
+    
+    // accessors
+    Point po() { return p[(int)CRD::o]; }
+    Point pu() { return p[(int)CRD::u]; }
+    Point pv() { return p[(int)CRD::v]; }
+    Point pw() { return p[(int)CRD::w]; }
+    Point puv() { return p[(int)CRD::uv]; }
+    Point pvw() { return p[(int)CRD::vw]; }
+    Point puw() { return p[(int)CRD::uw]; }
+    Point puvw() { return p[(int)CRD::uvw]; }
+
+    TFrame_ &o() { return tf[(int)CRD::o]; }
+    TFrame_ &u() { return tf[(int)CRD::u]; }
+    TFrame_ &v() { return tf[(int)CRD::v]; }
+    TFrame_ &w() { return tf[(int)CRD::w]; }
+    TFrame_ &uv() { return tf[(int)CRD::uv]; }
+    TFrame_ &uw() { return tf[(int)CRD::uw]; }
+    TFrame_ &vw() { return tf[(int)CRD::vw]; }
+    TFrame_ &uvw() { return tf[(int)CRD::uvw]; }
+
+    Pair &duvw0() { return gen[(int)GEN::uvw0]; }
+    Pair &duvw1() { return gen[(int)GEN::uvw1]; }
+    Pair &duwv0() { return gen[(int)GEN::uwv0]; }
+    Pair &duwv1() { return gen[(int)GEN::uwv1]; }
+    Pair &dvuw0() { return gen[(int)GEN::vuw0]; }
+    Pair &dvuw1() { return gen[(int)GEN::vuw1]; }
+    Pair &dvwu0() { return gen[(int)GEN::vwu0]; }
+    Pair &dvwu1() { return gen[(int)GEN::vwu1]; }
+    Pair &dwvu0() { return gen[(int)GEN::wvu0]; }
+    Pair &dwvu1() { return gen[(int)GEN::wvu1]; }
+    Pair &dwuv0() { return gen[(int)GEN::wuv0]; }
+    Pair &dwuv1() { return gen[(int)GEN::wuv1]; }
+
+    Boost ruvw0() { return Gen::bst (duvw0()); }
+    Boost ruvw1() { return Gen::bst (duvw1()); }
+    Boost ruwv0() { return Gen::bst (duwv0()); }
+    Boost ruwv1() { return Gen::bst (duwv1()); }
+    Boost rvuw0() { return Gen::bst (dvuw0()); }
+    Boost rvuw1() { return Gen::bst (dvuw1()); }
+    Boost rvwu0() { return Gen::bst (dvwu0()); }
+    Boost rvwu1() { return Gen::bst (dvwu1()); }
+    Boost rwvu0() { return Gen::bst (dwvu0()); }
+    Boost rwvu1() { return Gen::bst (dwvu1()); }
+    Boost rwuv0() { return Gen::bst (dwuv0()); }
+    Boost rwuv1() { return Gen::bst (dwuv1()); }
+
+    /// Constructor from target frame and point positions
+    TFrameBox(const Frame &f, const Pnt (&_p)[8]){
+        setPoints(_p);
+        buildBackwards(f);
+    }
+
+    /// Set the 8 Points of the Box
+    /// Front face then back face
+    void setPoints(const Pnt (&_p)[8]){
+        for(int i=0; i<8; ++i) p[i] = _p[i];
+    }
+
+    /// Build TFrames backwards from a single frame at u=v=w=1, given 8 known points.
+    void buildBackwards(const Frame &f){
+        
+        uvw() = TFrame_(f);
+
+        vw() = TFrame_(pvw(), uvw(), TDIR::u);
+        uw() = TFrame_(puw(), uvw(), TDIR::v);
+        uv() = TFrame_(puv(), uvw(), TDIR::w);
+
+        u() = TFrame_(pu(), uv(), TDIR::v);
+        u().addSurfaces(uw(), TDIR::w);
+
+        v() = TFrame_(pv(), vw(), TDIR::w);
+        v().addSurfaces(uv(), TDIR::u);
+
+        w() = TFrame_(pw(), uw(), TDIR::u);
+        w().addSurfaces(vw(), TDIR::v);
+
+        o() = TFrame_(po(), u(), TDIR::u);
+        o().addSurfaces(v(), TDIR::v);
+        o().addSurfaces(w(), TDIR::w);
+
+        calcGen();
+    }
+
+    /// 12 Surface Generators, 2 per Face
+    void calcGen(){
+        
+        // Front face
+        duvw0() = o().gen(u(), TCS::uv);
+        dvuw0() = o().gen(v(), TCS::vu);
+
+        // Left Face
+        dwvu0() = o().gen(w(), TCS::wv);
+        dvwu0() = o().gen(v(), TCS::vw);
+
+        // Bottom Face
+        dwuv0() = o().gen(w(), TCS::wu);
+        duwv0() = o().gen(u(), TCS::uw);
+
+        // Right Face
+        dwvu1() = u().gen(uw(), TCS::wv);
+        dvwu1() = u().gen(uv(), TCS::vw);
+
+        // Top Face
+        dwuv1() = v().gen(vw(), TCS::wu);
+        duwv1() = v().gen(uv(), TCS::uw);
+
+        // Back Face
+        duvw1() = w().gen(uw(), TCS::uv);
+        dvuw1() = w().gen(vw(), TCS::vu);
+
+    }
+
+    std::array<Pair, 3> calcTensor(float z){
+
+        Pair otu = o().t[0];
+        Pair otv = o().t[1];
+
+        //Pair vtu = v().t[0];
+        //Pair vtv = v().t[1];
+
+        // u0 = tu moved back to w = z
+        Pair logW = dwvu0() * z;
+        Boost bw = Gen::bst( logW );
+        Pair u00 = Tops::NormalizePair( otu.spin( bw ) );
+        Pair v00 = Tops::NormalizePair( otv.spin( bw ) );
+
+        // u10 = u00 moved across the bottom
+        Pair u10 = Tops::NormalizePair( u00.spin( ruwv0() ) );
+
+        // v01 = v00 moved up the left side
+        Pair v01 = Tops::NormalizePair( v00.spin( rvwu0() ) );
+
+        // u11 = u10 moved up the right side
+        Pair u11 = Tops::NormalizePair( u10.spin( rvwu1() ) );
+
+        // v11 = v01 moved across the top side
+        Pair v11 = Tops::NormalizePair( v01.spin( ruwv1() ) );
+
+        DualSphere su0 = Tops::Normalize(v().svw() <= u00);
+        DualSphere sv0 = Tops::Normalize(u().suw() <= v00);
+
+        DualSphere su1 = Tops::Normalize(sv0 <= u11);
+        DualSphere sv1 = Tops::Normalize(su0 <= v11);
+
+        Pair logU = Tops::CalcGen(u00, u10, su0, su1);
+        Pair logV = Tops::CalcGen(v00, v01, sv0, sv1);
+
+        return {logU, logV, logW};
+        
+    }
+
+    // TODO: build forwards from a single frame at u=v=w=0, given 9 curvature values
+    void build(const Frame &f, const float (&_k)[9]){
+    }
+
+    // calculate a 3D mapping from coordinate to mapped point
+    Point calcMap(float x, float y, float z){
+        auto logs = calcTensor(z);
+
+        return Tops::Xf(p[0], Gen::bst(logs[0] * x) * Gen::bst(logs[1] * y) * Gen::bst(logs[2]));
+    }
+
 };
 
 /// A much simpler rep than in cyclidix
@@ -1131,6 +1365,7 @@ struct TVolume {
 
     Pair tu = Tops::NormalizePair(tf().tu.spin(wvu0));
     Pair tv = Tops::NormalizePair(tf().tv.spin(wvu0));
+
     Pair tu1 = Tops::NormalizePair(tu.spin(uwv0));
     Pair tv1 = Tops::NormalizePair(tv.spin(vwu0));
 

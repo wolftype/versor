@@ -49,6 +49,8 @@ struct MyApp : App {
     objectController.attach(&mFrame110);
 
     grid.init(20, 20);
+
+    bPlay = bDrawSurfaces = false;
   }
 
   /*-----------------------------------------------------------------------------

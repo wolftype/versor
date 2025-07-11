@@ -180,6 +180,16 @@ struct Grid {
     GraphUtil::DrawGrid(graph, resU, resV, bStart, 1.0, .3, .3, alpha);
   }
 
+  void plot(float width, float height){
+    for (int i = 0; i < resU; ++i) {
+      float tu = 1.0 * i / (resU - 1);
+      for (int j = 0; j < resV; ++j) {
+        float tv = 1.0 * j / (resV - 1);
+        pnts[i * resV + j] = Round::null(width * tu, height * tv, 0);
+      }
+    }
+  }
+  
   /// Plot according to two u,v log generators
   void plot(const Point &p0, const Pair &genU, const Pair &genV) {
     if (!bInit)
