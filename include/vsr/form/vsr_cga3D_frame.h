@@ -200,6 +200,11 @@ namespace vsr { namespace cga {
     Par ty() const;       ///< Null Point Pair in local y direction
     Par tz() const;       ///< Null Point Pair in local z direction
 
+    /* Global Tangent as Null Point Pair*/
+    Par ntx() const;       ///< Null Point Pair in local x direction
+    Par nty() const;       ///< Null Point Pair in local y direction
+    Par ntz() const;       ///< Null Point Pair in local z direction
+
     /* Global Weighted Tangent as Null Point Pair*/
     Par tx( VSR_PRECISION v) const;       ///< Null Point Pair in local x direction
     Par ty( VSR_PRECISION v) const;       ///< Null Point Pair in local y direction

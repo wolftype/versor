@@ -65,7 +65,7 @@ struct Tops {
   static DualSphere Surface(const Pair &tv, float k) {
     return Normalize((Inf(TMP_PSIGN) <= tv) * ((tv * k) + 1));
   }
-  // Generate a surface given a point and a tangent
+  // Generate a surface given a point (or sphere) and a tangent
   static DualSphere Surface(const Point &p, const Pair &t) {
     return Normalize(p <= t);
   }
@@ -91,9 +91,9 @@ struct Tops {
     return Pair(v.copy<Tnv>()).trs(p);
   }
 
-  // when to use?
+  // Tangent of s at p
   static Pair Element(const DualSphere &s, const Point &p) {
-    return Pair(Unit(s ^ p)).copy<Tnv>().trs(p);
+    return Tops::Element( Tops::Unit(s ^ p), p);//Pair(Unit(s ^ p)).copy<Tnv>().trs(p);
   }
 
   // Transforms Pair by X with optional flip

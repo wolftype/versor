@@ -114,6 +114,7 @@ struct App : public gfx::GFXAppImGui {
       scene.model.quat() = gfx::Quat(1, 0, 0, 0);
       break;
     }
+    case 73:
     case 'i': {
       printf("vsr_cga3D_app mono print\n");
       monoPrint();

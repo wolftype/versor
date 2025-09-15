@@ -5,6 +5,7 @@
 #include <vsr/draw/vsr_cga3D_helpers.h>
 #include <vsr/form/vsr_rigid.h>
 #include <vsr/util/vsr_draw_util.h>
+#include <GLFW/glfw3.h>
 
 using namespace gfx;
 using namespace vsr;
@@ -31,8 +32,6 @@ struct MyApp : App {
   Frame mFrame100;
   Frame mFrame010;
   Frame mFrame110;
-
-  double time = 0.0;
 
   void onDrawGui() {
     gui(bDrawSurfaces, "bDrawSurfaces");
@@ -61,9 +60,13 @@ struct MyApp : App {
     // Lets design a surface you can pinch with your fingers
 
     // Orient Pose towards an oscillating target
-    if (bPlay)
-      time += .01;
-    Vec target(sin(time) * 10, 1, 1);
+    // Use frame-rate independent time from GLFW
+    double current_time = bPlay ? glfwGetTime() : 0.0;
+    
+    Vec target(sin(current_time) * 10, 1, 1);
+
+   // Draw(Round::null(target), 1, 0, 0, 1);
+
     mFrame110.orient(target);
 
     // Given three points, find a fourth on the same circle.

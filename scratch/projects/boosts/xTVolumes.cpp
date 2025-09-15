@@ -143,7 +143,7 @@ struct MyApp : App {
     gui(ps.bPDF, "bPDF"); ///< pdf or eps
   }
 
-  void setup() {
+  void onSetup() {
 
     mColor.set(.8, .8, .8);
     ps.bOffsetOutput = false;
@@ -226,7 +226,7 @@ struct MyApp : App {
                 kV1U.eval(timer), kU1W.eval(timer), kW1V.eval(timer), uSpacing,
                 vSpacing, wSpacing);
 
-    cout << Round::radius(vol.tf().suv) << endl;
+    //cout << Round::radius(vol.tf().suv) << endl;
 
     if (bDrawManyMany) {
       TVolume tvol = vol;

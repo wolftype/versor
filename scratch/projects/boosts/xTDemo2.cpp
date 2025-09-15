@@ -92,15 +92,33 @@ struct MyApp : App {
         Point pnts[8] = {p000, p100, p010, p110, p001, p101, p011, p111};
 
         mFrameB.scale(kRadius);
+        // Draw(mFrameB.tx(), 1, 0, 0);
+        // Draw(mFrameB.ty(), 0, 1, 0);
+        // Draw(mFrameB.tz(), 0, 0, 1);
 
-        Pair genZ = mFrameB.ipy() * kBoostAmountY;
-        Pair genY = mFrameB.ipz() * kBoostAmountZ;
+        // Pair genZ = mFrameB.ipz() * kBoostAmountZ;
         Pair genX = mFrameB.ipx() * kBoostAmountX;
+        Pair genY = mFrameB.ipy() * kBoostAmountY;
+        Pair genZ = mFrameB.ipz() * kBoostAmountZ;
 
-        Con bst = Gen::bst(genZ) * Gen::bst(genY) * Gen::bst(genX);
+
+
+        Con con =  Gen::bst(genX) * Gen::bst(genZ) * Gen::bst(genY) *
+
         for(int i=0; i<8; ++i){
-            pnts[i] = Tops::Xf(pnts[i], bst);
-        }    
+            pnts[i] = Tops::Xf(pnts[i], con);
+            Draw(Round::sphere(pnts[i], 0.01), 1, 1, 1);
+        }   
+        
+        // for (int i=0; i<=10; ++i){
+        //     for (int j=0; j<=10; ++j){
+        //         for (int k=0; k<=10; ++k){
+        //             Point p = Round::null(p000 + Vec(mWidth * i/10.0, mHeight * j/10.0, mDepth * k/10.0));
+        //             Point p2 = Tops::Xf(p, con);
+        //             Draw(Round::sphere(p2  , 0.01), 1, 1, 1);
+        //         }
+        //     }
+        // }
 
         Frame f111(pnts[7], mFrame.rotor());
 
@@ -139,7 +157,7 @@ struct MyApp : App {
         }
 
         draw(mFrame);
-        draw(mFrameB);
+       // draw(mFrameB);
 
         Frame f000(pnts[0], mTFrameBox.o().rotor());
         Frame f001(pnts[4], mTFrameBox.w().rotor());

@@ -88,6 +88,12 @@ namespace vsr{ namespace cga {
     Par Frame::ty() const { return Par( y().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
     Par Frame::tz() const { return Par( z().copy<Tnv>() * mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
 
+    /* Global Tangent as Null Point Pair*/
+    Par Frame::ntx() const { return Par( x().copy<Tnv>() * -mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
+    Par Frame::nty() const { return Par( y().copy<Tnv>() * -mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
+    Par Frame::ntz() const { return Par( z().copy<Tnv>() * -mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
+
+        
     /* Global WEIGHTED Tangent as Null Point Pair*/
     Par Frame::tx(VSR_PRECISION v) const { return Par( x().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
     Par Frame::ty(VSR_PRECISION v) const { return Par( y().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
@@ -260,7 +266,7 @@ namespace vsr{ namespace cga {
       auto biv = xy();
       Rot yRot;
       //if z is just flipped around then do something special for y
-      if ( (dir<=target)[0] < -.9999 ) {
+      if ( (dir<=target)[0] < -.999999 ) {
         yRot = Gen::rot( Biv::xy * PIOVERTWO );
       }
       else {

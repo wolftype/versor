@@ -44,6 +44,10 @@ struct MyApp : App {
     bool bDrawConstructedFrame;
     bool bDrawTransformation;
     bool bDrawPointV;
+    bool bDrawFullFrame;
+    bool bDrawCircle;
+    bool bDrawTangent;
+    bool bDrawNetCircle;    
 
     void onSetup(){
         mFrameA.set(-2,0,0);
@@ -53,19 +57,26 @@ struct MyApp : App {
         objectController.attach(&mFrameB);
         objectController.attach(&mFrameC);
         mVelocity = 1;
+        mColor = Vec(1,1,1);
     }
 
     void onDrawGui() {
-        gui(mCurvatureA, "CurvatureA", -1000, 1000);
-        gui(mCurvatureB, "CurvatureB", -1000, 1000);
-        gui(mVelocity, "Velocity", 0, 10);
-        gui(bUseRelSense, "Use Relative Sense");
-        gui(bRelApproach, "Relative Approach");
-        gui(bDrawCoordinateSurfaces, "Draw Coordinate Surfaces");
-        gui(bDrawConstructedFrame, "Draw Constructed Frame");
+        gui(bDrawCircle, "Draw Circle");
+        gui(bDrawTangent, "Draw Tangent");
         gui(bDrawCoordinateSurfaceU, "Draw Coordinate Surface U");
         gui(bDrawTransformation, "Draw Transformation");
-        gui(bDrawPointV, "Draw Point V");
+
+        gui(bDrawFullFrame, "Draw Full Frame");
+        gui(bDrawCoordinateSurfaces, "Draw Coordinate Surfaces");
+        gui(bDrawConstructedFrame, "Draw Constructed Frame");
+
+        gui(bDrawPointV, "Draw Point");
+        gui(bDrawNetCircle, "Draw Net Circle");
+
+        gui(mCurvatureA, "CurvatureA", -1000, 1000);
+        gui(mCurvatureB, "CurvatureB", -1000, 1000);
+
+        gui(mVelocity, "Velocity", 0, 10);
     }
 
     void onDraw(){
@@ -76,27 +87,26 @@ struct MyApp : App {
 
         if (tval > 1) tval = 0;
 
+
         //Given a Point, a Destination Tangent, and a Direction to move in,
         //We can build two constant coordinate surfaces
         //Here we will build constant V and W surfaces as we move in U direction
         TFrame_ tf(mFrameB);
         Point p = mFrameA.pos();
 
-        //Normalize(p <= t);
-        //THese are Constant V and W surfaces as we move in U direction from p to tf 
-        DualSphere svu = Tops::Surface(p, tf.v());
-        DualSphere swu = Tops::Surface(p, tf.w());
+        // Let's draw the circle
+        if (bDrawCircle){
+            DrawRound(p ^ tf.u(),0  ,0,0);
+        }
+        //Extract the Tangent at p from the Circle it shares with the destination Tangent
+        Pair tu = Tops::NormalizePair(p <= (p ^ tf.u()).inv()); 
 
-        // Now we can extact the Vector directions there
-        Vec v = Tops::Unit(svu ^ p);
-        Vec w = Tops::Unit(swu ^ p);
-        Vec u = (v ^ w).duale();
+       
 
-        // And turn them back into normalized Tangents
-        Pair tu = Tops::Element(u, p);
-        Pair tv = Tops::Element(v, p);
-        Pair tw = Tops::Element(w, p);
+        //A Surface of constant U:
+        DualSphere suv = Tops::Surface(tu, mCurvatureA);  
 
+        //And now
         if (bDrawTransformation && !bDrawPointV){
             // calculate the unique transformation that takes one tangent to the other
             // curvature values control acceleration of the transformation
@@ -104,14 +114,33 @@ struct MyApp : App {
             Boost bst = Gen::boost(gen * tval);
             Pair t = Tops::Xf(tu, bst ); 
             Point tp = Tops::Xf(mFrameA.pos(), bst ); 
-            Draw(t, 1,1,1);
-            Draw(Round::sphere(tp, 0.1), 1,1,1);
+            Draw(t, 1,.2,.2);
+            Draw(Round::sphere(tp, 0.1), 1,.2,.2);
         }
 
-        draw(Round::sphere(p, 0.2));
+        //For the others, we Normalize(p <= t) for t = tv and t = tw;
+        //THese are Constant V and W surfaces as we move in U direction from p to tf 
+        DualSphere svu = Tops::Surface(p, tf.v());
+        DualSphere swu = Tops::Surface(p, tf.w());
+
+        // Now we can extract the other two Tangents at p]
+        Pair tv = Tops::NormalizePair(p ^ (svu).inv());
+       // Pair tv = Tops::Element(svu, p);
+        Pair tw = Tops::Element(swu, p);
+
+
+        draw(Round::sphere(p, 0.1),1,0,0);
+        draw(Round::sphere(mFrameB.pos(),0.1),1,0,0);
         draw(tf.u(),1,0,0);
-        draw(tf.v(),0,1,0);
-        draw(tf.w(),0,0,1);
+
+        if (bDrawTangent){
+            draw(tu,1,0,0);
+        }
+
+        if (bDrawFullFrame){
+            draw(tf.v(),0,1,0);
+            draw(tf.w(),0,0,1);
+        }
 
         if (bDrawConstructedFrame){
             draw(tu,1,0,0);
@@ -119,41 +148,62 @@ struct MyApp : App {
             draw(tw,0,0,1);
         }
 
-
-
         //now use built in functions
-        //TFrame_ tf
         if (bDrawPointV){
-            Point pv = mFrameC.pos();
-            draw(Round::sphere(pv,.1));
-            TFrame_ tfv (pv, tf, TDIR::v);
-            draw(tfv.u(),1,0,0);
-            draw(tfv.v(),0,1,0);
-            draw(tfv.w(),0,0,1);
+            Point pu = mFrameC.pos();
 
+            Circle cir = mFrameA.pos() ^ mFrameB.pos() ^ mFrameC.pos();
+            Point po = Round::split( (suv ^ cir.dual()).dual() )[0];
+
+            if (bDrawNetCircle){
+                draw(cir,0,0,0);
+            }
+
+            draw(Round::sphere(pu,.1));
+            draw(Round::sphere(po,.1));
+
+            TFrame_ tfu (pu, tf, TDIR::v);
+            TFrame_ tfo (po, tfu, TDIR::u);
+
+            draw(tfo.u(),1,0,0);
+            draw(tfo.v(),0,1,0);
+            draw(tfo.w(),0,0,1);
+
+            draw(tfu.u(),1,0,0);
+            draw(tfu.v(),0,1,0);
+            draw(tfu.w(),0,0,1);
 
             if (bDrawTransformation){
 
-                Pair genU = Tops::CalcGen(tu, tf.u(), Tops::Surface(tu, mCurvatureA), tfv.suv());
-                Pair genV = Tops::CalcGen(tfv.v(), tf.v(), Tops::Surface(tfv.v(), mCurvatureB), svu);
+                DualSphere svu0 = Tops::Surface(suv, tfu.v());
+
+                Pair genU = Tops::CalcGen(tu, tf.u(), suv, tfu.suv());
+                Pair genV = Tops::CalcGen(tfu.v(), tf.v(), svu0, svu);
                 Boost bstU  = Gen::boost(genU * tval);
                 Boost bstV = Gen::boost(genV * tval);
 
-                Pair ptu = Tops::Xf(tu, bstU ); 
-                Point tpu = Tops::Xf(p, bstU ); 
-                Draw(ptu, 1,1,1); 
-                Draw(Round::sphere(tpu, 0.1), 1,1,1);
+                Draw(Tops::Xf(tu, bstU ), 1,0,0); 
+                Draw(Round::sphere(Tops::Xf(p, bstU ), 0.1), 1,.2,.2);
 
-                Pair ptv = Tops::Xf(tfv.v(), bstV ); 
-                Point tpv = Tops::Xf(pv, bstV ); 
-                Draw(ptv, 1,1,1); 
-                Draw(Round::sphere(tpv, 0.1), 1,1,1);
+                Draw(Tops::Xf(tfu.v(), bstV ), 0,1,0); 
+                Draw(Round::sphere(Tops::Xf(pu, bstV ), 0.1), .2,1,.2);
+
+                Draw(Tops::Xf(tfo.u(), bstU), 1,0,0);
+                Draw(Round::sphere(Tops::Xf(po, bstU), 0.1), 1,0,0);
+
+                Draw(Tops::Xf(tfo.v(), bstV), 0,1,0);
+                Draw(Round::sphere(Tops::Xf(po, bstV), 0.1), 0,1,0);
+
+                if (bDrawCoordinateSurfaces){
+                    //DrawRound (suv0,1,0,0, .2);
+                    DrawRound (svu0,0,1,0, .2);
+                }
 
             }
 
             if (bDrawCoordinateSurfaces){
-                DrawRound( tfv.suv(), 1,0,0, .2);
-                DrawRound( tfv.swv(), 0,0,1, .2);
+                DrawRound( tfu.suv(), 1,0,0, .2);
+                DrawRound( tfu.swv(), 0,0,1, .2);
             }
 
         }
@@ -163,9 +213,9 @@ struct MyApp : App {
             DrawRound(swu, 0,0,1,.2);
         }
 
-        if (bDrawCoordinateSurfaceU && !bDrawPointV){
+        if (bDrawCoordinateSurfaceU){
             DrawRound(Tops::Surface(tu, mCurvatureA), 1,0,0, .2);
-            DrawRound(Tops::Surface(tf.u(), mCurvatureB), 0,1,0, .2);
+            if (!bDrawPointV) DrawRound(Tops::Surface(tf.u(), mCurvatureB), 1,0,0, .2);
         }
  
     }
