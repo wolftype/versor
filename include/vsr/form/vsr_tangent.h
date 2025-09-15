@@ -25,6 +25,7 @@
 #define vsr_tangent_INC
 
 #include <vsr/form/vsr_cga3D_frame.h>
+#include <array>
 
 namespace vsr {
 namespace cga {
@@ -156,7 +157,7 @@ struct Tops {
     // IMPORTANT: added check for bRelApproach as well
     bool bFlip = bRelSense;// && !bRelApproach;
     float flip = bFlip ? -1.0 : 1.0;
-    //float cw = bRelApproach && bFlip; 
+    //float cw = bRelApproach && bFlip;
     //return Gen::log(ratio * flip, cw, true) / 2.0;
    // cout << bRelSense << " " << bRelApproach << " " << flip << endl;
     return Gen::log(ratio * flip, bRelApproach, true) / 2.0;
@@ -194,7 +195,7 @@ struct TSX {
 // wip: Q: how to encode either as curvature floats or surfaces directly
 // need to maintain flexibilty to do either
 // Add ability to extract Rotor, and change pos to method
-struct 
+struct
 TFrame_ {
 
   Point mPos;
@@ -269,7 +270,7 @@ TFrame_ {
   TFrame_(const Point &p, const TFrame_ &tf, const TDIR &idx) {
     build(p, tf, idx);
   }
-  
+
 
   void build(const Point &p, const TFrame_ &tf, const TDIR &idx) {
     int tidx = (int)idx;
@@ -455,7 +456,7 @@ struct TFrameBox {
     Pair gen[12];
 
     Pair genUV[2];
-    
+
     // accessors
     Point po() { return p[(int)CRD::o]; }
     Point pu() { return p[(int)CRD::u]; }
@@ -515,7 +516,7 @@ struct TFrameBox {
 
     /// Build TFrames backwards from a single frame at u=v=w=1, given 8 known points.
     void buildBackwards(const Frame &f){
-        
+
         uvw() = TFrame_(f);
 
         vw() = TFrame_(pvw(), uvw(), TDIR::u);
@@ -540,7 +541,7 @@ struct TFrameBox {
 
     /// 12 Surface Generators, 2 per Face
     void calcGen(){
-        
+
         // Front face
         duvw0() = o().gen(u(), TCS::uv);
         dvuw0() = o().gen(v(), TCS::vu);
@@ -603,12 +604,13 @@ struct TFrameBox {
         Pair logV = Tops::CalcGen(v00, v01, sv0, sv1);
 
         return {logU, logV, logW};
-        
+
     }
 
-    // TODO: build forwards from a single frame at u=v=w=0, given 9 curvature values
-    void build(const Frame &f, const float (&_k)[9]){
-    }
+    // // TODO: build forwards from a single frame at u=v=w=0, given 9 curvature values
+    // void build(const Frame &f, const float (&_k)[9]){
+    //     // TODO: implement this function
+    // }
 
     // calculate a 3D mapping from coordinate to mapped point
     Point calcMap(float x, float y, float z){
@@ -1871,11 +1873,11 @@ struct TangentFrame : public Frame {
           case 0:
               c = (sphere[1].dual() ^ sphere[2].dual()).undual();
               break;
-              
+
           case 1:
               c = (sphere[0].dual() ^ sphere[2].dual()).undual();
               break;
-              
+
           case 2:
               c = (sphere[0].dual() ^ sphere[1].dual()).undual();
               break;

@@ -193,7 +193,7 @@ struct Euc{
     template<class algebra>
     GAVec< typename algebra::up > static hom(const GAVec<algebra>& v){
       using up = typename algebra::up;
-      return GAVec<up>(v) + GAE<up>::e<up::Dim>(1.0);
+      return GAVec<up>(v) + GAE<up>::template e<up::Dim>(1.0);
     }
 
 //    template< bits::type N, class T >
