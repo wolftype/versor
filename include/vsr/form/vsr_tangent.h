@@ -226,6 +226,7 @@ enum class TDIR { u = 0, v = 1, w = 2 };
 enum class TCS { uv = 0, uw = 1, vu = 2, vw = 3, wu = 4, wv = 5 };
 
 // 8 corners of a cube in bit representation
+// must be fed in 0-8 order.
 enum class CRD {
   o = 0,  //p000
   u = 1,  //p001

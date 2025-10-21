@@ -11,22 +11,21 @@
  *       Compiler:  gcc
  *
  *         Author: pablo colapinto
- *   Organization: mat, ucsb 
+ *   Organization: mat, ucsb
  *
  * =====================================================================================
  */
 
 
-#include "vsr_cga3D.h"   
-#include "vsr_GLVimpl.h"
+#include "vsr/vsr_app.h"
 #include "vsr_chain.h"
 
 using namespace vsr;
 using namespace vsr::cga3D;
 
 
-struct MyApp : App {    
-   
+struct MyApp : App {
+
   Pnt mouse;
   Lin ray;
 
@@ -34,24 +33,24 @@ struct MyApp : App {
   float amt, falloff;
 
   MyApp(Window * win ) : App(win){
-    scene.camera.pos( 0,0,10 ); 
+    scene.camera.pos( 0,0,10 );
     time = 0;
   }
 
   void initGui(){
       gui(amt,"amt",-100,100)(falloff,"falloff",-100,100);
   }
-  
+
     void getMouse(){
-      auto tv = interface.vd().ray; 
+      auto tv = interface.vd().ray;
       Vec z (tv[0], tv[1], tv[2] );
       auto tm = interface.mouse.projectMid;
-      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1); 
-      mouse = Round::point( ray,  Ori(1) );  
+      ray = Round::point( tm[0], tm[1], tm[2] ) ^ z ^ Inf(1);
+      mouse = Round::point( ray,  Ori(1) );
   }
 
-    virtual void onDraw(){ 
-        
+    virtual void onDraw(){
+
       getMouse();
 
       Draw(mouse);
@@ -79,9 +78,9 @@ struct MyApp : App {
 
 
       for (int i = 0; i < chain.num(); ++i){
-        Draw( chain[i] );      
+        Draw( chain[i] );
 
-        Mot m = chain[i].mot()/refChain[i].mot(); double n = m.rnorm(); 
+        Mot m = chain[i].mot()/refChain[i].mot(); double n = m.rnorm();
         if (n!=0) m /= n;
 
         log[i] = Gen::log( m ) * amt;
@@ -93,12 +92,12 @@ struct MyApp : App {
       typedef decltype( ( Pnt() ^ Inf() ) / ( Pnt() ^ Pnt() ^ Inf() ) ) RCType;
       RCType rca[ num -1 ];
       RCType rcb[ num -1 ];
-    
+
       for (int i = 0; i < refChain.num()-1; ++i){
 
           Point a = refChain[i].pos();
           Point b = refChain[i+1].pos();
-                  
+
           auto pss = a ^ b ^ Inf(1);
           VT norm = pss.rnorm();
           norm *= norm;
@@ -106,27 +105,27 @@ struct MyApp : App {
 
          // pss.vprint();
 
-          rca[i] = ( a ^ Inf(1) )/pss; 
-          rcb[i] = ( b ^ Inf(1) )/pss; 
+          rca[i] = ( a ^ Inf(1) )/pss;
+          rcb[i] = ( b ^ Inf(1) )/pss;
 
       }
 
 
 
-      
+
       for (int i = 0; i < m.num(); ++i){
-        Dll tdll;  
+        Dll tdll;
         Pnt p = Ro::point( m[i].Pos[0], m[i].Pos[1], m[i].Pos[2] );
-       //<t_úX> p.vprint();
+       //<t_ï¿½X> p.vprint();
         for (int j = 0; j < chain.num() -1; ++j){
 
          // Dll lf = refChain[j].dly();
           // auto pf = refChain[j].pos() ^ refChain[j].pos().trs(0,1,0);//efChain[j].pos().trs(0,.5,0), 1.0);
-          
+
           auto wa = fabs ( ( p <= rca[j] )[0] );
-          
-        //  cout << wa << endl;   
-         // auto wb = fabs ( ( p <= rcb[j] )[0] );  
+
+        //  cout << wa << endl;
+         // auto wb = fabs ( ( p <= rcb[j] )[0] );
 
         //  cout << wa << " " << wb << endl;
         //  VT sum = wa + wb;
@@ -138,18 +137,18 @@ struct MyApp : App {
 
         // tdll.vprint();
 
-          Draw( p.mot( tdll / chain.num() ),1,0,0 ); 
+          Draw( p.mot( tdll / chain.num() ),1,0,0 );
 
       }
-      
 
-      
 
-    
+
+
+
   }
-   
 
-  
+
+
 };
 
 
@@ -157,14 +156,14 @@ MyApp * app;
 
 
 int main(){
-                             
-  GLV glv(0,0);  
 
-  Window * win = new Window(500,500,"Versor",&glv);    
-  app = new MyApp( win ); 
+  GLV glv(0,0);
+
+  Window * win = new Window(500,500,"Versor",&glv);
+  app = new MyApp( win );
   app -> initGui();
-  
-  
+
+
   glv << *app;
 
   Application::run();
