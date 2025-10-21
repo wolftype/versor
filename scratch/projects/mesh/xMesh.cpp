@@ -35,7 +35,7 @@ struct MyApp : App
 
   Field<Pnt> f;
 
-  virtual void setup ()
+  virtual void onSetup ()
   {
     scene.camera.pos (0, 0, 10);
 

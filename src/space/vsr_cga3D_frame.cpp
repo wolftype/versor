@@ -93,7 +93,7 @@ namespace vsr{ namespace cga {
     Par Frame::nty() const { return Par( y().copy<Tnv>() * -mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
     Par Frame::ntz() const { return Par( z().copy<Tnv>() * -mScale ).trs(mPos); }    ///< Null Point Pair in local z direction
 
-        
+
     /* Global WEIGHTED Tangent as Null Point Pair*/
     Par Frame::tx(VSR_PRECISION v) const { return Par( x().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local x direction
     Par Frame::ty(VSR_PRECISION v) const { return Par( y().copy<Tnv>() * v * mScale ).trs(mPos); }    ///< Null Point Pair in local y direction
@@ -157,7 +157,7 @@ namespace vsr{ namespace cga {
       return *this;
     }
 
-    /// Move and Spin 
+    /// Move and Spin
     Frame& Frame::step(){
       move();
       spin();
@@ -207,7 +207,7 @@ namespace vsr{ namespace cga {
 
     /// Rotate by Rotor R
     Frame& Frame::rotate( const Rot& r){
-      mRot = mRot.spin(r);
+      mRot = r * mRot;
       return *this;
     }
 

@@ -189,9 +189,26 @@ struct Grid {
       }
     }
   }
-  
+
   /// Plot according to two u,v log generators
   void plot(const Point &p0, const Pair &genU, const Pair &genV) {
+    if (!bInit)
+      return;
+
+    for (int i = 0; i < resU; ++i) {
+      float tu = 1.0 * i / (resU - 1);
+      auto bstU = Gen::bst(genU * tu);
+      for (int j = 0; j < resV; ++j) {
+        float tv = 1.0 * j / (resV - 1);
+        auto bstV = Gen::bst(genV * tv);
+        auto con = bstV * bstU;
+        pnts[i * resV + j] = Tops::Xf(p0, con);
+      }
+    }
+  }
+
+  /// Plot according to two u,v log generators on sphere inputs
+  void splot(const Point &p0, const Pair &genU, const Pair &genV) {
     if (!bInit)
       return;
 

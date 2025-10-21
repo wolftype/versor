@@ -10,19 +10,6 @@ using namespace gfx;
 using namespace vsr;
 using namespace vsr::cga;
 
-// void DrawT(const TFrame_ &tf, bool bFlip = false) {
-//   Draw(tf.t[0] * (bFlip ? -1.0 : 1.0), 1, 0, 0);
-//   Draw(tf.t[1] * (bFlip ? -1.0 : 1.0), 0, 1, 0);
-//   Draw(tf.t[2] * (bFlip ? -1.0 : 1.0), 0, 0, 1);
-// }
-//
-// struct TPatch {
-//   TFrame_ tf[2][2];
-// }
-
-
-
-
 
 struct MyApp : App {
 
@@ -75,10 +62,19 @@ struct MyApp : App {
         gui(kBoostAmountX, "Boost X",-1, 1);
         gui(kBoostAmountY, "Boost Y",-1, 1);
         gui(kBoostAmountZ, "Boost Z",-1, 1);
+
+        if (ImGui::Button("Reset All Values")) {
+            mWidth = mHeight = mDepth = 2;
+            mU = mV = mW = 0.5;
+            kBoxAlpha = 0.5;
+            kBoostAmountX = kBoostAmountY = kBoostAmountZ = 0.0;
+            kRadius = 1;
+            mFrame.rotor() = Rot(1);
+        }
     }
 
     void onDraw(){
-        GL::lightsOff();
+       // GL::lightsOff();
 
         Point p000 = Round::null(-mWidth/2.0,-mHeight/2.0,-mDepth/2.0);
         Point p100 = Round::null(mWidth/2.0,-mHeight/2.0,-mDepth/2.0);
@@ -91,34 +87,40 @@ struct MyApp : App {
 
         Point pnts[8] = {p000, p100, p010, p110, p001, p101, p011, p111};
 
+        TPointBox tbox(pnts);
+
         mFrameB.scale(kRadius);
-        // Draw(mFrameB.tx(), 1, 0, 0);
-        // Draw(mFrameB.ty(), 0, 1, 0);
-        // Draw(mFrameB.tz(), 0, 0, 1);
+        mFrameB.pos() = Round::null(-mWidth/2.0,0,0);
 
-        // Pair genZ = mFrameB.ipz() * kBoostAmountZ;
-        Pair genX = mFrameB.ipx() * kBoostAmountX;
-        Pair genY = mFrameB.ipy() * kBoostAmountY;
-        Pair genZ = mFrameB.ipz() * kBoostAmountZ;
+        //Pair genX = mFrameB.ipx() * kBoostAmountX;
+        // First, boost through the left
+        Pair genX = tbox.cl().dual() * kBoostAmountX;
+        Bst bstX = Gen::bst(genX);
+        for(int i=0; i<8; ++i){
+            pnts[i] = Tops::Xf(pnts[i], bstX);
+        }
+        tbox.setPoints(pnts);
+        // Then boost through the bottom
+        Pair genY = tbox.cb().dual() * kBoostAmountY;
+        Bst bstY = Gen::bst(genY);
+        for(int i=0; i<8; ++i){
+            pnts[i] = Tops::Xf(pnts[i], bstY);
+        }
+        tbox.setPoints(pnts);
+        // Then boost through the front
+        Pair genZ = tbox.cf().dual() * kBoostAmountZ;
+        Bst bstZ = Gen::bst(genZ);
+        for(int i=0; i<8; ++i){
+            pnts[i] = Tops::Xf(pnts[i], bstZ);
+        }
+        tbox.setPoints(pnts);
 
-
-
-        Con con =  Gen::bst(genX) * Gen::bst(genZ) * Gen::bst(genY) *
+       // Con con =  Gen::bst(genX) * Gen::bst(genZ) * Gen::bst(genY);
 
         for(int i=0; i<8; ++i){
-            pnts[i] = Tops::Xf(pnts[i], con);
             Draw(Round::sphere(pnts[i], 0.01), 1, 1, 1);
-        }   
-        
-        // for (int i=0; i<=10; ++i){
-        //     for (int j=0; j<=10; ++j){
-        //         for (int k=0; k<=10; ++k){
-        //             Point p = Round::null(p000 + Vec(mWidth * i/10.0, mHeight * j/10.0, mDepth * k/10.0));
-        //             Point p2 = Tops::Xf(p, con);
-        //             Draw(Round::sphere(p2  , 0.01), 1, 1, 1);
-        //         }
-        //     }
-        // }
+        }
+
 
         Frame f111(pnts[7], mFrame.rotor());
 
@@ -129,7 +131,7 @@ struct MyApp : App {
             for(int i=0; i<kDiv; ++i){
                 float ti = i/float(kDiv-1);
                 for(int j=0; j<kDiv; ++j){
-                    float tj = j/float(kDiv-1); 
+                    float tj = j/float(kDiv-1);
                     int idx = i*kDiv + j;
                     switch(side){
                         case 0:
@@ -157,15 +159,14 @@ struct MyApp : App {
         }
 
         draw(mFrame);
-       // draw(mFrameB);
 
-        Frame f000(pnts[0], mTFrameBox.o().rotor());
-        Frame f001(pnts[4], mTFrameBox.w().rotor());
-        Frame f010(pnts[2], mTFrameBox.v().rotor());
-        Frame f011(pnts[5], mTFrameBox.vw().rotor());
-        Frame f100(pnts[1], mTFrameBox.u().rotor());
-        Frame f101(pnts[6], mTFrameBox.uw().rotor());
-        Frame f110(pnts[3], mTFrameBox.uv().rotor());
+        // Frame f000(pnts[0], mTFrameBox.o().rotor());
+        // Frame f001(pnts[4], mTFrameBox.w().rotor());
+        // Frame f010(pnts[2], mTFrameBox.v().rotor());
+        // Frame f011(pnts[5], mTFrameBox.vw().rotor());
+        // Frame f100(pnts[1], mTFrameBox.u().rotor());
+        // Frame f101(pnts[6], mTFrameBox.uw().rotor());
+        // Frame f110(pnts[3], mTFrameBox.uv().rotor());
 
         // draw(f000);
         // draw(f001);
@@ -175,6 +176,19 @@ struct MyApp : App {
         // draw(f101);
         // draw(f110);
         // draw(f111);
+
+        Mesh mesh = gfx::Mesh::Cone(1, 1, 20, 20);
+        mesh.drawElements();
+
+        draw(mTFrameBox.pbox.cl());
+        draw(mTFrameBox.pbox.cr());
+        draw(mTFrameBox.pbox.cf());
+        draw(mTFrameBox.pbox.cb());
+        draw(mTFrameBox.pbox.ct());
+        draw(mTFrameBox.pbox.cb());
+        draw(mTFrameBox.pbox.ck());
+
+
 
     }
 

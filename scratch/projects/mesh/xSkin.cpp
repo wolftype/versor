@@ -265,11 +265,7 @@ struct MyApp : App
   //Data To Graph
   vector<Point> pnts;
 
-  /*-----------------------------------------------------------------------------
-   *  Setup Variables
-   *-----------------------------------------------------------------------------*/
-  void setup ()
-  {
+ void onDrawGui() {
     ///Add Variables to GUI
     gui (amt, "amt", -100, 100);
     gui (iter, "iter", 0, 100);
@@ -287,7 +283,12 @@ struct MyApp : App
     gui (size, "size", -100, 100);
     gui (dist, "dist", -100, 100);
     gui (linewidth, "linewidth", 0, 10);
-
+}
+  /*-----------------------------------------------------------------------------
+   *  Setup Variables
+   *-----------------------------------------------------------------------------*/
+   void onSetup ()
+   {
     amt = 10;
     size = .5;
     dist = 0;

@@ -813,8 +813,11 @@ struct Euc{
     static GAPnt<A>
     split(const GAPar<A>& pp, bool bSecond){
 
-        VSR_PRECISION r = sqrt( fabs( ( pp <= pp )[0] ) );
+        VSR_PRECISION wt = ( pp <= pp )[0];
 
+        VSR_PRECISION r = sqrt( fabs(wt) );// * (wt>0 ? 1 : -1);
+
+        // Center
         auto d = GAInf<A>(-1) <= pp;
 
         GABst<A> bst = pp + ( bSecond ? r : -r );

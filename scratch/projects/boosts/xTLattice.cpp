@@ -62,7 +62,7 @@ struct MyApp : App {
     // Orient Pose towards an oscillating target
     // Use frame-rate independent time from GLFW
     double current_time = bPlay ? glfwGetTime() : 0.0;
-    
+
     Vec target(sin(current_time) * 10, 1, 1);
 
    // Draw(Round::null(target), 1, 0, 0, 1);
@@ -130,6 +130,8 @@ struct MyApp : App {
     // A) The Rubber Band around four fingers
     // B) What happens when two points are collapsed (triangular simplex)
     // C) The Stream.  The River.  What is this?
+
+
   }
 
   /*-----------------------------------------------------------------------------
