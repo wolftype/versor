@@ -8,6 +8,16 @@
 using namespace vsr::cga;
 using namespace gfx;
 
+// Face enum for bounding box deformation
+enum class Face {
+  Front,   // z=min
+  Back,    // z=max
+  Left,    // x=min
+  Right,   // x=max
+  Bottom,  // y=min
+  Top      // y=max
+};
+
 // Helper to compute and draw bounding box
 struct BoundingBox {
   Vec3f min, max;
@@ -62,15 +72,25 @@ struct BoundingBox {
   // Get 8 corner points in CRD bit order (x=bit0, y=bit1, z=bit2)
   vector<Vec3f> getCorners() const {
     return {
-      Vec3f(min[0], min[1], min[2]),  // 0: 000
-      Vec3f(max[0], min[1], min[2]),  // 1: 100
-      Vec3f(min[0], max[1], min[2]),  // 2: 010
-      Vec3f(max[0], max[1], min[2]),  // 3: 110
-      Vec3f(min[0], min[1], max[2]),  // 4: 001
-      Vec3f(max[0], min[1], max[2]),  // 5: 101
-      Vec3f(min[0], max[1], max[2]),  // 6: 011
-      Vec3f(max[0], max[1], max[2])   // 7: 111
+      Vec3f(min[0], min[1], min[2]),  // 0: 000 (o)
+      Vec3f(max[0], min[1], min[2]),  // 1: 100 (u)
+      Vec3f(min[0], max[1], min[2]),  // 2: 010 (v)
+      Vec3f(max[0], max[1], min[2]),  // 3: 110 (uv)
+      Vec3f(min[0], min[1], max[2]),  // 4: 001 (w)
+      Vec3f(max[0], min[1], max[2]),  // 5: 101 (uw)
+      Vec3f(min[0], max[1], max[2]),  // 6: 011 (vw)
+      Vec3f(max[0], max[1], max[2])   // 7: 111 (uvw)
     };
+  }
+
+  // Create TPointBox from bounding box corners
+  TPointBox toTPointBox() const {
+    auto corners = getCorners();
+    Point pnts[8];
+    for (int i = 0; i < 8; ++i) {
+      pnts[i] = Round::null(corners[i][0], corners[i][1], corners[i][2]);
+    }
+    return TPointBox(pnts);
   }
 
   // Draw wireframe box
@@ -116,6 +136,42 @@ struct BoundingBox {
   }
 };
 
+// Helper function to deform a TPointBox by applying boost through a face
+void deformTPointBox(TPointBox& tpbox, float amt, Face face) {
+  // Get circle from the specified face using TPointBox methods
+  Circle circle;
+  switch(face) {
+    case Face::Front:
+      circle = tpbox.cf();  // front circle
+      break;
+    case Face::Back:
+      circle = tpbox.ck();  // back circle (k for back)
+      break;
+    case Face::Left:
+      circle = tpbox.cl();  // left circle
+      break;
+    case Face::Right:
+      circle = tpbox.cr();  // right circle
+      break;
+    case Face::Bottom:
+      circle = tpbox.cb();  // bottom circle
+      break;
+    case Face::Top:
+      circle = tpbox.ct();  // top circle
+      break;
+  }
+
+  // Create boost generator from circle dual scaled by amount
+  Pair generator = circle.dual() * amt;
+  Bst K = Gen::bst(generator);
+
+  // Apply boost to all 8 corner points in place
+  for (int i = 0; i < 8; ++i) {
+    Point transformed = tpbox.p[i].spin(K);
+    tpbox.p[i] = Round::location(transformed);
+  }
+}
+
 struct MyApp : App
 {
   Mesh cone;
@@ -140,6 +196,21 @@ struct MyApp : App
   bool bShowBoundingBox = false;
   bool bApplyDeformation = false;
   float edgeResolution = 10;  // Number of segments per edge
+  bool bShowBaseFrame = true;
+  bool bShowCornerFrame = true;
+
+  // Mesh rendering options
+  enum class RenderMode { Smooth, Checkerbox };
+  RenderMode renderMode = RenderMode::Smooth;
+
+  // Face deformation amounts
+  float deformScale = 0.1;  // Global scale for all deformations
+  float deformFront = 0.0;
+  float deformBack = 0.0;
+  float deformLeft = 0.0;
+  float deformRight = 0.0;
+  float deformBottom = 0.0;
+  float deformTop = 0.0;
 
   // Build cone from circles using skinning
   Mesh buildCone(const Point& baseCenter, float width, float height, int stacks, int slices) {
@@ -273,27 +344,25 @@ struct MyApp : App
     glLineWidth(1);
   }
 
-  // Create TFrameBox from bounding box corners
+  // Create TFrameBox from bounding box corners with optional face deformations
   TFrameBox createTFrameBox(const BoundingBox& bbox) {
-    // Get bounding box corners as conformal points
-    auto corners = bbox.getCorners();
-    Point pnts[8] = {
-      Round::null(corners[0][0], corners[0][1], corners[0][2]),  // 000
-      Round::null(corners[1][0], corners[1][1], corners[1][2]),  // 100
-      Round::null(corners[2][0], corners[2][1], corners[2][2]),  // 010
-      Round::null(corners[3][0], corners[3][1], corners[3][2]),  // 110
-      Round::null(corners[4][0], corners[4][1], corners[4][2]),  // 001
-      Round::null(corners[5][0], corners[5][1], corners[5][2]),  // 101
-      Round::null(corners[6][0], corners[6][1], corners[6][2]),  // 011
-      Round::null(corners[7][0], corners[7][1], corners[7][2])   // 111
-    };
+    // Create TPointBox from bounding box
+    TPointBox tpbox = bbox.toTPointBox();
+
+    // Apply face deformations if any are non-zero (scaled by deformScale)
+    if (deformFront != 0.0) deformTPointBox(tpbox, deformFront * deformScale, Face::Front);
+    if (deformBack != 0.0) deformTPointBox(tpbox, deformBack * deformScale, Face::Back);
+    if (deformLeft != 0.0) deformTPointBox(tpbox, deformLeft * deformScale, Face::Left);
+    if (deformRight != 0.0) deformTPointBox(tpbox, deformRight * deformScale, Face::Right);
+    if (deformBottom != 0.0) deformTPointBox(tpbox, deformBottom * deformScale, Face::Bottom);
+    if (deformTop != 0.0) deformTPointBox(tpbox, deformTop * deformScale, Face::Top);
 
     // Move corner 111 based on cornerFrame
-    cornerFrame.pos() = pnts[7];
+    cornerFrame.pos() = tpbox.puvw();
 
-    // Create TFrameBox
-    Frame f111(pnts[7], cornerFrame.rotor());
-    return TFrameBox(f111, pnts);
+    // Create TFrameBox from deformed TPointBox
+    Frame f111(tpbox.puvw(), cornerFrame.rotor());
+    return TFrameBox(f111, tpbox.p);
   }
 
   // Apply TFrameBox deformation using bounding box corners and normalized coords
@@ -309,6 +378,24 @@ struct MyApp : App
       const Vec3f& uvw = bbox.coords[i];
       Point newPos = tbox.calcMap(uvw[0], uvw[1], uvw[2]);
       outputMesh[i].Pos = Vec3f(newPos[0], newPos[1], newPos[2]);
+    }
+
+    // Recalculate normals based on new positions (similar to Shape::Skin)
+    // For triangle strip topology, calculate normals from neighboring vertices
+    int res = (int)slices;
+    int num = (int)stacks;
+    for (int i = 0; i < res; ++i) {
+      for (int j = 0; j < num; ++j) {
+        int a = i * num + j;
+        int b = (i < (res - 1)) ? a + num : j;              // next col
+        int c = (i > 0) ? a - num : (res - 1) * num + j;    // prev col
+        int d = (j < (num - 1)) ? a + 1 : a;                // next row
+        int e = (j > 0) ? a - 1 : a;                        // prev row
+
+        Vec3f va = (outputMesh[b].Pos - outputMesh[c].Pos).cross(
+                    outputMesh[d].Pos - outputMesh[e].Pos).unit();
+        outputMesh[a].Norm = va;
+      }
     }
   }
 
@@ -336,11 +423,37 @@ struct MyApp : App
     gui(stacks, "stacks", 3, 50);
 
     // Display options
-    gui(bShowBoundingBox, "Show BBox");
+    ImGui::Separator();
+    ImGui::Text("Display Options");
+    gui(bShowBoundingBox, "Show BBox/Edges");
+    gui(bShowBaseFrame, "Show Base Frame");
+    gui(bShowCornerFrame, "Show Corner Frame");
+
+    // Render mode selection
+    ImGui::Text("Render Mode:");
+    if (ImGui::RadioButton("Smooth", renderMode == RenderMode::Smooth)) {
+      renderMode = RenderMode::Smooth;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Checkerbox", renderMode == RenderMode::Checkerbox)) {
+      renderMode = RenderMode::Checkerbox;
+    }
+
     gui(bApplyDeformation, "Apply Deformation");
 
     if (bApplyDeformation) {
       gui(edgeResolution, "Edge Resolution", 2, 50);
+
+      // Face deformation controls
+      ImGui::Separator();
+      ImGui::Text("Face Deformations");
+      gui(deformScale, "Deform Scale", 0.01, 1.0);
+      gui(deformFront, "Front", -0.5f, 0.5f);
+      gui(deformBack, "Back", -0.5f, 0.5f);
+      gui(deformLeft, "Left", -0.5f, 0.5f);
+      gui(deformRight, "Right", -0.5f, 0.5f);
+      gui(deformBottom, "Bottom", -0.5f, 0.5f);
+      gui(deformTop, "Top", -0.5f, 0.5f);
     }
 
     // Reset button
@@ -351,6 +464,8 @@ struct MyApp : App
       stacks = 20;
       cornerFrame.rotor() = Rot(1);
       baseFrame.rotor() = Rot(1);
+      deformScale = 0.1;
+      deformFront = deformBack = deformLeft = deformRight = deformBottom = deformTop = 0.0;
     }
   }
 
@@ -385,6 +500,7 @@ struct MyApp : App
     // Compute bounding box (with normalized coords)
     BoundingBox bbox = BoundingBox::fromMesh(cone);
 
+
     // Apply deformation if enabled
     Mesh* meshToDraw = &cone;
     TFrameBox* tboxPtr = nullptr;
@@ -397,36 +513,71 @@ struct MyApp : App
     }
 
     // Draw the cone (original or deformed)
-    glColor3f(0.3, 0.8, 1.0);
-    meshToDraw->drawElements();
+    if (renderMode == RenderMode::Smooth) {
+      // Smooth rendering - single color
+      glColor3f(0.3, 0.8, 1.0);
+      meshToDraw->drawElements();
+    } else if (renderMode == RenderMode::Checkerbox) {
+      // Checkerbox pattern - handle triangle strip topology
+      // Shape::Skin generates GL_TRIANGLE_STRIP, not individual triangles
+      glBegin(GL_TRIANGLES);
+      bool bC = true;   // Color state
+      bool bS = false;  // Toggle state
 
-    // Draw the base frame for reference
-    Draw(baseFrame, 0.5);
+      int numIndices = meshToDraw->numIdx();
+      // Triangle strip: each new index forms a triangle with previous 2
+      for (int i = 0; i < numIndices - 2; ++i) {
+        // Set color based on current state
+        glColor3f(bC ? 0.3 : 0.1, bC ? 0.5 : 0.2, bC ? 1.0 : 0.5);
 
-    // Draw corner frame if deformation is enabled
-    if (bApplyDeformation) {
+        // In triangle strip, every 3 consecutive indices form a triangle
+        // But winding order alternates, so we need to handle that
+        int idx0 = meshToDraw->indices()[i];
+        int idx1 = meshToDraw->indices()[i + 1];
+        int idx2 = meshToDraw->indices()[i + 2];
+
+        // Triangle strips alternate winding order
+        if (i % 2 == 0) {
+          // Even triangles: normal order
+          GL::normal((*meshToDraw)[idx0].Norm);
+          GL::vertex((*meshToDraw)[idx0].Pos);
+          GL::normal((*meshToDraw)[idx1].Norm);
+          GL::vertex((*meshToDraw)[idx1].Pos);
+          GL::normal((*meshToDraw)[idx2].Norm);
+          GL::vertex((*meshToDraw)[idx2].Pos);
+        } else {
+          // Odd triangles: reverse order to maintain consistent winding
+          GL::normal((*meshToDraw)[idx0].Norm);
+          GL::vertex((*meshToDraw)[idx0].Pos);
+          GL::normal((*meshToDraw)[idx2].Norm);
+          GL::vertex((*meshToDraw)[idx2].Pos);
+          GL::normal((*meshToDraw)[idx1].Norm);
+          GL::vertex((*meshToDraw)[idx1].Pos);
+        }
+
+        // Update state for next triangle (GraphUtil logic)
+        if (bS) bC = !bC;
+        bS = !bS;
+      }
+      glEnd();
+    }
+
+    // Draw the base frame if visible
+    if (bShowBaseFrame) {
+      Draw(baseFrame, 0.5);
+    }
+
+    // Draw corner frame if deformation is enabled and visible
+    if (bApplyDeformation && bShowCornerFrame) {
       Draw(cornerFrame, 0.5);
     }
 
-    // Highlight base circle
-    Circle baseCircle = Construct::circle(baseCenter, Biv::xz, width / 2.0);
-    glLineWidth(2);
-    Draw(baseCircle, 1.0, 0.5, 0.2);  // Orange
-    glLineWidth(1);
-
-    // Draw apex point
-    Vec basePos = Vec(baseCenter);
-    Point apex = Round::null(basePos[0], basePos[1] + height, basePos[2]);
-    glPointSize(8);
-    Draw(apex, 1.0, 0.0, 0.0);  // Red
-    glPointSize(1);
-
-    // Draw bounding box or TFrameBox edges
-    if (cone.num() > 0) {
+    // Draw bounding box or TFrameBox edges if enabled
+    if (bShowBoundingBox && cone.num() > 0) {
       if (bApplyDeformation && tboxPtr) {
         // Draw TFrameBox edges using calcMap sampling
         drawTFrameBoxEdges(*tboxPtr, (int)edgeResolution, 1.0, 1.0, 0.0);  // Yellow
-      } else if (bShowBoundingBox) {
+      } else {
         // Draw regular bounding box
         bbox.draw(1.0, 1.0, 0.0, 0.8);        // Yellow wireframe
         bbox.drawCorners(1.0, 0.0, 1.0, 6.0); // Magenta corner points
