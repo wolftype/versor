@@ -1,5 +1,5 @@
+#include "Common.h"
 #include <gtest/gtest.h>
-#include <tests/Common.h>
 #include <vsr/detail/vsr_multivector.h>
 #include <vsr/detail/vsr_generic_op.h>
 

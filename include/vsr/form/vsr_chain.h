@@ -23,6 +23,7 @@
 
 #include <map>
 #include <string>
+#include <cstring>
 
 namespace vsr{ namespace cga {
 
