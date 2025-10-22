@@ -194,7 +194,7 @@ namespace vsr{
 
       /// Reversion \\(\\tilde{A}\\)
       Multivector operator ~() const {
-        return Reverse< basis >::Type::template Make(*this) ;
+        return Reverse< basis >::Type::template Make<Multivector>(*this) ;
       }
 
       /// Inversion \\(\\tilde{A}/A\\tilde{A}\\)
@@ -448,11 +448,11 @@ Multivector<Algebra,B> Multivector<Algebra,B>::yz = Multivector<Algebra,B>().tem
  *-----------------------------------------------------------------------------*/
 template<typename Algebra, typename B>
 Multivector<Algebra,B> Multivector<Algebra,B>::conjugation() const{
-	return Conjugate<B>::Type::template Make(*this);
+	return Conjugate<B>::Type::template Make<Multivector>(*this);
 }
 template<typename Algebra, typename B>
 Multivector<Algebra,B> Multivector<Algebra,B>::involution() const{
-	return Involute<B>::Type::template Make(*this);
+	return Involute<B>::Type::template Make<Multivector>(*this);
 }
 
 

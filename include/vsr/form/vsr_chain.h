@@ -22,7 +22,7 @@
 #include <vsr/form/vsr_rigid.h>
 
 #include <map>
-#include <string>
+#include <cstring>
 
 namespace vsr{ namespace cga {
 
