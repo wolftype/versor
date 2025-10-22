@@ -304,7 +304,7 @@ endif ()
 
 # The targets that we install.
 install(TARGETS ${_install_targets}
-  EXPORT VersorTargets
+  EXPORT versorTargets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -319,32 +319,32 @@ endforeach()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Export targets for install-tree.
-install(EXPORT VersorTargets
+install(EXPORT versorTargets
   NAMESPACE versor::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Versor
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/versor
 )
 
 # Also export for build-tree (optional but handy for superbuilds).
-export(EXPORT VersorTargets
+export(EXPORT versorTargets
   NAMESPACE versor::
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/VersorTargets.cmake"
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/versorTargets.cmake"
 )
 
-# Generate and install VersorConfig.cmake and VersorConfigVersion.cmake.
+# Generate and install versorConfig.cmake and versorConfigVersion.cmake.
 configure_package_config_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/VersorConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/VersorConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Versor"
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/versorConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/versorConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/versor"
 )
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/VersorConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/versorConfigVersion.cmake"
   VERSION "${PROJECT_VERSION}"
   COMPATIBILITY SameMajorVersion
 )
 
 install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/VersorConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/VersorConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Versor"
+  "${CMAKE_CURRENT_BINARY_DIR}/versorConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/versorConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/versor"
 )
