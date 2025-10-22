@@ -128,6 +128,12 @@ To build library
 
 	./build.sh
 
+Run
+
+    ./build.sh --help
+
+for a list of possible options.
+
 To build library and examples:
 
 	./build.sh --examples
@@ -146,7 +152,13 @@ You can add your own file to the list of targets by adding it to /examples or sc
 
 INSTALLATION
 ---
-Hmmm, haven't added install options yet!  Will do so soon I promise.
+
+To configure, build and install the project you can run for example:
+
+    ./build.sh --install -j 8
+
+This will run `sudo cmake --install`, after configuration and building, and currently installs with prefix /usr/local.
+Please use cmake directly if you need a different prefix.
 
 Use Cases
 ---
