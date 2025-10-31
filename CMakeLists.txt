@@ -86,7 +86,6 @@ endif()
 
 
 #project include directories
-include_directories(BEFORE ${PROJECT_SOURCE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
 #CORE TEST TARGETS -- all files in tests get built to test math library functionality

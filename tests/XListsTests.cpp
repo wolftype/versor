@@ -1,5 +1,5 @@
+#include "Common.h"
 #include <gtest/gtest.h>
-#include <tests/Common.h>
 #include <vsr/detail/vsr_xlists.h>
 
 using namespace vsr;
