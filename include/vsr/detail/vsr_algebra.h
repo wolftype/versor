@@ -210,7 +210,7 @@ namespace vsr {
            typedef gp_basis_t<typename B::basis, typename A::basis > tmp_basis;
            //............................................lh...........rh.................return type
            using x = typename impl::template rot_arrow_t<tmp_basis, typename B::basis, typename A::basis>;
-           return x::Arrow::template Make<A>( gp(b, a), Reverse<typename B::basis>::Type::template Make(b) );
+           return x::Arrow::template Make<A>( gp(b, a), Reverse<typename B::basis>::Type::template Make<B>(b) );
          }
 
          /// Reflect a by b, return type a
@@ -218,7 +218,7 @@ namespace vsr {
          static constexpr A reflect(const A& a, const B& b) {
           typedef gp_basis_t<typename B::basis, typename A::basis > tmp_basis;
           using x = typename impl::template rot_arrow_t<tmp_basis, typename B::basis, typename A::basis>;
-          return x::Arrow::template Make<A>( gp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make(b) );
+          return x::Arrow::template Make<A>( gp(b, a.involution() ), Reverse<typename B::basis>::Type::template Make<B>(b) );
          }
 
           /// make a type from sum of basis B1 and B2
