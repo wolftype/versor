@@ -104,7 +104,7 @@ cd into glew folder:
 
 or clone from current repos:
 
-	git clone git://glew.git.sourceforge.net/gitroot/glew/glew
+	git clone https://github.com/nigels-com/glew.git glew
 	cd glew
 	make extensions
 	sudo make install
